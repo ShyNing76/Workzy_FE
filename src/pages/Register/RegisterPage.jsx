@@ -1,6 +1,8 @@
 import {useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import registerImage from "/src/assets/registerImage.jpg"
+import "./register.scss"
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const RegisterPage = () => {
 
@@ -21,6 +23,18 @@ const RegisterPage = () => {
         setFlag(false);
         console.log("Submit data: ", email, password, name)
         navigate("/login")
+    }
+
+    // Show password
+    const [showPassword, setShowPassword] = useState(false);
+    const handleShowPassword = () => {
+        setShowPassword( !showPassword)
+    }
+
+    // Show confirm password
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const handleShowConfirmPassword = () => {
+        setShowConfirmPassword( !showConfirmPassword)
     }
 
     return (
@@ -73,25 +87,37 @@ const RegisterPage = () => {
                             </div>
                             <div className="form-control mt-4">
                                 <label className="label">Password</label>
-                                <input
-                                    type="password"
-                                    className="input input-bordered w-full"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Enter your password"
-                                    required
-                                />
+                                <div className="password-container">
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        className="input input-bordered w-full password-input"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        placeholder="Enter your password"
+                                        required
+                                    />
+                                    {
+                                        showPassword ?<FaEyeSlash className="eye-icon" onClick={handleShowPassword}/>  : <FaEye className="eye-icon" onClick={handleShowPassword} />
+                                    }
+                                </div>
+
                             </div>
                             <div className="form-control mt-4">
                                 <label className="label">Confirm Password</label>
-                                <input
-                                    type="password"
-                                    className="input input-bordered w-full"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    placeholder="Confirm your password"
-                                    required
-                                />
+                                <div className="password-container">
+                                    <input
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        className="input input-bordered w-full password-input"
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        placeholder="Confirm your password"
+                                        required
+                                    />
+                                    {
+                                        showConfirmPassword ?<FaEyeSlash className="eye-icon" onClick={handleShowConfirmPassword}/>  : <FaEye className="eye-icon" onClick={handleShowConfirmPassword} />
+                                    }
+                                </div>
+
                             </div>
                             <button type="submit" className="btn btn-neutral w-full mt-6">
                                 Register

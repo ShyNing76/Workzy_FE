@@ -1,6 +1,8 @@
 import {Link, useNavigate} from "react-router-dom";
 import {useState} from "react";
 import loginImage from "/src/assets/loginImage.jpg"
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import "./loginPage.scss"
 
 const LoginPage = () => {
 
@@ -12,6 +14,12 @@ const LoginPage = () => {
         e.preventDefault()
         console.log("Submit data: ", email, password);
         navigate("/")
+    }
+
+    // Show password
+    const [showPassword, setShowPassword] = useState(false);
+    const handleShowPassword = () => {
+        setShowPassword( !showPassword)
     }
 
     return (
@@ -38,14 +46,21 @@ const LoginPage = () => {
                             </div>
                             <div className="form-control mt-4">
                                 <label className="label">Password</label>
-                                <input
-                                    type="password"
-                                    className="input input-bordered w-full"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Enter your password"
-                                    required
-                                />
+                                <div className="password-container">
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        className="input input-bordered w-full password-input"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        placeholder="Enter your password"
+                                        required
+                                    />
+                                    {
+                                        showPassword ?<FaEyeSlash className="eye-icon" onClick={handleShowPassword}/>  : <FaEye className="eye-icon" onClick={handleShowPassword} />
+                                    }
+
+                                </div>
+
                                 <label className="label">
                                     <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
                                 </label>
