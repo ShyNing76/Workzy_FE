@@ -1,143 +1,158 @@
-import {useState} from "react";
-import {Link, useNavigate} from "react-router-dom";
-import registerImage from "/src/assets/registerImage.jpg"
-import "./register.scss"
+import { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import registerImage from "/src/assets/registerImage.jpg";
+import "./register.scss";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { toast, ToastContainer } from "react-toastify";
+import { registerApi } from "../../config/api";
+import { AuthContext } from "../../components/context/auth.context";
 
 const RegisterPage = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [name, setName] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [flag, setFlag] = useState(false)
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
+  //   Check Authentication
+  const { setAuth } = useContext(AuthContext);
 
-    const handleRegister = (e) => {
-        e.preventDefault();
-        if (password !== confirmPassword) {
-            setFlag(true);
-            return;
-        }
-        setFlag(false);
-        console.log("Submit data: ", email, password, name)
-        navigate("/login")
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      toast.error("Password does not match!!!");
+      return;
     }
 
-    // Show password
-    const [showPassword, setShowPassword] = useState(false);
-    const handleShowPassword = () => {
-        setShowPassword( !showPassword)
+    const res = await registerApi(name, email, password);
+
+    if (res && res.err === 1) {
+      localStorage.setItem("access_token", res.accessToken);
+      setAuth({
+        isAuthenticated: true,
+      });
+      navigate("/");
+    } else {
+      toast.error(res.message);
+      setEmail("");
+      setPassword("");
+      setName("");
+      setConfirmPassword("");
     }
+  };
 
-    // Show confirm password
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const handleShowConfirmPassword = () => {
-        setShowConfirmPassword( !showConfirmPassword)
-    }
+  // Show password
+  const [showPassword, setShowPassword] = useState(false);
+  const handleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
 
-    return (
-        <>
-            <div className="flex justify-center items-center h-screen bg-gray-100">
-                <div className="flex w-full max-w-4xl bg-white shadow-md rounded-md overflow-hidden h-auto">
-                    <div className="w-full max-w-md p-8 space-y-4 bg-white shadow-md rounded-md">
-                        {
-                            flag &&
-                            <div role="alert" className="alert alert-error">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-6 w-6 shrink-0 stroke-current"
-                                    fill="none"
-                                    viewBox="0 0 24 24">
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                <span>Passwords do not match!</span>
-                            </div>
-                        }
+  // Show confirm password
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const handleShowConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
+  return (
+    <>
+      <ToastContainer />
 
-                        <h2 className="text-2xl font-bold text-center">Register</h2>
-                        <form onSubmit={handleRegister}>
-                            <div className="form-control">
-                                <label className="label">Name</label>
-                                <input
-                                    type="text"
-                                    className="input input-bordered w-full"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    placeholder="Enter your name"
-                                    required
-                                />
-                            </div>
-                            <div className="form-control mt-4">
-                                <label className="label">Email</label>
-                                <input
-                                    type="email"
-                                    className="input input-bordered w-full"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="Enter your email"
-                                    required
-                                />
-                            </div>
-                            <div className="form-control mt-4">
-                                <label className="label">Password</label>
-                                <div className="password-container">
-                                    <input
-                                        type={showPassword ? "text" : "password"}
-                                        className="input input-bordered w-full password-input"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        placeholder="Enter your password"
-                                        required
-                                    />
-                                    {
-                                        showPassword ?<FaEyeSlash className="eye-icon" onClick={handleShowPassword}/>  : <FaEye className="eye-icon" onClick={handleShowPassword} />
-                                    }
-                                </div>
-
-                            </div>
-                            <div className="form-control mt-4">
-                                <label className="label">Confirm Password</label>
-                                <div className="password-container">
-                                    <input
-                                        type={showConfirmPassword ? "text" : "password"}
-                                        className="input input-bordered w-full password-input"
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                        placeholder="Confirm your password"
-                                        required
-                                    />
-                                    {
-                                        showConfirmPassword ?<FaEyeSlash className="eye-icon" onClick={handleShowConfirmPassword}/>  : <FaEye className="eye-icon" onClick={handleShowConfirmPassword} />
-                                    }
-                                </div>
-
-                            </div>
-                            <button type="submit" className="btn btn-neutral w-full mt-6">
-                                Register
-                            </button>
-                        </form>
-                        <p className="text-center">
-                            Already have an account?{' '}
-                            <Link to="/login" className="text-black-500 font-bold">Login</Link>
-                        </p>
-                    </div>
-
-                    <div className="hidden md:flex w-1/2">
-                        <img src={registerImage} alt="Register Illustration" className="object-cover w-full h-full"/>
-                    </div>
+      <div className="flex justify-center items-center h-screen bg-gray-100">
+        <div className="flex w-full max-w-4xl bg-white shadow-md rounded-md overflow-hidden h-auto">
+          <div className="w-full max-w-md p-8 space-y-4 bg-white shadow-md rounded-md">
+            <h2 className="text-2xl font-bold text-center">Register</h2>
+            <form onSubmit={handleRegister}>
+              <div className="form-control">
+                <label className="label">Name</label>
+                <input
+                  type="text"
+                  className="input input-bordered w-full"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter your name"
+                  required
+                />
+              </div>
+              <div className="form-control mt-4">
+                <label className="label">Email</label>
+                <input
+                  type="email"
+                  className="input input-bordered w-full"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  required
+                />
+              </div>
+              <div className="form-control mt-4">
+                <label className="label">Password</label>
+                <div className="password-container">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    className="input input-bordered w-full password-input"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    required
+                  />
+                  {showPassword ? (
+                    <FaEyeSlash
+                      className="eye-icon"
+                      onClick={handleShowPassword}
+                    />
+                  ) : (
+                    <FaEye className="eye-icon" onClick={handleShowPassword} />
+                  )}
                 </div>
-            </div>
+              </div>
+              <div className="form-control mt-4">
+                <label className="label">Confirm Password</label>
+                <div className="password-container">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    className="input input-bordered w-full password-input"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirm your password"
+                    required
+                  />
+                  {showConfirmPassword ? (
+                    <FaEyeSlash
+                      className="eye-icon"
+                      onClick={handleShowConfirmPassword}
+                    />
+                  ) : (
+                    <FaEye
+                      className="eye-icon"
+                      onClick={handleShowConfirmPassword}
+                    />
+                  )}
+                </div>
+              </div>
+              <button type="submit" className="btn btn-neutral w-full mt-6">
+                Register
+              </button>
+            </form>
+            <p className="text-center">
+              Already have an account?{" "}
+              <Link to="/login" className="text-black-500 font-bold">
+                Login
+              </Link>
+            </p>
+          </div>
 
+          <div className="hidden md:flex w-1/2">
+            <img
+              src={registerImage}
+              alt="Register Illustration"
+              className="object-cover w-full h-full"
+            />
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
 
-        </>
-    )
-}
-
-export default RegisterPage
+export default RegisterPage;
