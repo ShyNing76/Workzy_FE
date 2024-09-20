@@ -1,0 +1,32 @@
+.service-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0rem; /* Giảm margin để có không gian hơn trong lưới */
+    margin-left: 25%;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    text-align: center;
+    /* Điều chỉnh width để fit trong lưới */
+    height: 200px;
+    width: 50%; /* Để phù hợp với các thiết lập của lưới trong HTML */
+    box-sizing: border-box; /* Đảm bảo padding và border được tính trong kích thước tổng */
+    
+    .description-icon {
+        align-items: center;
+        font-size: 30px;
+        margin-left: 15px;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    p {
+        font-size: 1rem;
+        color: #555;
+    }
+}
