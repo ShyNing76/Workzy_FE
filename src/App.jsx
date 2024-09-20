@@ -18,10 +18,12 @@ function App() {
           isAuthenticated: true,
         });
       }
+
       setAppLoading(false);
     };
 
     fetchAccount();
+    setAppLoading(false);
   }, []);
 
   return (

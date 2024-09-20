@@ -18,8 +18,6 @@ const Navbar = () => {
     });
   };
 
-  console.log("check auth: ", auth);
-
   return (
     <div className="navbar bg-base-100 shadow-lg">
       <div className="ml-4 navbar-start">

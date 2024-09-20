@@ -1,13 +1,13 @@
-.password-container{
+.password-container {
   position: relative;
   width: 100%;
 
-  .password-input{
+  .password-input {
     width: 100%;
     padding-right: 40px;
   }
 
-  .eye-icon{
+  .eye-icon {
     position: absolute;
     right: 15px;
     top: 50%;
@@ -15,9 +15,8 @@
     cursor: pointer;
     font-size: 20px;
 
-    &:hover{
+    &:hover {
       color: #8e8e8e;
     }
   }
-
 }

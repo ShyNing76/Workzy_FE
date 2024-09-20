@@ -22,7 +22,7 @@ const registerApi = (name, email, password) => {
 };
 
 const getUserAuthen = () => {
-  const URL_API = "api/v1/users";
+  const URL_API = "api/v1/customer/profile";
 
   return axios.get(URL_API);
 };

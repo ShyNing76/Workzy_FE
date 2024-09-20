@@ -13,13 +13,13 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   //   Check Authentication
-  const { setAuth } = useContext(AuthContext);
+  const { setAuth, appLoading, setAppLoading } = useContext(AuthContext);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const res = await loginApi(email, password);
+    setAppLoading(true);
 
-    console.log("Check res: ", res);
+    const res = await loginApi(email, password);
 
     if (res && res.err === 1) {
       localStorage.setItem("access_token", res.accessToken);
@@ -32,6 +32,8 @@ const LoginPage = () => {
       setEmail("");
       setPassword("");
     }
+
+    setAppLoading(false);
   };
 
   // Show password
@@ -94,9 +96,18 @@ const LoginPage = () => {
                   </a>
                 </label>
               </div>
-              <button type="submit" className="btn btn-neutral w-full mt-6">
-                Login
-              </button>
+
+              {!appLoading ? (
+                <button type="submit" className="btn btn-neutral w-full mt-6">
+                  Login
+                </button>
+              ) : (
+                <button className="btn btn-neutral w-full mt-6">
+                  <span className="loading loading-spinner"></span>
+                  loading
+                </button>
+              )}
+
               <div className="divider">OR</div>
               <button className="btn w-full">Login With Google</button>
             </form>
