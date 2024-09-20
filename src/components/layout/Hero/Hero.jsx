@@ -7,7 +7,7 @@ const Hero = (props) => {
 
   return (
     <div className="hero-container flex flex-col md:flex-row justify-between items-center md:items-start md:space-x-8 p-8">
-      {/* Thông tin bên trái */}
+      
       <div className="hero-detail-container w-full md:w-1/2">
         <h2 className="text-4xl font-bold mb-4 leading-tight">{title}</h2>
         <p className="text-lg mb-6 text-gray-600">{details}</p>
@@ -21,7 +21,7 @@ const Hero = (props) => {
         </div>
       </div>
       
-      {/* Hình ảnh bên phải */}
+      
       <div className="w-full md:w-1/2">
         <img
           src={image}
