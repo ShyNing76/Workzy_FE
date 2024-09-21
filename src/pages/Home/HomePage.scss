@@ -1,0 +1,6 @@
+.service-card-container {
+    display: flex;
+    //flex-wrap: wrap; // Cho phép card xuống hàng nếu không còn đủ chỗ
+    justify-content: space-between; // Căn đều các card
+    gap: 1rem; // Khoảng cách giữa các card
+}
