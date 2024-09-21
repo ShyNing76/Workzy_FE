@@ -40,7 +40,7 @@ const Navbar = () => {
           </div>
           <ul
             tabIndex={0}
-            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[10] mt-3 w-52 p-2 shadow"
           >
             <li>
               <details>
@@ -83,7 +83,7 @@ const Navbar = () => {
 
             <ul
               tabIndex={0}
-              className="dropdown-content menu bg-base-100 rounded-box z-[1] w-44 p-2 shadow"
+              className="dropdown-content menu bg-base-100 rounded-box z-[10] w-44 p-2 shadow"
             >
               <li>
                 <Link to="/services/service1">Services 1</Link>
@@ -113,7 +113,7 @@ const Navbar = () => {
           </div>
           <ul
             tabIndex={0}
-            className="dropdown-content  menu bg-base-100 rounded-box z-[1] w-32 p-2 shadow"
+            className="dropdown-content  menu bg-base-100 rounded-box z-[10] w-32 p-2 shadow"
           >
             <li>
               <a>Vietnamese</a>
@@ -138,7 +138,7 @@ const Navbar = () => {
               </div>
               <ul
                 tabIndex={0}
-                className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] w-48 p-2 shadow "
+                className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[10] w-48 p-2 shadow "
               >
                 <li>
                   <a>Profile</a>
@@ -185,7 +185,7 @@ const Navbar = () => {
               </div>
               <ul
                 tabIndex={1}
-                className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] w-80 p-2 shadow"
+                className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[10] w-80 p-2 shadow"
               >
                 <li>
                   <Notification

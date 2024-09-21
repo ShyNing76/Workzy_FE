@@ -46,7 +46,7 @@ const OfficeLocations = () => {
 
   return (
     <div className="flex p-8 mx-10 ">
-      <div className="w-1/2 mr-5">
+      <div className="w-1/2 mr-10">
         {offices.map((office, index) => (
           <div key={index} className="mb-8">
             <h2 className="text-2xl font-bold mb-4">{office.city}</h2>
@@ -57,9 +57,9 @@ const OfficeLocations = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   onMouseEnter={() => setHoveredLocation(location)}
-                  className="flex items-center text-lg hover:text-neutral-800 font-semibold hover:underline transition duration-300 ease-in-out transform py-2 px-4 bg-gray-100 rounded-lg shadow-md hover:shadow-lg"
+                  className="flex items-center text-lg hover:text-neutral-800 font-semibold hover:underline transition duration-300 ease-in-out transform py-2 px-4 rounded-lg "
                 >
-                  <FaLocationDot className="mr-2 fontw" />
+                  <FaLocationDot className="mr-4 " />
                   {location.name}: {location.address}
                 </a>
               </div>
