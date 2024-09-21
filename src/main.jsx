@@ -14,6 +14,7 @@ import ContactPage from "./pages/Contact/ContactPage.jsx";
 import { AuthWrapper } from "./components/context/auth.context.jsx";
 
 const router = createBrowserRouter([
+  // Customer
   {
     path: "/",
     element: <App />,
@@ -50,10 +51,13 @@ const router = createBrowserRouter([
       },
     ],
   },
+  // Regiser
   {
     path: "register",
     element: <RegisterPage />,
   },
+
+  // Login
   {
     path: "login",
     element: <LoginPage />,

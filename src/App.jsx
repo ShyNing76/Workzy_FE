@@ -23,7 +23,6 @@ function App() {
     };
 
     fetchAccount();
-    setAppLoading(false);
   }, []);
 
   return (
