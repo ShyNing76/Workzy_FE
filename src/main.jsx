@@ -12,6 +12,9 @@ import LocationPage from "./pages/Location/LocationPage.jsx";
 import AboutPage from "./pages/About/AboutPage.jsx";
 import ContactPage from "./pages/Contact/ContactPage.jsx";
 import { AuthWrapper } from "./components/context/auth.context.jsx";
+import MainPage from "./pages/Staff/MainPage/MainPage.jsx";
+import BuildingRoomPage from "./pages/Staff/BuildingRoom/BuildingRoomPage.jsx";
+import BookingsPage from "./pages/Staff/Bookings/BookingsPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -58,6 +61,27 @@ const router = createBrowserRouter([
     path: "login",
     element: <LoginPage />,
   },
+  {
+    path: "staff",
+    element: <MainPage />,
+
+    children: [
+      {
+        index: true,
+        element: <MainPage />,
+      },
+      {
+        path: "buildingRoom",
+        element: <BuildingRoomPage />,
+      },
+      {
+        path: "bookings",
+        element: <BookingsPage />,
+    }
+    
+    ],
+  }
+  
 ]);
 
 createRoot(document.getElementById("root")).render(
