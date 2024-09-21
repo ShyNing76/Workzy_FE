@@ -13,11 +13,11 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   //   Check Authentication
-  const { setAuth, appLoading, setAppLoading } = useContext(AuthContext);
+  const { setAuth, loginLoading, setLoginLoading } = useContext(AuthContext);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setAppLoading(true);
+    setLoginLoading(true);
 
     const res = await loginApi(email, password);
 
@@ -33,7 +33,7 @@ const LoginPage = () => {
       setPassword("");
     }
 
-    setAppLoading(false);
+    setLoginLoading(false);
   };
 
   // Show password
@@ -97,7 +97,7 @@ const LoginPage = () => {
                 </label>
               </div>
 
-              {!appLoading ? (
+              {!loginLoading ? (
                 <button type="submit" className="btn btn-neutral w-full mt-6">
                   Login
                 </button>

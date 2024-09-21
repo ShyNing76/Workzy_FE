@@ -16,11 +16,12 @@ const RegisterPage = () => {
   const navigate = useNavigate();
 
   //   Check Authentication
-  const { setAuth, appLoading, setAppLoading } = useContext(AuthContext);
+  const { setAuth, registerLoading, setRegisterLoading } =
+    useContext(AuthContext);
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setAppLoading(true);
+    setRegisterLoading(true);
 
     if (password !== confirmPassword) {
       toast.error("Password does not match!!!");
@@ -44,7 +45,7 @@ const RegisterPage = () => {
       setConfirmPassword("");
     }
 
-    setAppLoading(false);
+    setRegisterLoading(false);
   };
 
   // Show password
@@ -136,7 +137,7 @@ const RegisterPage = () => {
                 </div>
               </div>
 
-              {!appLoading ? (
+              {!registerLoading ? (
                 <button type="submit" className="btn btn-neutral w-full mt-6">
                   Register
                 </button>
