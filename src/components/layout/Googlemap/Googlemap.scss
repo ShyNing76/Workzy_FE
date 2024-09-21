@@ -1,7 +1,9 @@
 .container-googlemap {
-    padding: 20px;
-    margin-top: 50px;
-    //background-color: #f8f9fa;
+    padding: 20px;   
+    background-color: #ebf1f8;
+    border-radius: 50px;
+    margin: 7rem 7rem 7rem 7rem;
+   
   
     .container-contact {
       text-align: center;
@@ -13,16 +15,14 @@
       p {
         font-size: 1.5rem;
         margin-top: 30px;
-        text-align: center;
-        font-weight: bolder;
-        
+        text-align: center;        
       }
     }
   
     .container-map {
       iframe {
-        border-radius: 20px;
-        margin-left: 150px;
+        border-color: #d1e3f8;
+        border-radius: 20px;     
         width: 80%; 
         height: 400px; 
         

@@ -19,7 +19,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5); // Màu xám với độ trong suốt
+        background-color: rgba(0, 0, 0, 0.4); // Màu xám với độ trong suốt
         z-index: 1; // Đảm bảo lớp phủ nằm trên hình nền nhưng dưới nội dung
       }
     
@@ -34,9 +34,7 @@
         margin-bottom: 2.5rem;
         color: #ffffff;
         text-shadow: 
-          3px 3px 0 #000000, /* Bóng đen */
-          6px 6px 0 #000000, /* Bóng đen sâu hơn */
-          9px 9px 0 #000000; /* Bóng đen sâu nhất */
+          3px 3px 3px  #000000, 
       }
 
     h2 {

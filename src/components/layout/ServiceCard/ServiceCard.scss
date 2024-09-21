@@ -9,17 +9,18 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     background-color: #fff;
     text-align: center;  
-    height: 200px;
+    height: 15rem;
     width: 50%; 
     box-sizing: border-box;
     &:hover {     
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 1);      
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);      
         cursor: pointer;
     }     
     .description-icon {
-        align-items: center;
+        display: flex;
+        justify-content:center ;
         font-size: 30px;
-        margin-left: 15px;
+        
     }
 
     h3 {

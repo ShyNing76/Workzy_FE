@@ -50,8 +50,7 @@ const HomePage = () => {
 
             <div>
                 <Googlemap
-                    src = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.0709101923308!2d106.77992101092796!3d10.88221128922828!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3174d89aad780e49%3A0x54542761d4c22175!2zS8O9IHTDumMgeMOhIEtodSBCIC0gxJDhuqFpIGjhu41jIFF14buRYyBnaWEgVFAuSENN!5e0!3m2!1svi!2s!4v1726835740160!5m2!1svi!2s"
-                    
+                    src = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.0709101923308!2d106.77992101092796!3d10.88221128922828!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3174d89aad780e49%3A0x54542761d4c22175!2zS8O9IHTDumMgeMOhIEtodSBCIC0gxJDhuqFpIGjhu41jIFF14buRYyBnaWEgVFAuSENN!5e0!3m2!1svi!2s!4v1726835740160!5m2!1svi!2s"                   
                 />
             </div>
         </>
