@@ -1,6 +1,7 @@
 import aboutFrontImg from "../../assets/about-us.png";
 import aboutUs1 from "../../assets/about-us-1.jpg";
 import aboutUs2 from "../../assets/about-us-2.png";
+import parners from "../../assets/partners.png";
 
 import Card from "../../components/layout/About/Card/Card";
 import "./AboutPage.scss";
@@ -102,7 +103,14 @@ const aboutPage = () => {
         </div>
       </div>
 
-      <div className="about-parners-container"></div>
+      <div className="about-parners-container">
+        <div className="about-parners-tittle">
+          <span>Parners of</span> WORKZY
+        </div>
+        <div className="about-parners-img">
+          <img src={parners} alt="" />
+        </div>
+      </div>
     </>
   );
 };
