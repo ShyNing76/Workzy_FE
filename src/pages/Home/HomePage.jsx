@@ -101,19 +101,22 @@ const HomePage = () => {
       </div>
 
       {/* Swiper and Info Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-8">
+      <div className="flex justify-between items-center w-full mx-auto max-w-7xl space-x-8 my-16">
         {/* Swiper (Left Side) */}
-        <div className="container-slide">
-          <h1>Explore Workzy's services</h1>
+        <div className="container-slide w-1/2 flex flex-col justify-center items-center">
+          <h1 className="text-3xl font-bold text-center">
+            Explore Workzy's services
+          </h1>
           <Slide slides={swiperSlides} />
         </div>
 
         {/* Information (Right Side) */}
-        <div className="info-container flex flex-col justify-center items-start text-left">
-          <h2 className="text-2xl font-bold mb-4">
+        <div className="info-container w-1/2 flex flex-col justify-center items-center">
+          <h2 className="text-2xl font-bold text-center">
             Offices in central districts
           </h2>
-          <div className="service-detail-container grid grid-cols-2 gap-4">
+
+          <div className="service-detail-container grid grid-cols-2 gap-4 p-6">
             <Servicedetail Icon={FaLocationArrow} detail="Strategic location" />
             <Servicedetail Icon={FaCoins} detail="Cost optimization" />
             <Servicedetail
@@ -141,10 +144,7 @@ const HomePage = () => {
               detail="Mail delivery service"
             />
             <Servicedetail Icon={AiFillPrinter} detail="Printing services" />
-            <Servicedetail
-              Icon={FaPhone}
-              detail="Dedicated phone line (fees, terms and conditions apply)"
-            />
+            <Servicedetail Icon={FaPhone} detail="Dedicated phone line" />
           </div>
         </div>
       </div>
