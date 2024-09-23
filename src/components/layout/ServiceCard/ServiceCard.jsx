@@ -1,13 +1,13 @@
 import React from 'react'
 import './ServiceCard.scss'
-import { BsPersonFill } from "react-icons/bs";
+
 
 const ServiceCard = (props) => {
-    const { title, description } = props
+    const { title, description, Icon } = props
   return (
     <div className='service-card'>
         <div className='description-icon'>
-          <BsPersonFill />
+          <Icon/>
         </div>
         
       <h3>{title}</h3>

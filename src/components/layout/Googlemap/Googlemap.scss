@@ -1,31 +1,10 @@
 .container-googlemap {
-    padding: 20px;   
-    background-color: #ebf1f8;
-    border-radius: 50px;
-    margin: 7rem 7rem 7rem 7rem;
-   
-  
-    .container-contact {
-      text-align: center;
-
-      h2{
-        font-size: 3rem;
-        margin-bottom: 60px;
-      }
-      p {
-        font-size: 1.5rem;
-        margin-top: 30px;
-        text-align: center;        
-      }
-    }
-  
-    .container-map {
+    
       iframe {
-        border-color: #d1e3f8;
+      
         border-radius: 20px;     
-        width: 80%; 
         height: 400px; 
         
       }
     }
-  }
+  
