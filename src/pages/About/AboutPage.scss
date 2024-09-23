@@ -5,7 +5,6 @@
   justify-content: center;
   width: 100%;
   height: 100vh;
-  background-image: url("path/to/your/image.jpg"); // Thay bằng đường dẫn hình ảnh của bạn
   background-size: cover;
   background-position: center;
 
@@ -64,6 +63,100 @@
     height: 100%;
     object-fit: cover;
     z-index: -1; // Đưa hình ảnh về phía sau nội dung
+  }
+
+  // Media queries for responsiveness
+  @media (max-width: 1024px) {
+    .about-content {
+      max-width: 70%;
+
+      h1 {
+        font-size: 3.5rem; // Giảm kích thước cho màn hình trung bình
+      }
+
+      p {
+        font-size: 1.2rem;
+      }
+
+      .about-detail {
+        flex-direction: column; // Thay đổi bố cục về dạng cột khi không đủ chiều ngang
+        margin: 2rem 0;
+
+        .about-box {
+          margin-bottom: 2rem; // Tạo khoảng cách giữa các box
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .about-content {
+      max-width: 80%;
+      left: 3%; // Điều chỉnh lại khoảng cách từ lề trái
+
+      h1 {
+        font-size: 2.8rem; // Giảm kích thước font chữ hơn nữa cho màn hình nhỏ hơn
+      }
+
+      p {
+        font-size: 1.1rem;
+      }
+
+      .about-detail {
+        margin: 2rem 0;
+
+        .about-box {
+          h2 {
+            font-size: 1.8rem;
+
+            span {
+              font-size: 2rem;
+            }
+          }
+
+          p {
+            font-size: 1rem;
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    height: auto; // Cho phép container tự động điều chỉnh chiều cao theo nội dung
+    padding: 2rem 1rem;
+
+    .about-content {
+      max-width: 90%;
+      left: 0; // Giảm khoảng cách từ lề trái về 0
+      padding: 1rem;
+
+      h1 {
+        font-size: 2.2rem; // Kích thước nhỏ hơn cho màn hình di động
+      }
+
+      p {
+        font-size: 1rem;
+      }
+
+      .about-detail {
+        margin: 1rem 0;
+
+        .about-box {
+          h2 {
+            font-size: 1.6rem;
+
+            span {
+              font-size: 1.8rem;
+            }
+          }
+
+          p {
+            font-size: 0.9rem;
+          }
+        }
+      }
+    }
   }
 }
 
@@ -200,6 +293,35 @@
     .about-hero-description {
       flex: none;
       width: 100%;
+    }
+  }
+}
+
+.about-parners-container {
+  margin: 2rem 6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .about-parners-tittle {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+
+    span {
+      color: #a8a8a8;
+      font-weight: bold;
+    }
+  }
+
+  .about-parners-img {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    img {
+      max-width: 100%;
+      height: auto;
     }
   }
 }
