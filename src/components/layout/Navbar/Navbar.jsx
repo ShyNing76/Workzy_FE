@@ -124,7 +124,7 @@ const Navbar = () => {
           </ul>
         </div>
 
-        {auth.isAuthenticated ? (
+        {!auth.isAuthenticated ? (
           <>
             <div className="dropdown dropdown-end dropdown-hover">
               <div
@@ -132,7 +132,7 @@ const Navbar = () => {
                 role="button"
                 className="btn btn-ghost btn-circle avatar"
               >
-                <div className="w-10 rounded-full">
+                <div className="w-8 rounded-full">
                   <img alt="defailt profile" src={defaultProfile} />
                 </div>
               </div>
@@ -141,16 +141,16 @@ const Navbar = () => {
                 className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[10] w-48 p-2 shadow "
               >
                 <li>
-                  <a>Profile</a>
+                  <Link to="/user/account">Profile</Link>
                 </li>
                 <li>
-                  <a>Booking</a>
+                  <Link to="/user/booking">Booking</Link>
                 </li>
                 <li>
-                  <a>Membership</a>
+                  <Link to="/user/membership">Membership</Link>
                 </li>
                 <li>
-                  <a>Support Center</a>
+                  <Link to="/user/support">Support Center</Link>
                 </li>
                 <hr />
                 <li>

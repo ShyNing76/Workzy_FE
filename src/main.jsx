@@ -12,6 +12,8 @@ import LocationPage from "./pages/Location/LocationPage.jsx";
 import AboutPage from "./pages/About/AboutPage.jsx";
 import ContactPage from "./pages/Contact/ContactPage.jsx";
 import { AuthWrapper } from "./components/context/auth.context.jsx";
+import Profile from "./pages/Profile/Profile.jsx";
+import User from "./pages/User/User.jsx";
 
 const router = createBrowserRouter([
   // Customer
@@ -49,6 +51,32 @@ const router = createBrowserRouter([
         path: "contact",
         element: <ContactPage />,
       },
+      {
+        path: "user",
+        element: <User />,
+        children: [
+          {
+            path: "account",
+            element: <Profile />,
+          },
+          {
+            path: "booking",
+            element: <Profile />,
+          },
+          {
+            path: "membership",
+            element: <Profile />,
+          },
+          {
+            path: "support",
+            element: <Profile />,
+          },
+          {
+            path: "notification",
+            element: <Profile />,
+          },
+        ],
+      },
     ],
   },
   // Regiser
@@ -60,6 +88,11 @@ const router = createBrowserRouter([
   // Login
   {
     path: "login",
+    element: <LoginPage />,
+  },
+
+  {
+    path: "*",
     element: <LoginPage />,
   },
 ]);
