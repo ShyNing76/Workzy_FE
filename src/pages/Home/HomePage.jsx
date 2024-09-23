@@ -152,7 +152,7 @@ const HomePage = () => {
             />
             <Servicedetail
               Icon = {FaPhone}
-              detail = "Dedicated phone line (fees, terms and conditions apply)"
+              detail = "Dedicated phone line"
             />
 
           </div>

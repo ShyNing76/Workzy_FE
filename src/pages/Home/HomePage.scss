@@ -46,7 +46,8 @@
   }
 
   .info-container {
-    margin-left: 100px;
+    max-width: fit-content;
+    margin-left: 150px;
     h2 {
       display: flex;
       justify-content: center;

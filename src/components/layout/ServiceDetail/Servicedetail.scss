@@ -1,7 +1,26 @@
 /* Inside your CSS or SCSS file (HomePage.scss or a separate file) */
-.desciption-icon {
+
+.service-detail-container {
+  background-color: rgb(243, 240, 240);
+  border-radius: 20px;
+  
+  .desciption-and-icon {
     display: flex;
     align-items: center;  /* Aligns icon and text vertically in the center */
-    gap: 8px;             /* Adds space between icon and text */
+    gap: 8px; 
+    margin: 5px 20px 5px 20px;
+    .icon {
+      color: #f39c12;
+    }
+    span {
+      font-size: 1rem;
+    }
   }
+
+}
+
+
+
+
   
+
