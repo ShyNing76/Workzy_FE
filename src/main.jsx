@@ -12,6 +12,9 @@ import LocationPage from "./pages/Location/LocationPage.jsx";
 import AboutPage from "./pages/About/AboutPage.jsx";
 import ContactPage from "./pages/Contact/ContactPage.jsx";
 import { AuthWrapper } from "./components/context/auth.context.jsx";
+import MainPage from "./pages/Staff/MainPage/MainPage.jsx";
+import BookingsPage from "./pages/Staff/Bookings/BookingsPage.jsx";
+import BuildingRoomPage from "./pages/Staff/BuildingRoom/BuildingRoomPage.jsx"
 
 const router = createBrowserRouter([
   // Customer
@@ -61,6 +64,22 @@ const router = createBrowserRouter([
   {
     path: "login",
     element: <LoginPage />,
+  },
+
+  //Staff
+  {
+    path: "staff",
+    element: <MainPage />,
+    children: [
+      {
+        path: "buildingroom",
+        element: <BuildingRoomPage />,
+      },
+      {
+        path: "bookings",
+        element: <BookingsPage />,
+      },
+    ],
   },
 ]);
 
