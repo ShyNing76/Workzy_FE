@@ -103,26 +103,15 @@ const RoomDetail = () => {
                         <br />
 
                         <div className="date-picker flex justify-center w-full max-w-7xl"> 
-                            <select className="date-picker-container select select-bordered w-full max-w-xs">
-                                <option disabled selected>Date</option>
-                                <option>22/9/2024</option>
-                                <option>23/9/2024</option> 
-                            </select>
+                            <input type="date" id="Date" name="Date" className="date-picker-container border border-gray-300 rounded p-2 w-full max-w-xs"></input>
                         </div>
                         <br />
                         
                         <div className="time-picker flex justify-center w-full max-w-7xl">
-                            <div className="time-picker-container flex grid gap-x-2 lg:grid-cols-2 justify-center w-full max-w-xs">
-                                <select className="start-time-select select select-bordered max-w-xs">
-                                    <option disabled selected>Start time</option>
-                                    <option>7:00 AM</option>
-                                    <option>8:00 AM</option>
-                                </select>
-                                <select className="end-time-select select select-bordered w-full max-w-xs">
-                                    <option disabled selected>End time</option>
-                                    <option>7:00 AM</option>
-                                    <option>8:00 AM</option>
-                                </select>
+                            <div className="time-picker-container flex grid lg:grid-cols-3 justify-center w-full max-w-xs">
+                                <input type="time" id="appt-time" name="appt-time" className="start-time-select border border-gray-300 rounded p-2 w-full max-w-xs"></input>
+                                <div className="ml-11 mr-10 mt-1 text-xl"><p>to</p></div>
+                                <input type="time" id="appt-time" name="appt-time" className="start-time-select border border-gray-300 rounded p-2 w-full max-w-xs"></input>
                             </div>
                         </div>
                         <br />

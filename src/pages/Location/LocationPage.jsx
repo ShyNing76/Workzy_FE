@@ -50,15 +50,15 @@ const locationPage = () => {
 				</div>
 			</div>
 
-			<div className="filter">
-				<div className="filter-container grid max-w-xl flex ml-12">
-					<div className="filter-option-container grid gap-x-2 lg:grid-cols-4">
-                        <select className="select select-bordered w-full max-w-xs">
+			<div className="room-filter">
+				<div className="room-filter-container grid max-w-xl flex ml-12">
+					<div className="room-filter-option-container grid gap-x-2 lg:grid-cols-4">
+                        <select className="room-filter-option-list-1 select select-bordered w-full max-w-xs">
 						    <option disabled selected>Type</option>
 						    <option>Working room</option>
 						    <option>Meeting room</option>
 					    </select>
-					    <select className="select select-bordered w-full max-w-xs">
+					    <select className="room-filter-option-list-2 select select-bordered w-full max-w-xs">
 						    <option disabled selected>Capacity</option>
 						    <option>Below 10 chairs</option>
 						    <option>10-20 chairs</option>
@@ -66,13 +66,13 @@ const locationPage = () => {
 							<option>30-50 chairs</option>
 							<option>Above 50 chairs</option>
 						</select>
-						<select className="select select-bordered w-full max-w-xs">
+						<select className="room-filter-option-list-3 select select-bordered w-full max-w-xs">
 						    <option disabled selected>Price</option>
 						    <input type="range" min={0} max="100" value="50" className="range range-sm" />
 						    <option>4-6 people</option>
 						    <option>6 people above</option>
 						</select>
-						<select className="select select-bordered w-full max-w-xs">
+						<select className="room-filter-option-list-4 select select-bordered w-full max-w-xs">
 						    <option disabled selected>Capacity</option>
 						    <option>1-3 people</option>
 						    <option>4-6 people</option>
@@ -313,7 +313,7 @@ const locationPage = () => {
 
                         </div>
                 </div>
-				<div className="join flex justify-center">
+				<div className="join flex justify-center mb-10">
   					<button className="join-item btn">1</button>
   					<button className="join-item btn">2</button>
   					<button className="join-item btn btn-disabled">...</button>
@@ -322,7 +322,7 @@ const locationPage = () => {
 				</div>
 			</div>
 
-            <div className="maps">
+            <div className="workzy-branch-maps">
                 <div className="maps-container">
                     <div>
                         <Googlemap

@@ -14,6 +14,7 @@ import ContactPage from "./pages/Contact/ContactPage.jsx";
 import { AuthWrapper } from "./components/context/auth.context.jsx";
 import Profile from "./pages/Profile/Profile.jsx";
 import User from "./pages/User/User.jsx";
+import RoomDetail from "./pages/Location/Room detail/RoomDetail.jsx";
 
 const router = createBrowserRouter([
   // Customer
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
       {
         path: "location",
         element: <LocationPage />,
+      },
+      {
+        path: "roomdetail",
+        element: <RoomDetail />,
       },
       {
         path: "about",
