@@ -3,9 +3,14 @@ import { IoLocationOutline } from "react-icons/io5";
 import { BrowserRouter as Router, Route, Link, NavLink } from "react-router-dom";
 import { BiArea } from "react-icons/bi";
 import { MdOutlineChair } from "react-icons/md";
+import React, { useState } from 'react';
+import { CiFilter } from "react-icons/ci";
 
 
 const locationPage = () => {
+    const [minPrice, setMinPrice] = useState('');
+    const [maxPrice, setMaxPrice] = useState('');
+
     return(
         <>
 			<div className="breadcrumbs text-sm sm:px-6">
@@ -53,12 +58,7 @@ const locationPage = () => {
 			<div className="room-filter">
 				<div className="room-filter-container grid max-w-xl flex ml-12">
 					<div className="room-filter-option-container grid gap-x-2 lg:grid-cols-4">
-                        <select className="room-filter-option-list-1 select select-bordered w-full max-w-xs">
-						    <option disabled selected>Type</option>
-						    <option>Working room</option>
-						    <option>Meeting room</option>
-					    </select>
-					    <select className="room-filter-option-list-2 select select-bordered w-full max-w-xs">
+						<select className="room-filter-option-list-2 select select-bordered w-full max-w-xs">
 						    <option disabled selected>Capacity</option>
 						    <option>Below 10 chairs</option>
 						    <option>10-20 chairs</option>
@@ -66,12 +66,13 @@ const locationPage = () => {
 							<option>30-50 chairs</option>
 							<option>Above 50 chairs</option>
 						</select>
-						<select className="room-filter-option-list-3 select select-bordered w-full max-w-xs">
-						    <option disabled selected>Price</option>
-						    <input type="range" min={0} max="100" value="50" className="range range-sm" />
-						    <option>4-6 people</option>
-						    <option>6 people above</option>
-						</select>
+
+						<select className="room-filter-option-list-1 select select-bordered w-full max-w-xs">
+						    <option disabled selected>Type</option>
+						    <option>Working room</option>
+						    <option>Meeting room</option>
+					    </select>
+
 						<select className="room-filter-option-list-4 select select-bordered w-full max-w-xs">
 						    <option disabled selected>Capacity</option>
 						    <option>1-3 people</option>
@@ -83,11 +84,64 @@ const locationPage = () => {
 				<br />
 			</div>
 
+			<div className="p-6 bg-white rounded-lg shadow-md">
+      <h3 className="text-lg font-semibold mb-4">Khoảng giá</h3>
+      <div className="flex justify-between items-center mb-4">
+        <div className="w-1/2">
+          <input
+            type="number"
+            className="border rounded-lg p-2 w-full"
+            value={minPrice}
+            onChange={(e) => setMinPrice(e.target.value)}
+            placeholder="Từ"
+          />
+        </div>
+        <span className="mx-2 text-gray-500">VND</span>
+        <div className="w-1/2">
+          <input
+            type="number"
+            className="border rounded-lg p-2 w-full"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(e.target.value)}
+            placeholder="Đến"
+          />
+        </div>
+        <span className="ml-2 text-gray-500">VND</span>
+      </div>
+      <div className="flex space-x-4">
+        <button className="bg-orange-500 text-white py-2 px-4 rounded-lg">Áp dụng</button>
+        <button className="bg-blue-800 text-white py-2 px-4 rounded-lg">Làm mới</button>
+      </div>
+    </div>
+			
+		<div className="navbar bg-base-300 rounded-box flex">
+  			<div className="flex-1 px-2 lg:flex-none">
+    			<a className="text-lg font-bold flex"><CiFilter className="text-3xl flex"/> &nbsp; Filter</a>
+  			</div>
+  			<div className="flex flex-1 px-2">
+
+    			<div className="flex items-stretch">
+				<div className="dropdown">
+  					<div tabIndex={0} role="button" className="btn m-1">Click</div>
+  					<div tabIndex={0} className="dropdown-content card card-compact bg-primary text-primary-content z-[1] w-80 p-2 shadow">
+    					<div className="card-body">
+      						<h3 className="card-title">Card title!</h3>
+      						<p>you can use any element as a dropdown.</p>
+    					</div>
+  					</div>
+				</div>
+
+					<a className="btn btn-ghost rounded-btn">Button</a>
+
+    			</div>
+  			</div>
+		</div>
+
 			<div className="room-list">
 				<div className="room-list-container">
                             <div className="room-list-page-1 mx-auto grid max-w-2xl grid-cols-1 items-start gap-x-8 gap-y-16 px-4 py-24 sm:px-6 sm:py-10 lg:max-w-7xl lg:grid-cols-4 lg:px-8 item-center">
-                            	
-							<div className="room-list-item">
+
+								<div className="room-list-item">
 						            <div className="room-list-item-container flex w-full flex-col lg:flex-row">
 							            <Link to="/RoomDetail"><div className="card card-compact bg-base-100 w-60 shadow-xl lg:mr-10">
 								            <figure>

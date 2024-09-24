@@ -1,46 +1,64 @@
+import React, { useState } from 'react';
 import { PiChalkboardSimple } from "react-icons/pi";
 import { PiNoteBlankLight } from "react-icons/pi";
 import { BsProjector } from "react-icons/bs";
 import { IoCafeOutline } from "react-icons/io5";
 
 const RoomDetail = () => {
+    const [minPrice, setMinPrice] = useState(0);
+    const [maxPrice, setMaxPrice] = useState(102000000);
     return(
         <>
             <div className="detail-room-container mx-auto grid max-w-2xl grid-cols-1 items-start gap-x-8 gap-y-16 px-4 py-24 sm:px-6 sm:py-10 lg:max-w-7xl lg:grid-cols-2 lg:px-8">
-
-                <div className="detail-room-container-left-col ml-20"> {/* Added margin-left */}
-                    <div className="room-images-carousel-container">
-                        <div className="carousel w-full">
-                            <div id="item1" className="carousel-item w-full">
-                                <img
+                <div className="detail-room-container-left-col ml-20">
+                    <div className="room-img-gallery grid gap-4 mb-8">
+                        <div>
+                            <img
+                                className="room-img-main-view h-auto max-w-full rounded-lg"
                                 src="./src/assets/9.png"
-                                className="w-full" />
-                            </div>
-                            <div id="item2" className="carousel-item w-full">
-                                <img
-                                src="./src/assets/9.png"
-                                className="w-full" />
-                            </div>
-                            <div id="item3" className="carousel-item w-full">
-                                <img
-                                src="./src/assets/9.png"
-                                className="w-full" />
-                            </div>
-                            <div id="item4" className="carousel-item w-full">
-                                <img
-                                src="./src/assets/9.png"
-                                className="w-full" />
-                            </div>
+                                alt="Featured"
+                            />
                         </div>
-                        <div className="flex w-full justify-center gap-2 py-2">
-                            <a href="#item1" className="btn btn-xs">1</a>
-                            <a href="#item2" className="btn btn-xs">2</a>
-                            <a href="#item3" className="btn btn-xs">3</a>
-                            <a href="#item4" className="btn btn-xs">4</a>
+                        <div className="grid grid-cols-5 gap-4">
+                            <div>
+                                <img
+                                    className="h-auto max-w-full rounded-lg"
+                                    src="./src/assets/9.png"
+                                    alt="Gallery Image 1"
+                                />
+                            </div>
+                            <div>
+                                <img
+                                    className="h-auto max-w-full rounded-lg"
+                                    src="./src/assets/9.png"
+                                    alt="Gallery Image 2"
+                                />
+                            </div>
+                            <div>
+                                <img
+                                    className="h-auto max-w-full rounded-lg"
+                                    src="./src/assets/9.png"
+                                    alt="Gallery Image 3"
+                                />
+                            </div>
+                            <div>
+                                <img
+                                    className="h-auto max-w-full rounded-lg"
+                                    src="./src/assets/9.png"
+                                    alt="Gallery Image 4"
+                                />
+                            </div>
+                            <div>
+                                <img
+                                    className="h-auto max-w-full rounded-lg"
+                                    src="./src/assets/9.png"
+                                    alt="Gallery Image 5"
+                                />
+                            </div>
                         </div>
                     </div>
 
-                    <div className="room-descriptions-container">
+                    <div className="room-descriptions-container mb-4">
                         <h2 className="room-descriptions-title text-2xl font-bold mb-4">Room Description</h2>
                         <ul className="room-descriptions-list-container list-disc px-8">
                             <li>TV available</li>
