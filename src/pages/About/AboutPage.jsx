@@ -130,7 +130,7 @@ const aboutPage = () => {
             />
             <Accordion
               qs="How far in advance can I make a reservation?"
-              ans="ou can make reservations up to 30 days in advance. However, please note that seats can be booked by multiple people, so try to book as early as possible."
+              ans="You can make reservations up to 30 days in advance. However, please note that seats can be booked by multiple people, so try to book as early as possible."
             />
             <Accordion
               qs="Do I need to register an account to make a reservation?"

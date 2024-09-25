@@ -36,7 +36,38 @@ const RegisterPage = () => {
       setAuth({
         isAuthenticated: true,
       });
-      navigate("/");
+
+      const userRes = await getUserAuthen();
+
+      if (userRes && userRes.data && userRes.err == 1) {
+        const { role_id } = userRes.data;
+        localStorage.setItem("role_id", role_id);
+
+        switch (role_id) {
+          case 1: {
+            //admin
+            navigate("/admin");
+            break;
+          }
+          case 2: {
+            //manager
+            navigate("/manager");
+            break;
+          }
+          case 3: {
+            //staff
+            navigate("/staff");
+            break;
+          }
+          case 4: {
+            //customer
+            navigate("/");
+            break;
+          }
+          default:
+            break;
+        }
+      }
     } else {
       toast.error(res.message);
       setEmail("");

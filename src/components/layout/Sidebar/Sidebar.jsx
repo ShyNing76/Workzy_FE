@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./Sidebar.scss";
 // Icon
 import { CgProfile } from "react-icons/cg";
@@ -13,9 +13,23 @@ import { GoSidebarCollapse } from "react-icons/go";
 
 import { Link } from "react-router-dom";
 import defaultProfile from "../../../assets/default-profile.jpg";
+import { getUserAuthen } from "../../../config/api";
 
 const Sidebar = (props) => {
-  const { outlet } = props;
+  const { outlet, refresh } = props;
+  const [name, setName] = useState("");
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const res = await getUserAuthen();
+
+      if (res && res.data && res.err === 1) {
+        setName(res?.data?.name);
+      }
+    };
+
+    fetchUserInfo();
+  }, [refresh]);
 
   return (
     <>
@@ -39,13 +53,13 @@ const Sidebar = (props) => {
           ></label>
           <ul className="menu text-base-content min-h-full w-80 p-4 side-bar">
             {/* Sidebar content here */}
-            <li className="menu-item flex items-center">
-              <div className="avatar mr-4">
+            <li className="menu-item flex items-center text-center">
+              <div className="avatar ">
                 <div className="w-10 rounded-full">
                   <img src={defaultProfile} alt="User avatar" />
                 </div>
               </div>
-              <div className="text-lg font-semibold">Name of user</div>
+              <div className="text-lg font-semibold te">{name}</div>
             </li>
             <hr />
             <li className="menu-item">
