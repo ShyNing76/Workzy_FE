@@ -30,11 +30,27 @@ const router = createBrowserRouter([
         element: <ServicesPage />,
         children: [
           {
-            path: "service1",
+            path: "single-pod",
             element: <ServicesPage />,
           },
           {
-            path: "service2",
+            path: "double-pod",
+            element: <ServicesPage />,
+          },
+          {
+            path: "quad-pod",
+            element: <ServicesPage />,
+          },
+          {
+            path: "meeting-room",
+            element: <ServicesPage />,
+          },
+          {
+            path: "working-room",
+            element: <ServicesPage />,
+          },
+          {
+            path: "event-space",
             element: <ServicesPage />,
           },
         ],

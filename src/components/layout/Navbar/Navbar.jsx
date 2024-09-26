@@ -86,10 +86,22 @@ const Navbar = () => {
               className="dropdown-content menu bg-base-100 rounded-box z-[10] w-44 p-2 shadow"
             >
               <li>
-                <Link to="/services/service1">Services 1</Link>
+                <Link to="/services/single-pod">Single POD</Link>
               </li>
               <li>
-                <Link to="/services/service2">Services 2</Link>
+                <Link to="/services/double-pod">Double POD</Link>
+              </li>
+              <li>
+                <Link to="/services/quad-pod">Quad POD</Link>
+              </li>
+              <li>
+                <Link to="/services/meeting-room">Meeting room</Link>
+              </li>
+              <li>
+                <Link to="/services/working-room">Working room</Link>
+              </li>
+              <li>
+                <Link to="/services/event-space">Event space</Link>
               </li>
             </ul>
           </li>

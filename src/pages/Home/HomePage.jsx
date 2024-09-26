@@ -116,7 +116,7 @@ const HomePage = () => {
             Offices in central districts
           </h2>
 
-          <div className="service-detail-container grid grid-cols-2 gap-4 p-6">
+          <div className="service-info-container grid grid-cols-2 gap-4 p-6">
             <Servicedetail Icon={FaLocationArrow} detail="Strategic location" />
             <Servicedetail Icon={FaCoins} detail="Cost optimization" />
             <Servicedetail

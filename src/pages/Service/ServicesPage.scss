@@ -1,0 +1,76 @@
+.our-service-card-container {
+    display: flex;
+    flex-direction: column;
+    align-items: left; // Căn giữa tất cả các phần tử theo chiều ngang
+    padding: 20px;
+    margin: 0 10%;
+    
+    .personal-title, .business-title {
+        // display: flex;
+        // justify-content: left;
+        // text-align: left;
+        font-weight: bolder;
+        font-size: 5rem;
+        color: rgb(0, 0, 0);
+        margin-left: 50px;
+        margin-top: 4%; // Khoảng cách giữa tiêu đề và các card
+    }
+}
+
+.personal-container,  .business-container {
+    display: flex;
+    // gap: 20px; // Khoảng cách giữa các card
+    justify-content: space-around; // Căn giữa toàn bộ card theo chiều ngang
+    width: 100%; // Đảm bảo container chiếm toàn bộ chiều rộng để grid hoạt động
+    padding: 20px;
+}
+
+.our-service-detail-container {
+    font-size: 3rem;
+    text-align: center;
+    svg {
+        color: #000;
+        font-weight: lighter;
+    }
+    span {
+        font-size: 1.8rem !important;
+    }
+    
+}
+.info-container {
+    .btn {
+        display: flex;
+        padding: 10px 15px 10px 15px;
+        background-color: #000000;
+        color: #fff;
+        font-size: 1rem;
+        border-radius: 8px;
+        text-decoration: none;
+        text-align: center;
+        margin-top: 20px;
+        transition: background-color 0.3s ease;
+        width: 200px;
+    &:hover {
+        background-color: #51565c;
+    }
+}
+    p {
+        font-size: 1rem;
+        margin-top: 20px;
+    }
+}
+
+
+
+.swiper-and-other-location-container {
+    background-color: #eff6fd;
+    border-radius: 20px;
+    align-items: center;
+    width: 100%;
+    padding: 50px 50px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    display: flex;
+    justify-content: space-around;
+    
+}
