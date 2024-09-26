@@ -97,6 +97,7 @@ const HomePage = () => {
             </>
           }
           image={imageHero}
+          showButton = {true}
         />
       </div>
 
@@ -165,9 +166,11 @@ const HomePage = () => {
                 of the world’s most successful corporations, you can work close
                 to your clients, colleagues, or family through our network.
               </p>
+
             </>
           }
           image={imageHero2}
+          showButton = {true}
         />
       </div>
 

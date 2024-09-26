@@ -14,6 +14,12 @@ import ContactPage from "./pages/Contact/ContactPage.jsx";
 import { AuthWrapper } from "./components/context/auth.context.jsx";
 import Profile from "./pages/Profile/Profile.jsx";
 import User from "./pages/User/User.jsx";
+import SinglePOD from "./pages/SinglePOD/SinglePOD.jsx";
+import DoublePOD from "./pages/DoublePOD/DoublePOD.jsx";
+import QuadPOD from "./pages/QuadPOD/QuadPOD.jsx";
+import MeetingRoom from "./pages/MeetingRoom/MeetingRoom.jsx";
+import WorkingRoom from "./pages/WorkingRoom/WorkingRoom.jsx";
+import EventSpace from "./pages/EventSpace/EventSpace.jsx";
 
 const router = createBrowserRouter([
   // Customer
@@ -25,34 +31,44 @@ const router = createBrowserRouter([
         index: true,
         element: <HomePage />,
       },
+      //path of services
+      {
+        path: "services/single-pod",
+        element: <SinglePOD />,
+      },
+
+      {
+        path: "services/double-pod",
+        element: <DoublePOD />,
+      },
+
+      {
+        path: "services/quad-pod",
+        element: <QuadPOD />,
+      },
+
+      {
+        path: "services/meeting-room",
+        element: <MeetingRoom />,
+      },
+
+      {
+        path: "services/working-room",
+        element: <WorkingRoom />,
+      },
+
+      {
+        path: "services/event-space",
+        element: <EventSpace />,
+      },
+
       {
         path: "services",
         element: <ServicesPage />,
         children: [
-          {
-            path: "single-pod",
-            element: <ServicesPage />,
-          },
-          {
-            path: "double-pod",
-            element: <ServicesPage />,
-          },
-          {
-            path: "quad-pod",
-            element: <ServicesPage />,
-          },
-          {
-            path: "meeting-room",
-            element: <ServicesPage />,
-          },
-          {
-            path: "working-room",
-            element: <ServicesPage />,
-          },
-          {
-            path: "event-space",
-            element: <ServicesPage />,
-          },
+         
+          
+          
         ],
       },
       {
