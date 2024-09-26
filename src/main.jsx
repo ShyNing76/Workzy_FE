@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 import "./styles/index.css";
 import "react-toastify/dist/ReactToastify.css";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import HomePage from "./pages/Home/HomePage.jsx";
 import RegisterPage from "./pages/Register/RegisterPage.jsx";
 import LoginPage from "./pages/Login/LoginPage.jsx";
@@ -15,6 +15,8 @@ import { AuthWrapper } from "./components/context/auth.context.jsx";
 import MainPage from "./pages/Staff/MainPage/MainPage.jsx";
 import BookingsPage from "./pages/Staff/Bookings/BookingsPage.jsx";
 import BuildingRoomPage from "./pages/Staff/BuildingRoom/BuildingRoomPage.jsx"
+import Profile from "./pages/Profile/Profile.jsx";
+import User from "./pages/User/User.jsx";
 
 const router = createBrowserRouter([
   // Customer
@@ -52,6 +54,32 @@ const router = createBrowserRouter([
         path: "contact",
         element: <ContactPage />,
       },
+      {
+        path: "user",
+        element: <User />,
+        children: [
+          {
+            path: "account",
+            element: <Profile />,
+          },
+          {
+            path: "booking",
+            element: <Profile />,
+          },
+          {
+            path: "membership",
+            element: <Profile />,
+          },
+          {
+            path: "support",
+            element: <Profile />,
+          },
+          {
+            path: "notification",
+            element: <Profile />,
+          },
+        ],
+      },
     ],
   },
   // Regiser
@@ -72,6 +100,10 @@ const router = createBrowserRouter([
     element: <MainPage />,
     children: [
       {
+        index: true, 
+        element: <Navigate to="/staff" />, 
+      },
+      {
         path: "buildingroom",
         element: <BuildingRoomPage />,
       },
@@ -80,6 +112,10 @@ const router = createBrowserRouter([
         element: <BookingsPage />,
       },
     ],
+},
+  {
+    path: "*",
+    element: <LoginPage />,
   },
 ]);
 

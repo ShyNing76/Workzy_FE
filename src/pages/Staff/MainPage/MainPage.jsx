@@ -2,7 +2,6 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { IoHomeOutline } from "react-icons/io5";
 import "./MainPage.scss";
 
-
 const MainPage = () => {
   const location = useLocation(); 
 
@@ -25,9 +24,15 @@ const MainPage = () => {
           Bookings
         </Link>
       </div>
+      
       <main className="content">
-
-        <Outlet />
+        {location.pathname === '/staff' ? (
+          <div className="background-container">
+            <h2 className="overlay-text">Working environment improves quality of life</h2>
+          </div>
+        ) : (
+          <Outlet />
+        )}
       </main>
     </div>
   );

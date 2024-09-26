@@ -1,10 +1,13 @@
 .booking-container {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     padding: 20px;
+    flex: 1;
 
     .main-bookings-content {
+        flex: 1;
+        overflow: auto;
         width: 100%;
         max-width: 100%;
         margin-top: 20px;
@@ -33,53 +36,40 @@
             }
         }
 
-        .booking-table {
+        .table-responsive {
+            overflow-x: auto;  
+            margin-top: 20px;
             width: 100%;
-            border-collapse: collapse;
+            max-width: 100%;
 
-            thead {
-                background-color: #8695a5;
 
-                th {
-                    padding: 10px;
-                    border: 1px solid #ddd;
-                    text-align: center;
-                    color: #fff;
-                }
-            }
+            .booking-table {
+                width: 100%;
+                border-collapse: collapse;
 
-            tbody {
-                tr {
-                    &:nth-child(even) {
-                        background-color: #f2f2f2;
-                    }
+                thead {
+                    background-color: #8695a5;
 
-                    td {
+                    th {
                         padding: 10px;
                         border: 1px solid #ddd;
                         text-align: center;
+                        color: #fff;
+                    }
+                }
 
-                        .check-in-button {
-                            padding: 5px 10px;
-                            background-color: #82b7f0;
-                            color: black;
-                            border: none;
-                            border-radius: 5px;
-                            cursor: pointer;
-                            transition: background-color 0.3s;
-
-                            &:hover {
-                                background-color: #0056b3;
-                            }
+                tbody {
+                    tr {
+                        &:nth-child(even) {
+                            background-color: #f2f2f2;
                         }
 
-                        .buttons {
-                            display: flex; 
-                            align-items: center; 
-                            justify-content: center; 
-                            gap: 10px; 
+                        td {
+                            padding: 10px;
+                            border: 1px solid #ddd;
+                            text-align: center;
 
-                            button {
+                            .check-in-button {
                                 padding: 5px 10px;
                                 background-color: #82b7f0;
                                 color: black;
@@ -90,6 +80,27 @@
 
                                 &:hover {
                                     background-color: #0056b3;
+                                }
+                            }
+
+                            .buttons {
+                                display: flex; 
+                                align-items: center; 
+                                justify-content: center; 
+                                gap: 10px; 
+
+                                button {
+                                    padding: 5px 10px;
+                                    background-color: #82b7f0;
+                                    color: black;
+                                    border: none;
+                                    border-radius: 5px;
+                                    cursor: pointer;
+                                    transition: background-color 0.3s;
+
+                                    &:hover {
+                                        background-color: #0056b3;
+                                    }
                                 }
                             }
                         }
