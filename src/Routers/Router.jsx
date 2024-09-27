@@ -13,6 +13,13 @@ import RoomDetail from "../pages/Room detail/RoomDetail.jsx";
 import { createBrowserRouter } from "react-router-dom";
 import ScrollToTop from "../components/context/scrollToTop.jsx";
 import PrivateRoute from "./PrivateRoute.jsx";
+import SinglePOD from "../pages/SinglePOD/SinglePOD.jsx";
+import DoublePOD from "../pages/DoublePOD/DoublePOD.jsx";
+import QuadPOD from "../pages/QuadPOD/QuadPOD.jsx";
+import MeetingRoom from "../pages/MeetingRoom/MeetingRoom.jsx";
+import WorkingRoom from "../pages/WorkingRoom/WorkingRoom.jsx";
+import EventSpace from "../pages/EventSpace/EventSpace.jsx";
+
 
 // Role id store in local Storage after login and register
 const roleID = localStorage.getItem("role_id");
@@ -33,18 +40,44 @@ export const router = createBrowserRouter([
         index: true,
         element: <HomePage />,
       },
+      //path of services
+      {
+        path: "services/single-pod",
+        element: <SinglePOD />,
+      },
+
+      {
+        path: "services/double-pod",
+        element: <DoublePOD />,
+      },
+
+      {
+        path: "services/quad-pod",
+        element: <QuadPOD/>,
+      },
+
+      {
+        path: "services/meeting-room",
+        element: <MeetingRoom />,
+      },
+
+      {
+        path: "services/working-room",
+        element: <WorkingRoom />,
+      },
+
+      {
+        path: "services/event-space",
+        element: <EventSpace />,
+      },
+
       {
         path: "services",
         element: <ServicesPage />,
         children: [
-          {
-            path: "service1",
-            element: <ServicesPage />,
-          },
-          {
-            path: "service2",
-            element: <ServicesPage />,
-          },
+         
+          
+          
         ],
       },
       {
