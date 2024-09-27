@@ -11,7 +11,7 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.clear("access_token");
+    localStorage.clear("access_token", "role_id");
     navigate("/");
     setAuth({
       isAuthenticated: false,

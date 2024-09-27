@@ -22,8 +22,8 @@ const swiperSlides = [
 
 const EventSpace = () => {
   return (
-    <div className="singlepod-container">
-      <div className="single-pod-details-container">
+    <div >
+      <div>
         <Hero
           reverse={true}
           showButton={false}

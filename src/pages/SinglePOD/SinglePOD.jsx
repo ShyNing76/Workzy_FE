@@ -23,8 +23,8 @@ const swiperSlides = [
 
 const SinglePOD = () => {
   return (
-    <div className="singlepod-container">
-      <div className="single-pod-details-container">
+    <div>
+      <div>
         <Hero
           reverse={true}
           showButton={false}
