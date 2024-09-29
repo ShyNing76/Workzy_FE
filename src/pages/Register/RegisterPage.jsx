@@ -4,7 +4,7 @@ import registerImage from "/src/assets/registerImage.jpg";
 import "./register.scss";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
-import { registerApi } from "../../config/api";
+import { getUserAuthen, registerApi } from "../../config/api";
 import { AuthContext } from "../../components/context/auth.context";
 
 const RegisterPage = () => {
@@ -16,7 +16,7 @@ const RegisterPage = () => {
   const navigate = useNavigate();
 
   //   Check Authentication
-  const { setAuth, registerLoading, setRegisterLoading } =
+  const { setRoleId, setAuth, registerLoading, setRegisterLoading } =
     useContext(AuthContext);
 
   const handleRegister = async (e) => {
@@ -31,12 +31,44 @@ const RegisterPage = () => {
 
     const res = await registerApi(name, email, password);
 
-    if (res && res.err === 1) {
+    if (res && res.err === 0) {
       localStorage.setItem("access_token", res.accessToken);
       setAuth({
         isAuthenticated: true,
       });
-      navigate("/");
+
+      const userRes = await getUserAuthen();
+
+      if (userRes && userRes.data && userRes.err == 0) {
+        const { role_id } = userRes.data;
+        localStorage.setItem("role_id", role_id);
+        setRoleId(role_id);
+
+        switch (role_id) {
+          case 1: {
+            //admin
+            navigate("/admin");
+            break;
+          }
+          case 2: {
+            //manager
+            navigate("/manager");
+            break;
+          }
+          case 3: {
+            //staff
+            navigate("/staff");
+            break;
+          }
+          case 4: {
+            //customer
+            navigate("/");
+            break;
+          }
+          default:
+            break;
+        }
+      }
     } else {
       toast.error(res.message);
       setEmail("");

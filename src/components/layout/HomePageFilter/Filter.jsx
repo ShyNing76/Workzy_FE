@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Filter.scss";
 import { CiLocationOn } from "react-icons/ci";
 import { BsPersonWorkspace } from "react-icons/bs";
 
 const Filter = () => {
+  const [location, setLocation] = useState("");
+  const [workspaceType, setWorkspaceType] = useState("");
+
   return (
     <div className="filter-container">
       <h1>Working environment improves quality of life</h1>
@@ -17,29 +20,38 @@ const Filter = () => {
           <form>
             <div className="input-container">
               <CiLocationOn className="location-icon" />
-              <select className="select select-bordered w-full max-w-xs select-location">
-                <option disabled selected>
+              <select
+                className="select select-bordered w-full max-w-xs select-location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+              >
+                <option disabled value="">
                   Select location
                 </option>
-                <option>Ho Chi Minh city</option>
-                <option>Ha Noi</option>
+                <option value="Ho Chi Minh">Ho Chi Minh</option>
+                <option value="Ha Noi">Ha Noi</option>
               </select>
             </div>
 
             <div className="input-container">
               <BsPersonWorkspace className="workspace-icon" />
-              <select className="select select-bordered w-full max-w-xs select-workspace">
-                <option disabled selected>
+              <select
+                className="select select-bordered w-full max-w-xs select-workspace"
+                value={workspaceType}
+                onChange={(e) => setWorkspaceType(e.target.value)}
+              >
+                <option disabled value="">
                   Select workspace type
                 </option>
-                <option>Type 1</option>
-                <option>Type 2</option>
-                <option>Type 3</option>
-                <option>Type 4</option>
-                <option>Type 5</option>
+                <option value="Single POD">Single POD</option>
+                <option value="Double POD">Double POD</option>
+                <option value="Double POD">Quad POD</option>
+                <option value="Working Room">Working Room</option>
+                <option value="Meeting Room">Meeting Room</option>
+                <option value="Event Space">Event Space</option>
               </select>
             </div>
-            <button className="btn">Search</button>
+            <button className="btn">Find now</button>
           </form>
         </div>
       </div>

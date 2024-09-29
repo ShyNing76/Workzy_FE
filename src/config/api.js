@@ -27,4 +27,38 @@ const getUserAuthen = () => {
   return axios.get(URL_API);
 };
 
-export { loginApi, registerApi, getUserAuthen };
+const putUpdateCustomerInfo = (name, date_of_birth, gender) => {
+  const URL_API = "api/v1/customer/profile";
+  const data = {
+    name,
+    date_of_birth,
+    gender,
+  };
+
+  return axios.put(URL_API, data);
+};
+
+const putUpdateCustomerPassword = (currentPassword, newPassword) => {
+  const URL_API = "api/v1/customer/password";
+  const data = {
+    current_password: currentPassword,
+    new_password: newPassword,
+  };
+
+  return axios.put(URL_API, data);
+};
+
+const getGoogleCallBack = (code) => {
+  return axios.get("api/v1/auth/google/callback", {
+    code,
+  });
+};
+
+export {
+  loginApi,
+  registerApi,
+  getUserAuthen,
+  putUpdateCustomerInfo,
+  putUpdateCustomerPassword,
+  getGoogleCallBack,
+};

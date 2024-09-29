@@ -1,9 +1,7 @@
-const locationPage = () => {
-    return(
-        <>
-            Location Page
-        </>
-    )
-}
+import React from "react";
 
-export default locationPage
+const LocationPage = () => {
+  return <div>Location Page</div>;
+};
+
+export default LocationPage;
