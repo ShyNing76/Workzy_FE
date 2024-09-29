@@ -23,7 +23,7 @@ const Sidebar = (props) => {
     const fetchUserInfo = async () => {
       const res = await getUserAuthen();
 
-      if (res && res.data && res.err === 1) {
+      if (res && res.data && res.err === 0) {
         setName(res?.data?.name);
       }
     };

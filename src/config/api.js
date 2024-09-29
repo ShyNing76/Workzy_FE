@@ -48,10 +48,17 @@ const putUpdateCustomerPassword = (currentPassword, newPassword) => {
   return axios.put(URL_API, data);
 };
 
+const getGoogleCallBack = (code) => {
+  return axios.get("api/v1/auth/google/callback", {
+    code,
+  });
+};
+
 export {
   loginApi,
   registerApi,
   getUserAuthen,
   putUpdateCustomerInfo,
   putUpdateCustomerPassword,
+  getGoogleCallBack,
 };

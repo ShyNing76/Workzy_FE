@@ -27,7 +27,7 @@ const ModalUpdatePassword = (props) => {
       const res = await putUpdateCustomerPassword(currentPassWord, newPassWord);
       const modal = document.getElementById("modal-update-password");
 
-      if (res && res.err === 1) {
+      if (res && res.err === 0) {
         toast.success(res.message);
         if (modal) {
           setCurrentPassWord("");

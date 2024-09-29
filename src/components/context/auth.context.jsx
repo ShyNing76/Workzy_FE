@@ -5,6 +5,7 @@ export const AuthContext = createContext({
   appLoading: true,
   loginLoading: true,
   registerLoading: true,
+  roleId: localStorage.getItem("role_id"),
 });
 
 export const AuthWrapper = (props) => {
@@ -15,6 +16,9 @@ export const AuthWrapper = (props) => {
   const [appLoading, setAppLoading] = useState(true);
   const [loginLoading, setLoginLoading] = useState(false);
   const [registerLoading, setRegisterLoading] = useState(false);
+
+  // Role Id
+  const [roleId, setRoleId] = useState(localStorage.getItem("role_id"));
 
   return (
     <AuthContext.Provider
@@ -27,6 +31,8 @@ export const AuthWrapper = (props) => {
         setLoginLoading,
         registerLoading,
         setRegisterLoading,
+        roleId,
+        setRoleId,
       }}
     >
       {props.children}

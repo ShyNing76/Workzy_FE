@@ -33,12 +33,15 @@ const Profile = (props) => {
   const fetchUserInfo = async () => {
     const res = await getUserAuthen();
 
-    if (res && res.data && res.err === 1) {
-      setName(res?.data?.name);
-      setDate(convertDateToYYYYMMDD(res?.data?.Customer?.date_of_birth));
-      setGender(res?.data?.Customer?.gender);
-      setPhone(res?.data?.Customer?.phone);
-      setEmail(res?.data?.email);
+    const data = res?.data;
+    const customer = res?.data?.Customer;
+
+    if (res && res.data && res.err === 0) {
+      setName(data?.name);
+      setDate(convertDateToYYYYMMDD(data.date_of_birth));
+      setGender(data.gender);
+      setPhone(data.phone);
+      setEmail(data.email);
     }
   };
 
@@ -80,7 +83,7 @@ const Profile = (props) => {
     try {
       const res = await putUpdateCustomerInfo(name, date, gender);
 
-      if (res && res.err === 1) {
+      if (res && res.err === 0) {
         setUpdateSuccess(true);
         toast.success(res.message);
       } else {

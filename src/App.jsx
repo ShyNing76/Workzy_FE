@@ -13,7 +13,7 @@ function App() {
       setAppLoading(true);
 
       const res = await getUserAuthen();
-      if (res && res.data && res.err === 1) {
+      if (res && res.data && res.err === 0) {
         setAuth({
           isAuthenticated: true,
         });

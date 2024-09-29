@@ -72,7 +72,6 @@ const OfficeLocations = () => {
           <iframe
             src={hoveredLocation.googleMapsEmbedLink}
             className="w-full h-full"
-            allowfullscreen=""
             loading="lazy"
             referrerpolicy="no-referrer-when-downgrade"
           ></iframe>

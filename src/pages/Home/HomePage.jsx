@@ -27,6 +27,7 @@ import { MdContactSupport } from "react-icons/md";
 import { TbTruckDelivery } from "react-icons/tb";
 import { AiFillPrinter } from "react-icons/ai";
 import { FaPhone } from "react-icons/fa6";
+import Accordion from "../../components/layout/Accordion/Accordion";
 const HomePage = () => {
   // Define the slides for the Swiper
   const swiperSlides = [
@@ -43,7 +44,7 @@ const HomePage = () => {
       </div>
 
       {/* Service Cards Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 justify-items-center">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 justify-items-center mx-20">
         <ServiceCard
           title="Our solution"
           description="Browse our full range of products and services"
@@ -148,7 +149,7 @@ const HomePage = () => {
       </div>
 
       {/* Hero Section 2 */}
-      <div>
+      {/* <div>
         <Hero
           title="Work Seamlessly Wherever Your Business Takes You"
           details={
@@ -164,6 +165,41 @@ const HomePage = () => {
           }
           image={imageHero2}
         />
+      </div> */}
+
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center my-16">
+        <div className="md:w-1/2 mb-8 md:mb-0 flex flex-col justify-center">
+          <div className="text-left">
+            <h1 className="text-5xl font-extrabold text-gray-800 mb-4 leading-tight">
+              <span className="text-amber-500">FAQ</span> with WORKZY ?
+            </h1>
+          </div>
+        </div>
+
+        <div className="md:w-1/2">
+          <div className="join join-vertical w-full">
+            <Accordion
+              qs="What is POD booking workspace?"
+              ans="POD booking workspace is a system that allows users to book flexible working spaces in offices or co-working spaces. You can choose the type of space that suits your needs."
+            />
+            <Accordion
+              qs="How far in advance can I make a reservation?"
+              ans="You can make reservations up to 30 days in advance. However, please note that seats can be booked by multiple people, so try to book as early as possible."
+            />
+            <Accordion
+              qs="Do I need to register an account to make a reservation?"
+              ans="Yes, you need to register for an account to make a reservation. This helps us manage your reservation information and improve user experience."
+            />
+            <Accordion
+              qs="How can I pay?"
+              ans="You can pay through a variety of methods, including credit cards, debit cards, and other online payment gateways."
+            />
+            <Accordion
+              qs="Who will assist me if I have problems with my booking?"
+              ans="Our customer support team is always ready to help. You can contact us via email, phone, or live chat."
+            />
+          </div>
+        </div>
       </div>
 
       {/* Google Map and Contact Section */}
