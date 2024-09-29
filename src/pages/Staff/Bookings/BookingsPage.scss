@@ -42,10 +42,10 @@
             width: 100%;
             max-width: 100%;
 
-
             .booking-table {
                 width: 100%;
                 border-collapse: collapse;
+                table-layout: fixed; 
 
                 thead {
                     background-color: #8695a5;
@@ -55,6 +55,7 @@
                         border: 1px solid #ddd;
                         text-align: center;
                         color: #fff;
+                        white-space: nowrap; 
                     }
                 }
 
@@ -68,6 +69,10 @@
                             padding: 10px;
                             border: 1px solid #ddd;
                             text-align: center;
+                            word-wrap: break-word; 
+                            white-space: nowrap; 
+                            overflow: hidden; 
+                            text-overflow: ellipsis;
 
                             .check-in-button {
                                 padding: 5px 10px;

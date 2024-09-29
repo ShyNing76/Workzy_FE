@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import RoomControls from "../../../components/staff/building/RoomControls/RoomControls";
-import TimeGrid from "../../../components/staff/building/timegrid/TimeGrid";
 import './BuildingRoomPage.scss'; 
 
 const BuildingRoomPage = () => {
@@ -19,7 +18,7 @@ const BuildingRoomPage = () => {
                 setSelectedDate={setSelectedDate} 
             />
             <br/>
-            <TimeGrid selectedStatus={selectedStatus} />
+            
         </div>
     );
 }

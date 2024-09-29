@@ -9,12 +9,11 @@ const BookingsPage = () => {
     const [showUtilitiesModal, setShowUtilitiesModal] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [bookings, setBookings] = useState([
-        { id: 1, customerId: 1, price: 200000, additionalPrice: 21000, brokenPrice: 0, totalPrice: 221000, workspaceId: 1, createDate: '12/09/2024', bookingDate: '13/09/2024', status: "Paid", utilitiesChecked: [] },
-        { id: 2, customerId: 2, price: 100000, additionalPrice: 0, brokenPrice: 0, totalPrice: 100000, workspaceId: 2, createDate: '6/09/2024', bookingDate: '14/09/2024', status: "Paid", utilitiesChecked: [] },
-        { id: 3, customerId: 3, price: 500000, additionalPrice: 0, brokenPrice: 0, totalPrice: 500000, workspaceId: 3, createDate: '09/09/2024', bookingDate: '14/09/2024', status: "Paid", utilitiesChecked: [] },
-        { id: 4, customerId: 4, price: 180000, additionalPrice: 0, brokenPrice: 0, totalPrice: 180000, workspaceId: 4, createDate: '10/09/2024', bookingDate: '14/09/2024', status: "Paid", utilitiesChecked: [] },
-        { id: 5, customerId: 5, price: 250000, additionalPrice: 0, brokenPrice: 0, totalPrice: 250000, workspaceId: 5, createDate: '14/09/2024', bookingDate: '14/09/2024', status: "Paid", utilitiesChecked: [] },
-        { id: 6, customerId: 6, price: 200000, additionalPrice: 0, brokenPrice: 0, totalPrice: 550000, workspaceId: 1, createDate: '14/09/2024', bookingDate: '15/09/2024', status: "Paid", utilitiesChecked: [] },
+        { id: 1, customername: "John Doe", price: 200000, additionalPrice: 21000, brokenPrice: 0, totalPrice: 221000, workspacename: "WY102A", createDate: '12/09/2024', bookingDate: '13/09/2024', status: "Paid", utilitiesChecked: [] },
+        { id: 2, customername: "Jane Smith", price: 100000, additionalPrice: 0, brokenPrice: 0, totalPrice: 100000, workspacename: "WY102B", createDate: '6/09/2024', bookingDate: '14/09/2024', status: "Paid", utilitiesChecked: [] },
+        { id: 3, customername: "Michael Johnson", price: 500000, additionalPrice: 0, brokenPrice: 0, totalPrice: 500000, workspacename: "WY200A", createDate: '09/09/2024', bookingDate: '14/09/2024', status: "Paid", utilitiesChecked: [] },
+        { id: 4, customername: "Emily Davis", price: 180000, additionalPrice: 0, brokenPrice: 0, totalPrice: 180000, workspacename: "WY201B", createDate: '10/09/2024', bookingDate: '14/09/2024', status: "Paid", utilitiesChecked: [] },
+        { id: 5, customername: "Sarah Brown", price: 250000, additionalPrice: 0, brokenPrice: 0, totalPrice: 250000, workspacename: "WY301B", createDate: '14/09/2024', bookingDate: '14/09/2024', status: "Paid", utilitiesChecked: [] },
     ]);
 
     const handleCheckInOut = (index) => {
@@ -79,7 +78,7 @@ const BookingsPage = () => {
         if (booking.utilitiesChecked.length === 5) {
             booking.status = "Complete"; 
         } else {
-            booking.status = "Blocked"; 
+            booking.status = "Under Maintenance"; 
         }
 
         setBookings(updatedBookings);
@@ -90,17 +89,12 @@ const BookingsPage = () => {
     const renderBookingRow = (booking, index) => (
         <tr key={booking.id}>
             <td>{booking.id}</td>
-            <td>{booking.customerId}</td>
-            <td>{booking.price.toLocaleString('vi-VN')}</td>
-            <td>{booking.additionalPrice.toLocaleString('vi-VN')}</td>
-            <td>{booking.createDate}</td>
-            <td>{booking.bookingDate}</td>
-            <td>{booking.workspaceId}</td>
-            <td>{booking.brokenPrice.toLocaleString('vi-VN')}</td>
+            <td>{booking.customername}</td>
+            <td>{booking.workspacename}</td>
             <td>{booking.totalPrice.toLocaleString('vi-VN')}</td>
-            <td>{booking.status}</td> 
+            <td>{booking.status}</td>
             <td>
-                {booking.status === "Complete" ? (
+                {booking.status === "Complete" || booking.status === "Under Maintenance" ? (
                     <button onClick={() => { setSelectedBooking(booking); setShowDetailModal(true); }}>
                         Detail
                     </button>
@@ -117,6 +111,7 @@ const BookingsPage = () => {
             </td>
         </tr>
     );
+    
 
     return (
         <div className='booking-container'>
@@ -127,13 +122,8 @@ const BookingsPage = () => {
                     <thead>
                         <tr>
                             <th>BookingID</th>
-                            <th>CustomerID</th>
-                            <th>WorkspacePrice</th>
-                            <th>Additional utilities price</th>
-                            <th>Create Booking</th>
-                            <th>Date Booking</th>
-                            <th>WorkspaceID</th>                           
-                            <th>Broken_price</th>
+                            <th>Customer Name</th>
+                            <th>Workspace Name</th>                           
                             <th>Total price</th>
                             <th>Status</th>
                             <th>Action</th>
