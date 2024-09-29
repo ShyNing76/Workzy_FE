@@ -96,6 +96,7 @@ const HomePage = () => {
             </>
           }
           image={imageHero}
+          showButton = {true}
         />
       </div>
 
@@ -115,7 +116,7 @@ const HomePage = () => {
             Offices in central districts
           </h2>
 
-          <div className="service-detail-container grid grid-cols-2 gap-4 p-6">
+          <div className="service-info-container grid grid-cols-2 gap-4 p-6">
             <Servicedetail Icon={FaLocationArrow} detail="Strategic location" />
             <Servicedetail Icon={FaCoins} detail="Cost optimization" />
             <Servicedetail
@@ -154,6 +155,7 @@ const HomePage = () => {
           title="Work Seamlessly Wherever Your Business Takes You"
           details={
             <>
+
               With over 4,000 office locations worldwide, we offer meeting rooms
               and coworking spaces in every town, city, and major transport hub.
               <br />
@@ -161,9 +163,11 @@ const HomePage = () => {
               Whether you're working solo, growing a startup, or leading one of
               the world’s most successful corporations, you can work close to
               your clients, colleagues, or family through our network.
+
             </>
           }
           image={imageHero2}
+          showButton = {true}
         />
       </div> */}
 
