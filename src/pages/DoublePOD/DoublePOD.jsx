@@ -23,14 +23,14 @@ const swiperSlides = [
 const DoublePOD = () => {
   return (
     <div>
-      <div>
+      <div className="hero-service-container">
         <Hero
           reverse={true}
           showButton={false}
           title="Double POD"
           details={
             <>
-              Capacity: 2 person
+              <span style={{ color: '#f39c12', fontWeight: 'bold' }}>Capacity:</span> 2 person
               <br />
               <br />
               The dual workspace, perfect for collaborative tasks, brainstorming
