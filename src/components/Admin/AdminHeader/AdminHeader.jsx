@@ -1,3 +1,4 @@
+import { IoNotificationsOutline } from "react-icons/io5";
 import { FaRegBell } from "react-icons/fa";
 import { IoMenu } from "react-icons/io5";
 import { VscAccount } from "react-icons/vsc";
@@ -16,10 +17,13 @@ const AdminHeader = () => {
                 <div className="font-bold text-3xl ml-2">Workzy Admin</div>
             </div>
 
-            <div className="flex-none">
+            <div className="dropdown dropdown-end flex-none mr-2">
                 <button className="btn btn-square btn-ghost">
-                    <FaRegBell className="text-2xl"/>
+                    <IoNotificationsOutline className="text-2xl"/>
                 </button>
+                <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                    <p className="text-center">No new notification</p>
+                </ul>
             </div>
 
             <div className="profile-avt-dropdown dropdown dropdown-end">
@@ -29,7 +33,15 @@ const AdminHeader = () => {
                     </div>
                 </div>
                 <ul tabIndex={0} className="profile-avt-menu menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
-                    <li><a><VscAccount />Profile</a></li>
+                    <div className="flex flex-1 mb-3">
+                        <div className="mask mask-circle w-10">
+                            <img alt="Tailwind CSS Navbar component" src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+                        </div>
+                        <div className="flex flex-col">
+                            <h1 className="ml-2 text-xl font-semibold">Admin</h1>
+                            <a className="link ml-2 text-xs">View profile</a>
+                        </div>
+                    </div>
                     <li><a><IoLogOutOutline />Logout</a></li>
                 </ul>
             </div>

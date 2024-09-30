@@ -7,7 +7,7 @@ const UpdateModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fiel
   return (
     <div className="modal modal-open">
       <div className="modal-box">
-        <h3 className="font-bold text-lg">Update Item</h3>
+        <h3 className="font-bold text-lg">Update Info</h3>
         <form onSubmit={onSubmit}>
           {fields.map((field) => (
             <div key={field.name} className="form-control">

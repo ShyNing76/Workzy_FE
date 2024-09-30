@@ -7,7 +7,7 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
   return (
     <div className="modal modal-open">
       <div className="modal-box">
-        <h3 className="font-bold text-lg">Add Item</h3>
+        <h3 className="font-bold text-lg">Add New</h3>
         <form onSubmit={onSubmit}>
           {fields.map((field) => (
             field.name !== 'id' && (
