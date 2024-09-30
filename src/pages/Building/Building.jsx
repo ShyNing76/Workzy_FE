@@ -2,13 +2,10 @@ import React from "react";
 import Googlemap from "../../components/layout/Googlemap/Googlemap";
 import { IoLocationOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
-import { BiArea } from "react-icons/bi";
-import { MdOutlineChair } from "react-icons/md";
-import { useState } from "react";
-import { CiFilter } from "react-icons/ci";
 import Carousel from "../../components/layout/Carousel/Carousel";
 import RoomCard from "../../components/layout/RoomCard/RoomCard";
 import FilterBar from "../../components/layout/FilterBar/FilterBar";
+import buildingImage from "../../assets/8.jpg";
 
 const Building = () => {
   const images = [
@@ -18,9 +15,6 @@ const Building = () => {
     "https://picsum.photos/500/300?random=4",
     "https://picsum.photos/500/300?random=5",
   ];
-
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
 
   return (
     <>
@@ -62,7 +56,7 @@ const Building = () => {
             </div>
           </div>
           <div className="building-img border border-gray-300">
-            <img src="./src/assets/8.jpg" />
+            <img src={buildingImage} />
           </div>
         </div>
       </div>
@@ -79,71 +73,93 @@ const Building = () => {
       </div>
 
       <div className="room-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mx-12">
-        <RoomCard
-          roomName="Premium Meeting Room"
-          roomType="Meeting Room"
-          area={50}
-          chairs={18}
-          price={30000}
-          image="https://picsum.photos/500/300?random=1"
-        />
+        <Link to="roomdetail">
+          <RoomCard
+            roomName="Premium Meeting Room"
+            roomType="Meeting Room"
+            area={50}
+            chairs={18}
+            price={30000}
+            image="https://picsum.photos/500/300?random=1"
+          />
+        </Link>
 
-        <RoomCard
-          roomName="Premium Meeting Room"
-          roomType="Meeting Room"
-          area={50}
-          chairs={18}
-          price={30000}
-          image="https://picsum.photos/500/300?random=2"
-        />
-        <RoomCard
-          roomName="Premium Meeting Room"
-          roomType="Meeting Room"
-          area={50}
-          chairs={18}
-          price={30000}
-          image="https://picsum.photos/500/300?random=3"
-        />
-        <RoomCard
-          roomName="Premium Meeting Room"
-          roomType="Meeting Room"
-          area={50}
-          chairs={18}
-          price={30000}
-          image="https://picsum.photos/500/300?random=4"
-        />
-        <RoomCard
-          roomName="Premium Meeting Room"
-          roomType="Meeting Room"
-          area={50}
-          chairs={18}
-          price={30000}
-          image="https://picsum.photos/500/300?random=5"
-        />
-        <RoomCard
-          roomName="Premium Meeting Room"
-          roomType="Meeting Room"
-          area={50}
-          chairs={18}
-          price={30000}
-          image="https://picsum.photos/500/300?random=6"
-        />
-        <RoomCard
-          roomName="Premium Meeting Room"
-          roomType="Meeting Room"
-          area={50}
-          chairs={18}
-          price={30000}
-          image="https://picsum.photos/500/300?random=7"
-        />
-        <RoomCard
-          roomName="Premium Meeting Room"
-          roomType="Meeting Room"
-          area={50}
-          chairs={18}
-          price={30000}
-          image="https://picsum.photos/500/300?random=8"
-        />
+        <Link to="roomdetail">
+          <RoomCard
+            roomName="Premium Meeting Room"
+            roomType="Meeting Room"
+            area={50}
+            chairs={18}
+            price={30000}
+            image="https://picsum.photos/500/300?random=2"
+          />
+        </Link>
+
+        <Link to="roomdetail">
+          <RoomCard
+            roomName="Premium Meeting Room"
+            roomType="Meeting Room"
+            area={50}
+            chairs={18}
+            price={30000}
+            image="https://picsum.photos/500/300?random=3"
+          />
+        </Link>
+
+        <Link to="roomdetail">
+          <RoomCard
+            roomName="Premium Meeting Room"
+            roomType="Meeting Room"
+            area={50}
+            chairs={18}
+            price={30000}
+            image="https://picsum.photos/500/300?random=4"
+          />
+        </Link>
+
+        <Link to="roomdetail">
+          <RoomCard
+            roomName="Premium Meeting Room"
+            roomType="Meeting Room"
+            area={50}
+            chairs={18}
+            price={30000}
+            image="https://picsum.photos/500/300?random=5"
+          />
+        </Link>
+
+        <Link to="roomdetail">
+          <RoomCard
+            roomName="Premium Meeting Room"
+            roomType="Meeting Room"
+            area={50}
+            chairs={18}
+            price={30000}
+            image="https://picsum.photos/500/300?random=6"
+          />
+        </Link>
+
+        <Link to="roomdetail">
+          <RoomCard
+            roomName="Premium Meeting Room"
+            roomType="Meeting Room"
+            area={50}
+            chairs={18}
+            price={30000}
+            image="https://picsum.photos/500/300?random=7"
+          />
+        </Link>
+
+        <Link to="roomdetail">
+          <RoomCard
+            roomName="Premium Meeting Room"
+            roomType="Meeting Room"
+            area={50}
+            chairs={18}
+            price={30000}
+            image="https://picsum.photos/500/300?random=8"
+          />
+        </Link>
       </div>
 
       <div className="join flex justify-center mb-10">

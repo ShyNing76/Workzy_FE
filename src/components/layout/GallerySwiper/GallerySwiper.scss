@@ -1,0 +1,48 @@
+.swiper-gallery-container {
+  .mySwiper2 {
+    height: 60vh; // Đặt chiều cao cho Swiper chính
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px; // Bo tròn góc cho hình ảnh
+
+    img {
+      object-fit: cover; // Đảm bảo hình ảnh không bị méo
+    }
+  }
+
+  .mySwiper {
+    height: 100px; // Chiều cao cho Swiper thumbnail
+    margin-top: 10px;
+
+    img {
+      cursor: pointer; // Con trỏ khi di chuột vào thumbnail
+      transition: transform 0.3s; // Thêm hiệu ứng chuyển tiếp
+      border-radius: 20px; // Bo tròn góc cho thumbnail
+      height: 80px;
+
+      &:hover {
+        transform: scale(1.1); // Phóng to thumbnail khi hover
+      }
+    }
+  }
+
+  // Nút điều hướng
+  .swiper-button-next,
+  .swiper-button-prev {
+    color: #fff; // Đổi màu nút điều hướng
+    width: 40px; // Chiều rộng nút
+    height: 40px; // Chiều cao nút
+    background-color: rgba(0, 0, 0, 0.5); // Nền mờ
+    border-radius: 50%; // Bo tròn nút
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    scale: 0.5;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.8); // Tối màu khi hover
+    }
+  }
+}

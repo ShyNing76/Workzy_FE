@@ -81,11 +81,11 @@ export const router = createBrowserRouter([
         element: <LocationPage />,
       },
       {
-        path: "building",
+        path: "/location/building",
         element: <Building />,
       },
       {
-        path: "roomdetail",
+        path: "/location/building/roomdetail",
         element: <RoomDetail />,
       },
       {

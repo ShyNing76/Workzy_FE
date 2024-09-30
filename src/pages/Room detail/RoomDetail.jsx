@@ -3,60 +3,49 @@ import { PiChalkboardSimple } from "react-icons/pi";
 import { PiNoteBlankLight } from "react-icons/pi";
 import { BsProjector } from "react-icons/bs";
 import { IoCafeOutline } from "react-icons/io5";
+import RoomImage from "../../assets/9.png";
+import GallerySwiper from "../../components/layout/GallerySwiper/GallerySwiper";
+import "./RoomDetail.scss";
+import Googlemap from "../../components/layout/Googlemap/Googlemap";
 
 const RoomDetail = () => {
   return (
     <>
       <div className="detail-room-container mx-auto grid max-w-2xl grid-cols-1 items-start gap-x-8 gap-y-16 px-4 py-24 sm:px-6 sm:py-10 lg:max-w-7xl lg:grid-cols-2 lg:px-8">
-        <div className="detail-room-container-left-col ml-20">
-          <div className="room-img-gallery grid gap-4 mb-8">
-            <div>
-              <img
-                className="room-img-main-view h-auto max-w-full rounded-lg"
-                src="./src/assets/9.png"
-                alt="Featured"
-              />
+        <div className="detail-room-container-left-col">
+          <div className="gallery-contain">
+            <GallerySwiper />
+          </div>
+
+          <div className="time-booking-container">
+            <h2 className="text-2xl font-bold mb-4">Time Booking</h2>
+
+            {/* AM Time Row */}
+            <div className="time-row">
+              <div className="am-label">AM</div>
+              <div className="time-slot-grid">
+                {Array.from({ length: 12 }, (_, i) => (
+                  <div key={i} className="time-slot">
+                    {`${i.toString().padStart(2, "0")}:00`}
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="grid grid-cols-5 gap-4">
-              <div>
-                <img
-                  className="h-auto max-w-full rounded-lg"
-                  src="./src/assets/9.png"
-                  alt="Gallery Image 1"
-                />
-              </div>
-              <div>
-                <img
-                  className="h-auto max-w-full rounded-lg"
-                  src="./src/assets/9.png"
-                  alt="Gallery Image 2"
-                />
-              </div>
-              <div>
-                <img
-                  className="h-auto max-w-full rounded-lg"
-                  src="./src/assets/9.png"
-                  alt="Gallery Image 3"
-                />
-              </div>
-              <div>
-                <img
-                  className="h-auto max-w-full rounded-lg"
-                  src="./src/assets/9.png"
-                  alt="Gallery Image 4"
-                />
-              </div>
-              <div>
-                <img
-                  className="h-auto max-w-full rounded-lg"
-                  src="./src/assets/9.png"
-                  alt="Gallery Image 5"
-                />
+
+            {/* PM Time Row */}
+            <div className="time-row">
+              <div className="pm-label">PM</div>
+              <div className="time-slot-grid">
+                {Array.from({ length: 12 }, (_, i) => (
+                  <div key={i} className="time-slot">
+                    {`${(i + 12).toString().padStart(2, "0")}:00`}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
 
-          <div className="room-descriptions-container mb-4">
+          <div className="room-descriptions-container mt-4 mb-4">
             <h2 className="room-descriptions-title text-2xl font-bold mb-4">
               Room Description
             </h2>
@@ -68,11 +57,10 @@ const RoomDetail = () => {
               <li>Catering, tea, coffee, water facilities available anytime</li>
             </ul>
           </div>
-          <br />
 
           <div className="room-amenities-container">
             <h2 className="text-2xl font-bold mb-4">Amenities</h2>
-            <ul className="amenities-list mx-auto grid grid-cols-1 items-start gap-y-6 px-4 py-24 sm:px-6 sm:py-10 lg:max-w-7xl lg:grid-cols-2 lg:px-8 item-center">
+            <ul className="amenities-list mx-auto grid grid-cols-1 items-start gap-y-6 px-4 py-12 sm:px-6 sm:py-10 lg:max-w-7xl lg:grid-cols-2 lg:px-8 item-center">
               <li className="amenities-1 flex">
                 <PiChalkboardSimple className="text-2xl" /> &nbsp; Whiteboard
               </li>
@@ -87,160 +75,83 @@ const RoomDetail = () => {
               </li>
             </ul>
           </div>
-          <br />
 
-          <div className="room-notes-container">
-            <h2 className="text-2xl font-bold mb-4">Notes</h2>
-            <p></p>
+          <div className="map-building  ">
+            <h2 className="text-2xl font-bold mb-4">Map</h2>
+            <Googlemap src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.6099415304884!2d106.80730807470056!3d10.841132857997573!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752731176b07b1%3A0xb752b24b379bae5e!2zVHLGsOG7nW5nIMSQ4bqhaSBo4buNYyBGUFQgVFAuIEhDTQ!5e0!3m2!1svi!2s!4v1726955415730!5m2!1svi!2s" />
           </div>
         </div>
 
         <div className="detail-room-container-right-col">
-          {" "}
-          {/* Added margin-left */}
-          <div className="room-name-price-container container">
-            <div className="room-name-container flex ml-32 items-center">
-              <h1 className="room-name text-3xl font-black tracking-tight sm:text-5xl text-left">
-                Room name
-              </h1>
-              <div className="status-badge badge badge-success text-white text-xm p-3 font-bold ml-6">
-                Available
-              </div>
-            </div>
-            <div className="price-container flex ml-32 justify-between">
-              <h2 className="text-3xl font-bold tracking-tight sm:text-2xl text-left">
-                Type:
-              </h2>
-
-              <h2 className="text-3xl font-bold tracking-tight sm:text-2xl text-left">
-                Single POD
-              </h2>
+          <div className="room-name-container flex items-center justify-center">
+            <h1 className="room-name text-3xl font-black tracking-tight sm:text-5xl text-left">
+              Room name
+            </h1>
+            <div className="status-badge badge badge-success text-white text-xm p-3 font-bold ml-6">
+              Available
             </div>
           </div>
-          <br />
-          <div className="room-booking-detail-container">
-            <div className="remaining-time-container ml-36">
-              <h1 className="">Remaining time:</h1>
+          <div className="type-capacity-container">
+            <div className="flex justify-between font-semibold">
+              <div>Type: </div>
+              <div>Working Room</div>
             </div>
-            <br />
-            <div className="room-select-container flex justify-center w-full max-w-7xl">
-              <select className="room-select select select-bordered w-full max-w-xs">
-                <option disabled selected>
-                  Room
-                </option>
-                <option>Room No.1</option>
-                <option>Room No.2</option>
-              </select>
+            <div className=" flex justify-between font-semibold">
+              <div>Capacity: </div>
+              <div>18 seats</div>
             </div>
-            {/*  */}
-            {/* <div className="date-picker flex justify-center w-full max-w-7xl">
-              <input
-                type="date"
-                id="Date"
-                name="Date"
-                className="date-picker-container border border-gray-300 rounded p-2 w-full max-w-xs"
-              ></input>
-            </div>
-            <div className="time-picker flex justify-center w-full max-w-7xl">
-              <div className="time-picker-container grid lg:grid-cols-3 justify-center w-full max-w-xs">
-                <input
-                  type="time"
-                  id="appt-time"
-                  name="appt-time"
-                  className="start-time-select border border-gray-300 rounded p-2 w-full max-w-xs"
-                ></input>
-                <div className="ml-11 mr-10 mt-1 text-xl">
-                  <p>to</p>
-                </div>
-                <input
-                  type="time"
-                  id="appt-time"
-                  name="appt-time"
-                  className="start-time-select border border-gray-300 rounded p-2 w-full max-w-xs"
-                ></input>
-              </div>
-            </div> */}
-            <div className="discount-code-input-container flex justify-center w-full max-w-7xl">
-              <input
-                type="text"
-                placeholder="Discount code (optional)"
-                className="input input-bordered w-full max-w-xs"
-              />
-            </div>
-            <br />
-            {/* <div className="room-booking-price">
-              <div className="room-booking-price-container container item-center flex w-full flex-col lg:flex-row justify-center max-w-7xl">
-                <div className="room-booking-price-board card card-compact bg-base-100 w-96 shadow-xl">
-                  <div className="room-booking-price-detail-container flex flex-col lg:flex-row justify-between sm:px-4">
-                    <div className="room-booking-price-titles">
-                      <div className="amount-container flex">
-                        <p>Amount </p>
-                        <p>&nbsp;</p>
-                        <p>(1h30m)</p>
-                      </div>
-                      <p>Discount: </p>
-                      <p>Subtotal: </p>
-                      <p>Tax: </p>
-                      <p>Grand Total (To Pay): </p>
-                      <p>Payment Settled: </p>
-                      <p>Payment Outstanding: </p>
-                      <hr />
+          </div>
 
-                      <p className="font-black text-xl">Total:</p>
-                    </div>
-
-                    <div className="room-booking-price-amounts">
-                      <div className="amount-price flex aligned-right">
-                        <p>375.000</p>
-                        <p>&nbsp;</p>
-                        <p>VNĐ</p>
-                      </div>
-                      <div className="discount-price flex">
-                        <p>0</p>
-                        <p>&nbsp;</p>
-                        <p>VNĐ</p>
-                      </div>
-                      <div className="subtotal-price flex">
-                        <p>375.000</p>
-                        <p>&nbsp;</p>
-                        <p>VNĐ</p>
-                      </div>
-                      <div className="tax-price flex">
-                        <p>37.500</p>
-                        <p>&nbsp;</p>
-                        <p>VNĐ</p>
-                      </div>
-                      <div className="grand-total-price flex">
-                        <p>412.500</p>
-                        <p>&nbsp;</p>
-                        <p>VNĐ</p>
-                      </div>
-                      <div className="payment-settled-price flex">
-                        <p>0</p>
-                        <p>&nbsp;</p>
-                        <p>VNĐ</p>
-                      </div>
-                      <div className="payment-outstanding-price flex">
-                        <p>412.500</p>
-                        <p>&nbsp;</p>
-                        <p>VNĐ</p>
-                      </div>
-                      <div className="payment-outstanding-price flex font-black text-xl">
-                        <p>412.500</p>
-                        <p>&nbsp;</p>
-                        <p>VNĐ</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="card-actions justify-center sm:py-3"></div>
+          <div className="font-semibold mb-2">Type Booking: </div>
+          <div role="tablist" className="tabs tabs-lifted">
+            <input
+              type="radio"
+              name="my_tabs_2"
+              role="tab"
+              className="tab"
+              aria-label="Hour"
+              defaultChecked
+            />
+            <div
+              role="tabpanel"
+              className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+            >
+              <div className=" flex justify-between font-semibold items-center">
+                <div>Price: </div>
+                <div className="text-amber-500 text-xl font-bold">
+                  300.000 VND/h
                 </div>
               </div>
-            </div>{" "} */}
-            <div className="flex justify-center">
-              {/* Center the button */}
-              <button className="book-btn btn btn-wide">Book</button>
+              <div>Remaining Time: </div>
             </div>
-            <br />
+
+            <input
+              type="radio"
+              name="my_tabs_2"
+              role="tab"
+              className="tab"
+              aria-label="Day"
+            />
+            <div
+              role="tabpanel"
+              className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+            >
+              Tab content 2
+            </div>
+
+            <input
+              type="radio"
+              name="my_tabs_2"
+              role="tab"
+              className="tab"
+              aria-label="Month"
+            />
+            <div
+              role="tabpanel"
+              className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+            >
+              Tab content 3
+            </div>
           </div>
         </div>
       </div>
