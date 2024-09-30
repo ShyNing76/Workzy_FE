@@ -1,0 +1,16 @@
+.header-container{
+    .logo-container{
+        .circle{
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 2rem;
+        }
+    }
+}
