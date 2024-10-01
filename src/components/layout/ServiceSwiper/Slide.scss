@@ -8,13 +8,25 @@
       height: 45vh;
     }
   }
+
+
+  // Nút điều hướng
+  .swiper-button-next,
+  .swiper-button-prev {
+    color: #fff; // Đổi màu nút điều hướng
+    width: 40px; // Chiều rộng nút
+    height: 40px; // Chiều cao nút
+    background-color: rgba(0, 0, 0, 0.5); // Nền mờ
+    border-radius: 50%; // Bo tròn nút
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    scale: 0.5;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.8); // Tối màu khi hover
+    }
+  }
 }
 
-// .swiper-button-next,
-// .swiper-button-prev {
-//   background-color: #bebdbd5d; // Darker semi-transparent background to be more visible
-//   border-radius: 50%; // Keep buttons circular
-//   width: 60px; // Width of the buttons
-//   height: 60px; // Height of the buttons
-//   z-index: 50;
-// }

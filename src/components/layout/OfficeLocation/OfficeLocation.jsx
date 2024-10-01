@@ -7,7 +7,7 @@ const OfficeLocations = () => {
       city: "TP. HỒ CHÍ MINH",
       locations: [
         {
-          name: "WORKZY Khu Công Nghệ Cao",
+          name: "WORKZY Công Nghệ Cao",
           address:
             "Lô E2a-7, Đường D1, Đ. D1, Long Thạnh Mỹ, Thành Phố Thủ Đức, Hồ Chí Minh",
           googleMapsLink: "https://maps.app.goo.gl/zHwkDrqihCSCgKhk6",
