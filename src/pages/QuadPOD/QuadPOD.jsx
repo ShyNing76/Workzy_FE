@@ -23,14 +23,14 @@ const swiperSlides = [
 const QuadPOD = () => {
   return (
     <div>
-      <div>
+      <div className="hero-service-container">
         <Hero
           reverse={true}
           showButton={false}
           title="Quad POD"
           details={
             <>
-              Capacity: 4 person
+              <span style={{ color: '#f39c12', fontWeight: 'bold' }}>Capacity:</span> 4 person
               <br />
               <br />
               The Quad POD, designed for small teams or group collaborations,

@@ -1,0 +1,29 @@
+.container-slide {
+  h1 {
+    font-weight: bold;
+    font-size: 3rem;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+.info-container {
+  max-width: 100%;
+  margin-left: 50%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  h2 {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+}
+.service-info-container {
+  background-color: rgb(243, 240, 240);
+  border-radius: 20px   ;
+  text-align: center;
+
+}

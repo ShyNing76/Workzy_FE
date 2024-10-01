@@ -23,14 +23,14 @@ const swiperSlides = [
 const MeetingRoom = () => {
   return (
     <div >
-      <div>
+      <div className="hero-service-container">
         <Hero
           reverse={true}
           showButton={false}
           title="Meeting room"
           details={
             <>
-              Capacity: 15 person
+              <span style={{ color: '#f39c12', fontWeight: 'bold' }}>Capacity:</span> 15 person
               <br />
               <br />
               The Meeting Room at Workzy is tailored for both formal and casual

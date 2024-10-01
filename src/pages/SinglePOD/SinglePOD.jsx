@@ -1,4 +1,5 @@
 import React from "react";
+import "./SinglePOD.scss"
 import Hero from "../../components/layout/Hero/Hero";
 import imageSinglePod from "../../assets/imageSinglePod.jpg";
 import BenefitService from "../../components/layout/BenefitService/BenefitService";
@@ -24,14 +25,15 @@ const swiperSlides = [
 const SinglePOD = () => {
   return (
     <div>
-      <div>
+      <div className="hero-service-container">
         <Hero
           reverse={true}
           showButton={false}
           title="Single POD"
           details={
             <>
-              Capacity: 1 person
+              <span style={{ color: '#f39c12', fontWeight: 'bold' }}>Capacity:</span> 1 person
+
               <br />
               <br />
               The solo workspace, ideal for tasks requiring intense focus,

@@ -23,14 +23,14 @@ const swiperSlides = [
 const EventSpace = () => {
   return (
     <div >
-      <div>
+      <div className="hero-service-container">
         <Hero
           reverse={true}
           showButton={false}
           title="Event Space"
           details={
             <>
-              Capacity: 100 person
+              <span style={{ color: '#f39c12', fontWeight: 'bold' }}>Capacity:</span> 100 person
               <br />
               <br />
               The Event Space at Workzy is a versatile venue designed to host a
