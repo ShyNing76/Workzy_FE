@@ -7,6 +7,11 @@ import RoomImage from "../../assets/9.png";
 import GallerySwiper from "../../components/layout/GallerySwiper/GallerySwiper";
 import "./RoomDetail.scss";
 import Googlemap from "../../components/layout/Googlemap/Googlemap";
+import CustomDatePicker from "../../components/layout/DatePicker/CustomDatePicker";
+import TimePicker from "../../components/layout/TimePicker/TimePicker";
+import BookingSummary from "../../components/layout/Booking Summary/BookingSummary";
+import DateRangePicker from "../../components/layout/DateRangePicker/DateRangePicker";
+import MonthRangePicker from "../../components/layout/MonthRangePicker/MonthRangePicker";
 
 const RoomDetail = () => {
   return (
@@ -116,13 +121,38 @@ const RoomDetail = () => {
               role="tabpanel"
               className="tab-content bg-base-100 border-base-300 rounded-box p-6"
             >
-              <div className=" flex justify-between font-semibold items-center">
-                <div>Price: </div>
+              {/* Price section */}
+              <div className="flex justify-between font-semibold items-center">
+                <div>Price:</div>
                 <div className="text-amber-500 text-xl font-bold">
                   300.000 VND/h
                 </div>
               </div>
-              <div>Remaining Time: </div>
+
+              {/* Remaining Time section */}
+              <div className="font-semibold mt-4 mb-2">Remaining Time:</div>
+
+              <div className="container mx-auto">
+                {/* Custom Date Picker */}
+                <div className="mb-4">
+                  <CustomDatePicker />
+                </div>
+
+                {/* Time Picker */}
+                <div className="mb-4">
+                  <TimePicker />
+                </div>
+
+                {/* Discount Code Input */}
+                <input
+                  type="text"
+                  placeholder="Discount code"
+                  className="input input-bordered w-full max-w-xs mb-3"
+                />
+
+                {/* Booking Summary */}
+                <BookingSummary />
+              </div>
             </div>
 
             <input
@@ -136,7 +166,23 @@ const RoomDetail = () => {
               role="tabpanel"
               className="tab-content bg-base-100 border-base-300 rounded-box p-6"
             >
-              Tab content 2
+              <div className=" flex justify-between font-semibold items-center">
+                <div>Price: </div>
+                <div className="text-amber-500 text-xl font-bold">
+                  1.300.000 VND/day
+                </div>
+              </div>
+              <div className="font-semibold mt-4 mb-2">Remaining Time: </div>
+              <div className="my-4">
+                <DateRangePicker />
+              </div>
+
+              <input
+                type="text"
+                placeholder="Discount code"
+                className="input input-bordered w-full max-w-xs mb-3"
+              />
+              <BookingSummary />
             </div>
 
             <input
@@ -150,7 +196,23 @@ const RoomDetail = () => {
               role="tabpanel"
               className="tab-content bg-base-100 border-base-300 rounded-box p-6"
             >
-              Tab content 3
+              <div className=" flex justify-between font-semibold items-center">
+                <div>Price: </div>
+                <div className="text-amber-500 text-xl font-bold">
+                  10.300.000 VND/month
+                </div>
+              </div>
+              <div className="font-semibold mt-4 mb-2">Remaining Time: </div>
+              <div className="pb-4">
+                <MonthRangePicker />
+              </div>
+
+              <input
+                type="text"
+                placeholder="Discount code"
+                className="input input-bordered w-full max-w-xs mb-3"
+              />
+              <BookingSummary />
             </div>
           </div>
         </div>
