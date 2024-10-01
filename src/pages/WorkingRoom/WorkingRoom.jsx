@@ -23,14 +23,14 @@ const swiperSlides = [
 const WorkingRoom = () => {
   return (
     <div>
-      <div>
+      <div className="hero-service-container">
         <Hero
           reverse={true}
           showButton={false}
           title="Working room"
           details={
             <>
-              Capacity: 30 person
+              <span style={{ color: '#f39c12', fontWeight: 'bold' }}>Capacity:</span> 30 person
               <br />
               <br />
               The Working Room at Workzy offers a focused and adaptable space

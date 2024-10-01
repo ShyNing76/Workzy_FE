@@ -20,6 +20,19 @@
       margin-top: 40px;
       text-align: center;
     }
+    .btn {
+      width: 35%;
+      font-size: 1rem;
+      text-align: center;
+      color: white;
+      background-color: black;
+      margin-top: 40px;
+      border-radius: 10px;
+      
+      &:hover {
+        background-color: rgb(110, 108, 108);
+      }
+    }
   }
 }
 .container-map-contact {
@@ -34,27 +47,30 @@
   }
 }
 
-.container-slide {
-  h1 {
-    font-weight: bold;
-    font-size: 3rem;
-    display: flex;
-    justify-content: center;
-    text-align: center;
-  }
-}
 
-.info-container {
-  max-width: fit-content;
-  margin-left: 150px;
-  h2 {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 10px;
+.tabs {
+  justify-content: center; 
+  
+
+  .tab {
+    margin: 0px 70px;
     font-weight: bold;
+    font-size: 1.2rem;
+    border-radius: 8px; // Rounded corners
+    transition: background-color 0.3s, color 0.3s; // Smooth transition
+    
+    &.tab-active {
+      background-color: #007bff; 
+      color: #fff; 
+    }
+    &:hover {
+      background-color: rgba(0, 123, 255, 0.2); // Adjusted hover color
+    }
   }
 }
-.service-info-container {
-  background-color: rgb(243, 240, 240);
-  border-radius: 20px   ;
+h2 {
+  font-size: 3rem;
+  margin-bottom: 60px;
+  text-align: center;
+  font-weight: bold;
 }
