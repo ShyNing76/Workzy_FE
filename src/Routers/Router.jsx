@@ -13,6 +13,8 @@ import RoomDetail from "../pages/Room detail/RoomDetail.jsx";
 import { createBrowserRouter } from "react-router-dom";
 import ScrollToTop from "../components/context/scrollToTop.jsx";
 import PrivateRoute from "./PrivateRoute.jsx";
+import Building from "../pages/Building/Building.jsx";
+import GoogleCallback from "../pages/GoogleCallBack/GoogleCallback.jsx";
 import SinglePOD from "../pages/SinglePOD/SinglePOD.jsx";
 import DoublePOD from "../pages/DoublePOD/DoublePOD.jsx";
 import QuadPOD from "../pages/QuadPOD/QuadPOD.jsx";
@@ -20,9 +22,7 @@ import MeetingRoom from "../pages/MeetingRoom/MeetingRoom.jsx";
 import WorkingRoom from "../pages/WorkingRoom/WorkingRoom.jsx";
 import EventSpace from "../pages/EventSpace/EventSpace.jsx";
 
-
 // Role id store in local Storage after login and register
-const roleID = localStorage.getItem("role_id");
 
 export const router = createBrowserRouter([
   // Customer
@@ -53,7 +53,7 @@ export const router = createBrowserRouter([
 
       {
         path: "services/quad-pod",
-        element: <QuadPOD/>,
+        element: <QuadPOD />,
       },
 
       {
@@ -74,15 +74,15 @@ export const router = createBrowserRouter([
       {
         path: "services",
         element: <ServicesPage />,
-        children: [
-         
-          
-          
-        ],
+        children: [],
       },
       {
         path: "location",
         element: <LocationPage />,
+      },
+      {
+        path: "building",
+        element: <Building />,
       },
       {
         path: "roomdetail",
@@ -100,7 +100,7 @@ export const router = createBrowserRouter([
         path: "user",
         element: (
           <>
-            <PrivateRoute roleID={roleID} requiredRoleID="4">
+            <PrivateRoute requiredRoleID="4">
               <User />
             </PrivateRoute>
           </>
@@ -140,6 +140,12 @@ export const router = createBrowserRouter([
   {
     path: "login",
     element: <LoginPage />,
+  },
+
+  // Call back google
+  {
+    path: "api/v1/auth/google/callback", //5173
+    element: <GoogleCallback />,
   },
 
   {

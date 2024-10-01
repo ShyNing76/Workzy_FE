@@ -8,7 +8,9 @@ import "../../../../node_modules/swiper/swiper.min.css";
 // Import Swiper modules
 import { Autoplay, Pagination, Navigation } from "swiper/modules";
 
-const Carousel = () => {
+const Carousel = (props) => {
+  const { images } = props;
+
   return (
     <Swiper
       modules={[Autoplay, Pagination]}
@@ -25,21 +27,11 @@ const Carousel = () => {
       // grabCursor={true} // Hiệu ứng khi hover chuột
       freeMode={true} // Di chuyển liên tục
     >
-      <SwiperSlide>
-        <img src="https://picsum.photos/500/300?random=1" alt="Slide 1" />
-      </SwiperSlide>
-      <SwiperSlide>
-        <img src="https://picsum.photos/500/300?random=2" alt="Slide 2" />
-      </SwiperSlide>
-      <SwiperSlide>
-        <img src="https://picsum.photos/500/300?random=3" alt="Slide 3" />
-      </SwiperSlide>
-      <SwiperSlide>
-        <img src="https://picsum.photos/500/300?random=4" alt="Slide 3" />
-      </SwiperSlide>
-      <SwiperSlide>
-        <img src="https://picsum.photos/500/300?random=5" alt="Slide 3" />
-      </SwiperSlide>
+      {images.map((image, index) => (
+        <SwiperSlide key={`Swiper-slide-${index}`}>
+          <img src={image} alt="Slide 1" />
+        </SwiperSlide>
+      ))}
     </Swiper>
   );
 };

@@ -45,6 +45,7 @@ const Filter = () => {
                 </option>
                 <option value="Single POD">Single POD</option>
                 <option value="Double POD">Double POD</option>
+                <option value="Double POD">Quad POD</option>
                 <option value="Working Room">Working Room</option>
                 <option value="Meeting Room">Meeting Room</option>
                 <option value="Event Space">Event Space</option>
