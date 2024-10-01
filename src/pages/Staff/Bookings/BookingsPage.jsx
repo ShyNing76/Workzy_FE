@@ -48,7 +48,6 @@ const BookingsPage = () => {
         const bookingIndex = updatedBookings.findIndex(b => b.id === selectedBooking.id);
         const booking = updatedBookings[bookingIndex];
 
-        
         const printerPrice = 25000000;
         const papershredderPrice = 350000;
         const faxmachinePrice = 4750000;
@@ -72,13 +71,12 @@ const BookingsPage = () => {
             booking.brokenPrice += monitorPrice;
         }
 
-        
         booking.totalPrice = booking.price + booking.additionalPrice + booking.brokenPrice;
 
         if (booking.utilitiesChecked.length === 5) {
             booking.status = "Complete"; 
         } else {
-            booking.status = "Under Maintenance"; 
+            booking.status = "Pending";  // Chỉnh sửa ở đây
         }
 
         setBookings(updatedBookings);
@@ -94,7 +92,7 @@ const BookingsPage = () => {
             <td>{booking.totalPrice.toLocaleString('vi-VN')}</td>
             <td>{booking.status}</td>
             <td>
-                {booking.status === "Complete" || booking.status === "Under Maintenance" ? (
+                {booking.status === "Complete" || booking.status === "Pending" ? (
                     <button onClick={() => { setSelectedBooking(booking); setShowDetailModal(true); }}>
                         Detail
                     </button>
@@ -111,39 +109,37 @@ const BookingsPage = () => {
             </td>
         </tr>
     );
-    
 
     return (
         <div className='booking-container'>
             <div className='main-bookings-content'>
                 <SearchBar />
                 <div className='table-responsive'>
-                <table className='booking-table'>
-                    <thead>
-                        <tr>
-                            <th>BookingID</th>
-                            <th>Customer Name</th>
-                            <th>Workspace Name</th>                           
-                            <th>Total price</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {bookings.map(renderBookingRow)}
-                    </tbody>
-                </table>
+                    <table className='booking-table'>
+                        <thead>
+                            <tr>
+                                <th>BookingID</th>
+                                <th>Customer Name</th>
+                                <th>Workspace Name</th>                           
+                                <th>Total price</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {bookings.map(renderBookingRow)}
+                        </tbody>
+                    </table>
                 </div>
                 {showDetailModal && selectedBooking && (
                     <DetailModal booking={selectedBooking} onClose={() => setShowDetailModal(false)} />
                 )}
-
                 {showUtilitiesModal && selectedBooking && (
                     <UtilitiesModal 
                         booking={selectedBooking} 
-                        onCheckUtility={handleUtilitiesCheck} 
-                        onDone={handleDone} 
                         onClose={() => setShowUtilitiesModal(false)} 
+                        onUtilitiesCheck={handleUtilitiesCheck} 
+                        onDone={handleDone} 
                     />
                 )}
             </div>
