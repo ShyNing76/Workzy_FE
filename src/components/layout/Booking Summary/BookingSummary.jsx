@@ -1,7 +1,9 @@
 import React from "react";
 
-const BookingSummary = () => {
-  const amount = 300000; // Số tiền
+const BookingSummary = (props) => {
+  const { handleSubmit, price, discountProps } = props;
+
+  const amount = price; // Số tiền
   const discount = 0; // Giảm giá
   const subtotal = amount - discount;
   const tax = subtotal * 0.1; // Giả sử thuế là 10%
@@ -37,7 +39,10 @@ const BookingSummary = () => {
       </div>
 
       {/* Nút Book */}
-      <button className="mt-4 w-full bg-black text-white py-2 rounded-md shadow-md">
+      <button
+        onClick={handleSubmit}
+        className="mt-4 w-full bg-black text-white py-2 rounded-md shadow-md"
+      >
         Book
       </button>
     </div>

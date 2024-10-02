@@ -1,0 +1,36 @@
+.custom-slider {
+  width: 100%;
+  margin: 10px 0;
+
+  .slider-thumb {
+    background-color: #f59e0b; // Sử dụng màu của DaisyUI (blue-500)
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+
+    &:focus {
+      outline: none;
+      box-shadow: 0px 0px 5px #f59e0b; // Light blue focus (blue-400)
+    }
+  }
+
+  .slider-track {
+    background-color: #d1d5db; // Light grey (gray-300)
+    height: 8px;
+    border-radius: 4px;
+    position: relative;
+
+    &-active {
+      background-color: #f59e0b; // Active track color (blue-500)
+    }
+  }
+}
+
+.custom-slider {
+  margin: 15px 0;
+}

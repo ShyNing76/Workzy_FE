@@ -28,7 +28,7 @@
       background-color: black;
       margin-top: 40px;
       border-radius: 10px;
-      
+
       &:hover {
         background-color: rgb(110, 108, 108);
       }
@@ -47,28 +47,31 @@
   }
 }
 
+.service-tabs {
+  justify-content: center;
+  text-align: center;
+  width: 100%;
 
-.tabs {
-  justify-content: center; 
-  
-
-  .tab {
-    margin: 0px 70px;
-    font-weight: bold;
-    font-size: 1.2rem;
+  .service-tab {
+    // margin: 0px 70px;
+    padding: 0 76px;
+    font-weight: 500;
+    // font-size: 1.2rem;
     border-radius: 8px; // Rounded corners
     transition: background-color 0.3s, color 0.3s; // Smooth transition
-    
-    &.tab-active {
-      background-color: #007bff; 
-      color: #fff; 
-    }
+    width: 100%;
+
     &:hover {
-      background-color: rgba(0, 123, 255, 0.2); // Adjusted hover color
+      background-color: #f0ae44; // Adjusted hover color
+    }
+
+    &:is(input[type="radio"]):after {
+      width: 100px;
     }
   }
 }
-h2 {
+
+.tittle-service-tab {
   font-size: 3rem;
   margin-bottom: 60px;
   text-align: center;

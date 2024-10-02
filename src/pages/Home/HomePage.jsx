@@ -8,7 +8,7 @@ import Filter from "../../components/layout/HomePageFilter/Filter";
 import Card from "../../components/layout/About/Card/Card";
 import ServiceCard from "../../components/layout/ServiceCard/ServiceCard";
 
-import OfficeNavbar from "../../components/layout/OfficeNavbar/OfficeNavbar"
+import OfficeNavbar from "../../components/layout/OfficeNavbar/OfficeNavbar";
 import Googlemap from "../../components/layout/Googlemap/Googlemap";
 //Icon:
 import { AiOutlineSolution } from "react-icons/ai";
@@ -59,13 +59,12 @@ import eventSpaceImage1 from "../../assets/eventSpaceImage1.jpg";
 import eventSpaceImage2 from "../../assets/eventSpaceImage2.jpg";
 import eventSpaceImage3 from "../../assets/eventSpaceImage3.jpg";
 
-
-
 import { MdContactSupport } from "react-icons/md";
 import { TbTruckDelivery } from "react-icons/tb";
 import { AiFillPrinter } from "react-icons/ai";
 import { FaPhone } from "react-icons/fa6";
 import Accordion from "../../components/layout/Accordion/Accordion";
+import Comment from "../../components/layout/CommentSection/Comment";
 
 const HomePage = () => {
   // Define the slides for the Swiper
@@ -73,123 +72,122 @@ const HomePage = () => {
     {
       name: "Single POD",
       swiperSlides: [
-        {image: singlePODimage1},
-        {image: singlePODimage2},
-        {image: singlePODimage3} 
+        { image: singlePODimage1 },
+        { image: singlePODimage2 },
+        { image: singlePODimage3 },
       ],
       serviceDetails: [
-        { Icon: FaRegCalendarAlt, details:"Open 24/7"},
-        { Icon: FaWifi, details: "Strong, stable Wi-Fi"},
-        { Icon: BsCupHot, details: "Coffee and Tea"},
-        { Icon: MdConnectWithoutContact, details: "Community connection"},
-        { Icon: MdOutlineContactSupport, details: "Support"},
-        { Icon: BiBuildingHouse, details: "Professional Enviroment"}
+        { Icon: FaRegCalendarAlt, details: "Open 24/7" },
+        { Icon: FaWifi, details: "Strong, stable Wi-Fi" },
+        { Icon: BsCupHot, details: "Coffee and Tea" },
+        { Icon: MdConnectWithoutContact, details: "Community connection" },
+        { Icon: MdOutlineContactSupport, details: "Support" },
+        { Icon: BiBuildingHouse, details: "Professional Enviroment" },
       ],
-      subTitle: "Private and Flexible"
+      subTitle: "Private and Flexible",
     },
 
     {
       name: "Double POD",
       swiperSlides: [
-        {image: doublePODimage1},
-        {image: doublePODimage2},
-        {image: doublePODimage3} 
+        { image: doublePODimage1 },
+        { image: doublePODimage2 },
+        { image: doublePODimage3 },
       ],
       serviceDetails: [
-        { Icon: FaRegCalendarAlt, details:"Open 24/7"},
-        { Icon: FaWifi, details: "Strong, stable Wi-Fi"},
-        { Icon: BsCupHot, details: "Coffee and Tea"},
-        { Icon: MdConnectWithoutContact, details: "Community connection"},
-        { Icon: MdOutlinePeopleAlt, details: "1-2 People"},
-        { Icon: BiBuildingHouse, details: "Professional Enviroment"},
-       
+        { Icon: FaRegCalendarAlt, details: "Open 24/7" },
+        { Icon: FaWifi, details: "Strong, stable Wi-Fi" },
+        { Icon: BsCupHot, details: "Coffee and Tea" },
+        { Icon: MdConnectWithoutContact, details: "Community connection" },
+        { Icon: MdOutlinePeopleAlt, details: "1-2 People" },
+        { Icon: BiBuildingHouse, details: "Professional Enviroment" },
       ],
-      subTitle: "Private and Spacious"
+      subTitle: "Private and Spacious",
     },
 
     {
       name: "Quad POD",
       swiperSlides: [
-        {image: quadPODimage1},
-        {image: quadPODimage2},
-        {image: quadPODimage3} 
+        { image: quadPODimage1 },
+        { image: quadPODimage2 },
+        { image: quadPODimage3 },
       ],
       serviceDetails: [
-        { Icon: FaRegCalendarAlt, details:"Open 24/7"},
-        { Icon: FaWifi, details: "Strong, stable Wi-Fi"},
-        { Icon: BsCupHot, details: "Coffee and Tea"},
-        { Icon: MdConnectWithoutContact, details: "Community connection"},
-        { Icon: FiPrinter, details: "Printer"},
-        { Icon: MdGroups2, details: "2-4 People"},
-        { Icon: BiBuildingHouse, details: "Professional Enviroment"}
+        { Icon: FaRegCalendarAlt, details: "Open 24/7" },
+        { Icon: FaWifi, details: "Strong, stable Wi-Fi" },
+        { Icon: BsCupHot, details: "Coffee and Tea" },
+        { Icon: MdConnectWithoutContact, details: "Community connection" },
+        { Icon: FiPrinter, details: "Printer" },
+        { Icon: MdGroups2, details: "2-4 People" },
+        { Icon: BiBuildingHouse, details: "Professional Enviroment" },
       ],
-      subTitle: "Work with your teammate"
+      subTitle: "Work with your teammate",
     },
 
     {
       name: "Working Room",
       swiperSlides: [
-        {image: workingRoomImage1},
-        {image: workingRoomImage2},
-        {image: workingRoomImage3} 
+        { image: workingRoomImage1 },
+        { image: workingRoomImage2 },
+        { image: workingRoomImage3 },
       ],
       serviceDetails: [
-        { Icon: FaRegCalendarAlt, details:"Open 24/7"},
-        { Icon: FaWifi, details: "Strong, stable Wi-Fi"},
-        { Icon: BsCupHot, details: "Coffee and Tea"},
-        { Icon: MdConnectWithoutContact, details: "Community connection"},
-        { Icon: FiPrinter, details: "Printer"},
-        { Icon: BsFillTelephoneFill, details: "Telephone for room"},
-        { Icon: BiBuildingHouse, details: "Professional Enviroment"},
-        { Icon: BiRename, details: "Incorporate a business name"},
-        { Icon: SlScreenDesktop, details: "Screen"},
-        { Icon: FaChalkboard, details: "White board"}
+        { Icon: FaRegCalendarAlt, details: "Open 24/7" },
+        { Icon: FaWifi, details: "Strong, stable Wi-Fi" },
+        { Icon: BsCupHot, details: "Coffee and Tea" },
+        { Icon: MdConnectWithoutContact, details: "Community connection" },
+        { Icon: FiPrinter, details: "Printer" },
+        { Icon: BsFillTelephoneFill, details: "Telephone for room" },
+        { Icon: BiBuildingHouse, details: "Professional Enviroment" },
+        { Icon: BiRename, details: "Incorporate a business name" },
+        { Icon: SlScreenDesktop, details: "Screen" },
+        { Icon: FaChalkboard, details: "White board" },
       ],
-      subTitle: "Productive and Comfortable workspace"
+      subTitle: "Productive and Comfortable workspace",
     },
 
     {
       name: "Meeting Room",
       swiperSlides: [
-        {image: meetingRoomImage1},
-        {image: meetingRoomImage2},
-        {image: meetingRoomImage3} 
+        { image: meetingRoomImage1 },
+        { image: meetingRoomImage2 },
+        { image: meetingRoomImage3 },
       ],
       serviceDetails: [
-        { Icon: FaRegCalendarAlt, details:"Open 24/7"},
-        { Icon: FaWifi, details: "Strong, stable Wi-Fi"},
-        { Icon: BsCupHot, details: "Coffee and Tea"},
-        { Icon: MdGroups2, details: "6-15 people"},
-        { Icon: FiPrinter, details: "Printer"},
-        { Icon: BsFillTelephoneFill, details: "Telephone for room"},
-        { Icon: MdOutlineSecurity, details: "Security"},
-        { Icon: PiProjectorScreenDuotone, details: "Projector"},
-        { Icon: SlScreenDesktop, details: "Screen"},
-        { Icon: FaChalkboard, details: "White board"}
+        { Icon: FaRegCalendarAlt, details: "Open 24/7" },
+        { Icon: FaWifi, details: "Strong, stable Wi-Fi" },
+        { Icon: BsCupHot, details: "Coffee and Tea" },
+        { Icon: MdGroups2, details: "6-15 people" },
+        { Icon: FiPrinter, details: "Printer" },
+        { Icon: BsFillTelephoneFill, details: "Telephone for room" },
+        { Icon: MdOutlineSecurity, details: "Security" },
+        { Icon: PiProjectorScreenDuotone, details: "Projector" },
+        { Icon: SlScreenDesktop, details: "Screen" },
+        { Icon: FaChalkboard, details: "White board" },
       ],
-      subTitle: "Collaborative and Professional space"
+      subTitle: "Collaborative and Professional space",
     },
 
     {
       name: "Event Space",
       swiperSlides: [
-        {image: eventSpaceImage1},
-        {image: eventSpaceImage2},
-        {image: eventSpaceImage3} 
+        { image: eventSpaceImage1 },
+        { image: eventSpaceImage2 },
+        { image: eventSpaceImage3 },
       ],
       serviceDetails: [
-        { Icon: LiaHandsHelpingSolid, details:"Event-ready and Supportive"},
-        { Icon: FaWifi, details: "Strong, stable Wi-Fi"},
-        { Icon: BsCupHot, details: "Coffee and Tea"},
-        { Icon: MdGroups2, details: "50-150 people"},
-        { Icon: MdOutlineSecurity, details: "Security"},
-        { Icon: PiProjectorScreenDuotone, details: "Projector"},
-        { Icon: SlScreenDesktop, details: "Screen"},
-        { Icon: FaChalkboard, details: "White board"}
+        { Icon: LiaHandsHelpingSolid, details: "Event-ready and Supportive" },
+        { Icon: FaWifi, details: "Strong, stable Wi-Fi" },
+        { Icon: BsCupHot, details: "Coffee and Tea" },
+        { Icon: MdGroups2, details: "50-150 people" },
+        { Icon: MdOutlineSecurity, details: "Security" },
+        { Icon: PiProjectorScreenDuotone, details: "Projector" },
+        { Icon: SlScreenDesktop, details: "Screen" },
+        { Icon: FaChalkboard, details: "White board" },
       ],
-      subTitle: "Versatile and Inviting venue"
+      subTitle: "Versatile and Inviting venue",
     },
-  ]
+  ];
 
   return (
     <>
@@ -204,25 +202,25 @@ const HomePage = () => {
           title="Our solution"
           description="Browse our full range of products and services"
           Icon={AiOutlineSolution}
-          link = "/about"
+          link="/about"
         />
         <ServiceCard
           title="Talk to us"
           description="Get advice from one of our experts"
           Icon={MdPhoneInTalk}
-          link = "/contact"
+          link="/contact"
         />
         <ServiceCard
           title="Book workspace"
           description="Book rooms and offices"
           Icon={ImOffice}
-          link = "/services"
+          link="/services"
         />
         <ServiceCard
           title="Set up office"
           description="Start building a real presence today"
           Icon={TbSettingsUp}
-          link = "/location"
+          link="/location"
         />
         <ServiceCard
           title="Become a VIP"
@@ -234,8 +232,7 @@ const HomePage = () => {
           title="Explore our web"
           description="View our web to find your workspace"
           Icon={RiPhoneFindLine}
-          link = "/about"
-
+          link="/about"
         />
       </div>
 
@@ -258,14 +255,14 @@ const HomePage = () => {
             </>
           }
           image={imageHero}
-          showButton = {true}
+          showButton={true}
         />
       </div>
 
       {/*How it work */}
       <div className="about-testimonials">
         <div className="title-about-cart">
-          <span style={{padding: '100px'}}>How it work</span> 
+          <span style={{ padding: "100px" }}>How it work</span>
         </div>
         <div className="about-card">
           <Card
@@ -286,24 +283,29 @@ const HomePage = () => {
         </div>
       </div>
 
-      
       {/*Discover workzy services*/}
-      <h2>Discover Services of <span style={{color: '#f39c12' }}>Workzy</span></h2>
-      <div role="tablist" className="tabs tabs-bordered">
+      <div className="tittle-service-tab">
+        Discover Services of <span style={{ color: "#f39c12" }}>Workzy</span>
+      </div>
+      <div role="tablist" className="service-tabs tabs tabs-bordered">
         {tabs.map((room, index) => (
-          
-          <React.Fragment key = {index}>
+          <React.Fragment key={index}>
             <input
-            type="radio"
-            name="my_tabs_2"
-            role="tab"
-            className="tab"
-            aria-label={`${room.name}`}
-            defaultChecked={index === 0} // Tab đầu tiên được chọn mặc định
-          />
-          <div role="tabpanel" className="tab-content p-10">
-            <OfficeNavbar title={room.name} swiperSlides={room.swiperSlides} serviceDetails={room.serviceDetails} subTitle={room.subTitle}/>
-          </div>
+              type="radio"
+              name="my_tabs_2"
+              role="tab"
+              className="tab service-tab "
+              aria-label={`${room.name}`}
+              defaultChecked={index === 0} // Tab đầu tiên được chọn mặc định
+            />
+            <div role="tabpanel" className="tab-content p-10">
+              <OfficeNavbar
+                title={room.name}
+                swiperSlides={room.swiperSlides}
+                serviceDetails={room.serviceDetails}
+                subTitle={room.subTitle}
+              />
+            </div>
           </React.Fragment>
         ))}
       </div>
@@ -329,40 +331,10 @@ const HomePage = () => {
           showButton = {true}
         />
       </div> */}
+      <h2 className="text-4xl font-bold mb-6 ml-36">What Our Users Say</h2>
 
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center my-16">
-        <div className="md:w-1/2 mb-8 md:mb-0 flex flex-col justify-center">
-          <div className="text-left">
-            <h1 className="text-5xl font-extrabold text-gray-800 mb-4 leading-tight">
-              <span className="text-amber-500">FAQ</span> with WORKZY ?
-            </h1>
-          </div>
-        </div>
-
-        <div className="md:w-1/2">
-          <div className="join join-vertical w-full">
-            <Accordion
-              qs="What is POD booking workspace?"
-              ans="POD booking workspace is a system that allows users to book flexible working spaces in offices or co-working spaces. You can choose the type of space that suits your needs."
-            />
-            <Accordion
-              qs="How far in advance can I make a reservation?"
-              ans="You can make reservations up to 30 days in advance. However, please note that seats can be booked by multiple people, so try to book as early as possible."
-            />
-            <Accordion
-              qs="Do I need to register an account to make a reservation?"
-              ans="Yes, you need to register for an account to make a reservation. This helps us manage your reservation information and improve user experience."
-            />
-            <Accordion
-              qs="How can I pay?"
-              ans="You can pay through a variety of methods, including credit cards, debit cards, and other online payment gateways."
-            />
-            <Accordion
-              qs="Who will assist me if I have problems with my booking?"
-              ans="Our customer support team is always ready to help. You can contact us via email, phone, or live chat."
-            />
-          </div>
-        </div>
+      <div className="container mx-auto pt-5">
+        <Comment />
       </div>
 
       {/* Google Map and Contact Section */}
@@ -375,7 +347,9 @@ const HomePage = () => {
           <p className="mb-2">Hot Line: 1900 1234</p>
           <p className="mb-2">Email: contact_workzy@gmail.com</p>
           <p>Call expert: 0792 695 143</p>
-          <Link to='/contact' className="btn">Contact us</Link>
+          <Link to="/contact" className="btn">
+            Contact us
+          </Link>
         </div>
       </div>
     </>

@@ -2,13 +2,10 @@ import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns"; // Để định dạng ngày
-import { FaCalendarAlt } from "react-icons/fa";
+import { FaRegCalendar } from "react-icons/fa";
 
-const CustomDatePicker = () => {
-  const [selectedDate, setSelectedDate] = useState(null);
-
-  // Lấy ngày hôm nay
-  const today = new Date();
+const CustomDatePicker = (props) => {
+  const { selectedDate, setSelectedDate, today } = props;
 
   return (
     <div className="relative w-full max-w-xs">
@@ -20,7 +17,7 @@ const CustomDatePicker = () => {
         className="input input-bordered w-80 h-12 pl-4 pr-12 " // Điều chỉnh padding
         placeholderText="Select Date"
       />
-      <FaCalendarAlt className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
+      <FaRegCalendar className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
     </div>
   );
 };

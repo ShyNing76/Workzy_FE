@@ -73,93 +73,77 @@ const Building = () => {
       </div>
 
       <div className="room-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mx-12">
-        <Link to="roomdetail">
-          <RoomCard
-            roomName="Premium Meeting Room"
-            roomType="Meeting Room"
-            area={50}
-            chairs={18}
-            price={30000}
-            image="https://picsum.photos/500/300?random=1"
-          />
-        </Link>
+        <RoomCard
+          roomName="Premium Meeting Room"
+          roomType="Meeting Room"
+          area={50}
+          chairs={18}
+          price={30000}
+          image="https://picsum.photos/500/300?random=1"
+        />
 
-        <Link to="roomdetail">
-          <RoomCard
-            roomName="Premium Meeting Room"
-            roomType="Meeting Room"
-            area={50}
-            chairs={18}
-            price={30000}
-            image="https://picsum.photos/500/300?random=2"
-          />
-        </Link>
+        <RoomCard
+          roomName="Premium Meeting Room"
+          roomType="Meeting Room"
+          area={50}
+          chairs={18}
+          price={30000}
+          image="https://picsum.photos/500/300?random=2"
+        />
 
-        <Link to="roomdetail">
-          <RoomCard
-            roomName="Premium Meeting Room"
-            roomType="Meeting Room"
-            area={50}
-            chairs={18}
-            price={30000}
-            image="https://picsum.photos/500/300?random=3"
-          />
-        </Link>
+        <RoomCard
+          roomName="Premium Meeting Room"
+          roomType="Meeting Room"
+          area={50}
+          chairs={18}
+          price={30000}
+          image="https://picsum.photos/500/300?random=3"
+        />
 
-        <Link to="roomdetail">
-          <RoomCard
-            roomName="Premium Meeting Room"
-            roomType="Meeting Room"
-            area={50}
-            chairs={18}
-            price={30000}
-            image="https://picsum.photos/500/300?random=4"
-          />
-        </Link>
+        <RoomCard
+          roomName="Premium Meeting Room"
+          roomType="Meeting Room"
+          area={50}
+          chairs={18}
+          price={30000}
+          image="https://picsum.photos/500/300?random=4"
+        />
 
-        <Link to="roomdetail">
-          <RoomCard
-            roomName="Premium Meeting Room"
-            roomType="Meeting Room"
-            area={50}
-            chairs={18}
-            price={30000}
-            image="https://picsum.photos/500/300?random=5"
-          />
-        </Link>
+        <RoomCard
+          roomName="Premium Meeting Room"
+          roomType="Meeting Room"
+          area={50}
+          chairs={18}
+          price={30000}
+          image="https://picsum.photos/500/300?random=5"
+        />
 
-        <Link to="roomdetail">
-          <RoomCard
-            roomName="Premium Meeting Room"
-            roomType="Meeting Room"
-            area={50}
-            chairs={18}
-            price={30000}
-            image="https://picsum.photos/500/300?random=6"
-          />
-        </Link>
+        <RoomCard
+          roomName="Premium Meeting Room"
+          roomType="Meeting Room"
+          area={50}
+          chairs={18}
+          price={30000}
+          image="https://picsum.photos/500/300?random=6"
+        />
 
-        <Link to="roomdetail">
-          <RoomCard
-            roomName="Premium Meeting Room"
-            roomType="Meeting Room"
-            area={50}
-            chairs={18}
-            price={30000}
-            image="https://picsum.photos/500/300?random=7"
-          />
-        </Link>
+        <RoomCard
+          roomName="Premium Meeting Room"
+          roomType="Meeting Room"
+          area={50}
+          chairs={18}
+          price={30000}
+          image="https://picsum.photos/500/300?random=7"
+        />
 
-        <Link to="roomdetail">
-          <RoomCard
-            roomName="Premium Meeting Room"
-            roomType="Meeting Room"
-            area={50}
-            chairs={18}
-            price={30000}
-            image="https://picsum.photos/500/300?random=8"
-          />
-        </Link>
+        <RoomCard
+          roomName="Premium Meeting Room"
+          roomType="Meeting Room"
+          area={50}
+          chairs={18}
+          price={30000}
+          image="https://picsum.photos/500/300?random=8"
+        />
       </div>
 
       <div className="join flex justify-center mb-10">
