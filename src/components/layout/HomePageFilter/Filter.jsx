@@ -2,10 +2,29 @@ import React, { useState } from "react";
 import "./Filter.scss";
 import { CiLocationOn } from "react-icons/ci";
 import { BsPersonWorkspace } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
 
 const Filter = () => {
   const [location, setLocation] = useState("");
   const [workspaceType, setWorkspaceType] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const queryParams = {};
+
+    if (location) {
+      queryParams.location = location;
+    }
+
+    if (workspaceType) {
+      queryParams.workspaceType = workspaceType;
+    }
+
+    const queryString = new URLSearchParams(queryParams).toString();
+    navigate(`/location?${queryString}`);
+  };
 
   return (
     <div className="filter-container">
@@ -17,7 +36,7 @@ const Filter = () => {
           technology, discover workspace solutions for every team.
         </p>
         <div className="search-container">
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="input-container">
               <CiLocationOn className="location-icon" />
               <select
@@ -28,8 +47,8 @@ const Filter = () => {
                 <option disabled value="">
                   Select location
                 </option>
-                <option value="Ho Chi Minh">Ho Chi Minh</option>
-                <option value="Ha Noi">Ha Noi</option>
+                <option value="HCM">Ho Chi Minh</option>
+                <option value="Hanoi">Ha Noi</option>
               </select>
             </div>
 
@@ -45,13 +64,15 @@ const Filter = () => {
                 </option>
                 <option value="Single POD">Single POD</option>
                 <option value="Double POD">Double POD</option>
-                <option value="Double POD">Quad POD</option>
+                <option value="Quad POD">Quad POD</option>
                 <option value="Working Room">Working Room</option>
                 <option value="Meeting Room">Meeting Room</option>
                 <option value="Event Space">Event Space</option>
               </select>
             </div>
-            <button className="btn">Find now</button>
+            <button type="submit" className="btn">
+              Find now
+            </button>
           </form>
         </div>
       </div>

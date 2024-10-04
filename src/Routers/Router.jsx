@@ -74,7 +74,6 @@ export const router = createBrowserRouter([
       {
         path: "services",
         element: <ServicesPage />,
-        children: [],
       },
       {
         path: "location",

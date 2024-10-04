@@ -32,6 +32,10 @@ const BookingRoom = () => {
   const [price, setPrice] = useState(0);
   const [discount, setDiscount] = useState(0);
 
+  // Amount Text and Price in booking
+  const [amountText, setAmountText] = useState("");
+  const [amountPrice, setAmountPrice] = useState(0);
+
   // Set default whenever currentTab Change
   useEffect(() => {
     if (currentTab === "hour") {
@@ -39,14 +43,20 @@ const BookingRoom = () => {
       setStartTime("");
       setEndTime("");
       setNumOfHours("");
+      setAmountText("");
+      setAmountPrice(0);
     } else if (currentTab === "day") {
       setStartDate(null);
       setEndDate(null);
       setNumOfDays("");
+      setAmountText("");
+      setAmountPrice(0);
     } else if (currentTab === "month") {
       setStartDate(null);
       setEndDate(null);
       setNumOfMonths("");
+      setAmountText("");
+      setAmountPrice(0);
     }
   }, [currentTab]);
 
@@ -222,7 +232,15 @@ const BookingRoom = () => {
             />
 
             {/* Booking Summary */}
-            <BookingSummary handleSubmit={handleSubmit} price={300000} />
+            <BookingSummary
+              handleSubmit={handleSubmit}
+              price={300000}
+              numOfHours={numOfHours}
+              amountText={amountText}
+              setAmountText={setAmountText}
+              amountPrice={amountPrice}
+              setAmountPrice={setAmountPrice}
+            />
           </div>
         </div>
 
@@ -261,7 +279,15 @@ const BookingRoom = () => {
             placeholder="Discount code"
             className="input input-bordered w-full max-w-xs mb-3"
           />
-          <BookingSummary handleSubmit={handleSubmit} price={1300000} />
+          <BookingSummary
+            handleSubmit={handleSubmit}
+            price={1300000}
+            numOfDays={numOfDays}
+            amountText={amountText}
+            setAmountText={setAmountText}
+            amountPrice={amountPrice}
+            setAmountPrice={setAmountPrice}
+          />
         </div>
 
         {/* Tab for Month */}
@@ -302,7 +328,15 @@ const BookingRoom = () => {
             placeholder="Discount code"
             className="input input-bordered w-full max-w-xs mb-3"
           />
-          <BookingSummary handleSubmit={handleSubmit} price={10300000} />
+          <BookingSummary
+            handleSubmit={handleSubmit}
+            price={10300000}
+            numOfMonths={numOfMonths}
+            amountText={amountText}
+            setAmountText={setAmountText}
+            amountPrice={amountPrice}
+            setAmountPrice={setAmountPrice}
+          />
         </div>
       </div>
     </>

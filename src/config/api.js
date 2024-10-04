@@ -54,6 +54,12 @@ const getGoogleCallBack = (code) => {
   });
 };
 
+const getBuildingFromSearch = (queryString) => {
+  const URL_API = `api/v1/search/${queryString}`;
+
+  return axios.get(URL_API);
+};
+
 export {
   loginApi,
   registerApi,
@@ -61,4 +67,5 @@ export {
   putUpdateCustomerInfo,
   putUpdateCustomerPassword,
   getGoogleCallBack,
+  getBuildingFromSearch,
 };

@@ -20,7 +20,7 @@ import { useOutletContext } from "react-router-dom";
 const Profile = (props) => {
   const { handleUpdate } = useOutletContext();
 
-  const [avatar, setAvatar] = useState(defaultProfile);
+  const [avatar, setAvatar] = useState(null);
   const [name, setName] = useState("");
   const [date, setDate] = useState("");
   const [gender, setGender] = useState("");
@@ -34,14 +34,14 @@ const Profile = (props) => {
     const res = await getUserAuthen();
 
     const data = res?.data;
-    const customer = res?.data?.Customer;
 
     if (res && res.data && res.err === 0) {
       setName(data?.name);
-      setDate(convertDateToYYYYMMDD(data.date_of_birth));
-      setGender(data.gender);
-      setPhone(data.phone);
-      setEmail(data.email);
+      setDate(convertDateToYYYYMMDD(data?.date_of_birth));
+      setGender(data?.gender);
+      setPhone(data?.phone);
+      setEmail(data?.email);
+      setAvatar(data?.image);
     }
   };
 
@@ -78,8 +78,50 @@ const Profile = (props) => {
   };
 
   // Handle submit
-  const handleSubmit = async () => {
+  const handleSubmitProfile = async (e) => {
     setLoading(true);
+    e.preventDefault();
+    const today = new Date();
+    const dob = new Date(date);
+    const maxAgeLimit = 120;
+    const minDate = new Date(
+      today.getFullYear() - maxAgeLimit,
+      today.getMonth(),
+      today.getDate()
+    );
+
+    console.log("Today: ", today);
+    console.log("Dob: ", dob);
+
+    if (!name) {
+      toast.error("Name needs to be fill !!!");
+    }
+
+    if (!dob || isNaN(dob.getTime())) {
+      toast.error("Date Of Birth needs to be fill !!!");
+    } else {
+      if (dob >= today) {
+        toast.error(
+          `Date of Birth cannot be larger than ${today.toLocaleDateString()}!!!`
+        );
+        setLoading(false);
+        return;
+      }
+
+      // Kiểm tra nếu tuổi quá xa (quá 120 năm)
+      if (dob <= minDate) {
+        toast.error(
+          `Date of Birth cannot be more than ${minDate.toLocaleDateString()} !!!`
+        );
+        setLoading(false);
+        return;
+      }
+    }
+
+    if (!gender) {
+      toast.error("Gender needs to be fill !!!");
+    }
+
     try {
       const res = await putUpdateCustomerInfo(name, date, gender);
 
@@ -100,106 +142,114 @@ const Profile = (props) => {
       <div className="max-w-5xl container mx-auto p-8 bg-white rounded-lg shadow-lg">
         <div className="flex">
           {/* Left Content */}
+
           <div className="left-content w-1/2 pr-8">
-            <h1 className="text-2xl font-semibold mb-4">
-              Personal Information
-            </h1>
+            <form action="" onSubmit={handleSubmitProfile}>
+              <h1 className="text-2xl font-semibold mb-4">
+                Personal Information
+              </h1>
 
-            {/* Avatar and Name */}
-            <div className="avatar-name flex items-center mb-6 cursor-pointer">
-              <div
-                className="relative avatar mr-4"
-                onClick={handleClickFileHidden}
-              >
-                <div className="w-36 rounded-full ring-offset-base-100 ring ring-offset-2 ring-neutral">
-                  <img src={avatar} alt="User avatar" />
+              {/* Avatar and Name */}
+              <div className="avatar-name flex items-center mb-6 cursor-pointer">
+                <div
+                  className="relative avatar mr-4"
+                  onClick={handleClickFileHidden}
+                >
+                  <div className="w-36 rounded-full ring-offset-base-100 ring ring-offset-2 ring-neutral">
+                    <img
+                      src={avatar === null ? defaultProfile : avatar}
+                      alt="User avatar"
+                    />
+                  </div>
+                  {/* Pencil Icon */}
+                  <div className="absolute bottom-0 right-0 bg-gray-300 p-1 rounded-full shadow-md">
+                    <GoPencil className="text-gray-600 w-5 h-5" />
+                  </div>
                 </div>
-                {/* Pencil Icon */}
-                <div className="absolute bottom-0 right-0 bg-gray-300 p-1 rounded-full shadow-md">
-                  <GoPencil className="text-gray-600 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Enter your name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="input input-bordered w-full max-w-xs"
+                />
+              </div>
+
+              {/* Hidden file input */}
+              <input
+                type="file"
+                accept="image/*"
+                style={{ display: "none" }}
+                id="avatarInput"
+                onChange={handleAvatarChange}
+              />
+
+              {/* Date of Birth */}
+              <div className="mb-4">
+                <label className="block font-semibold mb-2">
+                  Date of Birth
+                </label>
+                <input
+                  type="date"
+                  className="input input-bordered w-full"
+                  value={date || ""}
+                  onChange={(e) => setDate(e.target.value)}
+                />
+              </div>
+
+              {/* Gender */}
+              <div className="mb-4">
+                <label className="block font-semibold mb-2">Gender</label>
+                <div className="flex items-center space-x-4">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="gender"
+                      value="Male"
+                      checked={gender === "Male"}
+                      onChange={handleGenderChange}
+                      className="radio  mr-2"
+                    />
+                    <span>Male</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="gender"
+                      value="Female"
+                      checked={gender === "Female"}
+                      onChange={handleGenderChange}
+                      className="radio  mr-2"
+                    />
+                    <span>Female</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="gender"
+                      value="Others"
+                      checked={gender === "Others"}
+                      onChange={handleGenderChange}
+                      className="radio mr-2"
+                    />
+                    <span>Others</span>
+                  </label>
                 </div>
               </div>
-              <input
-                type="text"
-                placeholder="Enter your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="input input-bordered w-full max-w-xs"
-              />
-            </div>
 
-            {/* Hidden file input */}
-            <input
-              type="file"
-              accept="image/*"
-              style={{ display: "none" }}
-              id="avatarInput"
-              onChange={handleAvatarChange}
-            />
-
-            {/* Date of Birth */}
-            <div className="mb-4">
-              <label className="block font-semibold mb-2">Date of Birth</label>
-              <input
-                type="date"
-                className="input input-bordered w-full"
-                value={date || ""}
-                onChange={(e) => setDate(e.target.value)}
-              />
-            </div>
-
-            {/* Gender */}
-            <div className="mb-4">
-              <label className="block font-semibold mb-2">Gender</label>
-              <div className="flex items-center space-x-4">
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="gender"
-                    value="Male"
-                    checked={gender === "Male"}
-                    onChange={handleGenderChange}
-                    className="radio  mr-2"
-                  />
-                  <span>Male</span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="gender"
-                    value="Female"
-                    checked={gender === "Female"}
-                    onChange={handleGenderChange}
-                    className="radio  mr-2"
-                  />
-                  <span>Female</span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="gender"
-                    value="Other"
-                    checked={gender === "Other"}
-                    onChange={handleGenderChange}
-                    className="radio mr-2"
-                  />
-                  <span>Other</span>
-                </label>
+              <div className="text-center mt-10">
+                {!loading ? (
+                  <button type="submit" className="btn btn-neutral ">
+                    Save changes
+                  </button>
+                ) : (
+                  <button className="btn">
+                    <span className="loading loading-spinner"></span>
+                    loading
+                  </button>
+                )}
               </div>
-            </div>
-
-            <div className="text-center mt-10">
-              {!loading ? (
-                <button className="btn btn-neutral " onClick={handleSubmit}>
-                  Save changes
-                </button>
-              ) : (
-                <button className="btn">
-                  <span className="loading loading-spinner"></span>
-                  loading
-                </button>
-              )}
-            </div>
+            </form>
           </div>
 
           {/* Divider Line */}

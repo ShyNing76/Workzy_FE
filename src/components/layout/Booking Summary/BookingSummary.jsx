@@ -1,11 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const BookingSummary = (props) => {
-  const { handleSubmit, price, discountProps } = props;
+  const {
+    handleSubmit,
+    price,
+    discountProps,
+    numOfHours,
+    numOfDays,
+    numOfMonths,
+    amountText,
+    setAmountText,
+    amountPrice,
+    setAmountPrice,
+  } = props;
 
-  const amount = price; // Số tiền
+  useEffect(() => {
+    if (numOfHours) {
+      setAmountText(numOfHours + " Hour");
+      setAmountPrice(price * numOfHours);
+    } else if (numOfDays) {
+      setAmountText(numOfDays + " Day");
+      setAmountPrice(price * numOfDays);
+    } else if (numOfMonths) {
+      setAmountText(numOfMonths + " Month");
+      setAmountPrice(price * numOfMonths);
+    } else {
+      setAmountText("");
+    }
+  }, [numOfHours, numOfDays, numOfMonths]);
+
   const discount = 0; // Giảm giá
-  const subtotal = amount - discount;
+  const subtotal = amountPrice - discount;
   const tax = subtotal * 0.1; // Giả sử thuế là 10%
   const total = subtotal + tax;
 
@@ -14,8 +39,8 @@ const BookingSummary = (props) => {
       {/* Box hiển thị thông tin */}
       <div className="bg-gray-200 p-4 rounded-lg shadow-md">
         <div className="flex justify-between mb-2">
-          <span>Amount (1 hour):</span>
-          <span>{amount.toLocaleString()} VND</span>
+          <span>Amount ({amountText}):</span>
+          <span>{amountPrice.toLocaleString()} VND</span>
         </div>
         <div className="flex justify-between mb-2">
           <span>Discount:</span>

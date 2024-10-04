@@ -18,6 +18,7 @@ import { getUserAuthen } from "../../../config/api";
 const Sidebar = (props) => {
   const { outlet, refresh } = props;
   const [name, setName] = useState("");
+  const [avatar, setAvatar] = useState(null);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -25,6 +26,7 @@ const Sidebar = (props) => {
 
       if (res && res.data && res.err === 0) {
         setName(res?.data?.name);
+        setAvatar(res?.data?.image);
       }
     };
 
@@ -56,7 +58,10 @@ const Sidebar = (props) => {
             <li className="menu-item flex items-center text-center">
               <div className="avatar ">
                 <div className="w-10 rounded-full">
-                  <img src={defaultProfile} alt="User avatar" />
+                  <img
+                    src={avatar === null ? defaultProfile : avatar}
+                    alt="User avatar"
+                  />
                 </div>
               </div>
               <div className="text-lg font-semibold te">{name}</div>
