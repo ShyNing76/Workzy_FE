@@ -1,15 +1,15 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 
 import SearchBar from "../../../components/Admin/SearchBar/SearchBar.jsx";
 import AddModal from "../../../components/Admin/Modals/AddModal.jsx";
 import DeleteModal from "../../../components/Admin/Modals/DeleteModal.jsx";
 import UpdateModal from "../../../components/Admin/Modals/UpdateModal.jsx";
-import SuccessModal from "../../../components/Admin/Modals/SuccessModal.jsx";
 import AddButton from "../../../components/Admin/Buttons/AddButton.jsx";
 import UpdateButton from "../../../components/Admin/Buttons/UpdateButton.jsx";
 import DeleteButton from "../../../components/Admin/Buttons/DeleteButton.jsx";
+import SuccessAlert from "../../../components/Admin/SuccessAlert/SuccessAlert.jsx";
 
-import { useLocation } from "react-router-dom";
 
 const ServicesManagerPage = () => {
     const location = useLocation();
@@ -25,14 +25,18 @@ const ServicesManagerPage = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [currentService, setCurrentService] = useState({ id: "", name: "", status: "" });
     const [serviceToDelete, setServiceToDelete] = useState(null);
-    const [successModal, setSuccessModal] = useState({ show: false, message: "" });
     const [successMessage, setSuccessMessage] = useState("");
 
-    const serviceFields = [
-        { name: 'id', label: 'Service ID', type: 'text' },
-        { name: 'name', label: 'Service Name', type: 'text' },
-        { name: 'status', label: 'Status', type: 'text' }
-      ];
+  const addServiceFields = [
+    { name: 'name', label: 'Service Name', type: 'text' },
+  ];
+
+  const updateServiceFields = [
+    { name: 'id', label: 'Service ID', type: 'text' },
+    { name: 'name', label: 'Service Name', type: 'text' },
+    { name: 'status', label: 'Status', type: 'checkbox', checkboxLabels: { checked: 'Active', unchecked: 'Inactive' }},
+  ];
+
   
     const handleInputChange = (e) => {
       const { name, value } = e.target;
@@ -47,11 +51,10 @@ const ServicesManagerPage = () => {
 
     const handleAddServiceSubmit = (e) => {
         e.preventDefault();
-        const newService = { ...currentService, id: generateServiceId() };
+        const newService = { ...currentService, id: generateServiceId(), status: "Active" };
         setServices([...services, newService]);
         setShowAddModal(false);
         setSuccessMessage("Service Added Successfully!");
-        setSuccessModal({ show: true, message: "Service Added Successfully!" });
         setCurrentService({ id: '', name: '', status: '' });
     };
 
@@ -67,25 +70,24 @@ const ServicesManagerPage = () => {
           return prevServices;
       });
       setShowUpdateModal(false);
-      setSuccessModal({ show: true, message: "Service Updated Successfully!" });
+      setSuccessMessage("Service Updated Successfully!");
       setCurrentService({ id: '', name: '', status: '' });
     };
   
-
     const handleDeleteService = () => {
       setServices((prevServices) =>
           prevServices.filter((service) => service.id !== serviceToDelete.id)
       );
       setShowDeleteModal(false);
-      setSuccessModal({ show: true, message: "Service Deleted Successfully!" });
+      setSuccessMessage("Service Deleted Successfully!");
     };
 
     const handleSearchChange = (e) => {
       setSearchTerm(e.target.value);
     };
 
-    const closeSuccessModal = () => {
-      setSuccessModal({ show: false, message: "" });
+    const closeSuccessMessage = () => {
+      setSuccessMessage("");
     };
   
     const filteredServices = services.filter(
@@ -111,6 +113,13 @@ const ServicesManagerPage = () => {
                 <AddButton onClick={() => setShowAddModal(true)} label="Add Service" />
             </div>
             
+        </div>
+
+        <div>
+            <SuccessAlert
+              message={successMessage}
+              onClose={closeSuccessMessage}
+            />
         </div>
 
         {/* Table */}
@@ -163,38 +172,33 @@ const ServicesManagerPage = () => {
 
       {/* Add, Update, Delete, Success Modals */}
       <AddModal
-            show={showAddModal}
-            onClose={() => setShowAddModal(false)}
-            onSubmit={handleAddServiceSubmit}
-            currentItem={currentService}
-            onInputChange={handleInputChange}
-            fields={serviceFields}
+        show={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSubmit={handleAddServiceSubmit}
+        currentItem={currentService}
+        onInputChange={handleInputChange}
+        fields={addServiceFields}
       />
 
       <UpdateModal
-            show={showUpdateModal}
-            onClose={() => setShowUpdateModal(false)}
-            onSubmit={handleUpdateServiceSubmit}
-            currentItem={currentService}
-            onInputChange={handleInputChange}
-            fields={serviceFields}
+        show={showUpdateModal}
+        onClose={() => setShowUpdateModal(false)}
+        onSubmit={handleUpdateServiceSubmit}
+        currentItem={currentService}
+        onInputChange={handleInputChange}
+        fields={updateServiceFields}
       />
+
 
       <DeleteModal
-            show={showDeleteModal}
-            onClose={() => setShowDeleteModal(false)}
-            onDelete={handleDeleteService}
-            itemToDelete={serviceToDelete}
-            itemType="service"
+        show={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onDelete={handleDeleteService}
+        itemToDelete={serviceToDelete}
+        itemType="service"
       />
-
-      <SuccessModal
-          show={successModal.show}
-          message={successModal.message}
-          onClose={closeSuccessModal}
-      />
-  </div>
-    );
+    </div>
+  );
 };
 
 export default ServicesManagerPage;

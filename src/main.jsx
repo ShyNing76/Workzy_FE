@@ -18,6 +18,17 @@ import ManagersManagerPage from "./pages/Admin/ManagersManager/ManagersManagerPa
 import StaffsManagerPage from "./pages/Admin/StaffsManager/StaffsManagerPage.jsx";
 import MembersManagerPage from "./pages/Admin/MembersManager/MembersManagerPage.jsx";
 import VIPsManagerPage from "./pages/Admin/VIPsManager/VIPsManagerPage.jsx";
+import HCMBuildingsManagerPage from "./pages/Admin/BuildingsManager/HoChiMinh/HCMBuildingManagerPage.jsx";
+import HNBuildingsManagerPage from "./pages/Admin/BuildingsManager/HaNoi/HNBuildingManagerPage.jsx";
+import HCMWorkspacesManagerPage from "./pages/Admin/WorkspacesManager/HoChiMinh/HCMWorkspacesManagerPage.jsx";
+import HNWorkspacesManagerPage from "./pages/Admin/WorkspacesManager/HaNoi/HNWorkspacesManagerPage.jsx";
+import AmenitiesManagerPage from "./pages/Admin/AmenitiesManager/AmenitiesManagerPage.jsx";
+import WorkspacesTypesManagerPage from "./pages/Admin/WorkspaceTypesManager/WorkspaceTypesManager.jsx";
+import PaymentsManagerPage from "./pages/Admin/PaymentsManager/PaymentsManagerPage.jsx";
+import BookingsManagerPage from "./pages/Admin/BookingsManager/BookingsManagerPage.jsx";
+import ReviewsManagerPage from "./pages/Admin/ReviewsManager/ReviewsManagerPage.jsx";
+import TrackAndAnalyzeReport from "./pages/Admin/Track&AnalyzeReport/Track&AnalyzeReport.jsx";
+
 
 const router = createBrowserRouter([
   // Customer
@@ -95,6 +106,46 @@ const router = createBrowserRouter([
       {
         path: "vipsmanager",
         element: <VIPsManagerPage />,
+      },
+      {
+        path: "hcmbuildingmanager",
+        element: <HCMBuildingsManagerPage/>,
+      },
+      {
+        path: "hnbuildingmanager",
+        element: <HNBuildingsManagerPage/>,
+      },
+      {
+        path: "hcmworkspacesmanager",
+        element: <HCMWorkspacesManagerPage />,
+      },
+      {
+        path: "hnworkspacesmanager",
+        element: <HNWorkspacesManagerPage />,
+      },
+      {
+        path: "amenitiesmanager",
+        element: <AmenitiesManagerPage />,
+      },
+      {
+        path: "workspacetypesmanager",
+        element: <WorkspacesTypesManagerPage />,
+      },
+      {
+        path: "paymentsmanager",
+        element: <PaymentsManagerPage />,
+      },
+      {
+        path: "bookingsmanager",
+        element: <BookingsManagerPage />,
+      },
+      {
+        path: "reviewsmanager",
+        element: <ReviewsManagerPage />,
+      },
+      {
+        path: "trackandanalyzereport",
+        element: <TrackAndAnalyzeReport />,
       },
     ],
     // condition: (user) => user.isAdmin, // Add condition to check if user is admin before rendering the routes

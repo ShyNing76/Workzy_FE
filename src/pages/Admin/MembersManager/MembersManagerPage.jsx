@@ -4,10 +4,10 @@ import SearchBar from "../../../components/Admin/SearchBar/SearchBar.jsx";
 import AddModal from "../../../components/Admin/Modals/AddModal.jsx";
 import DeleteModal from "../../../components/Admin/Modals/DeleteModal.jsx";
 import UpdateModal from "../../../components/Admin/Modals/UpdateModal.jsx";
-import SuccessModal from "../../../components/Admin/Modals/SuccessModal.jsx";
 import AddButton from "../../../components/Admin/Buttons/AddButton.jsx";
 import UpdateButton from "../../../components/Admin/Buttons/UpdateButton.jsx";
 import DeleteButton from "../../../components/Admin/Buttons/DeleteButton.jsx";
+import SuccessAlert from "../../../components/Admin/SuccessAlert/SuccessAlert.jsx";
 
 import {useLocation } from "react-router-dom";
 
@@ -26,15 +26,20 @@ const MembersManagerPage = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [currentMember, setCurrentMember] = useState({ id: "", fname: "", lname: "", info: "" });
     const [memberToDelete, setMemberToDelete] = useState(null);
-    const [successModal, setSuccessModal] = useState({ show: false, message: "" });
     const [successMessage, setSuccessMessage] = useState("");
 
-    const memberFields = [
-        { name: 'id', label: 'Staff ID', type: 'text' },
-        { name: 'fname', label: 'First Name', type: 'text' },
-        { name: 'lname', label: 'Last Name', type: 'text' },
-        { name: 'info', label: 'Information', type: 'text' }
+    const addMemberFields = [
+      { name: 'fname', label: 'First Name', type: 'text' },
+      { name: 'lname', label: 'Last Name', type: 'text' },
+      { name: 'info', label: 'Information', type: 'text' }
     ];
+
+    const updateMemberFields = [
+      { name: 'id', label: 'Staff ID', type: 'text' },
+      { name: 'fname', label: 'First Name', type: 'text' },
+      { name: 'lname', label: 'Last Name', type: 'text' },
+      { name: 'info', label: 'Information', type: 'text' }
+    ]
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -53,7 +58,6 @@ const MembersManagerPage = () => {
         setMembers([...members, newMember]);
         setShowAddModal(false);
         setSuccessMessage("Member Added Successfully!");
-        setSuccessModal({ show: true, message: "Member Added Successfully!" });
         setCurrentMember({ id: '', fname: '', lname: '', info: '' });
     };
 
@@ -69,7 +73,7 @@ const MembersManagerPage = () => {
             return prevMembers;
         });
         setShowUpdateModal(false);
-        setSuccessModal({ show: true, message: "Member Updated Successfully!" });
+        setSuccessMessage("Member Updated Successfully!");
         setCurrentMember({ id: '', fname: '', lname: '', info: '' });
     };
 
@@ -78,15 +82,15 @@ const MembersManagerPage = () => {
             prevMembers.filter((member) => member.id !== memberToDelete.id)
         );
         setShowDeleteModal(false);
-        setSuccessModal({ show: true, message: "Member Deleted Successfully!" });
+        setSuccessMessage("Member Deleted Successfully!");
     };
   
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
     };
   
-    const closeSuccessModal = () => {
-        setSuccessModal({ show: false, message: "" });
+    const closeSuccessMessage = () => {
+      setSuccessMessage("");
     };
     
     const filteredMembers = members.filter(
@@ -113,6 +117,13 @@ const MembersManagerPage = () => {
                   <AddButton onClick={() => setShowAddModal(true)} label="Add Member" />
               </div>
               
+          </div>
+
+          <div>
+            <SuccessAlert
+              message={successMessage}
+              onClose={closeSuccessMessage}
+            />
           </div>
   
           {/* Table */}
@@ -170,7 +181,7 @@ const MembersManagerPage = () => {
               onSubmit={handleAddMemberSubmit}
               currentItem={currentMember}
               onInputChange={handleInputChange}
-              fields={memberFields}
+              fields={addMemberFields}
         />
   
         <UpdateModal
@@ -179,7 +190,7 @@ const MembersManagerPage = () => {
               onSubmit={handleUpdateMemberSubmit}
               currentItem={currentMember}
               onInputChange={handleInputChange}
-              fields={memberFields}
+              fields={updateMemberFields}
         />
   
         <DeleteModal
@@ -188,12 +199,6 @@ const MembersManagerPage = () => {
               onDelete={handleDeleteMember}
               itemToDelete={memberToDelete}
               itemType="member"
-        />
-  
-        <SuccessModal
-            show={successModal.show}
-            message={successModal.message}
-            onClose={closeSuccessModal}
         />
     </div>
     );

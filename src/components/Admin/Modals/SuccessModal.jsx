@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { CiCircleCheck } from "react-icons/ci";
 
+
 const SuccessModal = ({ show, message, onClose }) => {
   if (!show) return null;
 

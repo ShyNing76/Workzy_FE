@@ -4,10 +4,10 @@ import SearchBar from "../../../components/Admin/SearchBar/SearchBar.jsx";
 import AddModal from "../../../components/Admin/Modals/AddModal.jsx";
 import DeleteModal from "../../../components/Admin/Modals/DeleteModal.jsx";
 import UpdateModal from "../../../components/Admin/Modals/UpdateModal.jsx";
-import SuccessModal from "../../../components/Admin/Modals/SuccessModal.jsx";
 import AddButton from "../../../components/Admin/Buttons/AddButton.jsx";
 import UpdateButton from "../../../components/Admin/Buttons/UpdateButton.jsx";
 import DeleteButton from "../../../components/Admin/Buttons/DeleteButton.jsx";
+import SuccessAlert from "../../../components/Admin/SuccessAlert/SuccessAlert.jsx";
 
 import { useLocation } from "react-router-dom";
 
@@ -26,15 +26,20 @@ const ManagersManagerPage = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [currentManager, setCurrentManager] = useState({ id: "", fname: "", lname: "", info: "" });
     const [managerToDelete, setManagerToDelete] = useState(null);
-    const [successModal, setSuccessModal] = useState({ show: false, message: "" });
     const [successMessage, setSuccessMessage] = useState("");
 
-    const managerFields = [
-        { name: 'id', label: 'Manager ID', type: 'text' },
-        { name: 'fname', label: 'First Name', type: 'text' },
-        { name: 'lname', label: 'Last Name', type: 'text' },
-        { name: 'info', label: 'Information', type: 'text' }
-    ];
+    const addManagerFields = [
+      { name: 'fname', label: 'First Name', type: 'text' },
+      { name: 'lname', label: 'Last Name', type: 'text' },
+      { name: 'info', label: 'Information', type: 'text' },
+    ]
+
+    const updateManagerFields = [
+      { name: 'id', label: 'Manager ID', type: 'text' },
+      { name: 'fname', label: 'First Name', type: 'text' },
+      { name: 'lname', label: 'Last Name', type: 'text' },
+      { name: 'info', label: 'Information', type: 'text' }
+    ]
   
     const handleInputChange = (e) => {
       const { name, value } = e.target;
@@ -53,7 +58,6 @@ const ManagersManagerPage = () => {
         setManagers([...managers, newManager]);
         setShowAddModal(false);
         setSuccessMessage("Manager Added Successfully!");
-        setSuccessModal({ show: true, message: "Manager Added Successfully!" });
         setCurrentManager({ id: '', fname: '', lname: '', info: '' });
     };
 
@@ -69,7 +73,7 @@ const ManagersManagerPage = () => {
           return prevManagers;
       });
       setShowUpdateModal(false);
-      setSuccessModal({ show: true, message: "Manager Updated Successfully!" });
+      setSuccessMessage("Manager Updated Successfully!");
       setCurrentManager({ id: '', fname: '', lname: '', info: '' });
     };
   
@@ -78,16 +82,16 @@ const ManagersManagerPage = () => {
       setManagers((prevManagers) =>
           prevManagers.filter((manager) => manager.id !== managerToDelete.id)
       );
+      setSuccessMessage("Manager Deleted Successfully!");
       setShowDeleteModal(false);
-      setSuccessModal({ show: true, message: "Manager Deleted Successfully!" });
     };
 
     const handleSearchChange = (e) => {
       setSearchTerm(e.target.value);
     };
 
-    const closeSuccessModal = () => {
-      setSuccessModal({ show: false, message: "" });
+    const closeSuccessMessage = () => {
+      setSuccessMessage("");
     };
   
     const filteredManagers = managers.filter(
@@ -114,6 +118,13 @@ const ManagersManagerPage = () => {
                 <AddButton onClick={() => setShowAddModal(true)} label="Add Manager" />
             </div>
             
+        </div>
+
+        <div>
+          <SuccessAlert
+            message={successMessage}
+            onClose={closeSuccessMessage}
+          />
         </div>
 
         {/* Table */}
@@ -171,7 +182,7 @@ const ManagersManagerPage = () => {
             onSubmit={handleAddManagerSubmit}
             currentItem={currentManager}
             onInputChange={handleInputChange}
-            fields={managerFields}
+            fields={addManagerFields}
       />
 
       <UpdateModal
@@ -180,7 +191,7 @@ const ManagersManagerPage = () => {
             onSubmit={handleUpdateManagerSubmit}
             currentItem={currentManager}
             onInputChange={handleInputChange}
-            fields={managerFields}
+            fields={updateManagerFields}
       />
 
       <DeleteModal
@@ -189,12 +200,6 @@ const ManagersManagerPage = () => {
             onDelete={handleDeleteManager}
             itemToDelete={managerToDelete}
             itemType="manager"
-      />
-
-      <SuccessModal
-          show={successModal.show}
-          message={successModal.message}
-          onClose={closeSuccessModal}
       />
   </div>
     );

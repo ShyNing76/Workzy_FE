@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { CiCircleQuestion } from "react-icons/ci";
+import { GoTrash } from "react-icons/go";
+import { RxCross2 } from "react-icons/rx";
 
 const DeleteModal = ({ show, onClose, onDelete, itemToDelete, itemType }) => {
   if (!show) return null;
@@ -17,8 +19,8 @@ const DeleteModal = ({ show, onClose, onDelete, itemToDelete, itemType }) => {
         </div>
     
         <div className="modal-action">
-          <button className="btn btn-error" onClick={onDelete}>Yes</button>
-          <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
+          <button className="btn btn-error btn-sm" onClick={onDelete}><GoTrash/>Yes</button>
+          <button className="btn btn-ghost btn-sm" onClick={onClose}><RxCross2/>Cancel</button>
         </div>
       </div>
     </div>

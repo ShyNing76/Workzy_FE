@@ -30,7 +30,13 @@ const VIPsManagerPage = () => {
     const [successModal, setSuccessModal] = useState({ show: false, message: "" });
     const [successMessage, setSuccessMessage] = useState("");
 
-    const VIPFields = [
+    const addVIPFields = [
+      { name: 'fname', label: 'First Name', type: 'text' },
+      { name: 'lname', label: 'Last Name', type: 'text' },
+      { name: 'type', label: 'VIP level', type: 'text' }
+    ]
+    
+    const updateVIPFields = [
         { name: 'id', label: 'Staff ID', type: 'text' },
         { name: 'fname', label: 'First Name', type: 'text' },
         { name: 'lname', label: 'Last Name', type: 'text' },
@@ -172,7 +178,7 @@ const VIPsManagerPage = () => {
               onSubmit={handleAddVIPSubmit}
               currentItem={currentVIP}
               onInputChange={handleInputChange}
-              fields={VIPFields}
+              fields={addVIPFields}
         />
   
         <UpdateModal
@@ -181,7 +187,7 @@ const VIPsManagerPage = () => {
               onSubmit={handleUpdateVIPSubmit}
               currentItem={currentVIP}
               onInputChange={handleInputChange}
-              fields={VIPFields}
+              fields={updateVIPFields}
         />
   
         <DeleteModal

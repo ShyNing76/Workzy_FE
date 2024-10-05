@@ -29,11 +29,17 @@ const StaffsManagerPage = () => {
     const [successModal, setSuccessModal] = useState({ show: false, message: "" });
     const [successMessage, setSuccessMessage] = useState("");
 
-    const staffFields = [
-        { name: 'id', label: 'Staff ID', type: 'text' },
+    const addStaffFields = [
         { name: 'fname', label: 'First Name', type: 'text' },
         { name: 'lname', label: 'Last Name', type: 'text' },
         { name: 'info', label: 'Information', type: 'text' }
+    ];
+
+    const updateStaffFields = [
+      { name: 'id', label: 'Staff ID', type: 'text' },
+      { name: 'fname', label: 'First Name', type: 'text' },
+      { name: 'lname', label: 'Last Name', type: 'text' },
+      { name: 'info', label: 'Information', type: 'text' }
     ];
 
     const handleInputChange = (e) => {
@@ -171,7 +177,7 @@ const StaffsManagerPage = () => {
               onSubmit={handleAddStaffSubmit}
               currentItem={currentStaff}
               onInputChange={handleInputChange}
-              fields={staffFields}
+              fields={addStaffFields}
         />
   
         <UpdateModal
@@ -180,7 +186,7 @@ const StaffsManagerPage = () => {
               onSubmit={handleUpdateStaffSubmit}
               currentItem={currentStaff}
               onInputChange={handleInputChange}
-              fields={staffFields}
+              fields={updateStaffFields}
         />
   
         <DeleteModal
