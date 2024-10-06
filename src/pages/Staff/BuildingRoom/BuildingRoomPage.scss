@@ -1,0 +1,63 @@
+.building-room-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+
+    .navbar {
+        width: 100%;
+        background-color: white;
+        padding: 10px 0;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        display: flex;
+        
+        ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+    
+            li {
+                margin: 0 15px;
+                display: flex;
+                align-items: center;
+    
+                button {
+                    background: none;
+                    border: none;
+                    display: flex;
+                    align-items: center;  
+                    font-size: 18px;
+                    color: #333;
+                    cursor: pointer;
+    
+                    &:hover {
+                        color: #eaf0f7;
+                    }
+    
+                    svg {
+                        margin-right: 5px;  
+                    }
+                }
+            }
+        }
+    }
+    .sidebar {
+        background-color: #f1f1f1;
+        padding: 20px;
+        width: 200px;
+        height: 72%;
+        position: absolute;
+        left: 0;
+        top: 200px; 
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+
+        h2, h3 {
+            margin: 10px 0;
+            color: #333;
+        }
+    }
+}
