@@ -5,6 +5,8 @@ import "./LocationPage.scss";
 import { Link, useSearchParams } from "react-router-dom";
 import LocationFilter from "../../components/layout/LocationFilter/LocationFilter";
 import { getBuildingFromSearch } from "../../config/api";
+import MapLocation from "../../components/layout/MapLocation/MapLocation";
+import noDataIcon from "../../assets/no-data.png";
 
 const LocationPage = () => {
   // const Buildings = [
@@ -77,6 +79,8 @@ const LocationPage = () => {
         if (res && res.data && res.err === 0) {
           const buildingData = res?.data?.rows;
           setDataBuilding(buildingData);
+        } else {
+          setDataBuilding([]);
         }
       } catch (error) {
         console.error("Error fetching building data:", error);
@@ -106,17 +110,25 @@ const LocationPage = () => {
 
       <div className="building-container">
         <div className="building-list">
-          {dataBuilding.map((building, index) => (
-            <BuildingCard
-              key={`Building-${index}`}
-              name={building.building_name}
-              address={building.address}
-              onHover={() => setHoveredLocation(building)}
-            />
-          ))}
+          {dataBuilding && dataBuilding.length > 0 ? (
+            dataBuilding.map((building, index) => (
+              <BuildingCard
+                key={`Building-${index}`}
+                name={building.building_name}
+                address={building.address}
+                onHover={() => setHoveredLocation(building)}
+              />
+            ))
+          ) : (
+            <div className="no-data">
+              <img src={noDataIcon} alt="No Data" className="no-data-icon" />
+              <p>No Building Found</p>
+            </div>
+          )}
         </div>
         <div className="map-container">
-          <Googlemap src={googleMapsEmbedLink} />
+          {/* <Googlemap src={googleMapsEmbedLink} /> */}
+          <MapLocation dataBuilding={dataBuilding} />
         </div>
       </div>
     </>
