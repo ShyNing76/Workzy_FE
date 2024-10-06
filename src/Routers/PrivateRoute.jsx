@@ -7,13 +7,6 @@ const PrivateRoute = (props) => {
   const { children, requiredRoleID } = props;
   //   auth from auth Context (use context)
   const { roleId, auth } = useContext(AuthContext);
-  console.log("Auth: ", auth.isAuthenticated);
-  console.log("Check role_id: ", roleId, typeof roleId);
-  console.log(
-    "Check role_id_required: ",
-    requiredRoleID,
-    typeof requiredRoleID
-  );
 
   //   Check auth from user has login or not
   if (!auth.isAuthenticated) {

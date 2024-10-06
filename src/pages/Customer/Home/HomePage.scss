@@ -1,0 +1,79 @@
+.container-map-contact {
+  background-color: #eff6fd;
+  border-radius: 50px;
+  padding: 20px;
+  // background-color: #ebf1f8;
+  // border-radius: 50px;
+  margin: 5rem 10rem;
+
+  .container-contact {
+    text-align: center;
+    width: 100%;
+    size: 50cap;
+
+    h2 {
+      font-size: 3rem;
+      margin-bottom: 60px;
+    }
+    p {
+      font-size: 1.5rem;
+      margin-top: 40px;
+      text-align: center;
+    }
+    .btn {
+      width: 35%;
+      font-size: 1rem;
+      text-align: center;
+      color: white;
+      background-color: black;
+      margin-top: 40px;
+      border-radius: 10px;
+
+      &:hover {
+        background-color: rgb(110, 108, 108);
+      }
+    }
+  }
+}
+.container-map-contact {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.service-tabs {
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+
+  .service-tab {
+    // margin: 0px 70px;
+    padding: 0 76px;
+    font-weight: 500;
+    // font-size: 1.2rem;
+    border-radius: 8px; // Rounded corners
+    transition: background-color 0.3s, color 0.3s; // Smooth transition
+    width: 100%;
+
+    &:hover {
+      background-color: #f0ae44; // Adjusted hover color
+    }
+
+    &:is(input[type="radio"]):after {
+      width: 100px;
+    }
+  }
+}
+
+.tittle-service-tab {
+  font-size: 3rem;
+  margin-bottom: 60px;
+  text-align: center;
+  font-weight: bold;
+}
