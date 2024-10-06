@@ -1,12 +1,14 @@
-import Navbar from "./components/layout/Navbar/Navbar.jsx";
+import Navbar from "./components/layout/Customer/Navbar/Navbar.jsx";
 import { Outlet } from "react-router-dom";
-import Footer from "./components/layout/Footer/Footer.jsx";
+import Footer from "./components/layout/Customer/Footer/Footer.jsx";
 import { AuthContext } from "./components/context/auth.context.jsx";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { getUserAuthen } from "./config/api.js";
 
 function App() {
   const { auth, setAuth, appLoading, setAppLoading } = useContext(AuthContext);
+
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     const fetchAccount = async () => {
@@ -33,9 +35,9 @@ function App() {
         </div>
       ) : (
         <div className="flex flex-col min-h-screen">
-          <Navbar />
+          <Navbar refresh={refresh} />
           <div className="flex-grow">
-            <Outlet />
+            <Outlet context={{ refresh, setRefresh }} />
           </div>
           <Footer />
         </div>
