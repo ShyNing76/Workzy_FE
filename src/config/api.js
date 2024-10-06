@@ -60,6 +60,24 @@ const getBuildingFromSearch = (queryString) => {
   return axios.get(URL_API);
 };
 
+const getLatLonFromAddress = async (address) => {
+  try {
+    const response = await axios.get(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+        address
+      )}`
+    );
+    if (response) {
+      const { lat, lon } = response[0];
+      return { lat, lon };
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching coordinates:", error);
+    return null;
+  }
+};
+
 export {
   loginApi,
   registerApi,
@@ -68,4 +86,5 @@ export {
   putUpdateCustomerPassword,
   getGoogleCallBack,
   getBuildingFromSearch,
+  getLatLonFromAddress,
 };

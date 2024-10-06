@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Slider from "react-slider";
 import "./FilterBar.scss";
 
 const FilterBar = () => {
