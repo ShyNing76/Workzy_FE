@@ -275,7 +275,7 @@ export const router = createBrowserRouter([
     ,
     children: [
       {
-        path: "manager-dashboard",
+        path: "",
         element: <ManagerDashBoard/>
       },
 

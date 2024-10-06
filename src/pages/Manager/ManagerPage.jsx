@@ -52,7 +52,7 @@ const ManagerPage = () => {
           {/* Sidebar Menu */}
           <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4" style={{ paddingTop: '4rem' }}>
             <li className="menu-item-manager">
-              <Link to="/manager/manager-dashboard" className="flex items-center space-x-2">
+              <Link to="/manager" className="flex items-center space-x-2">
                 <FaChartBar />
                 <span>Dashboard</span>
               </Link>
