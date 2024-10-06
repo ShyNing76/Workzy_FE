@@ -21,6 +21,10 @@ import QuadPOD from "../pages/QuadPOD/QuadPOD.jsx";
 import MeetingRoom from "../pages/MeetingRoom/MeetingRoom.jsx";
 import WorkingRoom from "../pages/WorkingRoom/WorkingRoom.jsx";
 import EventSpace from "../pages/EventSpace/EventSpace.jsx";
+import ManagerPage from "../pages/Manager/ManagerPage.jsx";
+import ManagerAssign from "../pages/Manager/ManagerAssign/ManagerAssign.jsx";
+import ManagerDashBoard from "../pages/Manager/ManagerDashboard/ManagerDashBoard.jsx";
+
 
 // Role id store in local Storage after login and register
 
@@ -152,4 +156,26 @@ export const router = createBrowserRouter([
     path: "*",
     element: <LoginPage />,
   },
+
+  // Manager
+  {
+    path: "manager",
+    element: 
+      
+      <ManagerPage/>  
+      
+    ,
+    children: [
+      {
+        path: "manager-dashboard",
+        element: <ManagerDashBoard/>
+      },
+
+      {
+        path: "manager-assign",
+        element: <ManagerAssign/>
+      }
+    ]
+  }
+
 ]);

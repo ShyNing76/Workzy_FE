@@ -22,13 +22,13 @@ const registerApi = (name, email, password) => {
 };
 
 const getUserAuthen = () => {
-  const URL_API = "api/v1/customer/profile";
+  const URL_API = "api/v1/user/profile";
 
   return axios.get(URL_API);
 };
 
 const putUpdateCustomerInfo = (name, date_of_birth, gender) => {
-  const URL_API = "api/v1/customer/profile";
+  const URL_API = "api/v1/user/profile";
   const data = {
     name,
     date_of_birth,
@@ -39,7 +39,7 @@ const putUpdateCustomerInfo = (name, date_of_birth, gender) => {
 };
 
 const putUpdateCustomerPassword = (currentPassword, newPassword) => {
-  const URL_API = "api/v1/customer/password";
+  const URL_API = "api/v1/user/password";
   const data = {
     current_password: currentPassword,
     new_password: newPassword,

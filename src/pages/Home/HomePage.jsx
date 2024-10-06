@@ -39,7 +39,6 @@ import { TbHexagonNumber2 } from "react-icons/tb";
 import { TbHexagonNumber3 } from "react-icons/tb";
 //Image:
 import imageHero from "../../assets/Hero.jpg";
-import imageHero2 from "../../assets/Hero2.jpg";
 import singlePODimage1 from "../../assets/singlePODimage1.jpg";
 import singlePODimage2 from "../../assets/singlePODimage2.jpg";
 import singlePODimage3 from "../../assets/singlePODimage3.jpg";
@@ -58,13 +57,6 @@ import meetingRoomImage3 from "../../assets/meetingRoomImage3.jpg";
 import eventSpaceImage1 from "../../assets/eventSpaceImage1.jpg";
 import eventSpaceImage2 from "../../assets/eventSpaceImage2.jpg";
 import eventSpaceImage3 from "../../assets/eventSpaceImage3.jpg";
-
-
-
-import { MdContactSupport } from "react-icons/md";
-import { TbTruckDelivery } from "react-icons/tb";
-import { AiFillPrinter } from "react-icons/ai";
-import { FaPhone } from "react-icons/fa6";
 import Accordion from "../../components/layout/Accordion/Accordion";
 
 const HomePage = () => {
@@ -307,28 +299,6 @@ const HomePage = () => {
           </React.Fragment>
         ))}
       </div>
-
-      {/* Hero Section 2 */}
-      {/* <div>
-        <Hero
-          title="Work Seamlessly Wherever Your Business Takes You"
-          details={
-            <>
-
-              With over 4,000 office locations worldwide, we offer meeting rooms
-              and coworking spaces in every town, city, and major transport hub.
-              <br />
-              <br />
-              Whether you're working solo, growing a startup, or leading one of
-              the world’s most successful corporations, you can work close to
-              your clients, colleagues, or family through our network.
-
-            </>
-          }
-          image={imageHero2}
-          showButton = {true}
-        />
-      </div> */}
 
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center my-16">
         <div className="md:w-1/2 mb-8 md:mb-0 flex flex-col justify-center">
