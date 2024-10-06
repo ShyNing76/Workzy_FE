@@ -1,5 +1,3 @@
-import { StrictMode } from "react";
-
 // import ScrollToTop from "./components/context/scrollToTop.jsx";
 import { AuthWrapper } from "./components/context/auth.context.jsx";
 import "./styles/index.css";
