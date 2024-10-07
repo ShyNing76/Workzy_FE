@@ -1,19 +1,61 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import './RoomSchedule.scss';
+import RoomModal from '../../building/RoomModal/RoomModal';
 
-const Monthly = ({ selectedDate, selectedStatus }) => {
-    const months = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    const rooms = ['No 1', 'No 2', 'No 3', 'No 4', 'No 5'];
-
+const Monthly = ({ selectedStatus, workspaceType }) => {
     const [roomStatus, setRoomStatus] = useState({});
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedRoom, setSelectedRoom] = useState(null);
+
+    const roomPrefix = {
+        'Single POD': 'WY1',
+        'Double POD': 'WY1',
+        'Quad POD': 'WY1',
+        'Working Room': 'WY2',
+        'Meeting Room': 'WY3',
+        'Event Space': 'WY0'
+    };
+
+    const roomSuffix = {
+        'Single POD': 'S',
+        'Double POD': 'D',
+        'Quad POD': 'Q',
+        'Working Room': 'W',
+        'Meeting Room': 'M',
+        'Event Space': 'E'
+    };
+
+    const generateRooms = (workspaceType, count) => {
+        return Array.from({ length: count }, (_, i) => {
+            const number = String(i + 1);
+            return `${roomPrefix[workspaceType]}${number}${roomSuffix[workspaceType]}`;
+        });
+    };
+
+    const handleCellClick = (room, status) => {
+        let bookingDetails = null;
+        if (status === "booked") {
+            bookingDetails = {
+                id: "",
+                customerName: "",
+                date: "2024-09-20",
+            };
+        }
+
+        setSelectedRoom({ id: room, status, type: workspaceType, bookingDetails });
+        setModalOpen(true);
+    };
+
+    const rooms = generateRooms(workspaceType, 5);
+    const months = [
+        'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    
 
     useEffect(() => {
-        const generatedStatus = generateRoomStatus();
-        setRoomStatus(generatedStatus);
-    }, [selectedDate]);
+        const newRoomStatus = generateRoomStatus();
+        setRoomStatus(newRoomStatus);
+    }, [workspaceType]);
 
     const generateRoomStatus = () => {
         const statusOptions = ['available', 'booked', 'in_use', 'under_maintenance'];
@@ -49,8 +91,8 @@ const Monthly = ({ selectedDate, selectedStatus }) => {
                 <thead>
                     <tr>
                         <th></th>
-                        {months.map((month) => (
-                            <th key={month}>{month}</th>
+                        {months.map((month, index) => (
+                            <th key={index}>{month}</th>
                         ))}
                     </tr>
                 </thead>
@@ -62,15 +104,27 @@ const Monthly = ({ selectedDate, selectedStatus }) => {
                                 if (selectedStatus && selectedStatus !== status) {
                                     return <td key={index} style={{ backgroundColor: 'transparent' }}></td>;
                                 }
-                                return <td key={index} style={{ backgroundColor: getStatusColor(status) }}></td>;
+                                return (
+                                    <td 
+                                        key={index} 
+                                        style={{ backgroundColor: getStatusColor(status) }} 
+                                        onClick={() => handleCellClick(room, status)}
+                                    ></td>
+                                );
                             })}
                         </tr>
                     ))}
                 </tbody>
             </table>
+            {modalOpen && (
+                <RoomModal 
+                    isOpen={modalOpen} 
+                    onClose={() => setModalOpen(false)} 
+                    room={selectedRoom} 
+                />
+            )}
         </div>
     );
 };
-
 
 export default Monthly;

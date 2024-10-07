@@ -6,6 +6,7 @@ import Monthly from '../RoomRow/Monthly';
 
 const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSelectedType, selectedDate, setSelectedDate }) => {
     const [currentDate, setCurrentDate] = useState('');
+    const [workspaceType, setWorkspaceType] = useState('Single POD'); 
 
     useEffect(() => {
         const today = new Date().toISOString().split('T')[0]; 
@@ -16,11 +17,11 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
     const renderTable = () => {
         switch (selectedType) {
             case 'hourly':
-                return <TimeSlot selectedDate={selectedDate} selectedStatus={selectedStatus} />;
+                return <TimeSlot selectedDate={selectedDate} selectedStatus={selectedStatus} workspaceType={workspaceType} />; 
             case 'daily':
-                return <Daily selectedDate={selectedDate} selectedStatus={selectedStatus} />;
+                return <Daily selectedDate={selectedDate} selectedStatus={selectedStatus} workspaceType={workspaceType} />;  
             case 'monthly':
-                return <Monthly selectedDate={selectedDate} selectedStatus={selectedStatus} />;
+                return <Monthly selectedDate={selectedDate} selectedStatus={selectedStatus} workspaceType={workspaceType} />; 
             default:
                 return null;
         }
@@ -45,7 +46,22 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
                         </select>
                     </div>
                     <div className="control">
-                        <label htmlFor="type-select">Select Type</label>
+                        <label htmlFor="workspace-type-select">Select Workspace Type</label>
+                        <select 
+                            id="workspace-type-select" 
+                            value={workspaceType} 
+                            onChange={(e) => setWorkspaceType(e.target.value)} 
+                        >
+                            <option value="Single POD">Single POD</option>
+                            <option value="Double POD">Double POD</option>
+                            <option value="Quad POD">Quad POD</option>
+                            <option value="Working Room">Working Room</option>
+                            <option value="Meeting Room">Meeting Room</option>
+                            <option value="Event Space">Event Space</option>
+                        </select>
+                    </div>
+                    <div className="control">
+                        <label htmlFor="type-select">Select Booking Type</label>
                         <select 
                             id="type-select" 
                             value={selectedType} 
