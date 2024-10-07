@@ -38,10 +38,23 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
                   required
                 />
               )}
+
+
               
               {field.type === 'datetime' && (
                 <input
                   type="datetime-local"
+                  name={field.name}
+                  value={currentItem[field.name] || ""}
+                  onChange={onInputChange}
+                  className="input input-bordered"
+                  required
+                />
+              )}
+
+              {field.type === 'date' && (
+                <input
+                  type="date"
                   name={field.name}
                   value={currentItem[field.name] || ""}
                   onChange={onInputChange}

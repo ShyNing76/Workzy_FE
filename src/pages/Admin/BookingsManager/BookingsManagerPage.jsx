@@ -13,7 +13,7 @@ import SuccessAlert from "../../../components/layout/Admin/SuccessAlert/SuccessA
 const BookingsManagerPage = () => {
   const location = useLocation();
 
-  const [bookings, setBookings] = useState(
+  const [bookings, setBookings] = useState([
     {
       id: "BK01",
       customerID: "MB01",
@@ -47,7 +47,7 @@ const BookingsManagerPage = () => {
       endTimeDate: "",
       workspaceID: "WS03",
     }
-  );
+  ]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
@@ -68,7 +68,11 @@ const BookingsManagerPage = () => {
   const [successMessage, setSuccessMessage] = useState("");
 
   const addBookingFields = [
-    { label: "Customer ID", name: "customerID", type: "text" },
+    { 
+      label: "Customer ID", 
+      name: "customerID", 
+      type: "text" 
+    },
     {
       label: "Total Amenities Price",
       name: "totalAmenitiesPrice",
@@ -77,18 +81,46 @@ const BookingsManagerPage = () => {
     {
       label: "Total Workspace Price",
       name: "totalWorkspacePrice",
-      type: "number",
+      type: "value",
     },
-    { label: "Total Broken Price", name: "totalBrokenPrice", type: "number" },
-    { label: "Total Price", name: "totalPrice", type: "number" },
-    { label: "Start Time Date", name: "startTimeDate", type: "datetime" },
-    { label: "End Time Date", name: "endTimeDate", type: "datetime" },
-    { label: "Workspace ID", name: "workspaceID", type: "text" },
+    { 
+      label: "Total Broken Price", 
+      name: "totalBrokenPrice", 
+      type: "value" 
+    },
+    { 
+      label: "Total Price", 
+      name: "totalPrice", 
+      type: "value" 
+    },
+    { 
+      label: "Start Time Date", 
+      name: "startTimeDate", 
+      type: "datetime" 
+    },
+    { 
+      label: "End Time Date", 
+      name: "endTimeDate", 
+      type: "datetime" 
+    },
+    { 
+      label: "Workspace ID", 
+      name: "workspaceID", 
+      type: "text" 
+    },
   ];
 
   const updateBookingFields = [
-    { label: "Booking ID", name: "id", type: "text" },
-    { label: "Customer ID", name: "customerID", type: "text" },
+    { 
+      label: "Booking ID", 
+      name: "id", 
+      type: "text" 
+    },
+    { 
+      label: "Customer ID", 
+      name: "customerID", 
+      type: "text" 
+    },
     {
       label: "Total Amenities Price",
       name: "totalAmenitiesPrice",
@@ -99,11 +131,29 @@ const BookingsManagerPage = () => {
       name: "totalWorkspacePrice",
       type: "number",
     },
-    { label: "Total Broken Price", name: "totalBrokenPrice", type: "number" },
-    { label: "Total Price", name: "totalPrice", type: "number" },
-    { label: "Start Time Date", name: "startTimeDate", type: "datetime" },
-    { label: "End Time Date", name: "endTimeDate", type: "datetime" },
-    { label: "Workspace ID", name: "workspaceID", type: "text" },
+    { 
+      label: "Total Broken Price", 
+      name: "totalBrokenPrice", 
+      type: "number" 
+    },
+    { 
+      label: "Total Price", 
+      name: "totalPrice", 
+      type: "number" },
+    { 
+      label: "Start Time Date", 
+      name: "startTimeDate", 
+      type: "datetime" },
+    { 
+      label: "End Time Date", 
+      name: "endTimeDate", 
+      type: "datetime" 
+    },
+    { 
+      label: "Workspace ID", 
+      name: "workspaceID", 
+      type: "text" 
+    },
   ];
 
   const handleInputChange = (e) => {
@@ -114,9 +164,7 @@ const BookingsManagerPage = () => {
   const generateBookingId = () => {
     const lastId =
       bookings.length > 0 ? bookings[bookings.length - 1].id : "BK00";
-    const newId = `BK${(parseInt(lastId.substring(2)) + 1)
-      .toString()
-      .padStart(2, "0")}`;
+    const newId = `BK${parseInt(lastId.substring(2)) + 1}`;
     return newId;
   };
 
@@ -183,11 +231,13 @@ const BookingsManagerPage = () => {
     setSuccessMessage("");
   };
 
-  const filteredBookings = bookings.filter(
-    (booking) =>
-      booking.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.customerID.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.workspaceID.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredBookings = bookings.filter((booking) => {
+      return(
+        booking.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        booking.customerID.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        booking.workspaceID.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    }
   );
 
   return (
@@ -208,6 +258,7 @@ const BookingsManagerPage = () => {
             label="Add Booking"
           />
         </div>
+      </div>
 
         <div>
           <SuccessAlert
@@ -216,8 +267,8 @@ const BookingsManagerPage = () => {
           />
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="table w-full">
+        <div className="overflow-x-auto flex flex-1">
+          <table className="table table-zebra w-full">
             <thead>
               <tr>
                 <th>Booking ID</th>
@@ -244,11 +295,15 @@ const BookingsManagerPage = () => {
                     <td>{booking.startTimeDate}</td>
                     <td>{booking.endTimeDate}</td>
                     <td>{booking.workspaceID}</td>
-                    <td>
+
+                    <td className="flex space-x-2">
                       {/* Update Button */}
                       <UpdateButton
                         onClick={() => {
-                          setCurrentBooking({ ...booking, oldId: booking.id });
+                          setCurrentBooking({ 
+                            ...booking, 
+                            oldId: booking.id 
+                          });
                           setShowUpdateModal(true);
                         }}
                       />
@@ -300,7 +355,6 @@ const BookingsManagerPage = () => {
           itemToDelete={bookingToDelete}
           itemType="booking"
         />
-      </div>
     </div>
   );
 };
