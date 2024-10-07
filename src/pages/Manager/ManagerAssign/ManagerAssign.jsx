@@ -131,7 +131,7 @@ const ManagerAssign = () => {
       <h1 className="text-2xl font-bold top-10" >Assign Staff to Buildings</h1>
 
       {/* Filter section */}
-      <div className="manager-filter-section-container">
+      <div className="manager-filter-section-container" style={{marginTop: "20px", marginBottom: "20px"}}>
         <label htmlFor="location-filter"></label>
         <select
           id="location-filter"

@@ -1,6 +1,8 @@
 import React from "react";
 import "./ManagerPage.scss";
 import ManagerHeader from "../../components/layout/Manager/ManagerHeader/ManagerHeader";
+import { MdOutlineManageAccounts } from "react-icons/md";
+
 import { Link, Outlet } from "react-router-dom";
 import { MdOutlineAssignmentInd } from "react-icons/md";
 import { FaChartBar } from "react-icons/fa";
@@ -19,7 +21,7 @@ const ManagerPage = () => {
         <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
 
         {/* Drawer Content (Main Page Content) */}
-        <div className="drawer-content flex flex-col justify-center ">
+        <div className="drawer-content flex-col justify-center ">
           <div className="mx-auto w-full p-4">
             {/* Main content displayed here */}
             <Outlet />
@@ -61,6 +63,12 @@ const ManagerPage = () => {
               <Link to="/manager/manager-assign" className="flex items-center space-x-2">
                 <MdOutlineAssignmentInd />
                 <span>Assign Staff</span>
+              </Link>
+            </li>
+            <li className="menu-item-manager">
+              <Link to="/manager/manager-manage-staff" className="flex items-center space-x-2">
+                <MdOutlineManageAccounts />
+                <span>Manage Staff</span>
               </Link>
             </li>
           </ul>

@@ -45,6 +45,7 @@ import TrackAndAnalyzeReport from "../pages/Admin/Track&AnalyzeReport/Track&Anal
 import MainPage from "../pages/Staff/MainPage/MainPage.jsx";
 import BookingsPage from "../pages/Staff/Bookings/BookingsPage.jsx";
 import BuildingRoomPage from "../pages/Staff/BuildingRoom/BuildingRoomPage.jsx";
+import ManageStaff from "../pages/Manager/ManageStaff/ManageStaff.jsx";
 
 
 // Role id store in local Storage after login and register
@@ -282,6 +283,11 @@ export const router = createBrowserRouter([
       {
         path: "manager-assign",
         element: <ManagerAssign/>
+      },
+
+      {
+        path: "manager-manage-staff",
+        element: <ManageStaff/>
       }
     ]
   }
