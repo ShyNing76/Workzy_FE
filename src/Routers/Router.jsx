@@ -40,7 +40,7 @@ import ReviewsManagerPage from "../pages/Admin/ReviewsManager/ReviewsManagerPage
 import TrackAndAnalyzeReport from "../pages/Admin/Track&AnalyzeReport/Track&AnalyzeReport.jsx";
 
 import MainPage from "../pages/Staff/MainPage/MainPage.jsx";
-import BookingsPage from "../pages/Staff/Bookings/BookingsPage.jsx";
+import BookingManagement from "../pages/Staff/Bookings/BookingManagement.jsx";
 import BuildingRoomPage from "../pages/Staff/BuildingRoom/BuildingRoomPage.jsx";
 
 // Role id store in local Storage after login and register
@@ -233,7 +233,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "bookings",
-        element: <BookingsPage />,
+        element: <BookingManagement />,
       },
     ],
   },

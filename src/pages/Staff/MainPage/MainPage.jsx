@@ -21,7 +21,7 @@ const MainPage = () => {
           Building's Room
         </Link>
         <Link to="/staff/bookings" className={`tab ${location.pathname === '/staff/bookings' ? 'active' : ''}`}>
-          Bookings
+          Bookings Management 
         </Link>
       </div>
       
