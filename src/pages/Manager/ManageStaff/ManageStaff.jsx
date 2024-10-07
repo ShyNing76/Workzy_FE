@@ -52,8 +52,8 @@ const ManageStaff = () => {
     const updatedStaffs = staffs.map((staff) => {
       if (staff.id === staffId) {
         // return new object
-        // if status is "Block" then change to "Unblock"
 
+        // if status is "Block" then change to "Unblock"
         return {
           ...staff,
           status: staff.status === "Block" ? "Unblock" : "Block",
