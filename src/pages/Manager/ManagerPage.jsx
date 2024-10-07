@@ -2,7 +2,7 @@ import React from "react";
 import "./ManagerPage.scss";
 import ManagerHeader from "../../components/layout/Manager/ManagerHeader/ManagerHeader";
 import { MdOutlineManageAccounts } from "react-icons/md";
-
+import { MdOutlineRateReview } from "react-icons/md";
 import { Link, Outlet } from "react-router-dom";
 import { MdOutlineAssignmentInd } from "react-icons/md";
 import { FaChartBar } from "react-icons/fa";
@@ -69,6 +69,12 @@ const ManagerPage = () => {
               <Link to="/manager/manager-manage-staff" className="flex items-center space-x-2">
                 <MdOutlineManageAccounts />
                 <span>Manage Staff</span>
+              </Link>
+            </li>
+            <li className="menu-item-manager">
+              <Link to="/manager/manager-manage-review" className="flex items-center space-x-2">
+                <MdOutlineRateReview />
+                <span>Manage Review</span>
               </Link>
             </li>
           </ul>

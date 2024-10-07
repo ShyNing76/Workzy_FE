@@ -46,6 +46,7 @@ import MainPage from "../pages/Staff/MainPage/MainPage.jsx";
 import BookingsPage from "../pages/Staff/Bookings/BookingsPage.jsx";
 import BuildingRoomPage from "../pages/Staff/BuildingRoom/BuildingRoomPage.jsx";
 import ManageStaff from "../pages/Manager/ManageStaff/ManageStaff.jsx";
+import ManageReview from "../pages/Manager/ManageReview/ManageReview.jsx";
 
 
 // Role id store in local Storage after login and register
@@ -288,6 +289,10 @@ export const router = createBrowserRouter([
       {
         path: "manager-manage-staff",
         element: <ManageStaff/>
+      },
+      {
+        path: "manager-manage-review",
+        element: <ManageReview/>
       }
     ]
   }

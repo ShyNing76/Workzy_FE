@@ -120,8 +120,8 @@ const ManagerAssign = () => {
   };
 
   // Check if staff is assigned to any building
-  // some() kiểm tra xem có ít nhất một phần tử trong mảng thỏa mãn điều kiện mà bạn cung cấp (là hàm callback). 
-  // some() trả về true nếu có ít nhất một phần tử thỏa mãn điều kiện, ngược lại trả về false.
+  // some() check if there is at least one element in the array satisfies the condition (is a callback function)
+  // some() return true if at least one element satisfies the condition, otherwise return false.
   const isStaffAssigned = (staffId) => {
     return buildings.some(building => building.staffAssigned === staffId);
   };
@@ -166,24 +166,28 @@ const ManagerAssign = () => {
                 <td>
                  
                   <select
-                    value={building.staffAssigned || ""}
+                  
+                    value={building.staffAssigned || ""} 
                     onChange={(e) => {
+                      // Get selected staff ID and name
                       const selectedStaffId = e.target.value;
                       const selectedStaffName = staff.find(
                         (staff) => staff.id === selectedStaffId
-                      )?.name || "";
+                      )?.name || ""; // If found staff, return staff name, 
+                                     //if not found staff, return empty string
+
                       // Check if staff is assigned to any building
                       if (isStaffAssigned(selectedStaffId)) {
                         alert("Staff is already assigned to a building!");
                         return;
                       }
-                      // Update building state with selected staff
                       
-                      setBuildings(prevBuildings =>
-                        prevBuildings.map(preBuild =>
-                          preBuild.id === building.id
-                            ? { ...preBuild, staffAssigned: selectedStaffId, staffName: selectedStaffName }
-                            : preBuild
+                      // Update building state with selected staff                      
+                      setBuildings(currentBuildings =>
+                        currentBuildings.map(currentBuilding =>
+                          currentBuilding.id === building.id
+                            ? { ...currentBuilding, staffAssigned: selectedStaffId, staffName: selectedStaffName }
+                            : currentBuilding
                         )
                       );
                     }}
@@ -201,8 +205,8 @@ const ManagerAssign = () => {
                 </td>
                 <td>
                   <button
-                    onClick={() => handleAssignStaff(building.id)}
-                    disabled={!building.staffAssigned}
+                    onClick={() => handleAssignStaff(building.id)} // Click -> call function handleAssignStaff
+                    disabled={!building.staffAssigned} // If staffAssigned is null -> disabled
                     className="btn"
                   >
                     Assign
