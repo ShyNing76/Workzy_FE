@@ -47,7 +47,7 @@ const Sidebar = (props) => {
           </label>
           {outlet}
         </div>
-        <div className="drawer-side z-10">
+        <div className="drawer-side z-20 h-auto">
           <label
             htmlFor="my-drawer-2"
             aria-label="close sidebar"

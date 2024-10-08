@@ -5,6 +5,7 @@ import BookingSummary from "../Booking Summary/BookingSummary";
 import MonthRangePicker from "../MonthRangePicker/MonthRangePicker";
 import DateRangePicker from "../DateRangePicker/DateRangePicker";
 import TimeRangePicker from "../TimePicker/TimeRangePicker";
+import { formatDateTime } from "../../../context/dateFormat";
 
 const BookingRoom = () => {
   // Tab hiện tại
@@ -144,8 +145,8 @@ const BookingRoom = () => {
   const handleSubmit = () => {
     if (startDateTime && endDateTime) {
       // Gửi dữ liệu đến database (giả sử hàm sendToDatabase là hàm gửi dữ liệu)
-      console.log("Start DateTime:", startDateTime);
-      console.log("End DateTime:", endDateTime);
+      console.log("Start DateTime:", formatDateTime(startDateTime));
+      console.log("End DateTime:", formatDateTime(endDateTime));
 
       // Gửi dữ liệu
       // sendToDatabase({ startDateTime, endDateTime });
@@ -156,7 +157,7 @@ const BookingRoom = () => {
 
   return (
     <>
-      <div className="room-name-container flex items-center justify-center">
+      <div className="room-name-container flex items-center">
         <h1 className="room-name text-3xl font-black tracking-tight sm:text-5xl text-left">
           Room name
         </h1>
@@ -176,8 +177,9 @@ const BookingRoom = () => {
       </div>
 
       <div className="font-semibold mb-2">Type Booking: </div>
-      {/* Tab for Hour */}
       <div role="tablist" className="tabs tabs-lifted">
+        {/* Tab for Hour */}
+
         <input
           type="radio"
           name="my_tabs_2"
@@ -204,34 +206,36 @@ const BookingRoom = () => {
 
           <div className="container mx-auto">
             {/* Custom Date Picker */}
-            <div className="mb-4">
-              <CustomDatePicker
-                selectedDate={selectedDate}
-                setSelectedDate={setSelectedDate}
-                today={today}
-              />
-            </div>
+            <div className="custom-date-time-container">
+              <div className="custom-date-picker">
+                <CustomDatePicker
+                  selectedDate={selectedDate}
+                  setSelectedDate={setSelectedDate}
+                  today={today}
+                />
+              </div>
 
-            {/* Time Picker */}
-            <div className="mb-4">
-              <TimeRangePicker
-                selectedDate={selectedDate}
-                today={today}
-                startTime={startTime}
-                setStartTime={setStartTime}
-                endTime={endTime}
-                setEndTime={setEndTime}
-              />
+              <div className="custom-time-picker">
+                <TimeRangePicker
+                  selectedDate={selectedDate}
+                  today={today}
+                  startTime={startTime}
+                  setStartTime={setStartTime}
+                  endTime={endTime}
+                  setEndTime={setEndTime}
+                />
+              </div>
             </div>
 
             {/* Discount Code Input */}
             <input
               type="text"
               placeholder="Discount code"
-              className="input input-bordered w-full max-w-xs mb-3"
+              className="input input-bordered w-full max-w-xl mb-3"
             />
 
             {/* Booking Summary */}
+
             <BookingSummary
               handleSubmit={handleSubmit}
               price={300000}
@@ -277,7 +281,7 @@ const BookingRoom = () => {
           <input
             type="text"
             placeholder="Discount code"
-            className="input input-bordered w-full max-w-xs mb-3"
+            className="input input-bordered w-full max-w-xl mb-3"
           />
           <BookingSummary
             handleSubmit={handleSubmit}
@@ -326,7 +330,7 @@ const BookingRoom = () => {
           <input
             type="text"
             placeholder="Discount code"
-            className="input input-bordered w-full max-w-xs mb-3"
+            className="input input-bordered w-full max-w-xl mb-3"
           />
           <BookingSummary
             handleSubmit={handleSubmit}

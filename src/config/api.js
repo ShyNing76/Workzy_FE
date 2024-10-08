@@ -78,6 +78,50 @@ const getLatLonFromAddress = async (address) => {
   }
 };
 
+const getBuildingById = (buildingId) => {
+  const URL_API = `api/v1/building/${buildingId}`;
+
+  return axios.get(URL_API);
+};
+
+const putUpdatePhoneNumber = (phoneNumber) => {
+  const URL_API = "api/v1/user/phone";
+  const data = {
+    phone: phoneNumber,
+  };
+
+  return axios.put(URL_API, data);
+};
+
+const putUpdateImage = (image) => {
+  const URL_API = "api/v1/user/image";
+
+  const formData = new FormData();
+  formData.append("image", image);
+
+  try {
+  } catch (error) {
+    console.error("Error uploading image:", error);
+  }
+
+  return axios.put(URL_API, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
+const getWorkspaceByBuildingId = (buildingId, limit, page, queryString) => {
+  const URL_API = `api/v1/workspace/?building_id=${buildingId}&limit=${limit}&page=${page}${queryString}`;
+
+  return axios.get(URL_API);
+};
+
+const getAllWorkspacesByBuildingId = (buildingId) => {
+  const URL_API = `api/v1/workspace/?building_id=${buildingId}`; // No pagination in this call
+  return axios.get(URL_API);
+};
+
 export {
   loginApi,
   registerApi,
@@ -87,4 +131,9 @@ export {
   getGoogleCallBack,
   getBuildingFromSearch,
   getLatLonFromAddress,
+  getBuildingById,
+  putUpdatePhoneNumber,
+  putUpdateImage,
+  getWorkspaceByBuildingId,
+  getAllWorkspacesByBuildingId,
 };

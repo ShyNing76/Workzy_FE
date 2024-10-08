@@ -1,13 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Googlemap from "../../../components/layout/Customer/Googlemap/Googlemap";
 import { IoLocationOutline } from "react-icons/io5";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Carousel from "../../../components/layout/Customer/Carousel/Carousel";
 import RoomCard from "../../../components/layout/Customer/RoomCard/RoomCard";
 import FilterBar from "../../../components/layout/Customer/FilterBar/FilterBar";
 import buildingImage from "../../../assets/8.jpg";
+import {
+  getAllWorkspacesByBuildingId,
+  getBuildingById,
+  getWorkspaceByBuildingId,
+} from "../../../config/api";
+import { toast, ToastContainer } from "react-toastify";
 
 const Building = () => {
+  const { buildingId } = useParams();
+  const [buildingData, setBuildingData] = useState("");
+  const [workspaceData, setWorkspaceData] = useState("");
+
+  const ROOM_LIMIT = 8;
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(ROOM_LIMIT);
+  const [totalWorkspaces, setTotalWorkspaces] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
+  const navigate = useNavigate();
+
   const images = [
     "https://picsum.photos/500/300?random=1",
     "https://picsum.photos/500/300?random=2",
@@ -16,47 +34,90 @@ const Building = () => {
     "https://picsum.photos/500/300?random=5",
   ];
 
+  useEffect(() => {
+    const fetchBuildingData = async () => {
+      try {
+        const res = await getBuildingById(buildingId);
+
+        if (res && res.data && res.err === 0) {
+          setBuildingData(res.data);
+        } else {
+          navigate("/404");
+        }
+      } catch (error) {
+        toast.error(error);
+      }
+    };
+
+    fetchBuildingData();
+  }, [buildingId]);
+
+  useEffect(() => {
+    const fetchTotalWorkspaces = async () => {
+      try {
+        const res = await getAllWorkspacesByBuildingId(buildingId);
+        if (res && res.data && res.err === 0) {
+          setTotalWorkspaces(res.data.length); // Total workspaces
+        }
+      } catch (error) {
+        toast.error(error.message);
+      }
+    };
+
+    const fetchWorkspaceData = async () => {
+      try {
+        const res = await getWorkspaceByBuildingId(buildingId, limit, page);
+
+        if (res && res.data && res.err === 0) {
+          setWorkspaceData(res.data);
+        }
+      } catch (error) {
+        toast.error(error);
+      }
+    };
+
+    fetchTotalWorkspaces();
+    fetchWorkspaceData();
+  }, [buildingId, limit, page]);
+
+  // Count Total page
+  useEffect(() => {
+    if (totalWorkspaces > 0) {
+      setTotalPages(Math.ceil(totalWorkspaces / limit)); // Calculate total pages
+    }
+  }, [totalWorkspaces, limit]); // Depend on totalWorkspaces and limit
+
   return (
     <>
+      <ToastContainer />
       <div className="body-content mt-0">
-        <div className="body-content-container mx-auto grid max-w-2xl grid-cols-1 items-start gap-x-8 gap-y-16 px-4 py-24 sm:px-6 sm:py-10 lg:max-w-7xl lg:grid-cols-2 lg:px-8">
+        <div className="body-content-container mx-auto grid max-w-2xl lg:max-w-7xl lg:grid-cols-2 items-center gap-x-16 gap-y-16 px-4 py-24 sm:px-6 sm:py-10 lg:px-8">
+          {/* Nội dung văn bản */}
           <div className="body-content-text">
-            <div className="building-title text-3xl font-black tracking-tight sm:text-6xl text-left">
-              <h1>Workzy High-Tech Park</h1> <br />
+            <div className="building-title text-3xl font-black tracking-tight sm:text-5xl text-left">
+              <h1>{buildingData.building_name}</h1>
+              <br />
             </div>
 
             <div className="building-address">
-              <p className="building-address-detail text-sm flex">
-                <IoLocationOutline className="text-xl" /> &nbsp; Lô E2a-7, Đường
-                D1, phường Long Thạnh Mỹ, TP Thủ Đức, TPHCM
+              <p className="building-address-detail text-sm flex font-semibold">
+                <IoLocationOutline className="text-xl" /> &nbsp;{" "}
+                {buildingData.address}
               </p>
             </div>
 
-            <div className="buiding-detail body-content-normal-text text-justify mt-12">
-              Located in the fast-growing area of ​​Thu Duc City, Ho Chi Minh
-              City, the High-Tech Park branch has convenient transportation,
-              close to residential areas and commercial centers. This makes it
-              easy for individuals and businesses to move and access. With
-              meeting and working rooms from small to large, Workzy provides a
-              variety of spaces to suit the needs of organizing meetings,
-              seminars, events or group work. Each room is fully equipped with
-              amenities such as projectors, whiteboards, presentation screens
-              and high-speed internet connection. The staff at Workzy High-Tech
-              Park is always ready to support customers throughout the service
-              process. From equipment instructions to technical support,
-              everything is done quickly and professionally. Workzy not only
-              provides meeting rooms but also supports flexible working
-              solutions such as virtual office services, shared workspaces, and
-              other convenient service packages for startups and freelancers.
-              Workzy High-Tech Park aims to create a community workspace where
-              people can communicate, exchange ideas and develop work in the
-              most effective way. With the motto "Work smart, highly effective",
-              Workzy is committed to bringing comfort, convenience and
-              productivity to customers.
+            <div className="building-detail body-content-normal-text text-justify mt-12">
+              {buildingData.description}
             </div>
           </div>
-          <div className="building-img border border-gray-300">
-            <img src={buildingImage} />
+
+          {/* Hình ảnh */}
+          <div className="building-img flex justify-center items-center border">
+            <img
+              src={buildingImage}
+              alt="Building"
+              className="max-w-full h-full"
+            />
           </div>
         </div>
       </div>
@@ -73,86 +134,52 @@ const Building = () => {
       </div>
 
       <div className="room-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mx-12">
-        <RoomCard
-          roomName="Premium Meeting Room"
-          roomType="Meeting Room"
-          area={50}
-          chairs={18}
-          price={30000}
-          image="https://picsum.photos/500/300?random=1"
-        />
-
-        <RoomCard
-          roomName="Premium Meeting Room"
-          roomType="Meeting Room"
-          area={50}
-          chairs={18}
-          price={30000}
-          image="https://picsum.photos/500/300?random=2"
-        />
-
-        <RoomCard
-          roomName="Premium Meeting Room"
-          roomType="Meeting Room"
-          area={50}
-          chairs={18}
-          price={30000}
-          image="https://picsum.photos/500/300?random=3"
-        />
-
-        <RoomCard
-          roomName="Premium Meeting Room"
-          roomType="Meeting Room"
-          area={50}
-          chairs={18}
-          price={30000}
-          image="https://picsum.photos/500/300?random=4"
-        />
-
-        <RoomCard
-          roomName="Premium Meeting Room"
-          roomType="Meeting Room"
-          area={50}
-          chairs={18}
-          price={30000}
-          image="https://picsum.photos/500/300?random=5"
-        />
-
-        <RoomCard
-          roomName="Premium Meeting Room"
-          roomType="Meeting Room"
-          area={50}
-          chairs={18}
-          price={30000}
-          image="https://picsum.photos/500/300?random=6"
-        />
-
-        <RoomCard
-          roomName="Premium Meeting Room"
-          roomType="Meeting Room"
-          area={50}
-          chairs={18}
-          price={30000}
-          image="https://picsum.photos/500/300?random=7"
-        />
-
-        <RoomCard
-          roomName="Premium Meeting Room"
-          roomType="Meeting Room"
-          area={50}
-          chairs={18}
-          price={30000}
-          image="https://picsum.photos/500/300?random=8"
-        />
+        {workspaceData &&
+          workspaceData.map((workspace, index) => (
+            <RoomCard
+              key={`workspace-${workspace.workspace_id}`}
+              workspace={workspace}
+              image={`https://picsum.photos/500/300?random=${index}`}
+            />
+          ))}
       </div>
 
-      <div className="join flex justify-center mb-10">
-        <button className="join-item btn">1</button>
-        <button className="join-item btn">2</button>
-        <button className="join-item btn btn-disabled">...</button>
-        <button className="join-item btn">10</button>
-        <button className="join-item btn">11</button>
-      </div>
+      {totalPages > 1 && (
+        <div className="join flex justify-center mb-10">
+          <button
+            className="join-item btn"
+            onClick={() => setPage(page > 1 ? page - 1 : 1)} // Go to previous page
+            disabled={page === 1}
+          >
+            Prev
+          </button>
+
+          {[...Array(totalPages)].map(
+            (
+              _,
+              index // Dynamically generate the correct number of pages
+            ) => (
+              <button
+                key={index + 1}
+                className={`join-item btn ${
+                  page === index + 1 ? "btn-active" : ""
+                }`}
+                onClick={() => setPage(index + 1)} // Go to specific page
+              >
+                {index + 1}
+              </button>
+            )
+          )}
+
+          <button
+            className="join-item btn"
+            onClick={() => setPage(page < totalPages ? page + 1 : totalPages)} // Go to next page
+            disabled={page === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       <div className="workzy-branch-maps">
         <div className="maps-container">
