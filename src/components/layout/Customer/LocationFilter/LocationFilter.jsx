@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 const LocationFilter = (props) => {
   const [location, setLocation] = useState(props.location || "");
   const [workspaceType, setWorkspaceType] = useState(props.workSpaceType || "");
-  const [isSubmit, setIsSubmit] = useState(false);
 
   const navigate = useNavigate();
   const currentLocation = useLocation();
