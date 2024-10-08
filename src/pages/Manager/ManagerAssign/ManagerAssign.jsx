@@ -12,11 +12,12 @@ const ManagerAssign = () => {
       staffName: "",
       location: "HCM",
     },
-    { id: "Bu02", 
-      name: "Building B", 
-      staffAssigned: null, 
-      staffName: "", 
-      location: "HCM" 
+    {
+      id: "Bu02",
+      name: "Building B",
+      staffAssigned: null,
+      staffName: "",
+      location: "HCM",
     },
     {
       id: "Bu03",
@@ -25,35 +26,40 @@ const ManagerAssign = () => {
       staffName: "",
       location: "HN",
     },
-    { id: "Bu04", 
-      name: "Building D", 
-      staffAssigned: null, 
-      staffName: "", 
-      location: "HCM" 
+    {
+      id: "Bu04",
+      name: "Building D",
+      staffAssigned: null,
+      staffName: "",
+      location: "HCM",
     },
-    { id: "Bu05", 
-      name: "Building E", 
-      staffAssigned: null, 
-      staffName: "", 
-      location: "HN" 
+    {
+      id: "Bu05",
+      name: "Building E",
+      staffAssigned: null,
+      staffName: "",
+      location: "HN",
     },
-    { id: "Bu06", 
-      name: "Building F", 
-      staffAssigned: null, 
-      staffName: "", 
-      location: "HCM" 
+    {
+      id: "Bu06",
+      name: "Building F",
+      staffAssigned: null,
+      staffName: "",
+      location: "HCM",
     },
-    { id: "Bu07", 
-      name: "Building G", 
-      staffAssigned: null, 
-      staffName: "", 
-      location: "HN" 
+    {
+      id: "Bu07",
+      name: "Building G",
+      staffAssigned: null,
+      staffName: "",
+      location: "HN",
     },
-    { id: "Bu08", 
-      name: "Building H", 
-      staffAssigned: null, 
-      staffName: "", 
-      location: "HCM" 
+    {
+      id: "Bu08",
+      name: "Building H",
+      staffAssigned: null,
+      staffName: "",
+      location: "HCM",
     },
   ]);
 
@@ -84,7 +90,6 @@ const ManagerAssign = () => {
       name: "Nguyen Van HiHi",
       location: "HN",
     },
-    
   ]);
 
   // Filter Location
@@ -96,9 +101,9 @@ const ManagerAssign = () => {
   };
 
   // Get filtered buildings by location
-  const filteredBuildings = buildings.filter(
-    (building) => building.location === filterLocation
-  );
+  const filteredBuildings = filterLocation
+    ? buildings.filter((building) => building.location === filterLocation) // if Choose Location on filter -> show buildings with same value Location
+    : buildings; // If not, show all buildings
 
   // Get filtered staff by location
   const filteredStaff = staff.filter((staffMember) => {
@@ -109,9 +114,10 @@ const ManagerAssign = () => {
   const handleAssignStaff = (buildingId) => {
     const updatedBuildings = buildings.map((building) => {
       if (building.id === buildingId) {
-        return { ...building, 
-          staffAssigned: building.staffAssigned, 
-          staffName: building.staffName 
+        return {
+          ...building,
+          staffAssigned: building.staffAssigned,
+          staffName: building.staffName,
         };
       }
       return building;
@@ -130,15 +136,18 @@ const ManagerAssign = () => {
   // some() check if there is at least one element in the array satisfies the condition (is a callback function)
   // some() return true if at least one element satisfies the condition, otherwise return false.
   const isStaffAssigned = (staffId) => {
-    return buildings.some(building => building.staffAssigned === staffId);
+    return buildings.some((building) => building.staffAssigned === staffId);
   };
 
   return (
     <div className="assign-staff-container">
-      <h1 className="text-2xl font-bold top-10" >Assign Staff to Buildings</h1>
+      <h1 className="text-2xl font-bold top-10">Assign Staff to Buildings</h1>
 
       {/* Filter section */}
-      <div className="manager-filter-section-container" style={{marginTop: "20px", marginBottom: "20px"}}>
+      <div
+        className="manager-filter-section-container"
+        style={{ marginTop: "20px", marginBottom: "20px" }}
+      >
         <label htmlFor="location-filter"></label>
         <select
           id="location-filter"
@@ -146,9 +155,7 @@ const ManagerAssign = () => {
           onChange={handleFilterChange}
           className="select select-bordered w-full max-w-xs"
         >
-          <option disabled value="">
-            Location
-          </option>
+          <option value="">All Location</option>
           <option value="HCM">HCM</option>
           <option value="HN">HN</option>
         </select>
@@ -171,17 +178,15 @@ const ManagerAssign = () => {
                 <th>{building.id}</th>
                 <td>{building.name}</td>
                 <td>
-                 
                   <select
-                  
-                    value={building.staffAssigned || ""} 
+                    value={building.staffAssigned || ""}
                     onChange={(e) => {
                       // Get selected staff ID and name
                       const selectedStaffId = e.target.value;
-                      const selectedStaffName = staff.find(
-                        (staff) => staff.id === selectedStaffId
-                      )?.name || ""; // If found staff, return staff name, 
-                                     //if not found staff, return empty string
+                      const selectedStaffName =
+                        staff.find((staff) => staff.id === selectedStaffId)
+                          ?.name || ""; // If found staff, return staff name,
+                      //if not found staff, return empty string
 
                       // Check if staff is assigned to any building
                       if (isStaffAssigned(selectedStaffId)) {
@@ -192,12 +197,16 @@ const ManagerAssign = () => {
                         });
                         return;
                       }
-                      
-                      // Update building state with selected staff                      
-                      setBuildings(currentBuildings =>
-                        currentBuildings.map(currentBuilding =>
+
+                      // Update building state with selected staff
+                      setBuildings((currentBuildings) =>
+                        currentBuildings.map((currentBuilding) =>
                           currentBuilding.id === building.id
-                            ? { ...currentBuilding, staffAssigned: selectedStaffId, staffName: selectedStaffName }
+                            ? {
+                                ...currentBuilding,
+                                staffAssigned: selectedStaffId,
+                                staffName: selectedStaffName,
+                              }
                             : currentBuilding
                         )
                       );
@@ -207,11 +216,21 @@ const ManagerAssign = () => {
                     <option disabled value="">
                       Select Staff
                     </option>
-                    {filteredStaff.map((staffMember) => (
-                      <option key={staffMember.id} value={staffMember.id}>
-                        {staffMember.name}
-                      </option>
-                    ))}
+
+                    {/*Filter staff's Location by building's location*/}
+                    {staff
+                      .filter(
+                        (staffMember) =>
+                          staffMember.location === building.location
+                      )  // filter staff by building location then .map() to create <option> in dropdown 
+                      .map((filterStaffMember) => (
+                        <option
+                          key={filterStaffMember.id}
+                          value={filterStaffMember.id}
+                        >
+                          {filterStaffMember.name}
+                        </option>
+                      ))} 
                   </select>
                 </td>
                 <td>
