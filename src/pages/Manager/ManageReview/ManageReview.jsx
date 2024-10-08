@@ -73,7 +73,7 @@ const ManageReview = () => {
 
   return (
     <div className="manage-review-container">
-      <h1 className="text-2xl font-bold">Manage Review</h1>
+      <h1 className="text-2xl font-bold" style={{marginBottom: "20px", marginTop: "20px"}}>Manage Review</h1>
       <div className="overflow-x-auto">
         <table className="table w-full">
           <thead>
@@ -97,7 +97,7 @@ const ManageReview = () => {
                 </td>
                 <td>{review.date}</td>
                 <td>
-                  <button onClick={() => handleDeleteReview(review.id)}>
+                  <button className="btn btn-error" onClick={() => handleDeleteReview(review.id)}>
                     Delete
                   </button>
                 </td>

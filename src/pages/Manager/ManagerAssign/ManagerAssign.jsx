@@ -193,7 +193,7 @@ const ManagerAssign = () => {
                         Swal.fire({
                           icon: "error",
                           title: "Oops...",
-                          text: "Staff is already assigned to a building!",
+                          text: "Staff is already assigned to another building!",
                         });
                         return;
                       }

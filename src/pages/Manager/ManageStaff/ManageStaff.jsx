@@ -42,9 +42,9 @@ const ManageStaff = () => {
   };
 
   // Get filtered staff by location
-  const filterStaffByLocation = staffs.filter((staff) => {
-    return staff.location === filterLocation;
-  });
+  const filterStaffByLocation = filterLocation
+    ? staffs.filter((staff) => staff.location === filterLocation)
+    : staffs;
 
   // Change Status "Block" or "Unblock"
   const changeStatus = (staffId) => {
@@ -82,9 +82,7 @@ const ManageStaff = () => {
           onChange={handleFilterChange}
           className="select select-bordered w-full max-w-xs"
         >
-          <option disabled value="">
-            Location
-          </option>
+          <option value=""> Location</option>
           <option value="HCM">HCM</option>
           <option value="HN">HN</option>
         </select>
