@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
+import Swal from "sweetalert2";
 
 const ManagerAssign = () => {
   // Buildings
@@ -116,7 +117,13 @@ const ManagerAssign = () => {
       return building;
     });
     setBuildings(updatedBuildings);
-    alert(`Assign staff successfully!`);
+    Swal.fire({
+      position: "center",
+      icon: "success",
+      title: "Assign staff successfully!",
+      showConfirmButton: false,
+      timer: 1500,
+    });
   };
 
   // Check if staff is assigned to any building
@@ -178,7 +185,11 @@ const ManagerAssign = () => {
 
                       // Check if staff is assigned to any building
                       if (isStaffAssigned(selectedStaffId)) {
-                        alert("Staff is already assigned to a building!");
+                        Swal.fire({
+                          icon: "error",
+                          title: "Oops...",
+                          text: "Staff is already assigned to a building!",
+                        });
                         return;
                       }
                       

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Swal from "sweetalert2"
 
 const ManageReview = () => {
   const [reviews, setReviews] = useState([
@@ -47,11 +48,28 @@ const ManageReview = () => {
   ]);
   // Delete review
   const handleDeleteReview = (reviewId) => {
-    // filter out the review with the given id in reviews array
-    const updatedReviews = reviews.filter((review) => review.id !== reviewId);
-    setReviews(updatedReviews);
-    alert("Review deleted successfully");
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // filter out the review with the given id in reviews array
+        const updatedReviews = reviews.filter((review) => review.id !== reviewId);
+        setReviews(updatedReviews);
+        Swal.fire({
+          title: "Deleted!",
+          text: "Review has been deleted successfully.",
+          icon: "success",
+        });
+      }
+    });
   };
+  
 
   return (
     <div className="manage-review-container">
