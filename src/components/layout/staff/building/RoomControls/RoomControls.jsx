@@ -7,21 +7,72 @@ import Monthly from '../RoomRow/Monthly';
 const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSelectedType, selectedDate, setSelectedDate }) => {
     const [currentDate, setCurrentDate] = useState('');
     const [workspaceType, setWorkspaceType] = useState('Single POD'); 
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
     useEffect(() => {
-        const today = new Date().toISOString().split('T')[0]; 
-        setCurrentDate(today);
-        setSelectedDate(today); 
-    }, [setSelectedDate]); 
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0]; // YYYY-MM-DD
+        const currentMonth = today.toISOString().split('T')[0].slice(0, 7); // YYYY-MM
+        const currentYear = today.getFullYear(); // YYYY
+
+        // Set default date based on booking type
+        switch (selectedType) {
+            case 'hourly':
+                setCurrentDate(formattedDate);
+                setSelectedDate(formattedDate);
+                break;
+            case 'daily':
+                setCurrentDate(currentMonth);
+                setSelectedDate(currentMonth);
+                break;
+            case 'monthly':
+                setCurrentDate(currentYear.toString());
+                setSelectedDate(currentYear.toString());
+                setSelectedYear(currentYear); // Set the initial year for monthly
+                break;
+            default:
+                setCurrentDate(formattedDate);
+                setSelectedDate(formattedDate);
+        }
+    }, [selectedType, setSelectedDate]);
+
+    // Function to get input type based on booking type
+    const getDateInputType = () => {
+        switch (selectedType) {
+            case 'hourly':
+                return 'date'; // Select a specific date
+            case 'daily':
+                return 'month'; // Select a specific month
+            case 'monthly':
+                return 'number'; // Select a specific year (number input)
+            default:
+                return 'date';
+        }
+    };
+
+    // Handle date change depending on type
+    const handleDateChange = (e) => {
+        let value = e.target.value;
+        if (selectedType === 'monthly') {
+            // Only set the year for 'monthly'
+            value = value.substring(0, 4); // Get only the year part (YYYY)
+            setSelectedYear(value); // Update the year for the 'monthly' view
+            setCurrentDate(value); // Set currentDate to the selected year
+            setSelectedDate(value); // Update selectedDate to the selected year
+        } else {
+            setCurrentDate(value);
+            setSelectedDate(value);
+        }
+    };
 
     const renderTable = () => {
         switch (selectedType) {
             case 'hourly':
-                return <TimeSlot selectedDate={selectedDate} selectedStatus={selectedStatus} workspaceType={workspaceType} />; 
+                return <TimeSlot selectedDate={selectedDate} selectedStatus={selectedStatus} workspaceType={workspaceType} />;
             case 'daily':
-                return <Daily selectedDate={selectedDate} selectedStatus={selectedStatus} workspaceType={workspaceType} />;  
+                return <Daily selectedDate={selectedDate} selectedStatus={selectedStatus} workspaceType={workspaceType} />;
             case 'monthly':
-                return <Monthly selectedDate={selectedDate} selectedStatus={selectedStatus} workspaceType={workspaceType} />; 
+                return <Monthly selectedDate={selectedYear} selectedStatus={selectedStatus} workspaceType={workspaceType} />;
             default:
                 return null;
         }
@@ -73,15 +124,13 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
                         </select>
                     </div>
                     <div className="control">
-                        <label htmlFor="date-picker">Select Date</label>
+                        <label htmlFor="date-picker">Select {selectedType === 'hourly' ? 'Date' : selectedType === 'daily' ? 'Month' : 'Year'}</label>
                         <input 
-                            type="date" 
+                            type={getDateInputType()} 
                             id="date-picker" 
                             value={currentDate} 
-                            onChange={(e) => {
-                                setCurrentDate(e.target.value);
-                                setSelectedDate(e.target.value); 
-                            }} 
+                            onChange={handleDateChange}
+                            min={selectedType === 'monthly' ? '1900' : undefined} 
                         />
                     </div>
                 </div>
@@ -109,6 +158,6 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
             </div>
         </div>
     );
-};    
+};
 
 export default RoomControls;

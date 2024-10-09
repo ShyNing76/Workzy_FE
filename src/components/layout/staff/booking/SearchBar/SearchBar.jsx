@@ -1,30 +1,25 @@
-import React, { useState } from 'react';
-import './SearchBar.scss'
+import { useState } from "react";
+
 const SearchBar = ({ onSearch }) => {
-    const [searchTerm, setSearchTerm] = useState('');
+  const [searchInput, setSearchInput] = useState("");
 
-    const handleInputChange = (e) => {
-        const value = e.target.value;
-        setSearchTerm(value);
-        onSearch(value); 
-    };
+  const handleSearch = () => {
+    onSearch(searchInput); // Call the search function with the entered Booking ID
+  };
 
-    const handleClearSearch = () => {
-        setSearchTerm('');
-        onSearch(''); // Reset search
-    };
-
-    return (
-        <div className="search-bar">
-            <input
-                type="text"
-                placeholder="Search by Booking ID"
-                value={searchTerm}
-                onChange={handleInputChange}
-            />
-            <button onClick={handleClearSearch}>Clear</button>
-        </div>
-    );
+  return (
+    <div className="search-bar">
+      <input
+        type="text"
+        value={searchInput}
+        onChange={(e) => setSearchInput(e.target.value)}
+        placeholder="Enter Booking ID"
+      />
+      <button className="search-button" onClick={handleSearch}>
+        Search
+      </button>
+    </div>
+  );
 };
 
 export default SearchBar;

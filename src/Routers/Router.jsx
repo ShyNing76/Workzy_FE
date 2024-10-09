@@ -42,6 +42,7 @@ import TrackAndAnalyzeReport from "../pages/Admin/Track&AnalyzeReport/Track&Anal
 import MainPage from "../pages/Staff/MainPage/MainPage.jsx";
 import BookingManagement from "../pages/Staff/Bookings/BookingManagement.jsx";
 import BuildingRoomPage from "../pages/Staff/BuildingRoom/BuildingRoomPage.jsx";
+import Wishlist from "../pages/Staff/Wishlist/Wishlist.jsx";
 
 // Role id store in local Storage after login and register
 
@@ -234,6 +235,10 @@ export const router = createBrowserRouter([
       {
         path: "bookings",
         element: <BookingManagement />,
+      },
+      {
+        path: "wishlist",
+        element: <Wishlist/>,
       },
     ],
   },

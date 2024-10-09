@@ -1,27 +1,40 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { IoHomeOutline } from "react-icons/io5";
+import { useState, useEffect } from "react";
 import "./MainPage.scss";
 
 const MainPage = () => {
   const location = useLocation(); 
+  const [staffBuilding, setStaffBuilding] = useState("");
+
+  useEffect(() => {
+    const fetchBuilding = async () => {
+      const respone = await fetch("/api/getStaffBuilding");
+      const data = await respone.json();
+      setStaffBuilding(data.building);
+    };
+    fetchBuilding();
+  })
 
   return (
     <div className="main-container">
       <header className="header">
         <div className="logo-container">
           <div className="circle">WZ</div>
-          <h1>Workzy Staff at Location</h1>
+          <h1>Workzy Staff at {staffBuilding}</h1>
         </div>
       </header>
       <div className="tabs">
         <Link to="/staff" className={`tab ${location.pathname === '/staff' ? 'active' : ''}`}>
-          <IoHomeOutline size={20} /> Home
+           Home
         </Link>
         <Link to="/staff/buildingroom" className={`tab ${location.pathname === '/staff/buildingroom' ? 'active' : ''}`}>
           Building's Room
         </Link>
         <Link to="/staff/bookings" className={`tab ${location.pathname === '/staff/bookings' ? 'active' : ''}`}>
           Bookings Management 
+        </Link>
+        <Link to="/staff/wishlist" className={`tab ${location.pathname === '/staff/wishlist' ? 'active' : ''}`}>
+          Wishlist
         </Link>
       </div>
       

@@ -12,26 +12,5 @@
         flex: 1;
         padding: 8px;
     }
-    
-    button {
-        background-color: #3EB32D;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        padding: 8px 16px;
-        cursor: pointer;
-        
-        &:hover {
-            background-color: #36a82b; // Màu nền khi hover
-        }
-        
-        &.clear {
-            background-color: #f44336; // Màu nền cho nút Clear
-            margin-left: 10px; // Khoảng cách giữa nút Clear và nút khác
-            
-            &:hover {
-                background-color: #d32f2f; // Màu nền khi hover trên nút Clear
-            }
-        }
-    }
+
 }

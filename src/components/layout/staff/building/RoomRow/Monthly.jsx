@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import './RoomSchedule.scss';
 import RoomModal from '../../building/RoomModal/RoomModal';
 
-const Monthly = ({ selectedStatus, workspaceType }) => {
-    const [roomStatus, setRoomStatus] = useState({});
+const Monthly = ({ selectedStatus, workspaceType, selectedDate: selectedYear }) => {
+    const [roomStatusByYear, setRoomStatusByYear] = useState({});
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState(null);
 
@@ -51,13 +51,8 @@ const Monthly = ({ selectedStatus, workspaceType }) => {
         'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
     ];
     
-
-    useEffect(() => {
-        const newRoomStatus = generateRoomStatus();
-        setRoomStatus(newRoomStatus);
-    }, [workspaceType]);
-
-    const generateRoomStatus = () => {
+    // Generate room status based on selected year and workspace type
+    const generateRoomStatusForYear = () => {
         const statusOptions = ['available', 'booked', 'in_use', 'under_maintenance'];
         const generatedStatus = {};
 
@@ -69,6 +64,17 @@ const Monthly = ({ selectedStatus, workspaceType }) => {
 
         return generatedStatus;
     };
+
+    useEffect(() => {
+        // Check if the selected year already has room status stored
+        if (!roomStatusByYear[selectedYear]) {
+            const newRoomStatus = generateRoomStatusForYear();
+            setRoomStatusByYear(prevStatus => ({
+                ...prevStatus,
+                [selectedYear]: newRoomStatus
+            }));
+        }
+    }, [workspaceType, selectedYear]);
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -100,7 +106,7 @@ const Monthly = ({ selectedStatus, workspaceType }) => {
                     {rooms.map((room) => (
                         <tr key={room}>
                             <td>{room}</td>
-                            {roomStatus[room]?.map((status, index) => {
+                            {roomStatusByYear[selectedYear]?.[room]?.map((status, index) => {
                                 if (selectedStatus && selectedStatus !== status) {
                                     return <td key={index} style={{ backgroundColor: 'transparent' }}></td>;
                                 }

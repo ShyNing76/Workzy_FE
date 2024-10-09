@@ -19,9 +19,24 @@
         flex-direction: column;
 
         label {
-            color: white; 
-            font-weight: bold;
+            color: black; 
+            font-weight: bold ;
             margin-bottom: 5px;
+        }
+
+        input[type="date"], input[type="month"], input[type="number"] {
+            border: 1px solid black;  /* Khung viền đen */
+            border-radius: 4px;  /* Góc bo tròn */
+            font-size: 16px;  /* Kích thước chữ */
+            background-color: white;  
+        }
+
+        select {
+            border: 1px solid black; 
+            border-radius: 4px; 
+            appearance: none; 
+            background: white; 
+            cursor: pointer; 
         }
     }
 
@@ -50,6 +65,7 @@
 
     .status-label {
         font-size: 14px;
-        color: white; 
+        color: black; 
+        
     }
 }

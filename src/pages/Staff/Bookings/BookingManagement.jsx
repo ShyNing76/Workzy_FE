@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import './BookingManagement.scss';
 import DetailModal from '../../../components/layout/staff/booking/Modal/DetailModal';
@@ -216,6 +217,9 @@ const BookingManagement = () => {
             <td>
                 <AmenitiesIcon workspaceType={booking.workspacetype} />
             </td>
+            <td></td>
+            <td></td>
+            <td></td>
             <td>${booking.totalPrice}</td>
             <td>{booking.status}</td>
             <td>
@@ -253,11 +257,14 @@ const BookingManagement = () => {
                             <tr>
                                 <th style={{ width: '100px' }}>BookingID</th>
                                 <th style={{ width: '140px' }}>Customer Name</th>
-                                <th style={{ width: '160px' }}>Workspace Type</th>
+                                <th style={{ width: '140px' }}>Workspace Type</th>
                                 <th style={{ width: '150px' }}>Workspace Name</th>  
-                                <th style={{ width: '320px' }}>Amenities</th>                         
-                                <th style={{ width: '100px' }}>Total price</th>
-                                <th style={{ width: '120px' }}>Status</th>
+                                <th style={{ width: '220px' }}>Amenities</th>  
+                                <th>Start Time</th>  
+                                <th>End Time</th>           
+                                <th>Booking Type</th>          
+                                <th style={{ width: '90px' }}>Total price</th>
+                                <th style={{ width: '110px' }}>Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
