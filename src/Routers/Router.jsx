@@ -48,6 +48,7 @@ import BuildingRoomPage from "../pages/Staff/BuildingRoom/BuildingRoomPage.jsx";
 import ManageStaff from "../pages/Manager/ManageStaff/ManageStaff.jsx";
 import ManageReview from "../pages/Manager/ManageReview/ManageReview.jsx";
 
+import MemberShipPage from "../pages/Customer/MemberShip/MemberShipPage.jsx";
 
 // Role id store in local Storage after login and register
 
@@ -107,7 +108,7 @@ export const router = createBrowserRouter([
         element: <LocationPage />,
       },
       {
-        path: "/location/building",
+        path: "/location/:buildingId",
         element: <Building />,
       },
       {
@@ -142,7 +143,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "membership",
-            element: <Profile />,
+            element: <MemberShipPage />,
           },
           {
             path: "support",
