@@ -152,7 +152,7 @@ const Navbar = (props) => {
           </ul>
         </div>
 
-        {!auth.isAuthenticated ? (
+        {auth.isAuthenticated ? (
           <>
             <div className="dropdown dropdown-end dropdown-hover">
               <div

@@ -52,7 +52,7 @@ const TimeRangePicker = (props) => {
   }, [selectedDate, today]);
 
   return (
-    <div className="form-control w-full max-w-xs my-3">
+    <div className="form-control w-full max-w-xl my-3">
       <div className="flex space-x-4">
         {/* Start Time */}
         <div className="relative w-1/2">

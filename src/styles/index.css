@@ -2,8 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+.ps__rail-y {
+    background-color: #f0f0f0;
+    /* Background color of the scrollbar rail */
+}
+
+.ps__thumb-y {
+    background-color: #333;
+    /* Color of the scrollbar thumb */
+    border-radius: 10px;
+    /* Rounded scrollbar */
 }
