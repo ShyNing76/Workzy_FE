@@ -292,6 +292,7 @@ const BookingsManagerPage = () => {
                     <td>{booking.totalAmenitiesPrice}</td>
                     <td>{booking.totalWorkspacePrice}</td>
                     <td>{booking.totalBrokenPrice}</td>
+                    <td>{booking.totalPrice}</td>
                     <td>{booking.startTimeDate}</td>
                     <td>{booking.endTimeDate}</td>
                     <td>{booking.workspaceID}</td>

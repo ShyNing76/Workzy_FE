@@ -23,11 +23,9 @@ import WorkingRoom from "../pages/Customer/WorkingRoom/WorkingRoom.jsx";
 import EventSpace from "../pages/Customer/EventSpace/EventSpace.jsx";
 
 import AdminDashboardPage from "../pages/Admin/AdminDashboard/AdminDashboardPage.jsx";
-import ServicesManagerPage from "../pages/Admin/ServicesManager/ServicesManagerPage.jsx";
 import ManagersManagerPage from "../pages/Admin/ManagersManager/ManagersManagerPage.jsx";
 import StaffsManagerPage from "../pages/Admin/StaffsManager/StaffsManagerPage.jsx";
-import MembersManagerPage from "../pages/Admin/MembersManager/MembersManagerPage.jsx";
-import VIPsManagerPage from "../pages/Admin/VIPsManager/VIPsManagerPage.jsx";
+import CustomersManagerPage from "../pages/Admin/CustomersManager/CustomersManagerPage.jsx";
 import HCMBuildingsManagerPage from "../pages/Admin/BuildingsManager/HoChiMinh/HCMBuildingManagerPage.jsx";
 import HNBuildingsManagerPage from "../pages/Admin/BuildingsManager/HaNoi/HNBuildingManagerPage.jsx";
 import HCMWorkspacesManagerPage from "../pages/Admin/WorkspacesManager/HoChiMinh/HCMWorkspacesManagerPage.jsx";
@@ -37,7 +35,6 @@ import WorkspacesTypesManagerPage from "../pages/Admin/WorkspaceTypesManager/Wor
 import PaymentsManagerPage from "../pages/Admin/PaymentsManager/PaymentsManagerPage.jsx";
 import BookingsManagerPage from "../pages/Admin/BookingsManager/BookingsManagerPage.jsx";
 import ReviewsManagerPage from "../pages/Admin/ReviewsManager/ReviewsManagerPage.jsx";
-import TrackAndAnalyzeReport from "../pages/Admin/Track&AnalyzeReport/Track&AnalyzeReport.jsx";
 
 import MainPage from "../pages/Staff/MainPage/MainPage.jsx";
 import BookingsPage from "../pages/Staff/Bookings/BookingsPage.jsx";
@@ -160,19 +157,17 @@ export const router = createBrowserRouter([
         index: true,
         element: <Navigate to="/admin" />,
       },
-      { path: "servicesmanager", element: <ServicesManagerPage /> },
-      { path: "managersmanager", element: <ManagersManagerPage /> },
+      { 
+        path: "managersmanager", 
+        element: <ManagersManagerPage /> 
+      },
       {
         path: "staffsmanager",
         element: <StaffsManagerPage />,
       },
       {
-        path: "membersmanager",
-        element: <MembersManagerPage />,
-      },
-      {
-        path: "vipsmanager",
-        element: <VIPsManagerPage />,
+        path: "customersmanager",
+        element: <CustomersManagerPage />,
       },
       {
         path: "hcmbuildingmanager",
@@ -209,10 +204,6 @@ export const router = createBrowserRouter([
       {
         path: "reviewsmanager",
         element: <ReviewsManagerPage />,
-      },
-      {
-        path: "trackandanalyzereport",
-        element: <TrackAndAnalyzeReport />,
       },
     ],
     // condition: (user) => user.isAdmin, // Add condition to check if user is admin before rendering the routes
