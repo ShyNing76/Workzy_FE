@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { formatCurrency } from "../../../context/priceFormat";
 
 const BookingSummary = (props) => {
   const {
-    handleSubmit,
+    handleOpenCloseModal,
     price,
-    discountProps,
     numOfHours,
     numOfDays,
     numOfMonths,
@@ -12,27 +12,43 @@ const BookingSummary = (props) => {
     setAmountText,
     amountPrice,
     setAmountPrice,
+    discount,
+    total,
+    setTotal,
+    subtotal,
+    setSubtotal,
+    tax,
+    setTax,
   } = props;
 
   useEffect(() => {
-    if (numOfHours) {
-      setAmountText(numOfHours + " Hour");
+    if (numOfHours > 0) {
+      setAmountText(`${numOfHours} Hour${numOfHours > 1 ? "s" : ""}`);
       setAmountPrice(price * numOfHours);
-    } else if (numOfDays) {
-      setAmountText(numOfDays + " Day");
+    } else if (numOfDays > 0) {
+      setAmountText(`${numOfDays} Day${numOfDays > 1 ? "s" : ""}`);
       setAmountPrice(price * numOfDays);
-    } else if (numOfMonths) {
-      setAmountText(numOfMonths + " Month");
+    } else if (numOfMonths > 0) {
+      setAmountText(`${numOfMonths} Month${numOfMonths > 1 ? "s" : ""}`);
       setAmountPrice(price * numOfMonths);
     } else {
       setAmountText("");
+      setAmountPrice(0); // Reset giá khi không có gì được chọn
     }
-  }, [numOfHours, numOfDays, numOfMonths]);
+  }, [numOfHours, numOfDays, numOfMonths, price]); // Thêm `price` vào dependency để cập nhật khi thay đổi
 
-  const discount = 0; // Giảm giá
-  const subtotal = amountPrice - discount;
-  const tax = subtotal * 0.1; // Giả sử thuế là 10%
-  const total = subtotal + tax;
+  // Calculate the total price
+  useEffect(() => {
+    // Calculate the subtotal first
+    const newSubtotal = amountPrice - discount;
+
+    // Then calculate the tax based on the subtotal
+    const newTax = newSubtotal * 0.1; // Assuming tax is 10%
+
+    setSubtotal(newSubtotal);
+    setTax(newTax); // Giả sử thuế là 10%
+    setTotal(newSubtotal + newTax);
+  }, [amountPrice, discount]);
 
   return (
     <div className="w-full max-w-md mx-auto">
@@ -40,36 +56,40 @@ const BookingSummary = (props) => {
       <div className="bg-gray-200 p-4 rounded-lg shadow-md">
         <div className="flex justify-between mb-2">
           <span>Amount ({amountText}):</span>
-          <span>{amountPrice.toLocaleString()} VND</span>
+          <span>{formatCurrency(amountPrice)}</span>
         </div>
         <div className="flex justify-between mb-2">
           <span>Discount:</span>
-          <span>{discount.toLocaleString()} VND</span>
+          <span>{formatCurrency(discount)}</span>
         </div>
         <div className="flex justify-between mb-2">
           <span>Subtotal:</span>
-          <span>{subtotal.toLocaleString()} VND</span>
+          <span>{formatCurrency(subtotal)}</span>
         </div>
         <div className="flex justify-between mb-2">
           <span>Tax (10%):</span>
-          <span>{tax.toLocaleString()} VND</span>
+          <span>{formatCurrency(tax)}</span>
         </div>
         <div
           className=" mt-2 pt-2 flex justify-between"
           style={{ borderTop: "0.5px solid #000" }}
         >
           <span className="font-bold">Total:</span>
-          <span className="font-bold">{total.toLocaleString()} VND</span>
+          <span className="font-bold">{formatCurrency(total)}</span>
         </div>
       </div>
 
       {/* Nút Book */}
-      <button
-        onClick={handleSubmit}
-        className="mt-4 w-full bg-black text-white py-2 rounded-md shadow-md"
-      >
-        Book
-      </button>
+      <div className="cursor-not-allowed mt-4">
+        <button
+          onClick={handleOpenCloseModal}
+          className={`w-full text-white py-2 rounded-md shadow-md btn btn-neutral ${
+            amountPrice > 0 ? "" : "btn-disabled"
+          }`}
+        >
+          Book
+        </button>
+      </div>
     </div>
   );
 };

@@ -122,6 +122,43 @@ const getAllWorkspacesByBuildingId = (buildingId) => {
   return axios.get(URL_API);
 };
 
+const postCreateBooking = (
+  workspaceId,
+  type,
+  startTime,
+  endTime,
+  totalPrice
+) => {
+  const URL_API = "api/v1/booking/create";
+  const data = {
+    workspace_id: workspaceId,
+    type,
+    start_time: startTime,
+    end_time: endTime,
+    total_price: totalPrice,
+  };
+
+  return axios.post(URL_API, data);
+};
+
+const getWorkSpaceById = (workspaceId) => {
+  const URL_API = `api/v1/workspace/${workspaceId}`; // No pagination in this call
+
+  return axios.get(URL_API);
+};
+
+const getWorkSpaceTypeNameById = (workspacetypeId) => {
+  const URL_API = `api/v1/workspace-type/${workspacetypeId}`; // No pagination in this call
+
+  return axios.get(URL_API);
+};
+
+const getWorkSpaceAmenitiesById = (workspacetypeId) => {
+  const URL_API = `api/v1/amenityWorkspace/${workspacetypeId}`; // No pagination in this call
+
+  return axios.get(URL_API);
+};
+
 export {
   loginApi,
   registerApi,
@@ -136,4 +173,8 @@ export {
   putUpdateImage,
   getWorkspaceByBuildingId,
   getAllWorkspacesByBuildingId,
+  postCreateBooking,
+  getWorkSpaceById,
+  getWorkSpaceTypeNameById,
+  getWorkSpaceAmenitiesById,
 };

@@ -10,6 +10,7 @@ const TimeRangePicker = (props) => {
     endTime,
     setEndTime,
     setNumOfHours,
+    convertTimeToMinutes,
   } = props;
   const [currentTimeInMinutes, setCurrentTimeInMinutes] = useState(0);
 
@@ -18,20 +19,6 @@ const TimeRangePicker = (props) => {
     const hour = i.toString().padStart(2, "0");
     return `${hour}:00`;
   });
-
-  // function convert time to minutes
-  const convertTimeToMinutes = (time) => {
-    const [hour, minutes] = time.split(":").map(Number);
-    return hour * 60 + minutes;
-  };
-
-  // Validate Time
-  const startTimeInMinutes = convertTimeToMinutes(startTime);
-  const endTimeInMinutes = convertTimeToMinutes(endTime);
-  if (startTimeInMinutes >= endTimeInMinutes) {
-    setStartTime("");
-    setEndTime("");
-  }
 
   // Lấy giờ hiện tại theo phút
   useEffect(() => {

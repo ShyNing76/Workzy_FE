@@ -12,6 +12,7 @@ import {
   getWorkspaceByBuildingId,
 } from "../../../config/api";
 import { toast, ToastContainer } from "react-toastify";
+import Pagination from "../../../components/layout/Shared/Pagination/Pagination";
 
 const Building = () => {
   const { buildingId } = useParams();
@@ -145,40 +146,7 @@ const Building = () => {
       </div>
 
       {totalPages > 1 && (
-        <div className="join flex justify-center mb-10">
-          <button
-            className="join-item btn"
-            onClick={() => setPage(page > 1 ? page - 1 : 1)} // Go to previous page
-            disabled={page === 1}
-          >
-            Prev
-          </button>
-
-          {[...Array(totalPages)].map(
-            (
-              _,
-              index // Dynamically generate the correct number of pages
-            ) => (
-              <button
-                key={index + 1}
-                className={`join-item btn ${
-                  page === index + 1 ? "btn-active" : ""
-                }`}
-                onClick={() => setPage(index + 1)} // Go to specific page
-              >
-                {index + 1}
-              </button>
-            )
-          )}
-
-          <button
-            className="join-item btn"
-            onClick={() => setPage(page < totalPages ? page + 1 : totalPages)} // Go to next page
-            disabled={page === totalPages}
-          >
-            Next
-          </button>
-        </div>
+        <Pagination page={page} totalPages={totalPages} setPage={setPage} />
       )}
 
       <div className="workzy-branch-maps">

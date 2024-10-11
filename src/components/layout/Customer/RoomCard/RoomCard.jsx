@@ -10,7 +10,7 @@ const RoomCard = ({ workspace, image }) => {
     <>
       <div className="room-list-container">
         <div className="room-list-page-1 mx-auto grid max-w-2xl grid-cols-1 items-start gap-x-8 gap-y-16 sm:mx-6 sm:my-10 lg:max-w-7xl  item-center">
-          <Link to="/location/building/roomdetail">
+          <Link to={`/location/building/${workspace.workspace_id}`}>
             <div className="room-list-item">
               <div className="room-list-item-container flex w-full flex-col lg:flex-row">
                 <div className="room-card card card-compact bg-base-100 w-72 shadow-xl">

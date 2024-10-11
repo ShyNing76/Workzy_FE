@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import CustomDatePicker from "../DatePicker/CustomDatePicker";
 import BookingSummary from "../Booking Summary/BookingSummary";
 
@@ -6,10 +6,23 @@ import MonthRangePicker from "../MonthRangePicker/MonthRangePicker";
 import DateRangePicker from "../DateRangePicker/DateRangePicker";
 import TimeRangePicker from "../TimePicker/TimeRangePicker";
 import { formatDateTime } from "../../../context/dateFormat";
+import { formatCurrency } from "../../../context/priceFormat";
+import BookingSummaryModal from "../BookingSummaryModal/BookingSummaryModal";
+import { postCreateBooking } from "../../../../config/api";
+import { toast, ToastContainer } from "react-toastify";
+import { AuthContext } from "../../../context/auth.context";
+import { useNavigate } from "react-router-dom";
 
-const BookingRoom = () => {
+const BookingRoom = (props) => {
+  // Props room data
+  const { roomData, workSpaceTypeName } = props;
+
+  // Auth context
+  const { auth } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   // Tab hiện tại
-  const [currentTab, setCurrentTab] = useState("hour");
+  const [currentTab, setCurrentTab] = useState("Hourly");
   // Lấy ngày hôm nay
   const today = new Date();
   // SelectedDate (Time)
@@ -20,46 +33,86 @@ const BookingRoom = () => {
   // StartDate EndDate for (day & month)
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+
   // number of hour, day, month
-  const [numOfHours, setNumOfHours] = useState("");
-  const [numOfDays, setNumOfDays] = useState("");
-  const [numOfMonths, setNumOfMonths] = useState("");
+  const [numOfHours, setNumOfHours] = useState(0);
+  const [numOfDays, setNumOfDays] = useState(0);
+  const [numOfMonths, setNumOfMonths] = useState(0);
 
   // startDateTime and endDateTime
   const [startDateTime, setStartDateTime] = useState(null);
   const [endDateTime, setEndDateTime] = useState(null);
 
   // Price and discount
-  const [price, setPrice] = useState(0);
+  const [discountCode, setDiscountCode] = useState("");
+  const [subtotal, setSubtotal] = useState(0);
+  const [tax, setTax] = useState(0);
   const [discount, setDiscount] = useState(0);
+  const [total, setTotal] = useState(0);
 
   // Amount Text and Price in booking
   const [amountText, setAmountText] = useState("");
   const [amountPrice, setAmountPrice] = useState(0);
 
-  // Set default whenever currentTab Change
+  // Open close confirm booking modal
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Previous Tab
+  const isInitialMount = useRef(true);
+  const prevTabRef = useRef(currentTab);
+
+  // Effect for handling tab changes
   useEffect(() => {
-    if (currentTab === "hour") {
-      setSelectedDate(today);
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    const prevTab = prevTabRef.current;
+    prevTabRef.current = currentTab;
+
+    if (prevTab !== currentTab) {
+      // Reset all states when switching tabs
+      setAmountText("");
+      setAmountPrice(0);
+      setDiscountCode("");
+      setStartDateTime(null);
+      setEndDateTime(null);
+      setSelectedDate(currentTab === "Hourly" ? today : null);
       setStartTime("");
       setEndTime("");
-      setNumOfHours("");
-      setAmountText("");
-      setAmountPrice(0);
-    } else if (currentTab === "day") {
       setStartDate(null);
       setEndDate(null);
-      setNumOfDays("");
-      setAmountText("");
-      setAmountPrice(0);
-    } else if (currentTab === "month") {
-      setStartDate(null);
-      setEndDate(null);
-      setNumOfMonths("");
-      setAmountText("");
-      setAmountPrice(0);
+      setNumOfHours(0);
+      setNumOfDays(0);
+      setNumOfMonths(0);
     }
   }, [currentTab]);
+
+  useEffect(() => {
+    if (currentTab === "Hourly" && selectedDate && startTime && endTime) {
+      setStartDateTime(combineDateAndTime(selectedDate, startTime));
+      setEndDateTime(combineDateAndTime(selectedDate, endTime));
+      calculateHours(startTime, endTime);
+    } else if (currentTab === "Daily" && startDate && endDate) {
+      let updatedStartDate = new Date(startDate);
+      updatedStartDate.setHours(0, 0, 0, 0);
+      let updatedEndDate = new Date(endDate);
+      updatedEndDate.setHours(23, 59, 59, 999);
+
+      setStartDateTime(updatedStartDate);
+      setEndDateTime(updatedEndDate);
+      calculateDays(startDate, endDate);
+    } else if (currentTab === "Monthly" && startDate && endDate) {
+      let updatedStartDate = new Date(startDate);
+      updatedStartDate.setHours(0, 0, 0, 0);
+      let updatedEndDate = new Date(endDate);
+      updatedEndDate.setHours(23, 59, 59, 999);
+
+      setStartDateTime(updatedStartDate);
+      setEndDateTime(updatedEndDate);
+    }
+  }, [currentTab, selectedDate, startTime, endTime, startDate, endDate]);
 
   // Kết hợp Date với Time
   const combineDateAndTime = (date, time) => {
@@ -101,55 +154,50 @@ const BookingRoom = () => {
     }
   };
 
-  useEffect(() => {
-    switch (currentTab) {
-      case "hour":
-        // Với tab Hour, cần kết hợp selectedDate với startTime và endTime
-        if (selectedDate && startTime && endTime) {
-          setStartDateTime(combineDateAndTime(selectedDate, startTime));
-          setEndDateTime(combineDateAndTime(selectedDate, endTime));
-          calculateHours(startTime, endTime);
-        }
-        break;
+  // function convert time to minutes
+  const convertTimeToMinutes = (time) => {
+    const [hour, minutes] = time.split(":").map(Number);
+    return hour * 60 + minutes;
+  };
 
-      case "day":
-        if (startDate && endDate) {
-          let updatedstartDate = new Date(startDate); // Tạo một đối tượng Date từ endDate
-          updatedstartDate.setHours(0, 0, 0, 0);
-          let updatedEndDate = new Date(endDate); // Tạo một đối tượng Date từ endDate
-          updatedEndDate.setHours(23, 59, 59, 999);
+  // Validate Time
+  const startTimeInMinutes = convertTimeToMinutes(startTime);
+  const endTimeInMinutes = convertTimeToMinutes(endTime);
+  if (startTimeInMinutes >= endTimeInMinutes) {
+    setStartTime("");
+    setEndTime("");
+    setAmountPrice(0);
+  }
 
-          setStartDateTime(updatedstartDate);
-          setEndDateTime(updatedEndDate); // Set thời gian kết thúc là 23:59:59
-          calculateDays(startDate, endDate);
-        }
-        break;
+  // Handle open confirm booking modal
+  const handleOpenCloseModal = () => {
+    setIsOpen(!isOpen);
+  };
 
-      case "month":
-        if (startDate) {
-          let updatedstartDate = new Date(startDate); // Tạo một đối tượng Date từ endDate
-          updatedstartDate.setHours(0, 0, 0, 0);
-          let updatedEndDate = new Date(endDate); // Tạo một đối tượng Date từ endDate
-          updatedEndDate.setHours(23, 59, 59, 999);
-
-          setStartDateTime(updatedstartDate);
-          setEndDateTime(updatedEndDate); // Set thời gian kết thúc là 23:59:59
-        }
-        break;
-
-      default:
-        break;
+  // Booking call api
+  const handleConfirmBooking = async () => {
+    if (!auth.isAuthenticated) {
+      // If not login => Navigate to login page to login
+      navigate(`login?redirect=${window.location.pathname}`);
+      return;
     }
-  }, [currentTab, selectedDate, startTime, endTime, startDate, endDate]);
 
-  const handleSubmit = () => {
     if (startDateTime && endDateTime) {
-      // Gửi dữ liệu đến database (giả sử hàm sendToDatabase là hàm gửi dữ liệu)
-      console.log("Start DateTime:", formatDateTime(startDateTime));
-      console.log("End DateTime:", formatDateTime(endDateTime));
+      const res = await postCreateBooking(
+        roomData.workspace_id,
+        currentTab,
+        formatDateTime(startDateTime),
+        formatDateTime(endDateTime),
+        total
+      );
 
-      // Gửi dữ liệu
-      // sendToDatabase({ startDateTime, endDateTime });
+      if (res && res.err === 0) {
+        toast.success(res.message);
+      } else {
+        toast.error(res.message);
+      }
+
+      setIsOpen(false);
     } else {
       console.error("Dữ liệu không hợp lệ");
     }
@@ -157,9 +205,10 @@ const BookingRoom = () => {
 
   return (
     <>
+      <ToastContainer />
       <div className="room-name-container flex items-center">
         <h1 className="room-name text-3xl font-black tracking-tight sm:text-5xl text-left">
-          Room name
+          {roomData?.workspace_name}
         </h1>
         <div className="status-badge badge badge-success text-white text-xm p-3 font-bold ml-6">
           Available
@@ -168,11 +217,11 @@ const BookingRoom = () => {
       <div className="type-capacity-container">
         <div className="flex justify-between font-semibold">
           <div>Type: </div>
-          <div>Working Room</div>
+          <div>{workSpaceTypeName}</div>
         </div>
         <div className=" flex justify-between font-semibold">
           <div>Capacity: </div>
-          <div>18 seats</div>
+          <div>{roomData?.capacity} seats</div>
         </div>
       </div>
 
@@ -185,9 +234,9 @@ const BookingRoom = () => {
           name="my_tabs_2"
           role="tab"
           className="tab"
-          aria-label="Hour"
-          defaultChecked={currentTab === "hour"}
-          onClick={() => setCurrentTab("hour")}
+          aria-label="Hourly"
+          defaultChecked={currentTab === "Hourly"}
+          onClick={() => setCurrentTab("Hourly")}
         />
         <div
           role="tabpanel"
@@ -197,7 +246,7 @@ const BookingRoom = () => {
           <div className="flex justify-between font-semibold items-center">
             <div>Price:</div>
             <div className="text-amber-500 text-xl font-bold">
-              300.000 VND/h
+              {roomData && formatCurrency(roomData?.price_per_hour)}/h
             </div>
           </div>
 
@@ -223,6 +272,7 @@ const BookingRoom = () => {
                   setStartTime={setStartTime}
                   endTime={endTime}
                   setEndTime={setEndTime}
+                  convertTimeToMinutes={convertTimeToMinutes}
                 />
               </div>
             </div>
@@ -231,19 +281,28 @@ const BookingRoom = () => {
             <input
               type="text"
               placeholder="Discount code"
+              value={discountCode}
+              onChange={(e) => setDiscountCode(e.target.value)}
               className="input input-bordered w-full max-w-xl mb-3"
             />
 
             {/* Booking Summary */}
 
             <BookingSummary
-              handleSubmit={handleSubmit}
-              price={300000}
+              handleOpenCloseModal={handleOpenCloseModal}
+              price={roomData?.price_per_hour}
               numOfHours={numOfHours}
               amountText={amountText}
               setAmountText={setAmountText}
               amountPrice={amountPrice}
               setAmountPrice={setAmountPrice}
+              discount={discount}
+              total={total}
+              setTotal={setTotal}
+              subtotal={subtotal}
+              setSubtotal={setSubtotal}
+              tax={tax}
+              setTax={setTax}
             />
           </div>
         </div>
@@ -255,8 +314,8 @@ const BookingRoom = () => {
           name="my_tabs_2"
           role="tab"
           className="tab"
-          aria-label="Day"
-          onClick={() => setCurrentTab("day")}
+          aria-label="Daily"
+          onClick={() => setCurrentTab("Daily")}
         />
         <div
           role="tabpanel"
@@ -265,32 +324,43 @@ const BookingRoom = () => {
           <div className=" flex justify-between font-semibold items-center">
             <div>Price: </div>
             <div className="text-amber-500 text-xl font-bold">
-              1.300.000 VND/day
+              {roomData && formatCurrency(roomData?.price_per_day)}/day
             </div>
           </div>
           <div className="font-semibold mt-4 mb-2">Remaining Time: </div>
           <div className="my-4">
             <DateRangePicker
               startDate={startDate}
-              setStartDate={setStartDate}
               endDate={endDate}
+              setStartDate={setStartDate}
               setEndDate={setEndDate}
+              today={today}
             />
           </div>
 
           <input
             type="text"
             placeholder="Discount code"
+            value={discountCode}
+            onChange={(e) => setDiscountCode(e.target.value)}
             className="input input-bordered w-full max-w-xl mb-3"
           />
+
           <BookingSummary
-            handleSubmit={handleSubmit}
-            price={1300000}
+            handleOpenCloseModal={handleOpenCloseModal}
+            price={roomData?.price_per_day}
             numOfDays={numOfDays}
             amountText={amountText}
             setAmountText={setAmountText}
             amountPrice={amountPrice}
             setAmountPrice={setAmountPrice}
+            discount={discount}
+            total={total}
+            setTotal={setTotal}
+            subtotal={subtotal}
+            setSubtotal={setSubtotal}
+            tax={tax}
+            setTax={setTax}
           />
         </div>
 
@@ -301,8 +371,8 @@ const BookingRoom = () => {
           name="my_tabs_2"
           role="tab"
           className="tab"
-          aria-label="Month"
-          onClick={() => setCurrentTab("month")}
+          aria-label="Monthly"
+          onClick={() => setCurrentTab("Monthly")}
         />
         <div
           role="tabpanel"
@@ -311,7 +381,7 @@ const BookingRoom = () => {
           <div className=" flex justify-between font-semibold items-center">
             <div>Price: </div>
             <div className="text-amber-500 text-xl font-bold">
-              10.300.000 VND/month
+              {roomData && formatCurrency(roomData?.price_per_month)}/month
             </div>
           </div>
           <div className="font-semibold mt-4 mb-2">Remaining Time: </div>
@@ -324,25 +394,57 @@ const BookingRoom = () => {
               numOfMonths={numOfMonths}
               setNumOfMonths={setNumOfMonths}
               today={today}
+              setAmountPrice={setAmountPrice}
             />
           </div>
 
           <input
             type="text"
             placeholder="Discount code"
+            value={discountCode}
+            onChange={(e) => setDiscountCode(e.target.value)}
             className="input input-bordered w-full max-w-xl mb-3"
           />
+
           <BookingSummary
-            handleSubmit={handleSubmit}
-            price={10300000}
+            handleOpenCloseModal={handleOpenCloseModal}
+            price={roomData?.price_per_month}
             numOfMonths={numOfMonths}
             amountText={amountText}
             setAmountText={setAmountText}
             amountPrice={amountPrice}
             setAmountPrice={setAmountPrice}
+            discount={discount}
+            total={total}
+            setTotal={setTotal}
+            subtotal={subtotal}
+            setSubtotal={setSubtotal}
+            tax={tax}
+            setTax={setTax}
           />
         </div>
       </div>
+
+      <BookingSummaryModal
+        isOpen={isOpen}
+        handleOpenCloseModal={handleOpenCloseModal}
+        roomData={roomData}
+        workSpaceTypeName={workSpaceTypeName}
+        currentTab={currentTab}
+        selectedDate={selectedDate}
+        startTime={startTime}
+        endTime={endTime}
+        startDate={startDate}
+        endDate={endDate}
+        discountCode={discountCode}
+        amountPrice={amountPrice}
+        amountText={amountText}
+        subtotal={subtotal}
+        discount={discount}
+        tax={tax}
+        total={total}
+        handleConfirmBooking={handleConfirmBooking}
+      />
     </>
   );
 };

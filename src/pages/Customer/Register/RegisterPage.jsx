@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import registerImage from "../../../assets/registerImage.jpg";
 import "./register.scss";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -12,6 +12,8 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const location = useLocation();
+  const redirectTo = new URLSearchParams(location.search).get("redirect");
 
   const navigate = useNavigate();
 
@@ -62,7 +64,11 @@ const RegisterPage = () => {
           }
           case 4: {
             //customer
-            navigate("/");
+            if (redirectTo) {
+              navigate(redirectTo); // Điều hướng trở lại trang hiện tại sau khi đăng nhập
+            } else {
+              navigate("/"); // Hoặc điều hướng đến trang mặc định
+            }
             break;
           }
           default:
@@ -182,7 +188,10 @@ const RegisterPage = () => {
             </form>
             <p className="text-center">
               Already have an account?{" "}
-              <Link to="/login" className="text-black-500 font-bold">
+              <Link
+                to={`/login?redirect=${redirectTo || window.location.pathname}`}
+                className="text-black-500 font-bold"
+              >
                 Login
               </Link>
             </p>
