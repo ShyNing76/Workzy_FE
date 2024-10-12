@@ -43,6 +43,10 @@ import MainPage from "../pages/Staff/MainPage/MainPage.jsx";
 import BookingsPage from "../pages/Staff/Bookings/BookingsPage.jsx";
 import BuildingRoomPage from "../pages/Staff/BuildingRoom/BuildingRoomPage.jsx";
 import MemberShipPage from "../pages/Customer/MemberShip/MemberShipPage.jsx";
+import MyBooking from "../pages/Customer/MyBooking/MyBooking.jsx";
+import SupportCenter from "../pages/Customer/SupportCenter/SupportCenter.jsx";
+import NotificationPage from "../pages/Customer/Notification/NotificationPage.jsx";
+import PaymentPage from "../pages/Customer/Payment/Payment.jsx";
 
 // Role id store in local Storage after login and register
 
@@ -106,7 +110,7 @@ export const router = createBrowserRouter([
         element: <Building />,
       },
       {
-        path: "/location/building/roomdetail",
+        path: "/location/building/:roomid",
         element: <RoomDetail />,
       },
       {
@@ -116,6 +120,16 @@ export const router = createBrowserRouter([
       {
         path: "contact",
         element: <ContactPage />,
+      },
+      {
+        path: "/booking/payment",
+        element: (
+          <>
+            <PrivateRoute requiredRoleID="4">
+              <PaymentPage />
+            </PrivateRoute>
+          </>
+        ),
       },
       {
         path: "user",
@@ -133,7 +147,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "booking",
-            element: <Profile />,
+            element: <MyBooking />,
           },
           {
             path: "membership",
@@ -141,11 +155,11 @@ export const router = createBrowserRouter([
           },
           {
             path: "support",
-            element: <Profile />,
+            element: <SupportCenter />,
           },
           {
             path: "notification",
-            element: <Profile />,
+            element: <NotificationPage />,
           },
         ],
       },

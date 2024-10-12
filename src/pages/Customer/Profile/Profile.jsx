@@ -28,6 +28,7 @@ const Profile = (props) => {
   const [gender, setGender] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [googleToken, setGoogleToken] = useState("");
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -44,6 +45,7 @@ const Profile = (props) => {
       setPhone(data?.phone);
       setEmail(data?.email);
       setAvatar(data?.image);
+      setGoogleToken(data?.google_token || null);
     }
   };
 
@@ -298,7 +300,9 @@ const Profile = (props) => {
                 <p>Password</p>
               </div>
               <button
-                className="btn btn-outline btn-sm"
+                className={`btn ${
+                  googleToken ? "btn-disabled" : "btn-outline"
+                }  btn-sm`}
                 onClick={() =>
                   document.getElementById("modal-update-password").showModal()
                 }
