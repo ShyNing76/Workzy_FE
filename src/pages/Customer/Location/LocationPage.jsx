@@ -24,6 +24,9 @@ const LocationPage = () => {
   const location = searchParams.get("location") || "";
   const workSpaceType = searchParams.get("workspaceType") || "";
 
+  // Const isLoading
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     // Tạo query string từ các giá trị location và workspaceType
     // const queryParams = new URLSearchParams();
@@ -41,6 +44,7 @@ const LocationPage = () => {
 
     const fetchBuildingLocation = async () => {
       try {
+        setIsLoading(true);
         const res = await getBuildingFromSearch(queryString);
 
         // Kiểm tra kết quả trả về và cập nhật state
@@ -52,6 +56,8 @@ const LocationPage = () => {
         }
       } catch (error) {
         console.error("Error fetching building data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -72,37 +78,49 @@ const LocationPage = () => {
         </div>
       </div> */}
 
-      <div>
-        <LocationFilter location={location} workSpaceType={workSpaceType} />
-      </div>
+      {!isLoading ? (
+        <>
+          <div>
+            <LocationFilter location={location} workSpaceType={workSpaceType} />
+          </div>
 
-      <div className="building-container">
-        <div className="building-list">
-          {dataBuilding && dataBuilding.length > 0 ? (
-            <PerfectScrollbar>
-              {dataBuilding.map((building, index) => (
-                <BuildingCard
-                  key={`Building-${building.building_id}`}
-                  dataBuilding={dataBuilding[index]}
-                  onHover={() => setHoveredBuilding(building)}
-                />
-              ))}
-            </PerfectScrollbar>
-          ) : (
-            <div className="no-data">
-              <img src={noDataIcon} alt="No Data" className="no-data-icon" />
-              <p>No Building Found</p>
+          <div className="building-container">
+            <div className="building-list">
+              {dataBuilding && dataBuilding.length > 0 ? (
+                <PerfectScrollbar>
+                  {dataBuilding.map((building, index) => (
+                    <BuildingCard
+                      key={`Building-${building.building_id}`}
+                      dataBuilding={dataBuilding[index]}
+                      onHover={() => setHoveredBuilding(building)}
+                    />
+                  ))}
+                </PerfectScrollbar>
+              ) : (
+                <div className="no-data">
+                  <img
+                    src={noDataIcon}
+                    alt="No Data"
+                    className="no-data-icon"
+                  />
+                  <p>No Building Found</p>
+                </div>
+              )}
             </div>
-          )}
+            <div className="map-container">
+              {/* <Googlemap src={googleMapsEmbedLink} /> */}
+              <MapLocation
+                dataBuilding={dataBuilding}
+                hoveredBuilding={hoveredBuilding}
+              />
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="flex justify-center items-center h-screen">
+          <span className="loading loading-spinner loading-lg"></span>
         </div>
-        <div className="map-container">
-          {/* <Googlemap src={googleMapsEmbedLink} /> */}
-          <MapLocation
-            dataBuilding={dataBuilding}
-            hoveredBuilding={hoveredBuilding}
-          />
-        </div>
-      </div>
+      )}
     </>
   );
 };

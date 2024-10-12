@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import loginImage from "../../../assets/loginImage.jpg";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -13,6 +13,8 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo = new URLSearchParams(location.search).get("redirect");
 
   //   Check Authentication
   const { setRoleId, setAuth, loginLoading, setLoginLoading } =
@@ -60,7 +62,11 @@ const LoginPage = () => {
           }
           case 4: {
             //customer
-            navigate("/");
+            if (redirectTo) {
+              navigate(redirectTo); // Điều hướng trở lại trang hiện tại sau khi đăng nhập
+            } else {
+              navigate("/"); // Hoặc điều hướng đến trang mặc định
+            }
             break;
           }
           default:
@@ -153,7 +159,12 @@ const LoginPage = () => {
             </button>
             <p className="text-center">
               Don’t have an account?{" "}
-              <Link to="/register" className="text-black-500 font-bold">
+              <Link
+                to={`/register?redirect=${
+                  redirectTo || window.location.pathname
+                }`}
+                className="text-black-500 font-bold"
+              >
                 Register
               </Link>
             </p>

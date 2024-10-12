@@ -45,7 +45,7 @@ const formatDateTime = (date) => {
   }${offsetHours}:${offsetMinutes}`;
 
   // Format the date as yyyy_mm_ddThh:mm+07:00
-  return `${year}_${month}_${day}T${hours}:${minutes}${timezone}`;
+  return `${year}-${month}-${day}T${hours}:${minutes}${timezone}`;
 };
 
 export { convertDateToMMDDYYYY, convertDateToYYYYMMDD, formatDateTime };
