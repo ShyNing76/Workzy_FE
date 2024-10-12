@@ -159,6 +159,25 @@ const getWorkSpaceAmenitiesById = (workspacetypeId) => {
   return axios.get(URL_API);
 };
 
+const postCreatePaypalOrder = (bookingId) => {
+  const URL_API = "api/v1/booking/checkout/paypal";
+  const data = {
+    booking_id: bookingId,
+  };
+
+  return axios.post(URL_API, data);
+};
+
+const postApprovePaypalOrder = (orderId, bookingId) => {
+  const URL_API = "api/v1/booking/checkout/paypal/success";
+  const data = {
+    booking_id: bookingId,
+    order_id: orderId,
+  };
+
+  return axios.post(URL_API, data);
+};
+
 export {
   loginApi,
   registerApi,
@@ -177,4 +196,6 @@ export {
   getWorkSpaceById,
   getWorkSpaceTypeNameById,
   getWorkSpaceAmenitiesById,
+  postCreatePaypalOrder,
+  postApprovePaypalOrder,
 };

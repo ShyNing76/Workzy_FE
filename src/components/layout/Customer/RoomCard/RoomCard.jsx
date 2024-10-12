@@ -4,6 +4,7 @@ import { MdOutlineChair } from "react-icons/md";
 import { Link } from "react-router-dom";
 import Slide from "../ServiceSwiper/Slide";
 import "./RoomCard.scss";
+import { formatCurrency } from "../../../context/priceFormat";
 
 const RoomCard = ({ workspace, image }) => {
   return (
@@ -39,10 +40,10 @@ const RoomCard = ({ workspace, image }) => {
                   </div>
                   <div className="bg-slate-100 rounded-b-lg">
                     <div className="room-price flex p-3">
-                      <p className="font-bold text-xl text-amber-500">
-                        From {workspace.price_per_hour.toLocaleString()}
+                      <p className="font-bold text-xl  text-amber-500">
+                        <span className="text-black">From</span>{" "}
+                        {formatCurrency(workspace.price_per_hour)}/h
                       </p>
-                      <p className="font-bold text-xl ">&nbsp;VNĐ/h</p>
                     </div>
                   </div>
                 </div>

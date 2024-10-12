@@ -193,6 +193,20 @@ const BookingRoom = (props) => {
 
       if (res && res.err === 0) {
         toast.success(res.message);
+
+        navigate("/booking/payment", {
+          state: {
+            bookingId: res.data.booking_id, // Nếu API trả về bookingId
+            roomData,
+            workSpaceTypeName,
+            amountPrice,
+            amountText,
+            subtotal,
+            discount,
+            tax,
+            total,
+          },
+        });
       } else {
         toast.error(res.message);
       }
