@@ -3,62 +3,61 @@ import './RoomControls.scss';
 import TimeSlot from '../RoomRow/TimeSlot';
 import Daily from '../RoomRow/Daily';
 import Monthly from '../RoomRow/Monthly';
+import { getWorkspaceByBuildingId, getStaffBuildingId } from '../../../../../config/api.staff';
 
 const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSelectedType, selectedDate, setSelectedDate }) => {
-    const [currentDate, setCurrentDate] = useState('');
-    const [workspaceType, setWorkspaceType] = useState('Single POD'); 
-    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0]); 
+    const [workspaceType, setWorkspaceType] = useState(''); 
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear()); 
+    const [workspaces, setWorkspaces] = useState([]); 
+    const [workspaceTypes, setWorkspaceTypes] = useState([]);
 
     useEffect(() => {
-        const today = new Date();
-        const formattedDate = today.toISOString().split('T')[0]; // YYYY-MM-DD
-        const currentMonth = today.toISOString().split('T')[0].slice(0, 7); // YYYY-MM
-        const currentYear = today.getFullYear(); // YYYY
+        const fetchBuildingAndWorkspaces = async () => {
+            try {
+                const buildingResponse = await getStaffBuildingId();
+                if (buildingResponse && buildingResponse.err === 0) {
+                    const buildingId = buildingResponse.data.building_id;
+                    await fetchWorkspaces(buildingId);
+                }
+            } catch (error) {
+                console.error('Lỗi khi lấy building_id:', error);
+            }
+        };
 
-        // Set default date based on booking type
-        switch (selectedType) {
-            case 'hourly':
-                setCurrentDate(formattedDate);
-                setSelectedDate(formattedDate);
-                break;
-            case 'daily':
-                setCurrentDate(currentMonth);
-                setSelectedDate(currentMonth);
-                break;
-            case 'monthly':
-                setCurrentDate(currentYear.toString());
-                setSelectedDate(currentYear.toString());
-                setSelectedYear(currentYear); // Set the initial year for monthly
-                break;
-            default:
-                setCurrentDate(formattedDate);
-                setSelectedDate(formattedDate);
+        fetchBuildingAndWorkspaces();
+    }, []);
+
+    const fetchWorkspaces = async (id) => {
+        try {
+            const response = await getWorkspaceByBuildingId(id);
+            if (response && response.err === 0) {
+                setWorkspaces(response.data); 
+                const types = [...new Set(response.data.map(ws => ws.WorkspaceType.workspace_type_name))];
+                setWorkspaceTypes(types);
+            }
+        } catch (error) {
+            console.error('Lỗi khi lấy workspace:', error);
         }
-    }, [selectedType, setSelectedDate]);
+    };
 
-    // Function to get input type based on booking type
     const getDateInputType = () => {
         switch (selectedType) {
             case 'hourly':
-                return 'date'; // Select a specific date
+                return 'date';
             case 'daily':
-                return 'month'; // Select a specific month
+                return 'month';
             case 'monthly':
-                return 'number'; // Select a specific year (number input)
+                return 'number';
             default:
                 return 'date';
         }
     };
 
-    // Handle date change depending on type
     const handleDateChange = (e) => {
-        let value = e.target.value;
+        const value = e.target.value;
         if (selectedType === 'monthly') {
-            // Only set the year for 'monthly'
-            value = value.substring(0, 4); // Get only the year part (YYYY)
-            setSelectedYear(value); // Update the year for the 'monthly' view
-            setCurrentDate(value); // Set currentDate to the selected year
-            setSelectedDate(value); // Update selectedDate to the selected year
+            setSelectedYear(value);
         } else {
             setCurrentDate(value);
             setSelectedDate(value);
@@ -66,30 +65,36 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
     };
 
     const renderTable = () => {
+
         switch (selectedType) {
             case 'hourly':
-                return <TimeSlot selectedDate={selectedDate} selectedStatus={selectedStatus} workspaceType={workspaceType} />;
+                return <TimeSlot  selectedDate={currentDate} selectedStatus={selectedStatus} workspaces={filteredWorkspaces()} />;
             case 'daily':
-                return <Daily selectedDate={selectedDate} selectedStatus={selectedStatus} workspaceType={workspaceType} />;
+                return <Daily  selectedDate={currentDate} selectedStatus={selectedStatus} workspaces={filteredWorkspaces()}/>;
             case 'monthly':
-                return <Monthly selectedDate={selectedYear} selectedStatus={selectedStatus} workspaceType={workspaceType} />;
+                return <Monthly  selectedStatus={selectedStatus} workspaces={filteredWorkspaces()}/>;
             default:
                 return null;
         }
+    };
+
+    const filteredWorkspaces = () => {
+        return workspaceType ? workspaces.filter(workspace => workspace.WorkspaceType.workspace_type_name === workspaceType) : workspaces;
     };
 
     return (
         <div className="room-controls-wrapper" style={{ width: '100%' }}>
             <div className="room-controls">
                 <div className="control-row">
-                    <div className="control">
+                <div className="control">
                         <label htmlFor="status-select">Select Status</label>
                         <select 
+                            className="form-select" 
                             id="status-select" 
                             value={selectedStatus} 
                             onChange={(e) => setSelectedStatus(e.target.value)}
                         >
-                            <option value="">Select Status</option>
+                            <option value="">Status</option>
                             <option value="available">Available</option>
                             <option value="booked">Booked</option>
                             <option value="in_use">In Process</option>
@@ -99,21 +104,21 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
                     <div className="control">
                         <label htmlFor="workspace-type-select">Select Workspace Type</label>
                         <select 
+                            className="form-select" 
                             id="workspace-type-select" 
                             value={workspaceType} 
                             onChange={(e) => setWorkspaceType(e.target.value)} 
                         >
-                            <option value="Single POD">Single POD</option>
-                            <option value="Double POD">Double POD</option>
-                            <option value="Quad POD">Quad POD</option>
-                            <option value="Working Room">Working Room</option>
-                            <option value="Meeting Room">Meeting Room</option>
-                            <option value="Event Space">Event Space</option>
+                            <option value="">All Workspace Type</option>
+                            {workspaceTypes.map((type, index) => (
+                                <option key={index} value={type}>{type}</option>
+                            ))}
                         </select>
                     </div>
                     <div className="control">
                         <label htmlFor="type-select">Select Booking Type</label>
                         <select 
+                            className="form-select" 
                             id="type-select" 
                             value={selectedType} 
                             onChange={(e) => setSelectedType(e.target.value)}
@@ -128,32 +133,14 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
                         <input 
                             type={getDateInputType()} 
                             id="date-picker" 
-                            value={currentDate} 
+                            value={selectedType === 'daily' ? currentDate : selectedType === 'monthly' ? selectedYear : currentDate}
                             onChange={handleDateChange}
-                            min={selectedType === 'monthly' ? '1900' : undefined} 
+                            min={selectedType === 'monthly' ? '2000' : undefined} 
                         />
                     </div>
                 </div>
                 <div className="table-container">
                     {renderTable()}
-                </div>
-                <div className="status-legend">
-                    <div className="status-item">
-                        <div className="status-color" style={{ backgroundColor: '#D9D9D9' }}></div>
-                        <div className="status-label">Available</div>
-                    </div>
-                    <div className="status-item">
-                        <div className="status-color" style={{ backgroundColor: '#4CFC38' }}></div>
-                        <div className="status-label">Booked</div>
-                    </div>
-                    <div className="status-item">
-                        <div className="status-color" style={{ backgroundColor: '#379CFA' }}></div>
-                        <div className="status-label">In Process</div>
-                    </div>
-                    <div className="status-item">
-                        <div className="status-color" style={{ backgroundColor: '#FF0000' }}></div>
-                        <div className="status-label">Under Maintenance</div>
-                    </div>
                 </div>
             </div>
         </div>

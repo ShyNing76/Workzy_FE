@@ -11,11 +11,13 @@ import {
   getUserAuthen,
   putUpdateCustomerInfo,
   putUpdateCustomerPassword,
+  putUpdateImage,
 } from "../../../config/api";
 import { convertDateToYYYYMMDD } from "../../../components/context/dateFormat";
 import { toast } from "react-toastify";
 import { useOutletContext } from "react-router-dom";
 import ModalUpdatePassword from "../../../components/layout/Customer/UserModal/UpdatePasswordModal/ModalUpdatePassword";
+import UpdatePhoneModal from "../../../components/layout/Customer/UserModal/UpdatePhoneModal/UpdatePhoneModal";
 
 const Profile = (props) => {
   const { handleUpdate } = useOutletContext();
@@ -65,11 +67,18 @@ const Profile = (props) => {
   };
 
   // handleAvaterChange
-  const handleAvatarChange = (e) => {
+  const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
       const imageURL = URL.createObjectURL(file);
       setAvatar(imageURL);
+
+      const res = await putUpdateImage(file);
+
+      if (res && res.err === 0) {
+        setUpdateSuccess(true);
+        toast.success(res.message);
+      }
     }
   };
 
@@ -136,7 +145,7 @@ const Profile = (props) => {
 
   return (
     <>
-      <div className="max-w-5xl container mx-auto p-8 bg-white rounded-lg shadow-lg">
+      <div className="max-w-5xl container mx-auto my-24 p-8 bg-white rounded-lg shadow-lg">
         <div className="flex">
           {/* Left Content */}
 
@@ -261,7 +270,14 @@ const Profile = (props) => {
                 <MdOutlineLocalPhone className="text-xl mr-3" />
                 <p>{phone ? phone : "No Phone Number"}</p>
               </div>
-              <button className="btn btn-outline btn-sm">Update</button>
+              <button
+                className="btn btn-outline btn-sm"
+                onClick={() =>
+                  document.getElementById("modal-update-phone").showModal()
+                }
+              >
+                {phone ? "Update" : "Add"}
+              </button>
             </div>
 
             {/* Email */}
@@ -303,6 +319,7 @@ const Profile = (props) => {
 
       {/* Modal Update Password  */}
       <ModalUpdatePassword />
+      <UpdatePhoneModal setUpdateSuccess={setUpdateSuccess} />
     </>
   );
 };

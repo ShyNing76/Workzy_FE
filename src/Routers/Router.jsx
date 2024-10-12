@@ -21,6 +21,7 @@ import QuadPOD from "../pages/Customer/QuadPOD/QuadPOD.jsx";
 import MeetingRoom from "../pages/Customer/MeetingRoom/MeetingRoom.jsx";
 import WorkingRoom from "../pages/Customer/WorkingRoom/WorkingRoom.jsx";
 import EventSpace from "../pages/Customer/EventSpace/EventSpace.jsx";
+import MemberShipPage from "../pages/Customer/MemberShip/MemberShipPage.jsx";
 
 import AdminDashboardPage from "../pages/Admin/AdminDashboard/AdminDashboardPage.jsx";
 import ServicesManagerPage from "../pages/Admin/ServicesManager/ServicesManagerPage.jsx";
@@ -43,7 +44,6 @@ import MainPage from "../pages/Staff/MainPage/MainPage.jsx";
 import BookingManagement from "../pages/Staff/Bookings/BookingManagement.jsx";
 import BuildingRoomPage from "../pages/Staff/BuildingRoom/BuildingRoomPage.jsx";
 import Wishlist from "../pages/Staff/Wishlist/Wishlist.jsx";
-
 // Role id store in local Storage after login and register
 
 export const router = createBrowserRouter([
@@ -102,7 +102,7 @@ export const router = createBrowserRouter([
         element: <LocationPage />,
       },
       {
-        path: "/location/building",
+        path: "/location/:buildingId",
         element: <Building />,
       },
       {
@@ -137,7 +137,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "membership",
-            element: <Profile />,
+            element: <MemberShipPage />,
           },
           {
             path: "support",

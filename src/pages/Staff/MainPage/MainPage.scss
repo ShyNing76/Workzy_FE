@@ -86,7 +86,7 @@
       padding: 10px 20px;
       cursor: pointer;
       text-decoration: none;
-      color: black;
+      color: rgba(58, 56, 56, 0.63);
       font-weight: bold;
       margin-right: 5px;
       border: 1px solid black;
@@ -101,7 +101,8 @@
       &.active,
       &:hover {
         background-color: #ffffff;
-        color: rgb(157, 196, 243);
+        font-weight: extrabold;
+        color: black;
         border-bottom: 1px solid black;
         z-index: 1;
       }

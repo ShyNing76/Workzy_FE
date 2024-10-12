@@ -27,4 +27,25 @@ const convertDateToYYYYMMDD = (dateString) => {
   }
 };
 
-export { convertDateToMMDDYYYY, convertDateToYYYYMMDD };
+const formatDateTime = (date) => {
+  // Get the year, month, day, hour, and minute
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  // Get the timezone offset in hours (e.g., +07:00 or -07:00)
+  const timezoneOffset = date.getTimezoneOffset(); // in minutes
+  const absoluteOffset = Math.abs(timezoneOffset);
+  const offsetHours = String(Math.floor(absoluteOffset / 60)).padStart(2, "0");
+  const offsetMinutes = String(absoluteOffset % 60).padStart(2, "0");
+  const timezone = `${
+    timezoneOffset <= 0 ? "+" : "-"
+  }${offsetHours}:${offsetMinutes}`;
+
+  // Format the date as yyyy_mm_ddThh:mm+07:00
+  return `${year}_${month}_${day}T${hours}:${minutes}${timezone}`;
+};
+
+export { convertDateToMMDDYYYY, convertDateToYYYYMMDD, formatDateTime };

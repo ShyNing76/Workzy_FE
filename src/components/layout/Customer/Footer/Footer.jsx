@@ -1,5 +1,6 @@
 import { FaFacebookF, FaTiktok, FaLinkedin } from "react-icons/fa";
 import { SiGmail } from "react-icons/si";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -7,10 +8,27 @@ const Footer = () => {
       <footer className="footer bg-base-200 text-base-content p-10">
         <nav>
           <h6 className="footer-title">Our Services</h6>
-          <a className="link link-hover">Services 1</a>
-          <a className="link link-hover">Services 2</a>
-          <a className="link link-hover">Services 3</a>
-          <a className="link link-hover">Services 4</a>
+          <Link to="services" className="link link-hover">
+            All
+          </Link>
+          <Link to="services/single-pod" className="link link-hover">
+            Single POD
+          </Link>
+          <Link to="services/double-pod" className="link link-hover">
+            Double POD
+          </Link>
+          <Link to="services/quad-pod" className="link link-hover">
+            Quad POD
+          </Link>
+          <Link to="services/meeting-room" className="link link-hover">
+            Working Room
+          </Link>
+          <Link to="services/working-room" className="link link-hover">
+            Meeting Room
+          </Link>
+          <Link to="services/event-space" className="link link-hover">
+            Event Space
+          </Link>
         </nav>
         <nav>
           <h6 className="footer-title">Company</h6>

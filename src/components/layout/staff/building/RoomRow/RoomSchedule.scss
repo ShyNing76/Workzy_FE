@@ -2,6 +2,9 @@
     width: 100%; 
     padding: 10px;
     background-color: white;
+    max-height: 400px; 
+    overflow-y: auto;
+    
 
     table {
         width: 100%; 
@@ -13,6 +16,14 @@
             text-align: center;
             border: 1px solid #ddd;
             word-wrap: break-word; 
+        }
+
+        th {
+            position: sticky; 
+            top: -1px; 
+            background-color: #82b7f0be; 
+            z-index: 1; 
+            margin: 0;
         }
 
         th:first-child, td:first-child {

@@ -4,7 +4,7 @@ import BuildingImage from "../../../../assets/workspace.jpeg";
 import { Link } from "react-router-dom";
 
 const BuildingCard = (props) => {
-  const { name, address, onHover } = props;
+  const { dataBuilding, onHover } = props;
 
   return (
     <div className="building-card" onMouseEnter={onHover}>
@@ -12,27 +12,24 @@ const BuildingCard = (props) => {
         <img src={BuildingImage} alt="Workspace" />
       </div>
       <div className="building-details">
-        <h1 className="building-name">{name}</h1>
-        <div className="building-address">{address}</div>
+        <h1 className="building-name">{dataBuilding.building_name}</h1>
+        <div className="building-address">{dataBuilding.address}</div>
         <div className="features">
-          <div className="badge badge-warning p-3 font-semibold mx-1 my-1 bg-amber-500 ">
-            Single POD
-          </div>
-          <div className="badge badge-warning p-3 font-semibold mx-1 my-1 bg-amber-500">
-            Double POD
-          </div>
-          <div className="badge badge-warning p-3 font-semibold mx-1 my-1 bg-amber-500">
-            Event Space
-          </div>
-          <div className="badge badge-warning p-3 font-semibold mx-1 my-1 bg-amber-500">
-            Working Room
-          </div>
-          <div className="badge badge-warning p-3 font-semibold mx-1 my-1 bg-amber-500">
-            Meeting Room
-          </div>
+          {dataBuilding &&
+            dataBuilding.workspace_types.map((type, index) => (
+              <div
+                key={`type-${index}`}
+                className="badge badge-warning p-3 font-semibold mx-1 my-1 bg-amber-500 "
+              >
+                {type}
+              </div>
+            ))}
         </div>
         <div className="flex justify-end">
-          <Link to="building" className="btn btn-neutral btn-sm">
+          <Link
+            to={dataBuilding.building_id}
+            className="btn btn-neutral btn-sm"
+          >
             More Details
           </Link>
         </div>

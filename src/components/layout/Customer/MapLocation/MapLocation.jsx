@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -18,10 +18,12 @@ L.Icon.Default.mergeOptions({
 });
 
 const MapLocation = (props) => {
-  const { dataBuilding } = props;
+  const { dataBuilding, hoveredBuilding } = props;
 
   const [buildingsWithCoords, setBuildingsWithCoords] = useState([]);
-  const defaultPosition = [15.9266657, 107.9650855]; // Vị trí mặc định cho map
+  const defaultPosition = [14.9266657, 105.9650855]; // Vị trí mặc định cho map
+
+  const markerRefs = useRef([]);
 
   useEffect(() => {
     const fetchCoordinates = async (buildings) => {
@@ -52,13 +54,21 @@ const MapLocation = (props) => {
 
     // Kiểm tra nếu có dữ liệu building thì gọi hàm fetchCoordinates
     if (dataBuilding) {
-      console.log("Data Building before fetching coordinates:", dataBuilding); // Log toàn bộ data
-
       fetchCoordinates(dataBuilding);
     }
-
-    console.log("dataBuilding updated:", dataBuilding);
   }, [dataBuilding]);
+
+  useEffect(() => {
+    if (hoveredBuilding && buildingsWithCoords.length > 0) {
+      const index = buildingsWithCoords.findIndex(
+        (building) => building.building_name === hoveredBuilding.building_name
+      );
+
+      if (index !== -1 && markerRefs.current[index]) {
+        markerRefs.current[index].openPopup();
+      }
+    }
+  }, [hoveredBuilding, buildingsWithCoords]);
 
   return (
     <MapContainer
@@ -78,6 +88,9 @@ const MapLocation = (props) => {
           <Marker
             key={`building-${index}`}
             position={[building.latitude, building.longitude]}
+            ref={(el) => {
+              markerRefs.current[index] = el;
+            }}
           >
             <Popup>
               <b>{building.building_name}</b>

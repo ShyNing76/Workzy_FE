@@ -9,7 +9,7 @@
 
 .building-container {
   display: flex;
-  height: 100vh;
+  height: 80vh;
   overflow: hidden;
   justify-content: center;
   gap: 20px;
@@ -20,16 +20,16 @@
     overflow-y: auto;
     padding-right: 0;
 
-    /* Hide scrollbar for Webkit browsers (Chrome, Safari, Edge) */
-    ::-webkit-scrollbar {
-      width: 0; /* Remove scrollbar width */
-    }
+    // /* Hide scrollbar for Webkit browsers (Chrome, Safari, Edge) */
+    // ::-webkit-scrollbar {
+    //   width: 0; /* Remove scrollbar width */
+    // }
 
-    /* Hide scrollbar for Firefox */
-    scrollbar-width: none; /* Hide scrollbar for Firefox */
+    // /* Hide scrollbar for Firefox */
+    // scrollbar-width: none; /* Hide scrollbar for Firefox */
 
-    /* Hide scrollbar for IE and Edge (older versions) */
-    -ms-overflow-style: none; /* IE and Edge */
+    // /* Hide scrollbar for IE and Edge (older versions) */
+    // -ms-overflow-style: none; /* IE and Edge */
   }
 
   .map-container {
