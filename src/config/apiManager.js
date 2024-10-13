@@ -13,10 +13,19 @@ const getAllStaffs = () => {
     const URL_API = `/api/v1/staff/`;
     return axios.get(URL_API);
 }
+const unassignStaffFromBuilding = (staffId) => {
+    const URL_API = `/api/v1/staff/unassign/${staffId}`;
+    return axios.put(URL_API);
+}
 
-const assignStaffToBuilding = (buildingId, staffId) => {}
+const assignStaffToBuilding = (staffId, buildingId) => {
+    const URL_API = `/api/v1/staff/assign/${staffId}`;     // URL_API is the api to assign staff to building with staffId on header
+    return axios.put(URL_API, {building_id: buildingId});  // put request to assign staff to building with buildingId in body
+}   // ==> need to have building_id in body to assign staff to building
 
 export {
     getAllBuildings,
-    getAllStaffs
+    getAllStaffs,
+    assignStaffToBuilding,
+    unassignStaffFromBuilding
 }

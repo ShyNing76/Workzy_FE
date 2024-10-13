@@ -1,56 +1,36 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { getAllStaffs } from "../../../config/apiManager";
 
 const ManageStaff = () => {
-  const [location, setLocation] = useState("");
-  const [staffs, setStaffs] = useState([
-    {
-      id: "St01",
-      name: "Duy Long Do",
-      location: "HCM",
-      status: "Block",
-    },
-    {
-      id: "St02",
-      name: "Le Hoang Trong",
-      location: "HCM",
-      status: "Block",
-    },
-    {
-      id: "St03",
-      name: "Quang Tran",
-      location: "HN",
-      status: "Block",
-    },
-    {
-      id: "St04",
-      name: "Nguyen Van Haha",
-      location: "HCM",
-      status: "Block",
-    },
-    {
-      id: "St05",
-      name: "Nguyen Van HiHi",
-      location: "HN",
-      status: "Block",
-    },
-  ]);
-  const [filterLocation, setFilterLocation] = useState("");
+  const [staffs, setStaffs] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Handle filter location change
-  const handleFilterChange = (event) => {
-    setFilterLocation(event.target.value);
-  };
+  useEffect(() => {
+    const fetchStaffs = async () => {
+      setIsLoading(true);
+      try {
+        const responseStaffs = await getAllStaffs();
+        if (responseStaffs && responseStaffs.data && responseStaffs.err === 0) {
+          setStaffs(responseStaffs.data.rows);
+          console.log("Staffs:", responseStaffs.data.rows);
+        }
+      } catch (error) {
+        console.error("Error fetching staffs:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchStaffs();
+  }, []);
 
-  // Get filtered staff by location
-  const filterStaffByLocation = filterLocation
-    ? staffs.filter((staff) => staff.location === filterLocation)
-    : staffs;
+  
 
+  
   // Change Status "Block" or "Unblock"
   const changeStatus = (staffId) => {
     // Update staffs array
     const updatedStaffs = staffs.map((staff) => {
-      if (staff.id === staffId) {
+      if (staff.user_id === staffId) {
         // return new object
 
         // if status is "Block" then change to "Unblock"
@@ -70,23 +50,6 @@ const ManageStaff = () => {
     <div className="manage-staff-container">
       <h1 className="text-2xl font-bold top-10">Manage Staff</h1>
 
-      {/* Filter section */}
-      <div
-        className="manager-filter-section-container"
-        style={{ marginTop: "20px", marginBottom: "20px" }}
-      >
-        <label htmlFor="location-filter"></label>
-        <select
-          id="location-filter"
-          value={filterLocation}
-          onChange={handleFilterChange}
-          className="select select-bordered w-full max-w-xs"
-        >
-          <option value=""> Location</option>
-          <option value="HCM">HCM</option>
-          <option value="HN">HN</option>
-        </select>
-      </div>
 
       {/* Staff table */}
       <div className="overflow-x-auto">
@@ -95,22 +58,20 @@ const ManageStaff = () => {
             <tr>
               <th className="w-1/6">Staff ID</th>
               <th className="w-1/4">Staff Name</th>
-              <th className="w-1/6">Location</th>
               <th className="w-1/6">Status</th>
               <th className="w-1/4">Action</th>
             </tr>
           </thead>
 
           <tbody>
-            {filterStaffByLocation.map((staff) => (
-              <tr key={staff.id}>
-                <td className="w-1/6">{staff.id}</td>
-                <td className="w-1/4">{staff.name}</td>
-                <td className="w-1/6">{staff.location}</td>
+            {staffs.map((staff, index) => (
+              <tr key={index}>
+                <td className="w-1/6">{index + 1}</td>
+                <td className="w-1/4">{staff.name}</td>                
                 <td className="w-1/6 font-bold">{staff.status}</td>
                 <td className="w-1/4">
                   <button
-                    onClick={() => changeStatus(staff.id)}
+                    onClick={() => changeStatus(staff.user_id)}
                     className={`px-4 py-2 rounded ${
                       staff.status === "Block"
                         ? "bg-green-500 hover:bg-green-600"
