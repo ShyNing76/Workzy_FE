@@ -1,76 +1,76 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from 'react';
 import './RoomSchedule.scss';
+import RoomModal from '../../building/RoomModal/RoomModal';
 
-const Monthly = ({ selectedDate, selectedStatus }) => {
+const Monthly = ({ selectedStatus, workspaces = [] }) => {
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedRoom, setSelectedRoom] = useState(null);
     const months = [
-        'January', 'February', 'March', 'April', 'May', 'June',
+        'January', 'February', 'March', 'April', 'May', 'June', 
         'July', 'August', 'September', 'October', 'November', 'December'
     ];
-    const rooms = ['No 1', 'No 2', 'No 3', 'No 4', 'No 5'];
 
-    const [roomStatus, setRoomStatus] = useState({});
-
-    useEffect(() => {
-        const generatedStatus = generateRoomStatus();
-        setRoomStatus(generatedStatus);
-    }, [selectedDate]);
-
-    const generateRoomStatus = () => {
-        const statusOptions = ['available', 'booked', 'in_use', 'under_maintenance'];
-        const generatedStatus = {};
-
-        rooms.forEach(room => {
-            generatedStatus[room] = months.map(() => {
-                return statusOptions[Math.floor(Math.random() * statusOptions.length)];
-            });
-        });
-
-        return generatedStatus;
+    const handleCellClick = (workspace, month) => {
+        setSelectedRoom({ ...workspace, month });
+        setModalOpen(true);
     };
 
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'available':
-                return '#D9D9D9'; 
-            case 'booked':
-                return 'rgba(76, 252, 56, 0.5)'; 
-            case 'in_use':
-                return 'rgba(55, 156, 250, 0.5)'; 
-            case 'under_maintenance':
-                return 'rgba(255, 0, 0, 0.5)'; 
-            default:
-                return 'transparent'; 
-        }
-    };
+    // Kiểm tra dữ liệu đầu vào
+    if (!Array.isArray(workspaces)) {
+        console.error("workspaces is not an array", workspaces);
+        return <div>Không có dữ liệu</div>;
+    }
 
     return (
         <div className='room-schedule'>
             <table>
                 <thead>
                     <tr>
-                        <th></th>
-                        {months.map((month) => (
-                            <th key={month}>{month}</th>
+                        <th>Workspace</th>
+                        {months.map((month, index) => (
+                            <th key={index}>{month}</th>
                         ))}
                     </tr>
                 </thead>
                 <tbody>
-                    {rooms.map((room) => (
-                        <tr key={room}>
-                            <td>{room}</td>
-                            {roomStatus[room]?.map((status, index) => {
-                                if (selectedStatus && selectedStatus !== status) {
-                                    return <td key={index} style={{ backgroundColor: 'transparent' }}></td>;
-                                }
-                                return <td key={index} style={{ backgroundColor: getStatusColor(status) }}></td>;
-                            })}
+                    {workspaces.length > 0 ? (
+                        workspaces.map((workspace) => {
+                            // Nếu statuses không tồn tại hoặc không phải là mảng, gán giá trị mặc định
+                            const statuses = Array.isArray(workspace.statuses) && workspace.statuses.length === 12 
+                                ? workspace.statuses 
+                                : Array(12).fill('N/A'); // Mảng mặc định với 12 phần tử N/A
+
+                            return (
+                                <tr key={workspace.workspace_id}>
+                                    <td>{workspace.workspace_name}</td>
+                                    {months.map((month, index) => (
+                                        <td
+                                            key={index}
+                                            style={{ backgroundColor: 'transparent' }} // Màu nền tạm thời
+                                            onClick={() => handleCellClick(workspace, month)}
+                                        >
+                                            {statuses[index]} {/* Hiển thị trạng thái hoặc N/A */}
+                                        </td>
+                                    ))}
+                                </tr>
+                            );
+                        })
+                    ) : (
+                        <tr>
+                            <td colSpan={months.length + 1}>Không có dữ liệu</td>
                         </tr>
-                    ))}
+                    )}
                 </tbody>
             </table>
+            {modalOpen && (
+                <RoomModal 
+                    isOpen={modalOpen} 
+                    onClose={() => setModalOpen(false)} 
+                    room={selectedRoom} 
+                />
+            )}
         </div>
     );
 };
-
 
 export default Monthly;

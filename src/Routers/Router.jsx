@@ -24,6 +24,7 @@ import QuadPOD from "../pages/Customer/QuadPOD/QuadPOD.jsx";
 import MeetingRoom from "../pages/Customer/MeetingRoom/MeetingRoom.jsx";
 import WorkingRoom from "../pages/Customer/WorkingRoom/WorkingRoom.jsx";
 import EventSpace from "../pages/Customer/EventSpace/EventSpace.jsx";
+import MemberShipPage from "../pages/Customer/MemberShip/MemberShipPage.jsx";
 
 import AdminDashboardPage from "../pages/Admin/AdminDashboard/AdminDashboardPage.jsx";
 import ManagersManagerPage from "../pages/Admin/ManagersManager/ManagersManagerPage.jsx";
@@ -40,7 +41,7 @@ import BookingsManagerPage from "../pages/Admin/BookingsManager/BookingsManagerP
 import ReviewsManagerPage from "../pages/Admin/ReviewsManager/ReviewsManagerPage.jsx";
 
 import MainPage from "../pages/Staff/MainPage/MainPage.jsx";
-import BookingsPage from "../pages/Staff/Bookings/BookingsPage.jsx";
+import BookingManagement from "../pages/Staff/Bookings/BookingManagement.jsx";
 import BuildingRoomPage from "../pages/Staff/BuildingRoom/BuildingRoomPage.jsx";
 import ManageStaff from "../pages/Manager/ManageStaff/ManageStaff.jsx";
 import ManageReview from "../pages/Manager/ManageReview/ManageReview.jsx";
@@ -178,9 +179,9 @@ export const router = createBrowserRouter([
         index: true,
         element: <Navigate to="/admin" />,
       },
-      { 
-        path: "managersmanager", 
-        element: <ManagersManagerPage /> 
+      {
+        path: "managersmanager",
+        element: <ManagersManagerPage />,
       },
       {
         path: "staffsmanager",
@@ -245,7 +246,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "bookings",
-        element: <BookingsPage />,
+        element: <BookingManagement />,
+      },
+      {
+        path: "wishlist",
+        element: <Wishlist />,
       },
     ],
   },
@@ -276,31 +281,27 @@ export const router = createBrowserRouter([
   // Manager
   {
     path: "manager",
-    element: 
-      
-      <ManagerPage/>  
-      
-    ,
+    element: <ManagerPage />,
+
     children: [
       {
         path: "",
-        element: <ManagerDashBoard/>
+        element: <ManagerDashBoard />,
       },
 
       {
         path: "manager-assign",
-        element: <ManagerAssign/>
+        element: <ManagerAssign />,
       },
 
       {
         path: "manager-manage-staff",
-        element: <ManageStaff/>
+        element: <ManageStaff />,
       },
       {
         path: "manager-manage-review",
-        element: <ManageReview/>
-      }
-    ]
-  }
-
+        element: <ManageReview />,
+      },
+    ],
+  },
 ]);

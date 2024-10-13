@@ -1,27 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import './RoomSchedule.scss';
+import RoomModal from '../../building/RoomModal/RoomModal';
 
-const TimeSlot = ({ selectedDate, selectedStatus }) => {
-    const [roomStatus, setRoomStatus] = useState({});
-    const rooms = ['No 1', 'No 2', 'No 3', 'No 4', 'No 5'];
-    const hours = Array.from({ length: 24 }, (_, i) => `${i}:00`);
+const TimeSlot = ({ selectedDate, selectedStatus, workspaces  }) => {
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedRoom, setSelectedRoom] = useState(null);
+    const hours = [...Array(24).keys()];
 
-    useEffect(() => {
-        const generatedStatus = generateRoomStatus();
-        setRoomStatus(generatedStatus);
-    }, [selectedDate]); 
-
-    const generateRoomStatus = () => {
-        const statusOptions = ['available', 'booked', 'in_use', 'under_maintenance'];
-        const generatedStatus = {};
-
-        rooms.forEach(room => {
-            generatedStatus[room] = Array.from({ length: 24 }, () => {
-                return statusOptions[Math.floor(Math.random() * statusOptions.length)];
-            });
-        });
-
-        return generatedStatus;
+    
+    const handleCellClick = (workspace, hour) => {
+        setSelectedRoom({ ...workspace, hour });
+        setModalOpen(true);
     };
 
     const getStatusColor = (status) => {
@@ -40,33 +29,42 @@ const TimeSlot = ({ selectedDate, selectedStatus }) => {
     };
 
     return (
-        <div className="room-schedule">
+        <div className='room-schedule'>
             <table>
                 <thead>
                     <tr>
-                        <th></th>
-                        {hours.map((hour) => (
-                            <th key={hour}>{hour}</th>
+                        <th>Workspace</th>
+                        {hours.map(hour => (
+                            <th key={hour}>{hour}:00</th>
                         ))}
                     </tr>
                 </thead>
                 <tbody>
-                    {rooms.map((room) => (
-                        <tr key={room}>
-                            <td>{room}</td>
-                            {roomStatus[room]?.map((status, index) => {
-                                if (selectedStatus && selectedStatus !== status) {
-                                    return <td key={index} style={{ backgroundColor: 'transparent' }}></td>;
-                                }
-                                return <td key={index} style={{ backgroundColor: getStatusColor(status) }}></td>;
-                            })}
-                        </tr>
-                    ))}
+                {workspaces.map((workspace) => (
+                    <tr key={workspace.workspace_id}>
+                        <td>{workspace.workspace_name}</td>
+                        {hours.map(hour => (
+                            <td 
+                                key={`${workspace.workspace_id}-${hour}`}
+                                style={{ backgroundColor: getStatusColor(workspace.statuses ? workspace.statuses[hour] : undefined) }}
+                                onClick={() => handleCellClick(workspace, hour)}
+                            >
+                                {workspace.statuses ? workspace.statuses[hour] : 'N/A'}
+                            </td>
+                        ))}
+                    </tr>
+                ))}
                 </tbody>
             </table>
+            {modalOpen && (
+                <RoomModal 
+                    isOpen={modalOpen} 
+                    onClose={() => setModalOpen(false)} 
+                    room={selectedRoom} 
+                />
+            )}
         </div>
     );
 };
-
 
 export default TimeSlot;
