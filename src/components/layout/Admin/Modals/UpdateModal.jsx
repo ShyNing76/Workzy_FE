@@ -38,6 +38,28 @@ const UpdateModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fiel
                 />
               )}
 
+              {field.type === 'datetime' && (
+                <input
+                  type="datetime-local"
+                  name={field.name}
+                  value={currentItem[field.name] || ""}
+                  onChange={onInputChange}
+                  className="input input-bordered"
+                  required
+                />
+              )}
+
+              {field.type === 'date' && (
+                <input
+                  type="date"
+                  name={field.name}
+                  value={currentItem[field.name] || ""}
+                  onChange={onInputChange}
+                  className="input input-bordered"
+                  required
+                />
+              )}
+
               {field.type === 'select' && (
                 <select
                   name={field.name}
