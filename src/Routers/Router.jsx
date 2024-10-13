@@ -46,7 +46,6 @@ import BuildingRoomPage from "../pages/Staff/BuildingRoom/BuildingRoomPage.jsx";
 import ManageStaff from "../pages/Manager/ManageStaff/ManageStaff.jsx";
 import ManageReview from "../pages/Manager/ManageReview/ManageReview.jsx";
 
-import MemberShipPage from "../pages/Customer/MemberShip/MemberShipPage.jsx";
 import MyBooking from "../pages/Customer/MyBooking/MyBooking.jsx";
 import SupportCenter from "../pages/Customer/SupportCenter/SupportCenter.jsx";
 import NotificationPage from "../pages/Customer/Notification/NotificationPage.jsx";
