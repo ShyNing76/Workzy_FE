@@ -22,11 +22,11 @@ const Modal = ({ isOpen, onClose, room }) => {
                         const foundWorkspace = workspaceResponse.data.find(ws => ws.id === room.id);
                         setWorkspaceDetails(foundWorkspace);
                     } else {
-                        setError('Lỗi khi lấy workspace.');
+                        setError('Error when workspace.');
                     }
                 }
             } catch (error) {
-                setError('Lỗi API.');
+                setError('error API.');
             } finally {
                 setLoading(false);
             }

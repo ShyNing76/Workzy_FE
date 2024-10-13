@@ -65,6 +65,7 @@ import { AiFillPrinter } from "react-icons/ai";
 import { FaPhone } from "react-icons/fa6";
 import Accordion from "../../../components/layout/Customer/Accordion/Accordion";
 import Comment from "../../../components/layout/Customer/CommentSection/Comment";
+import { ToastContainer } from "react-toastify";
 
 const HomePage = () => {
   // Define the slides for the Swiper
@@ -191,6 +192,7 @@ const HomePage = () => {
 
   return (
     <>
+      <ToastContainer />
       {/* Filter Section */}
       <div>
         <Filter />

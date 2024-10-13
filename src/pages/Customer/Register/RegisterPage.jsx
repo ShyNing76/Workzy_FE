@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import registerImage from "../../../assets/registerImage.jpg";
 import "./register.scss";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -12,6 +12,8 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const location = useLocation();
+  const redirectTo = new URLSearchParams(location.search).get("redirect");
 
   const navigate = useNavigate();
 
@@ -21,63 +23,79 @@ const RegisterPage = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setRegisterLoading(true);
+    setRegisterLoading(true); // Hiển thị loading khi đang xử lý đăng ký
 
+    // Kiểm tra xác nhận mật khẩu
     if (password !== confirmPassword) {
       toast.error("Password does not match!!!");
-      setAppLoading(false);
+      setRegisterLoading(false); // Dừng loading nếu có lỗi
       return;
     }
 
-    const res = await registerApi(name, email, password);
+    try {
+      // Gọi API đăng ký
+      const res = await registerApi(name, email, password);
 
-    if (res && res.err === 0) {
-      localStorage.setItem("access_token", res.accessToken);
-      setAuth({
-        isAuthenticated: true,
-      });
+      // Kiểm tra nếu đăng ký thành công
+      if (res && res.err === 0) {
+        // Lưu access token vào localStorage
+        localStorage.setItem("access_token", res.accessToken);
 
-      const userRes = await getUserAuthen();
+        // Cập nhật trạng thái xác thực
+        setAuth({
+          isAuthenticated: true,
+        });
 
-      if (userRes && userRes.data && userRes.err == 0) {
-        const { role_id } = userRes.data;
-        localStorage.setItem("role_id", role_id);
-        setRoleId(role_id);
+        // Gọi API lấy thông tin người dùng sau khi đăng ký thành công
+        const userRes = await getUserAuthen();
 
-        switch (role_id) {
-          case 1: {
-            //admin
-            navigate("/admin");
-            break;
+        if (userRes && userRes.data && userRes.err === 0) {
+          const { role_id } = userRes.data;
+          localStorage.setItem("role_id", role_id);
+          setRoleId(role_id);
+
+          // Điều hướng theo vai trò của người dùng
+          switch (role_id) {
+            case 1: // admin
+              navigate("/admin");
+              break;
+            case 2: // manager
+              navigate("/manager");
+              break;
+            case 3: // staff
+              navigate("/staff");
+              break;
+            case 4: // customer
+              if (redirectTo) {
+                navigate(redirectTo); // Điều hướng đến trang người dùng yêu cầu trước đó
+              } else {
+                navigate("/"); // Điều hướng đến trang mặc định
+              }
+              break;
+            default:
+              break;
           }
-          case 2: {
-            //manager
-            navigate("/manager");
-            break;
-          }
-          case 3: {
-            //staff
-            navigate("/staff");
-            break;
-          }
-          case 4: {
-            //customer
-            navigate("/");
-            break;
-          }
-          default:
-            break;
+        } else {
+          // Xử lý khi không lấy được thông tin người dùng
+          toast.error("Failed to retrieve user information.");
         }
+      } else {
+        // Nếu đăng ký thất bại
+        toast.error(res.message);
       }
-    } else {
-      toast.error(res.message);
+    } catch (error) {
+      // Xử lý lỗi nếu có lỗi xảy ra trong quá trình đăng ký hoặc lấy thông tin
+      console.error("Registration error:", error);
+      toast.error("An error occurred. Please try again.");
+    } finally {
+      // Đảm bảo loading luôn được tắt dù có lỗi hay không
+      setRegisterLoading(false);
+      // Xóa form
       setEmail("");
       setPassword("");
       setName("");
       setConfirmPassword("");
     }
-
-    setRegisterLoading(false);
   };
 
   // Show password
@@ -182,7 +200,10 @@ const RegisterPage = () => {
             </form>
             <p className="text-center">
               Already have an account?{" "}
-              <Link to="/login" className="text-black-500 font-bold">
+              <Link
+                to={`/login?redirect=${redirectTo || window.location.pathname}`}
+                className="text-black-500 font-bold"
+              >
                 Login
               </Link>
             </p>

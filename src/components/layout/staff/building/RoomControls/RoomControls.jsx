@@ -21,7 +21,7 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
                     await fetchWorkspaces(buildingId);
                 }
             } catch (error) {
-                console.error('Lỗi khi lấy building_id:', error);
+                console.error('Error when get building_id:', error);
             }
         };
 
@@ -37,7 +37,7 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
                 setWorkspaceTypes(types);
             }
         } catch (error) {
-            console.error('Lỗi khi lấy workspace:', error);
+            console.error('Error when workspace:', error);
         }
     };
 

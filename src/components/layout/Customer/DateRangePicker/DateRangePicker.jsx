@@ -6,9 +6,28 @@ import { FaRegCalendar } from "react-icons/fa";
 import "./DateRangePicker.scss";
 
 const DateRangePicker = (props) => {
-  const { startDate, setStartDate, endDate, setEndDate } = props;
+  const { startDate, endDate, today, setStartDate, setEndDate } = props;
 
   const maxStartDate = addMonths(new Date(), 12);
+
+  // Validate Start Date and End Date
+  const handleOnchangeDate = (dates) => {
+    const [start, end] = dates;
+    // Validate that startDate is before or equal to endDate
+    if (start instanceof Date && end instanceof Date) {
+      if (start.getTime() > end.getTime()) {
+        setStartDate(null);
+        setEndDate(null);
+      } else {
+        setStartDate(start);
+        setEndDate(end);
+      }
+    } else {
+      // Đặt giá trị khi chỉ chọn startDate
+      setStartDate(start);
+      setEndDate(end);
+    }
+  };
 
   return (
     <div className="date-range-picker-container w-full flex flex-col items-start space-y-4 max-w-xl">
@@ -17,14 +36,12 @@ const DateRangePicker = (props) => {
         <DatePicker
           selected={startDate}
           onChange={(dates) => {
-            const [start, end] = dates;
-            setStartDate(start);
-            setEndDate(end);
+            handleOnchangeDate(dates);
           }}
           startDate={startDate}
           endDate={endDate}
           selectsRange
-          minDate={new Date()}
+          minDate={addDays(today, 1)}
           maxDate={maxStartDate}
           dateFormat="dd/MM/yyyy"
           placeholderText="Select date range"
