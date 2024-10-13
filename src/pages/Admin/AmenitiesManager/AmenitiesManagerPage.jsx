@@ -4,6 +4,7 @@ import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx"
 import AddModal from "../../../components/layout/Admin/Modals/AddModal.jsx";
 import DeleteModal from "../../../components/layout/Admin/Modals/DeleteModal.jsx";
 import UpdateModal from "../../../components/layout/Admin/Modals/UpdateModal.jsx";
+import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal.jsx";
 import SuccessAlert from "../../../components/layout/Admin/SuccessAlert/SuccessAlert.jsx";
 import AddButton from "../../../components/layout/Admin/Buttons/AddButton.jsx";
 import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.jsx";
@@ -14,54 +15,26 @@ import { useLocation } from "react-router-dom";
 const AmenitiesManagerPage = () => {
   const location = useLocation();
 
-  const [amenities, setAmenities] = useState([
-    {
-      id: "AM01",
-      name: "Amenity A",
-      images: [],
-      originalPrice: 100000,
-      depreciationPrice: 80000,
-      rentPrice: 20000,
-      type: "type1",
-      status: "Active",
-    },
-    {
-      id: "AM02",
-      name: "Amenity B",
-      images: [],
-      originalPrice: 200000,
-      depreciationPrice: 90000,
-      rentPrice: 30000,
-      type: "type2",
-      status: "Inactive",
-    },
-    {
-      id: "AM03",
-      name: "Amenity C",
-      images: [],
-      originalPrice: 300000,
-      depreciationPrice: 100000,
-      rentPrice: 40000,
-      type: "type3",
-      status: "Active",
-    },
-  ]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [amenities, setAmenities] = useState(null);
+  //const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [currentAmenity, setCurrentAmenity] = useState({
-    id: "",
-    name: "",
-    images: "",
-    originalPrice: "",
-    depreciationPrice: "",
-    rentPrice: "",
-    type: "",
-    status: "",
-  });
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedAmenityDetails, setSelectedAmenityDetails] = useState("");
   const [amenityToDelete, setAmenityToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
+  const [newAmenity, setNewAmenity] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    gender: '',
+    date_of_birth: '',
+  });
+
+  const [responseData, setResponseData] = useState(null);
+
+  //Hiện data lên table
 
   const addAmenityFields = [
     { name: "name", label: "Amenity Name", type: "text" },
@@ -88,91 +61,97 @@ const AmenitiesManagerPage = () => {
     },
   ];
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setCurrentAmenity((prev) => ({ ...prev, [name]: value }));
-  };
+  // const handleInputChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setCurrentAmenity((prev) => ({ ...prev, [name]: value }));
+  // };
 
-  const generateAmenityId = () => {
-    const lastId =
-      amenities.length > 0 ? amenities[amenities.length - 1].id : "AM00";
-    const newId = `AM${(parseInt(lastId.substring(2)) + 1)
-      .toString()
-      .padStart(2, "0")}`;
-    return newId;
-  };
+  // const handleRowClick = (amenity) => {
+  //   // Set the current amenity details in a structured form
+  //   setCurrentAmenityDetails({
+  //     ID: amenity.id,
+  //     Name: amenity.name,
+  //     "Original Price": amenity.originalPrice,
+  //     "Depreciation Price": amenity.depreciationPrice,
+  //     "Rent Price": amenity.rentPrice,
+  //     Type: amenity.type,
+  //     Status: amenity.status,
+  //     Images: amenity.images.join(", ") // Assuming images are URLs
+  //   });
+  //   setShowDetailsModal(true);
+  // };
 
-  const handleAddAmenitySubmit = (e) => {
-    e.preventDefault();
-    const newAmenity = {
-      ...currentAmenity,
-      id: generateAmenityId(),
-      status: "Active",
-    };
-    setAmenities([...amenities, newAmenity]);
-    setShowAddModal(false);
-    setSuccessMessage("Amenity Added Successfully!");
-    setCurrentAmenity({
-      id: "",
-      name: "",
-      images: "",
-      originalPrice: "",
-      depreciationPrice: "",
-      rentPrice: "",
-      type: "",
-      status: "",
-    });
-  };
+  // const handleAddAmenitySubmit = (e) => {
+  //   e.preventDefault();
+  //   const newAmenity = {
+  //     ...currentAmenity,
+  //     id: generateAmenityId(),
+  //     status: "Active",
+  //   };
+  //   setAmenities([...amenities, newAmenity]);
+  //   setShowAddModal(false);
+  //   setSuccessMessage("Amenity Added Successfully!");
+  //   setCurrentAmenity({
+  //     id: "",
+  //     name: "",
+  //     images: "",
+  //     originalPrice: "",
+  //     depreciationPrice: "",
+  //     rentPrice: "",
+  //     type: "",
+  //     status: "",
+  //   });
+  // };
 
-  const handleUpdateAmenitySubmit = (e) => {
-    e.preventDefault();
-    setAmenities((prevAmenities) => {
-      const amenityIndex = prevAmenities.findIndex(
-        (amenity) => amenity.id === currentAmenity.oldId
-      );
-      if (amenityIndex !== -1) {
-        const updatedAmenities = [...prevAmenities];
-        updatedAmenities[amenityIndex] = { ...currentAmenity };
-        return updatedAmenities;
-      }
-      return prevAmenities;
-    });
-    setShowUpdateModal(false);
-    setSuccessMessage("Amenity Updated Successfully!");
-    setCurrentAmenity({
-      id: "",
-      name: "",
-      images: "",
-      originalPrice: "",
-      depreciationPrice: "",
-      rentPrice: "",
-      type: "",
-      status: "",
-    });
-  };
+  // const handleUpdateAmenitySubmit = (e) => {
+  //   e.preventDefault();
+  //   setAmenities((prevAmenities) => {
+  //     const amenityIndex = prevAmenities.findIndex(
+  //       (amenity) => amenity.id === currentAmenity.oldId
+  //     );
+  //     if (amenityIndex !== -1) {
+  //       const updatedAmenities = [...prevAmenities];
+  //       updatedAmenities[amenityIndex] = { ...currentAmenity };
+  //       return updatedAmenities;
+  //     }
+  //     return prevAmenities;
+  //   });
+  //   setShowUpdateModal(false);
+  //   setSuccessMessage("Amenity Updated Successfully!");
+  //   setCurrentAmenity({
+  //     id: "",
+  //     name: "",
+  //     images: "",
+  //     originalPrice: "",
+  //     depreciationPrice: "",
+  //     rentPrice: "",
+  //     type: "",
+  //     status: "",
+  //   });
+  // };
 
-  const handleDeleteAmenity = () => {
-    setAmenities((prevAmenities) =>
-      prevAmenities.filter((amenity) => amenity.id !== amenityToDelete.id)
-    );
-    setShowDeleteModal(false);
-    setSuccessMessage("Amenity Deleted Successfully!");
-  };
+  // const handleDeleteAmenity = () => {
+  //   setAmenities((prevAmenities) =>
+  //     prevAmenities.filter((amenity) => amenity.id !== amenityToDelete.id)
+  //   );
+  //   setShowDeleteModal(false);
+  //   setSuccessMessage("Amenity Deleted Successfully!");
+  // };
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
+  // const handleSearchChange = (e) => {
+  //   setSearchTerm(e.target.value);
+  // };
 
-  const closeSuccessMessage = () => {
-    setSuccessMessage("");
-  };
+  // const closeSuccessMessage = () => {
+  //   setSuccessMessage("");
+  // };
 
-  const filteredAmenities = amenities.filter(
-    (amenity) =>
-      amenity.id.includes(searchTerm) ||
-      amenity.name.includes(searchTerm) ||
-      amenity.status.includes(searchTerm)
-  );
+  // const filteredAmenities = amenities.filter(
+  //   (amenity) =>
+  //     amenity.id.includes(searchTerm) ||
+  //     amenity.name.includes(searchTerm) ||
+  //     amenity.status.includes(searchTerm)
+  // );
 
   return (
     <div className="container mx-auto p-4">
@@ -187,15 +166,12 @@ const AmenitiesManagerPage = () => {
 
         {/* Add Button */}
         <div className="ml-2">
-          <AddButton
-            onClick={() => setShowAddModal(true)}
-            label="Add Amenity"
-          />
+          {/* <AddButton onClick={() => setShowAddModal(true)} label="Add Amenity" /> */}
         </div>
       </div>
 
       <div>
-        <SuccessAlert message={successMessage} onClose={closeSuccessMessage} />
+        {/* <SuccessAlert message={successMessage} onClose={closeSuccessMessage} /> */}
       </div>
 
       {/* Table */}
@@ -215,29 +191,36 @@ const AmenitiesManagerPage = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredAmenities.length > 0 ? (
-              filteredAmenities.map((amenity) => (
-                <tr key={amenity.id}>
+            {/* {filteredAmenities.length > 0 ? (
+              filteredAmenities.map((amenity) => ( */}
+                <tr
+                  key={amenity.id}
+                  onClick={() => handleRowClick(amenity)}
+                  className="cursor-pointer"
+                >
                   <td>{amenity.id}</td>
                   <td>{amenity.name}</td>
-                  <td>{amenity.images}</td>
+                  <td>{amenity.images.join(", ")}</td>
                   <td>{amenity.originalPrice}</td>
                   <td>{amenity.depreciationPrice}</td>
                   <td>{amenity.rentPrice}</td>
                   <td>{amenity.type}</td>
                   <td>{amenity.status}</td>
+                  <td className="flex"></td>
                   <td className="flex space-x-2">
                     {/* Update Button */}
                     <UpdateButton
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent row click from being triggered
                         setCurrentAmenity({ ...amenity, oldId: amenity.id });
                         setShowUpdateModal(true);
                       }}
                     />
-
+                    
                     {/* Delete Button */}
                     <DeleteButton
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent row click from being triggered
                         setAmenityToDelete(amenity);
                         setShowDeleteModal(true);
                       }}
@@ -247,8 +230,8 @@ const AmenitiesManagerPage = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="text-center">
-                  No Amenitys Found
+                <td colSpan="9" className="text-center">
+                  No Amenities Found
                 </td>
               </tr>
             )}
@@ -256,34 +239,42 @@ const AmenitiesManagerPage = () => {
         </table>
       </div>
 
-      {/* Add, Update, Delete, Success Modals */}
-      <AddModal
+      {/* Detail Modal */}
+      {/* <DetailsModal
+        show={showDetailsModal}
+        onClose={() => setShowDetailsModal(false)}
+        details={currentAmenityDetails}
+      />
+
+      {/* Add, Update, Delete Modals */}
+      {/* <AddModal
         show={showAddModal}
         onClose={() => setShowAddModal(false)}
         onSubmit={handleAddAmenitySubmit}
         currentItem={currentAmenity}
         onInputChange={handleInputChange}
         fields={addAmenityFields}
-      />
+      /> */}
 
-      <UpdateModal
+      {/* <UpdateModal
         show={showUpdateModal}
         onClose={() => setShowUpdateModal(false)}
         onSubmit={handleUpdateAmenitySubmit}
         currentItem={currentAmenity}
         onInputChange={handleInputChange}
         fields={updateAmenityFields}
-      />
+      /> */}
 
-      <DeleteModal
+      {/* <DeleteModal
         show={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onDelete={handleDeleteAmenity}
         itemToDelete={amenityToDelete}
         itemType="amenity"
-      />
+      /> */}
     </div>
   );
 };
 
 export default AmenitiesManagerPage;
+

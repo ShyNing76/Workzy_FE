@@ -1,4 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { getManager } from "../../../config/api.admin.js";
+import { getManagerById } from "../../../config/api.admin.js";
+import { postManager } from "../../../config/api.admin.js";
+import { putManager } from "../../../config/api.admin.js";
+import { deleteManager } from "../../../config/api.admin.js"
 
 import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
 import AddModal from "../../../components/layout/Admin/Modals/AddModal.jsx";
@@ -8,115 +13,186 @@ import AddButton from "../../../components/layout/Admin/Buttons/AddButton.jsx";
 import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.jsx";
 import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
 import SuccessAlert from "../../../components/layout/Admin/SuccessAlert/SuccessAlert.jsx";
+import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal.jsx";
 
 import { useLocation } from "react-router-dom";
+
 
 const ManagersManagerPage = () => {
   const location = useLocation();
 
-  const [managers, setManagers] = useState([
-    { id: "MN01", fname: "Van A", lname: "Le", info: "Staff manager " },
-    { id: "MN02", fname: "Van B", lname: "Nguyen", info: "Room manager" },
-    { id: "MN03", fname: "Duy Long", lname: "Do", info: "Location manager" },
-  ]);
-
-  const [searchTerm, setSearchTerm] = useState("");
+  const [manager, setManager] = useState(null);
+  const [loading, setLoading] = useState(true); // State loading
+  const [error, setError] = useState(null); // State lỗi
   const [showAddModal, setShowAddModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [currentManager, setCurrentManager] = useState({
-    id: "",
-    fname: "",
-    lname: "",
-    info: "",
-  });
+  const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [managerToDelete, setManagerToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
+  const [selectedManagerDetails, setSelectedManagerDetails] = useState(null);
+  const [newManager, setNewManager] = useState({
+    name: '',
+    email: '',
+    password: '',
+    date_of_birth: '',
+    phone: '',
+  });
+  const [responseData, setResponseData] = useState(null);
 
-  const addManagerFields = [
-    { name: "fname", label: "First Name", type: "text" },
-    { name: "lname", label: "Last Name", type: "text" },
-    { name: "info", label: "Information", type: "text" },
-  ];
-
-  const updateManagerFields = [
-    { name: "id", label: "Manager ID", type: "text" },
-    { name: "fname", label: "First Name", type: "text" },
-    { name: "lname", label: "Last Name", type: "text" },
-    { name: "info", label: "Information", type: "text" },
-  ];
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setCurrentManager((prev) => ({ ...prev, [name]: value }));
+  //Hiện data lên table
+  const fetchManager = async () => {
+    try {
+      const res = await getManager();
+      console.log("API response: ", res);
+      if (res && res.data) {
+        setManager(res.data);
+      } else {
+        setManager([]);
+      }
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const generateManagerId = () => {
-    const lastId =
-      managers.length > 0 ? managers[managers.length - 1].id : "MN00";
-    const newId = `MN${(parseInt(lastId.substring(2)) + 1)
-      .toString()
-      .padStart(2, "0")}`;
-    return newId;
-  };
+  useEffect(() => {
+    fetchManager();
+}, []);
 
-  const handleAddManagerSubmit = (e) => {
-    e.preventDefault();
-    const newManager = {
-      ...currentManager,
-      id: generateManagerId(),
-      name: `${currentManager.fname} ${currentManager.lname}`,
-    };
-    setManagers([...managers, newManager]);
+//Hiện detail khi click vô 1 hàng
+
+const handleRowClick = async (user_id) => {
+  try {
+    const res = await getManagerById(user_id);
+    if (res && res.data) {
+      setSelectedManagerDetails(res.data);
+      setShowDetailsModal(true);
+  }
+  } catch (err) {
+    console.error("Error fetching manager details: ", err);
+  }
+};
+
+//Khu vực hàm dành cho add
+
+const handleAddManger = async (e) => {
+  e.preventDefault();
+  const formData = new FormData();
+
+  formData.append('name', newManager.name);
+  formData.append('email', newManager.email);
+  formData.append('password', newManager.password);
+  formData.append('phone', newManager.phone);
+
+  try {
+    const Manager = await postManager(newManager);
+    setResponseData(Manager);
+
+    fetchManager();
     setShowAddModal(false);
     setSuccessMessage("Manager Added Successfully!");
-    setCurrentManager({ id: "", fname: "", lname: "", info: "" });
-  };
+    setNewManager({ name: '', email: '', password: '', date_of_birth: '', phone: ''});
+  } catch(err){
+    console.error("Error adding Manager: ", err);
+  }
+};
 
-  const handleUpdateManagerSubmit = (e) => {
-    e.preventDefault();
-    setManagers((prevManagers) => {
-      const managerIndex = prevManagers.findIndex(
-        (manager) => manager.id === currentManager.oldId
-      );
-      if (managerIndex !== -1) {
-        const updatedManagers = [...prevManagers];
-        updatedManagers[managerIndex] = {
-          ...currentManager,
-          name: `${currentManager.fname} ${currentManager.lname}`,
-        };
-        return updatedManagers;
-      }
-      return prevManagers;
-    });
+const addManagerFields = [
+  { label: "Name", type: "text", name: "name", value: `${newManager.name}` },
+  { label: "Email", type: "text", name: "email", value: `${newManager.email}` },
+  { label: "Password", type: "text", name: "password", value: `${newManager.password}` },
+  { label: "Date of birth:", type: "date", name: "date_of_birth", value: `${newManager.date_of_birth}`},
+  { label: "Phone number:", type: "text", name: "phone", value: `${newManager.phone}` },
+];
+
+const handleInputChange = (e) => {
+  const { name, value } = e.target;
+  setNewManager({
+    ...newManager,
+    [name]: value,
+  });
+};
+
+//Khu vực hàm dành cho update
+
+const handleUpdateManager = async (e) => {
+  e.preventDefault();
+  try{
+    await putManager(newManager.Manager.user_id, newManager);
+    fetchManager();
     setShowUpdateModal(false);
     setSuccessMessage("Manager Updated Successfully!");
-    setCurrentManager({ id: "", fname: "", lname: "", info: "" });
-  };
+  } catch (err) {
+    console.error("Error updating Manager: ", err)
+  }
+}
 
-  const handleDeleteManager = () => {
-    setManagers((prevManagers) =>
-      prevManagers.filter((manager) => manager.id !== managerToDelete.id)
-    );
-    setSuccessMessage("Manager Deleted Successfully!");
+const handleUpdateChange = (e) => {
+  const { name, value } = e.target;
+  setNewManager((prev) => ({ 
+    ...prev, 
+    [name]: value }));
+};
+
+
+const handleUpdateClick = (manager) => {
+  setNewManager(manager);
+  setShowUpdateModal(true);
+};
+
+const updateManagerFields = [
+  { label: "Name", type: "text", name: "name", value: newManager.name },
+  { label: "Email", type: "text", name: "email", value: newManager.email },
+  { label: "Password", type: "text", name: "password", value: newManager.password },
+  { label: "Date of birth", type: "date", name: "date_of_birth", value: newManager.date_of_birth },
+  { label: "Phone number:", type: "text", name: "phone", value: newManager.phone },
+];
+
+//Khu vực hàm dành cho delete
+
+const handleDeleteManager = async () => {
+  if (managerToDelete) {
+    const updatedManager = {
+      ...managerToDelete,
+      status: "inactive"
+    };
+    try {
+      await putManager(managerToDelete.Manager.user_id, updatedManager);
+      fetchManager(); // Refresh the manager list
+      setSuccessMessage("Manager Inactivated Successfully!");
+    } catch (err) {
+      console.error("Error inactivating manager: ", err);
+    }
     setShowDeleteModal(false);
-  };
+  }
+};
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
 
-  const closeSuccessMessage = () => {
-    setSuccessMessage("");
-  };
+  // const handleDeleteManager = () => {
+  //   setManagers((prevManagers) =>
+  //     prevManagers.filter((manager) => manager.id !== managerToDelete.id)
+  //   );
+  //   setSuccessMessage("Manager Deleted Successfully!");
+  //   setShowDeleteModal(false);
+  // };
 
-  const filteredManagers = managers.filter(
-    (manager) =>
-      manager.id.includes(searchTerm) ||
-      manager.fname.includes(searchTerm) ||
-      manager.lname.includes(searchTerm) ||
-      manager.info.includes(searchTerm)
-  );
+  // const handleSearchChange = (e) => {
+  //   setSearchTerm(e.target.value);
+  // };
+
+  // const closeSuccessMessage = () => {
+  //   setSuccessMessage("");
+  // };
+
+  // const filteredManagers = managers.filter(
+  //   (manager) =>
+  //     manager.id.includes(searchTerm) ||
+  //     manager.fname.includes(searchTerm) ||
+  //     manager.lname.includes(searchTerm) ||
+  //     manager.info.includes(searchTerm)
+  // );
 
   return (
     <div className="container mx-auto p-4">
@@ -124,9 +200,9 @@ const ManagersManagerPage = () => {
 
       <div className="grid grid-cols-2">
         <SearchBar
-          searchTerm={searchTerm}
-          handleSearchChange={handleSearchChange}
-          placeholder="Search by ID, name, or information"
+          // searchTerm={searchTerm}
+          // handleSearchChange={handleSearchChange}
+          // placeholder="Search by ID, name, or information"
         />
 
         {/* Add Button */}
@@ -138,59 +214,51 @@ const ManagersManagerPage = () => {
         </div>
       </div>
 
-      <div>
+      {/* <div>
         <SuccessAlert message={successMessage} onClose={closeSuccessMessage} />
-      </div>
+      </div> */}
 
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="table w-full">
           <thead>
             <tr>
-              <th>Manager ID</th>
               <th>Manager Name</th>
-              <th>Information</th>
+              <th>Email</th>
+              <th>Gender</th>
+              <th>Date of birth</th>
+              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredManagers.length > 0 ? (
-              filteredManagers.map((manager) => (
-                <tr key={manager.id}>
-                  <td>{manager.id}</td>
-                  <td>
-                    {manager.lname} {manager.fname}
-                  </td>
-                  <td>{manager.info}</td>
+            {Array.isArray(manager) && manager.map((manager) => (
+                <tr key={manager.user_id} className="cursor-pointer">
+                {/*<tr key={manager.user_id} className="cursor-pointer" onClick={() => handleRowClick(manager.Manager.user_id)}>*/}
+                  <td>{manager.name}</td>
+                  <td>{manager.email}</td>
+                  <td>{manager.gender}</td>
+                  <td>{manager.date_of_birth}</td>
+                  <td>{manager.status}</td>
                   <td>
                     {/* Update Button */}
-                    <UpdateButton
-                      onClick={() => {
-                        setCurrentManager({ ...manager, oldId: manager.id });
-                        setShowUpdateModal(true);
-                      }}
+                    <UpdateButton onClick={(e) => {
+                      e.stopPropagation();
+                      handleUpdateClick(manager)
+                    }} 
                     />
 
                     {/* Delete Button */}
-                    <DeleteButton
-                      onClick={() => {
-                        setManagerToDelete({
-                          ...manager,
-                          name: `${manager.lname} ${manager.fname}`,
-                        });
-                        setShowDeleteModal(true);
-                      }}
+                   <DeleteButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setManagerToDelete(manager);
+                      setShowDeleteModal(true);
+                    }}
                     />
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="text-center">
-                  No Managers Found
-                </td>
-              </tr>
-            )}
+              ))}
           </tbody>
         </table>
       </div>
@@ -199,8 +267,8 @@ const ManagersManagerPage = () => {
       <AddModal
         show={showAddModal}
         onClose={() => setShowAddModal(false)}
-        onSubmit={handleAddManagerSubmit}
-        currentItem={currentManager}
+        onSubmit={handleAddManger}
+        currentItem={newManager}
         onInputChange={handleInputChange}
         fields={addManagerFields}
       />
@@ -208,9 +276,9 @@ const ManagersManagerPage = () => {
       <UpdateModal
         show={showUpdateModal}
         onClose={() => setShowUpdateModal(false)}
-        onSubmit={handleUpdateManagerSubmit}
-        currentItem={currentManager}
-        onInputChange={handleInputChange}
+        onSubmit={handleUpdateManager}
+        currentItem={newManager}
+        onInputChange={handleUpdateChange}
         fields={updateManagerFields}
       />
 
@@ -219,6 +287,14 @@ const ManagersManagerPage = () => {
         onClose={() => setShowDeleteModal(false)}
         onDelete={handleDeleteManager}
         itemToDelete={managerToDelete}
+        itemType="manager"
+      />
+
+      <DetailsModal
+        show={showDetailsModal}
+        onClose={() => setShowDetailsModal(false)}
+        onDelete={handleDeleteManager}
+        details={selectedManagerDetails}
         itemType="manager"
       />
     </div>

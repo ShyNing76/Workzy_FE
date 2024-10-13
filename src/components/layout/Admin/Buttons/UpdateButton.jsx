@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 const UpdateButton = ({ onClick, label = "Update" }) => {
     return (
         <button className="btn btn-sm mr-2" onClick={onClick}>
-            <FiEdit3 /> {label}
+            <FiEdit3 />
         </button>
     );
 };

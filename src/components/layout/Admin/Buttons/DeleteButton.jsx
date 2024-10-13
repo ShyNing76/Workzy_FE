@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 const DeleteButton = ({ onClick, label = "Delete" }) => {
     return (
         <button className="btn btn-error btn-sm" onClick={onClick}>
-            <GoTrash /> {label}
+            <GoTrash className="text-white"/>
         </button>
     );
 };

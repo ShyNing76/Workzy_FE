@@ -91,6 +91,8 @@ const UpdateModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fiel
                 </label>
               )}
 
+
+
               {field.type === 'file' && (
                 <input
                   type="file"
@@ -100,10 +102,28 @@ const UpdateModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fiel
                   className="file-input file-input-bordered w-full max-w-xs"
                 />
               )}
+
+              {field.type === 'toggle' && (
+                <div className="flex items-center space-x-3">
+                  <label className="switch">
+                    <input
+                      type="checkbox"
+                      name={field.name}
+                      checked={currentItem[field.name] === 'active'}
+                      onChange={(e) => onInputChange({
+                        target: { name: field.name, value: e.target.checked ? 'active' : 'inactive' }
+                      })}
+                    />
+                    <span className="slider round"></span>
+                  </label>
+                  <span className='mb-2'>{!currentItem[field.name] || currentItem[field.name] === 'inactive' ? 'Inactive' : 'Active'}</span>
+                </div>
+              )}
+
             </div>
           ))}
           <div className="modal-action">
-            <button type="submit" className="btn btn-sm"><FiEdit3/>Confirm</button>
+            <button type="submit" className="btn btn-sm" onClick={onSubmit}><FiEdit3/>Confirm</button>
             <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}><RxCross2/>Cancel</button>
           </div>
         </form>
