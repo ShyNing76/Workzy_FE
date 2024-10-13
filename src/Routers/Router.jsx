@@ -50,6 +50,7 @@ import MyBooking from "../pages/Customer/MyBooking/MyBooking.jsx";
 import SupportCenter from "../pages/Customer/SupportCenter/SupportCenter.jsx";
 import NotificationPage from "../pages/Customer/Notification/NotificationPage.jsx";
 import PaymentPage from "../pages/Customer/Payment/Payment.jsx";
+import Wishlist from "../pages/Staff/Wishlist/Wishlist.jsx";
 
 // Role id store in local Storage after login and register
 
