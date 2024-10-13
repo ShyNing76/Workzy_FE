@@ -11,9 +11,6 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 
 const LocationPage = () => {
   // Get from API
-  const [googleMapsEmbedLink, setGoogleMapsEmbedLink] = useState(
-    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3959.4287485048703!2d106.80730807508958!3d10.841127589311627!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752731176b07b1%3A0xb752b24b379bae5e!2zVHLGsOG7nW5nIMSQ4bqhaSBo4buNYyBGUFQgVFAuIEhDTQ!5e1!3m2!1svi!2s!4v1726936398545!5m2!1svi!2s"
-  );
   const [buildingImage, setBuildingImage] = useState([]);
 
   // request param in react router dom

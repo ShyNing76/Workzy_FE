@@ -18,19 +18,19 @@ const DetailModal = ({ booking, onClose }) => {
                     </li>
                     <li className='flex justify-between mb-2'>
                         <span>3. Workspace Price</span>
-                        <span>{booking.price.toLocaleString('vi-VN')}đ</span>
+                        <span>${booking.price}</span>
                     </li>
                     <li className='flex justify-between mb-2'>
                         <span>4. Additional utilities price</span>
-                        <span>{booking.additionalPrice.toLocaleString('vi-VN')}đ</span>
+                        <span>${booking.additionalPrice}</span>
                     </li>
                     <li className='flex justify-between mb-2'>
                         <span>5. Broken_price</span>
-                        <span>{booking.brokenPrice.toLocaleString('vi-VN')}đ</span>
+                        <span>${booking.brokenPrice}</span>
                     </li>
                     <li className='flex justify-between mb-2'>
                         <span>6. Total Price</span>
-                        <span>{booking.totalPrice.toLocaleString('vi-VN')}đ</span>
+                        <span>${booking.totalPrice}</span>
                     </li>
                 </ul>
                 <div className='modal-action'>

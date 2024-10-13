@@ -19,11 +19,36 @@
         flex-direction: column;
 
         label {
-            color: white; 
-            font-weight: bold;
+            color: black; 
+            font-weight: bold ;
             margin-bottom: 5px;
         }
-        
+
+        input[type="date"], input[type="month"], input[type="number"] {
+            border: 1px solid black;  /* Khung viền đen */
+            border-radius: 4px;  /* Góc bo tròn */
+            font-size: 16px;  /* Kích thước chữ */
+            background-color: white;  
+            padding-left: 10px;
+        }
+
+        select {
+            border: 1px solid black; 
+            border-radius: 4px; 
+            appearance: none; 
+            background: white; 
+            cursor: pointer; 
+            padding-left: 10px;
+        }
+
+        .form-select {
+            -webkit-appearance: none; 
+            -moz-appearance: none; 
+            appearance: none; 
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>') no-repeat right 0.75rem center; /* Thêm mũi tên bên phải */
+            background-size: 1rem; 
+            padding-right: 2.5rem;
+        }
     }
 
     .table-container {
@@ -51,6 +76,7 @@
 
     .status-label {
         font-size: 14px;
-        color: white; 
+        color: black; 
+        
     }
 }
