@@ -13,6 +13,9 @@ import RoomDetail from "../pages/Customer/Room detail/RoomDetail.jsx";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import ScrollToTop from "../components/context/scrollToTop.jsx";
 import PrivateRoute from "./PrivateRoute.jsx";
+import ManagerPage from "../pages/Manager/ManagerPage.jsx";
+import ManagerAssign from "../pages/Manager/ManagerAssign/ManagerAssign.jsx";
+import ManagerDashBoard from "../pages/Manager/ManagerDashboard/ManagerDashBoard.jsx";
 import Building from "../pages/Customer/Building/Building.jsx";
 import GoogleCallback from "../pages/Customer/GoogleCallBack/GoogleCallback.jsx";
 import SinglePOD from "../pages/Customer/SinglePOD/SinglePOD.jsx";
@@ -42,6 +45,9 @@ import TrackAndAnalyzeReport from "../pages/Admin/Track&AnalyzeReport/Track&Anal
 import MainPage from "../pages/Staff/MainPage/MainPage.jsx";
 import BookingsPage from "../pages/Staff/Bookings/BookingsPage.jsx";
 import BuildingRoomPage from "../pages/Staff/BuildingRoom/BuildingRoomPage.jsx";
+import ManageStaff from "../pages/Manager/ManageStaff/ManageStaff.jsx";
+import ManageReview from "../pages/Manager/ManageReview/ManageReview.jsx";
+
 import MemberShipPage from "../pages/Customer/MemberShip/MemberShipPage.jsx";
 import MyBooking from "../pages/Customer/MyBooking/MyBooking.jsx";
 import SupportCenter from "../pages/Customer/SupportCenter/SupportCenter.jsx";
@@ -275,4 +281,35 @@ export const router = createBrowserRouter([
     path: "*",
     element: <LoginPage />,
   },
+
+  // Manager
+  {
+    path: "manager",
+    element: 
+      
+      <ManagerPage/>  
+      
+    ,
+    children: [
+      {
+        path: "",
+        element: <ManagerDashBoard/>
+      },
+
+      {
+        path: "manager-assign",
+        element: <ManagerAssign/>
+      },
+
+      {
+        path: "manager-manage-staff",
+        element: <ManageStaff/>
+      },
+      {
+        path: "manager-manage-review",
+        element: <ManageReview/>
+      }
+    ]
+  }
+
 ]);
