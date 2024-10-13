@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Googlemap from "../../../components/layout/Customer/Googlemap/Googlemap";
 import { IoLocationOutline } from "react-icons/io5";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import Carousel from "../../../components/layout/Customer/Carousel/Carousel";
 import RoomCard from "../../../components/layout/Customer/RoomCard/RoomCard";
 import FilterBar from "../../../components/layout/Customer/FilterBar/FilterBar";
@@ -13,6 +18,8 @@ import {
 } from "../../../config/api";
 import { toast, ToastContainer } from "react-toastify";
 import Pagination from "../../../components/layout/Shared/Pagination/Pagination";
+import noDataIcon from "../../../assets/no-data.png";
+import "./Building.scss";
 
 const Building = () => {
   const { buildingId } = useParams();
@@ -27,8 +34,16 @@ const Building = () => {
 
   // Is loading
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingRoom, setIsLoadingRoom] = useState(false);
 
   const navigate = useNavigate();
+
+  // Filter
+  const [searchParams] = useSearchParams();
+  const officeSize = searchParams.get("officeSize") || "";
+  const minPrice = searchParams.get("minPrice") || "";
+  const maxPrice = searchParams.get("maxPrice") || "";
+  const workSpaceType = searchParams.get("workspaceType") || "";
 
   const images = [
     "https://picsum.photos/500/300?random=1",
@@ -60,37 +75,70 @@ const Building = () => {
   }, [buildingId]);
 
   useEffect(() => {
+    let queryString = "";
+
+    // Thêm officeSize nếu có giá trị
+    if (officeSize) {
+      queryString += `&office_size=${officeSize}`;
+    }
+
+    // Thêm workspaceType nếu có giá trị
+    if (workSpaceType) {
+      queryString += `&workspace_type_name=${workSpaceType}`;
+    }
+
+    // Thêm minPrice và maxPrice nếu có giá trị
+    if (minPrice && maxPrice) {
+      queryString += `&min_price=${minPrice}&max_price=${maxPrice}`;
+    }
+
     const fetchTotalWorkspaces = async () => {
       try {
-        const res = await getAllWorkspacesByBuildingId(buildingId);
+        const res = await getAllWorkspacesByBuildingId(buildingId, queryString);
         if (res && res.data && res.err === 0) {
           setTotalWorkspaces(res.data.length); // Total workspaces
-        }
-      } catch (error) {
-        toast.error(error.message);
-      }
-    };
-
-    const fetchWorkspaceData = async () => {
-      try {
-        const res = await getWorkspaceByBuildingId(buildingId, limit, page);
-
-        if (res && res.data && res.err === 0) {
-          setWorkspaceData(res.data);
+        } else {
+          setTotalWorkspaces(0);
         }
       } catch (error) {
         toast.error(error);
       }
     };
 
+    const fetchWorkspaceData = async () => {
+      setIsLoadingRoom(true);
+      try {
+        const res = await getWorkspaceByBuildingId(
+          buildingId,
+          limit,
+          page,
+          queryString
+        );
+
+        if (res && res.data && res.err === 0) {
+          setWorkspaceData(res.data);
+        } else {
+          setWorkspaceData([]);
+        }
+      } catch (error) {
+        toast.error(error);
+      } finally {
+        setIsLoadingRoom(false);
+      }
+    };
+
     fetchTotalWorkspaces();
     fetchWorkspaceData();
-  }, [buildingId, limit, page]);
+  }, [buildingId, limit, page, officeSize, minPrice, maxPrice, workSpaceType]);
 
   // Count Total page
   useEffect(() => {
+    console.log("Total Workspace: ", totalWorkspaces);
+
     if (totalWorkspaces > 0) {
       setTotalPages(Math.ceil(totalWorkspaces / limit)); // Calculate total pages
+    } else {
+      setTotalPages(1);
     }
   }, [totalWorkspaces, limit]); // Depend on totalWorkspaces and limit
 
@@ -140,18 +188,51 @@ const Building = () => {
               Available{" "}
               <span className="text-amber-500 text-5xl">Workspace</span>
             </h1>
-            <FilterBar />
+            <FilterBar
+              officeSize={officeSize}
+              minPrice={minPrice}
+              maxPrice={maxPrice}
+              workSpaceType={workSpaceType}
+              buildingId={buildingId}
+            />
           </div>
 
+          {isLoadingRoom && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mx-12">
+              {Array.from({ length: 8 }).map((_, index) => (
+                <div key={index} className="flex w-72 flex-col gap-4 my-10">
+                  <div className="skeleton h-52 w-full"></div>
+                  <div className="skeleton h-4 w-40"></div>
+                  <div className="skeleton h-4 w-28"></div>
+                  <div className="flex justify-between">
+                    <div className="skeleton h-4 w-28"></div>
+                    <div className="skeleton h-4 w-28"></div>
+                  </div>
+                  <div className="skeleton h-12 w-full"></div>
+                </div>
+              ))}
+            </div>
+          )}
+
           <div className="room-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mx-12">
-            {workspaceData &&
+            {workspaceData && workspaceData.length && !isLoadingRoom > 0 ? (
               workspaceData.map((workspace, index) => (
                 <RoomCard
                   key={`workspace-${workspace.workspace_id}`}
                   workspace={workspace}
                   image={`https://picsum.photos/500/300?random=${index}`}
                 />
-              ))}
+              ))
+            ) : (
+              <div className="no-data-room">
+                <img
+                  src={noDataIcon}
+                  alt="No Data"
+                  className="no-data-icon-room"
+                />
+                <p>No Room Found</p>
+              </div>
+            )}
           </div>
 
           {totalPages > 1 && (

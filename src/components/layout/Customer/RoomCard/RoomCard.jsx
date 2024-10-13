@@ -9,7 +9,7 @@ import { formatCurrency } from "../../../context/priceFormat";
 const RoomCard = ({ workspace, image }) => {
   return (
     <>
-      <div className="room-list-container">
+      <div className=" room-list-container">
         <div className="room-list-page-1 mx-auto grid max-w-2xl grid-cols-1 items-start gap-x-8 gap-y-16 sm:mx-6 sm:my-10 lg:max-w-7xl  item-center">
           <Link to={`/location/building/${workspace.workspace_id}`}>
             <div className="room-list-item">
@@ -31,10 +31,12 @@ const RoomCard = ({ workspace, image }) => {
                     </div>
                     <div className="room-detail grid grid-cols-2 mb-4">
                       <p className="detail-1 flex">
-                        <BiArea className="text-2xl" /> &nbsp; 50 m2
+                        <BiArea className="text-2xl" /> &nbsp; {workspace.area}{" "}
+                        m2
                       </p>
                       <p className="detail-2 flex">
-                        <MdOutlineChair className="text-2xl" /> &nbsp; 18 chairs
+                        <MdOutlineChair className="text-2xl" /> &nbsp;{" "}
+                        {workspace.capacity} seats
                       </p>
                     </div>
                   </div>

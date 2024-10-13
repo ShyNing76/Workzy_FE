@@ -13,6 +13,9 @@ import RoomDetail from "../pages/Customer/Room detail/RoomDetail.jsx";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import ScrollToTop from "../components/context/scrollToTop.jsx";
 import PrivateRoute from "./PrivateRoute.jsx";
+import ManagerPage from "../pages/Manager/ManagerPage.jsx";
+import ManagerAssign from "../pages/Manager/ManagerAssign/ManagerAssign.jsx";
+import ManagerDashBoard from "../pages/Manager/ManagerDashboard/ManagerDashBoard.jsx";
 import Building from "../pages/Customer/Building/Building.jsx";
 import GoogleCallback from "../pages/Customer/GoogleCallBack/GoogleCallback.jsx";
 import SinglePOD from "../pages/Customer/SinglePOD/SinglePOD.jsx";
@@ -24,11 +27,9 @@ import EventSpace from "../pages/Customer/EventSpace/EventSpace.jsx";
 import MemberShipPage from "../pages/Customer/MemberShip/MemberShipPage.jsx";
 
 import AdminDashboardPage from "../pages/Admin/AdminDashboard/AdminDashboardPage.jsx";
-import ServicesManagerPage from "../pages/Admin/ServicesManager/ServicesManagerPage.jsx";
 import ManagersManagerPage from "../pages/Admin/ManagersManager/ManagersManagerPage.jsx";
 import StaffsManagerPage from "../pages/Admin/StaffsManager/StaffsManagerPage.jsx";
-import MembersManagerPage from "../pages/Admin/MembersManager/MembersManagerPage.jsx";
-import VIPsManagerPage from "../pages/Admin/VIPsManager/VIPsManagerPage.jsx";
+import CustomersManagerPage from "../pages/Admin/CustomersManager/CustomersManagerPage.jsx";
 import HCMBuildingsManagerPage from "../pages/Admin/BuildingsManager/HoChiMinh/HCMBuildingManagerPage.jsx";
 import HNBuildingsManagerPage from "../pages/Admin/BuildingsManager/HaNoi/HNBuildingManagerPage.jsx";
 import HCMWorkspacesManagerPage from "../pages/Admin/WorkspacesManager/HoChiMinh/HCMWorkspacesManagerPage.jsx";
@@ -38,16 +39,12 @@ import WorkspacesTypesManagerPage from "../pages/Admin/WorkspaceTypesManager/Wor
 import PaymentsManagerPage from "../pages/Admin/PaymentsManager/PaymentsManagerPage.jsx";
 import BookingsManagerPage from "../pages/Admin/BookingsManager/BookingsManagerPage.jsx";
 import ReviewsManagerPage from "../pages/Admin/ReviewsManager/ReviewsManagerPage.jsx";
-import TrackAndAnalyzeReport from "../pages/Admin/Track&AnalyzeReport/Track&AnalyzeReport.jsx";
 
 import MainPage from "../pages/Staff/MainPage/MainPage.jsx";
 import BookingManagement from "../pages/Staff/Bookings/BookingManagement.jsx";
 import BuildingRoomPage from "../pages/Staff/BuildingRoom/BuildingRoomPage.jsx";
-import Wishlist from "../pages/Staff/Wishlist/Wishlist.jsx"
-import MyBooking from "../pages/Customer/MyBooking/MyBooking.jsx";
-import SupportCenter from "../pages/Customer/SupportCenter/SupportCenter.jsx";
-import NotificationPage from "../pages/Customer/Notification/NotificationPage.jsx";
 import PaymentPage from "../pages/Customer/Payment/Payment.jsx";
+import Wishlist from "../pages/Staff/Wishlist/Wishlist.jsx";
 
 // Role id store in local Storage after login and register
 
@@ -176,19 +173,17 @@ export const router = createBrowserRouter([
         index: true,
         element: <Navigate to="/admin" />,
       },
-      { path: "servicesmanager", element: <ServicesManagerPage /> },
-      { path: "managersmanager", element: <ManagersManagerPage /> },
+      {
+        path: "managersmanager",
+        element: <ManagersManagerPage />,
+      },
       {
         path: "staffsmanager",
         element: <StaffsManagerPage />,
       },
       {
-        path: "membersmanager",
-        element: <MembersManagerPage />,
-      },
-      {
-        path: "vipsmanager",
-        element: <VIPsManagerPage />,
+        path: "customersmanager",
+        element: <CustomersManagerPage />,
       },
       {
         path: "hcmbuildingmanager",
@@ -226,10 +221,6 @@ export const router = createBrowserRouter([
         path: "reviewsmanager",
         element: <ReviewsManagerPage />,
       },
-      {
-        path: "trackandanalyzereport",
-        element: <TrackAndAnalyzeReport />,
-      },
     ],
     // condition: (user) => user.isAdmin, // Add condition to check if user is admin before rendering the routes
   },
@@ -253,7 +244,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "wishlist",
-        element: <Wishlist/>,
+        element: <Wishlist />,
       },
     ],
   },
@@ -279,5 +270,32 @@ export const router = createBrowserRouter([
   {
     path: "*",
     element: <LoginPage />,
+  },
+
+  // Manager
+  {
+    path: "manager",
+    element: <ManagerPage />,
+
+    children: [
+      {
+        path: "",
+        element: <ManagerDashBoard />,
+      },
+
+      {
+        path: "manager-assign",
+        element: <ManagerAssign />,
+      },
+
+      {
+        path: "manager-manage-staff",
+        element: <ManageStaff />,
+      },
+      {
+        path: "manager-manage-review",
+        element: <ManageReview />,
+      },
+    ],
   },
 ]);

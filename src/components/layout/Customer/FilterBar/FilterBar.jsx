@@ -1,14 +1,63 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./FilterBar.scss";
+import { useLocation, useNavigate } from "react-router-dom";
 
-const FilterBar = () => {
+const FilterBar = (props) => {
+  const { buildingId } = props;
+
   const MIN_PRICE = 30000;
   const MAX_PRICE = 1000000;
 
-  const [minPrice, setMinPrice] = useState(MIN_PRICE); // Giá trị mặc định min
-  const [maxPrice, setMaxPrice] = useState(MAX_PRICE); // Giá trị mặc định max
-  const [officeSize, setOfficeSize] = useState("");
-  const [workspaceType, setWorkspaceType] = useState("");
+  const [minPrice, setMinPrice] = useState(props.minPrice || MIN_PRICE); // Giá trị mặc định min
+  const [maxPrice, setMaxPrice] = useState(props.maxPrice || MAX_PRICE); // Giá trị mặc định max
+  const [officeSize, setOfficeSize] = useState(props.officeSize || "");
+  const [workspaceType, setWorkspaceType] = useState(props.workSpaceType || "");
+  const currentLocation = useLocation();
+
+  // Navigate
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const queryParams = {};
+
+    if (officeSize) {
+      queryParams.officeSize = officeSize;
+    }
+
+    if (workspaceType) {
+      queryParams.workspaceType = workspaceType;
+    }
+
+    if (minPrice && maxPrice) {
+      queryParams.minPrice = minPrice;
+      queryParams.maxPrice = maxPrice;
+    }
+
+    const queryString = new URLSearchParams(queryParams).toString();
+    navigate(`/location/${buildingId}?${queryString}`);
+  };
+
+  const handleReset = (e) => {
+    e.preventDefault();
+    navigate((`/location/${buildingId}`, { replace: true }));
+  };
+
+  // Reset state khi người dùng điều hướng tới trang /location mà không có query string (không phải từ Submit)
+  useEffect(() => {
+    const hasQueryParams =
+      new URLSearchParams(currentLocation.search).toString() !== "";
+    console.log(currentLocation.search);
+
+    // Nếu không có queryParams, nghĩa là không có thông tin từ `Submit`, thì reset form
+    if (!hasQueryParams) {
+      setMinPrice(MIN_PRICE);
+      setMaxPrice(MAX_PRICE);
+      setOfficeSize("");
+      setWorkspaceType("");
+    }
+  }, [currentLocation]);
 
   return (
     <>
@@ -23,12 +72,12 @@ const FilterBar = () => {
               <option disabled value="">
                 Office size
               </option>
-              <option>Under 10 seats</option>
-              <option>From 10 to 20 seats</option>
-              <option>From 20 to 30 seats</option>
-              <option>From 30 to 40 seats</option>
-              <option>From 40 to 50 seats</option>
-              <option>Over 50 seats</option>
+              <option value="1">Under 10 seats</option>
+              <option value="2">From 10 to 20 seats</option>
+              <option value="3">From 20 to 30 seats</option>
+              <option value="4">From 30 to 40 seats</option>
+              <option value="5">From 40 to 50 seats</option>
+              <option value="6">Over 50 seats</option>
             </select>
 
             <div className="dropdown m-2 ">
@@ -88,10 +137,16 @@ const FilterBar = () => {
           </div>
 
           <div>
-            <button className="btn btn-neutral w-24 btn-sm ml-8 font-bold">
+            <button
+              className="btn btn-neutral w-24 btn-sm ml-8 font-bold"
+              onClick={handleSubmit}
+            >
               Find
             </button>
-            <button className="btn btn-outline w-24 btn-sm mx-3 font-bold">
+            <button
+              className="btn btn-outline w-24 btn-sm mx-3 font-bold"
+              onClick={handleReset}
+            >
               Reset
             </button>
           </div>
