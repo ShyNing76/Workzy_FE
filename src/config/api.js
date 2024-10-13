@@ -112,13 +112,13 @@ const putUpdateImage = (image) => {
 };
 
 const getWorkspaceByBuildingId = (buildingId, limit, page, queryString) => {
-  const URL_API = `api/v1/workspace/?building_id=${buildingId}&limit=${limit}&page=${page}${queryString}`;
+  const URL_API = `api/v1/workspace/?building_id=${buildingId}&limit=${limit}&page=${page}&${queryString}`;
 
   return axios.get(URL_API);
 };
 
-const getAllWorkspacesByBuildingId = (buildingId) => {
-  const URL_API = `api/v1/workspace/?building_id=${buildingId}`; // No pagination in this call
+const getAllWorkspacesByBuildingId = (buildingId, queryString) => {
+  const URL_API = `api/v1/workspace/?building_id=${buildingId}&${queryString}`; // No pagination in this call
   return axios.get(URL_API);
 };
 
