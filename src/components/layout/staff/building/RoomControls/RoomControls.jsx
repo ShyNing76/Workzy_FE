@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './RoomControls.scss'; 
-import TimeSlot from '../RoomRow/TimeSlot';
+import Hourly from '../RoomRow/Hourly';
 import Daily from '../RoomRow/Daily';
 import Monthly from '../RoomRow/Monthly';
 import { getWorkspaceByBuildingId, getStaffBuildingId } from '../../../../../config/api.staff';
@@ -11,6 +11,8 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear()); 
     const [workspaces, setWorkspaces] = useState([]); 
     const [workspaceTypes, setWorkspaceTypes] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedWorkspace, setSelectedWorkspace] = useState(null); // Thêm state cho workspace được chọn
 
     useEffect(() => {
         const fetchBuildingAndWorkspaces = async () => {
@@ -21,7 +23,7 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
                     await fetchWorkspaces(buildingId);
                 }
             } catch (error) {
-                console.error('Error when get building_id:', error);
+                console.error('Error when getting building_id:', error);
             }
         };
 
@@ -37,7 +39,7 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
                 setWorkspaceTypes(types);
             }
         } catch (error) {
-            console.error('Error when workspace:', error);
+            console.error('Error when fetching workspaces:', error);
         }
     };
 
@@ -64,15 +66,19 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
         }
     };
 
-    const renderTable = () => {
+    const handleWorkspaceClick = (workspace) => {
+        setSelectedWorkspace(workspace); // Cập nhật workspace được chọn
+        setIsModalOpen(true); // Mở modal
+    };
 
+    const renderTable = () => {
         switch (selectedType) {
             case 'hourly':
-                return <TimeSlot  selectedDate={currentDate} selectedStatus={selectedStatus} workspaces={filteredWorkspaces()} />;
+                return <Hourly selectedDate={currentDate} selectedStatus={selectedStatus} workspaces={filteredWorkspaces()} onWorkspaceClick={handleWorkspaceClick} />;
             case 'daily':
-                return <Daily  selectedDate={currentDate} selectedStatus={selectedStatus} workspaces={filteredWorkspaces()}/>;
+                return <Daily selectedDate={currentDate} selectedStatus={selectedStatus} workspaces={filteredWorkspaces()} onWorkspaceClick={handleWorkspaceClick} />;
             case 'monthly':
-                return <Monthly  selectedStatus={selectedStatus} workspaces={filteredWorkspaces()}/>;
+                return <Monthly selectedStatus={selectedStatus} workspaces={filteredWorkspaces()} onWorkspaceClick={handleWorkspaceClick} />;
             default:
                 return null;
         }
@@ -86,7 +92,7 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
         <div className="room-controls-wrapper" style={{ width: '100%' }}>
             <div className="room-controls">
                 <div className="control-row">
-                <div className="control">
+                    <div className="control">
                         <label htmlFor="status-select">Select Status</label>
                         <select 
                             className="form-select" 
@@ -123,7 +129,7 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
                             value={selectedType} 
                             onChange={(e) => setSelectedType(e.target.value)}
                         >
-                            <option value="hourly">TimeSlot</option>
+                            <option value="hourly">Hourly</option>
                             <option value="daily">Daily</option>
                             <option value="monthly">Monthly</option>
                         </select>
@@ -133,15 +139,17 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
                         <input 
                             type={getDateInputType()} 
                             id="date-picker" 
-                            value={selectedType === 'daily' ? currentDate : selectedType === 'monthly' ? selectedYear : currentDate}
+                            value={selectedType === 'daily' ? selectedYear : currentDate} 
                             onChange={handleDateChange}
-                            min={selectedType === 'monthly' ? '2000' : undefined} 
                         />
                     </div>
                 </div>
-                <div className="table-container">
+                <div className="room-table">
                     {renderTable()}
                 </div>
+                {isModalOpen && selectedWorkspace && (
+                    <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} room={selectedWorkspace} bookingType={selectedType} />
+                )}
             </div>
         </div>
     );

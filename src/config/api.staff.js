@@ -17,10 +17,22 @@ const getBuildingById = (building_id) => {
 const getWorkspaceByBuildingId = (building_id) => {
   const URL_API = `/api/v1/workspace/?building_id=${building_id}`;
   return axios.get(URL_API);
-} 
+}; 
+
+const getWorkspaceById = (workspace_id) => {
+  const URL_API = `/api/v1/workspace/${workspace_id}`;
+  return axios.get(URL_API);
+};
+
+const getBooking = () =>{
+  const URL_API = "/api/v1/booking/get";
+  return axios.get(URL_API);
+};
 
 export {
   getStaffBuildingId,
   getBuildingById,
   getWorkspaceByBuildingId,
+  getBooking,
+  getWorkspaceById,
 };

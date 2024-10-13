@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './RoomSchedule.scss';
 import RoomModal from '../../building/RoomModal/RoomModal';
 
-const TimeSlot = ({ selectedDate, selectedStatus, workspaces  }) => {
+const Hourly = ({ selectedDate, selectedStatus, workspaces  }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState(null);
     const hours = [...Array(24).keys()];
@@ -67,4 +67,4 @@ const TimeSlot = ({ selectedDate, selectedStatus, workspaces  }) => {
     );
 };
 
-export default TimeSlot;
+export default Hourly;
