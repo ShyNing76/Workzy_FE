@@ -8,11 +8,14 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import { formatCurrency } from "../../../components/context/priceFormat";
 import "./Payment.scss";
+import Swal from "sweetalert2";
+import { formatTime } from "../../../components/context/timeFormat";
 
 const PaymentPage = () => {
   const paypalClientKey = import.meta.env.VITE_PAYPAL_CLIENT_KEY;
   const navigate = useNavigate();
   const location = useLocation();
+  const [timeLeft, setTimeLeft] = useState(600); //600s => 10min
 
   const {
     bookingId,
@@ -26,6 +29,36 @@ const PaymentPage = () => {
     total,
   } = location.state || {};
 
+  // Countdown timer
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeLeft((prevTime) => {
+        if (prevTime <= 1) {
+          clearInterval(interval); //Stop interval when end time
+          handleTimeExpired(); //Call function when end time
+          return 0;
+        }
+        return prevTime - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval); //Clear interval when component is unmount
+  }, []);
+
+  // Handle when time expire
+  const handleTimeExpired = () => {
+    Swal.fire({
+      title: "Time is up!",
+      text: "Your booking has expired. Redirecting to homepage...",
+      icon: "warning",
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      timer: 4000,
+    }).then(() => {
+      navigate("/"); //Navigate to homepage
+    });
+  };
+
   const handleCreateOrder = async () => {
     try {
       const res = await postCreatePaypalOrder(bookingId); // Gọi API tạo order
@@ -38,19 +71,36 @@ const PaymentPage = () => {
   };
 
   const handleApproveOrder = async (data) => {
-    console.log(data);
-
     try {
       const res = await postApprovePaypalOrder(data.orderID, bookingId); // Gọi API xác nhận thanh toán
 
       if (res && res.err === 0) {
-        toast.success(res.message);
-        navigate("/");
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Payment Successful!",
+          text: "Thank you for your payment.",
+          showConfirmButton: false,
+          timer: 4000,
+          allowOutsideClick: false,
+        }).then(() => {
+          navigate("/");
+        });
       } else {
-        toast.error(res.message);
+        Swal.fire({
+          title: "Payment Failed!",
+          text: res.message || "An error occurred during the payment process.",
+          icon: "error",
+          confirmButtonText: "Try Again",
+        });
       }
     } catch (error) {
-      toast.error("Lỗi khi xác nhận thanh toán:", error);
+      Swal.fire({
+        title: "Error",
+        text: "Fail to confirm payment.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -98,7 +148,7 @@ const PaymentPage = () => {
                 <div className="mt-4 p-2 bg-gray-100 rounded-lg flex items-center justify-between">
                   <p>Your booking must be paid within </p>
                   <div className="text-gray-700 bg-white py-2 px-3 rounded-lg">
-                    10:00
+                    {formatTime(timeLeft)}
                   </div>
                 </div>
 
