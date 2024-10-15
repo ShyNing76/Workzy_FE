@@ -23,15 +23,22 @@ const assignStaffToBuilding = (staffId, buildingId) => {
     return axios.put(URL_API, {building_id: buildingId});  // put request to assign staff to building with buildingId in body
 }   // ==> need to have building_id in body to assign staff to building
 
-const updateStaffStatus = (staffId) => {
-    const URL_API = `/api/v1/staff/${staffId}`
-    return axios.put(URL_API)
+const activeStaff = (staffId) => {
+    const URL_API = `/api/v1/staff/active/${staffId}`;
+    return axios.put(URL_API);
 }
+
+const inactiveStaff = (staffId) => {
+    const URL_API = `/api/v1/staff/unactive/${staffId}`;
+    return axios.put(URL_API);
+}
+
 
 export {
     getAllBuildings,
     getAllStaffs,
     assignStaffToBuilding,
     unassignStaffFromBuilding,
-    updateStaffStatus
+    activeStaff,
+    inactiveStaff
 }

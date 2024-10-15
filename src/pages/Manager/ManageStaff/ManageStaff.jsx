@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { getAllStaffs, updateStaffStatus } from "../../../config/apiManager";
-
+import {
+  getAllStaffs,
+  activeStaff,
+  inactiveStaff,
+} from "../../../config/apiManager";
+import Swal from "sweetalert2";
 const ManageStaff = () => {
   const [staffs, setStaffs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [isLoaded, setIsLoaded] = useState(false);
   useEffect(() => {
     const fetchStaffs = async () => {
       setIsLoading(true);
@@ -20,43 +24,54 @@ const ManageStaff = () => {
         setIsLoading(false);
       }
     };
-    fetchStaffs();
-  }, []);
+    if (!isLoaded) {
+      // isLoaded là false thì fetchStaffs
+      fetchStaffs();
+      setIsLoaded(true);
+    }
+  }, [isLoaded]);
 
-  
-
-  
   // Change Status "Block" or "Unblock"
-  const changeStatus = async (staffId) => {
-    console.log("staffId:", staffId)
+
+  const changeStatus = async (staffId, currentStatus) => {
     try {
-      const response = await updateStaffStatus(staffId)
-      console.log("response:", response)  
-      if (response && response.data && response.err === 0) {
-        // Update staffs array
-        const updatedStaffs = staffs.map ((staffMember) => {
-          if (staffMember.user_id === staffId) {
-            return {
-              ...staffMember,
-              status: staffMember.status === "active" ? "inactive" : "active"
-            }
-            
-          }
-          return staffMember
-        })
-        setStaffs(updatedStaffs)
-        console.log("Updated staffs:", updatedStaffs)
-        console.log("response:", response)
+      let response;
+      if (currentStatus === "inactive") {
+        response = await activeStaff(staffId);
+        console.log("response activeStaff :", response);
+      } else {
+        response = await inactiveStaff(staffId);
+        console.log("response inactiveStaff :", response);
+      }
+      if (response && response.err === 0) {
+        const updatedStatus =
+          currentStatus === "inactive" ? "active" : "inactive";
+
+        const updatedStaffs = staffs.map((staffMember) =>
+          staffMember.user_id === staffId
+            ? {
+                ...staffMember,
+                status: updatedStatus,
+              }
+            : staffMember
+        );
+        Swal.fire({
+          title: "Success",
+          text: `Staff status updated to ${updatedStatus} successfully.`,
+          icon: "success",
+        });
+        setStaffs(updatedStaffs);
+        setIsLoaded(false);
+        // set isLoaded là false để fetchStaffs lại
       }
     } catch (error) {
-      console.error("Error updating staff status:", error)
+      console.error("Error updating staff status:", error);
     }
-  }
+  };
 
   return (
     <div className="manage-staff-container">
       <h1 className="text-2xl font-bold top-10">Manage Staff</h1>
-
 
       {/* Staff table */}
       <div className="overflow-x-auto">
@@ -74,11 +89,11 @@ const ManageStaff = () => {
             {staffs.map((staff, index) => (
               <tr key={index}>
                 <td className="w-1/6">{index + 1}</td>
-                <td className="w-1/4">{staff.name}</td>                
+                <td className="w-1/4">{staff.name}</td>
                 <td className="w-1/6 font-bold">{staff.status}</td>
                 <td className="w-1/4">
                   <button
-                    onClick={() => changeStatus(staff.user_id)}
+                    onClick={() => changeStatus(staff.user_id, staff.status)}
                     className={`px-4 py-2 rounded ${
                       staff.status === "inactive"
                         ? "bg-green-500 hover:bg-green-600"
