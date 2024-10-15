@@ -1,37 +1,37 @@
 import { useLocation } from "react-router-dom";
 import React, { useState } from "react";
 
-import SearchBar from "../../../../components/layout/Admin/SearchBar/SearchBar.jsx";
-import AddModal from "../../../../components/layout/Admin/Modals/AddModal.jsx";
-import DeleteModal from "../../../../components/layout/Admin/Modals/DeleteModal.jsx";
-import UpdateModal from "../../../../components/layout/Admin/Modals/UpdateModal.jsx";
-import AddButton from "../../../../components/layout/Admin/Buttons/AddButton.jsx";
-import UpdateButton from "../../../../components/layout/Admin/Buttons/UpdateButton.jsx";
-import DeleteButton from "../../../../components/layout/Admin/Buttons/DeleteButton.jsx";
-import SuccessAlert from "../../../../components/layout/Admin/SuccessAlert/SuccessAlert.jsx";
+// import SearchBar from "../../../../components/layout/Admin/SearchBar/SearchBar.jsx";
+// import AddModal from "../../../../components/layout/Admin/Modals/AddModal.jsx";
+// import DeleteModal from "../../../../components/layout/Admin/Modals/DeleteModal.jsx";
+// import UpdateModal from "../../../../components/layout/Admin/Modals/UpdateModal.jsx";
+// import AddButton from "../../../../components/layout/Admin/Buttons/AddButton.jsx";
+// import UpdateButton from "../../../../components/layout/Admin/Buttons/UpdateButton.jsx";
+// import DeleteButton from "../../../../components/layout/Admin/Buttons/DeleteButton.jsx";
+// import SuccessAlert from "../../../../components/layout/Admin/SuccessAlert/SuccessAlert.jsx";
 
-const HNBuildingManager = () => {
+const HCMBuildingManager = () => {
   const location = useLocation();
 
   const [buildings, setBuildings] = useState([
     {
       id: "Bui1",
-      name: "Trần Duy Hưng",
-      location: "Hà Nội",
+      name: "Phan Văn Trị",
+      location: "Hồ Chí Minh",
       description: "Downtown",
       rating: 4,
-      address: "100 Trần Duy Hưng Hà Nội",
+      address: "200 Man Thiện Hồ Chí Minh",
       status: "Active",
       managerId: "MN01",
       images: [],
     },
     {
       id: "Bui2",
-      name: "Kim Mã",
-      location: "Hà Nội",
+      name: "CNC D1",
+      location: "Hồ Chí Minh",
       description: "workspaces",
       rating: 5,
-      address: "300 Kim Mã Hà Nội",
+      address: "D1 Khu CNC Hồ Chí Minh",
       status: "Active",
       managerId: "MN02",
       images: [],
@@ -52,11 +52,11 @@ const HNBuildingManager = () => {
       label: "Rating",
       type: "select",
       options: [
-        { label: "1", value: 1 },
-        { label: "2", value: 2 },
-        { label: "3", value: 3 },
-        { label: "4", value: 4 },
-        { label: "5", value: 5 },
+        { label: "1", number: 1 },
+        { label: "2", number: 2 },
+        { label: "3", number: 3 },
+        { label: "4", number: 4 },
+        { label: "5", number: 5 },
       ],
       className: "select select-bordered w-full max-w-xs",
     },
@@ -84,11 +84,11 @@ const HNBuildingManager = () => {
       label: "Rating",
       type: "select",
       options: [
-        { label: "1", value: 1 },
-        { label: "2", value: 2 },
-        { label: "3", value: 3 },
-        { label: "4", value: 4 },
-        { label: "5", value: 5 },
+        { label: "1", number: 1 },
+        { label: "2", number: 2 },
+        { label: "3", number: 3 },
+        { label: "4", number: 4 },
+        { label: "5", number: 5 },
       ],
       className: "select select-bordered w-full max-w-xs",
     },
@@ -131,7 +131,7 @@ const HNBuildingManager = () => {
   const [successMessage, setSuccessMessage] = useState("");
 
   const handleInputChange = (e) => {
-    const { name, type, value, checked } = e.target;
+    const { name, type, number, value, checked } = e.target;
     setCurrentBuilding((prev) => ({ ...prev, [name]: value }));
     const inputValue = type === "checkbox" ? checked : value;
   };
@@ -224,23 +224,23 @@ const HNBuildingManager = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-4xl font-black mb-4">Ha Noi Building List</h1>
+      <h1 className="text-4xl font-black mb-4">Building List</h1>
 
       <div className="grid grid-cols-2">
-        <SearchBar
+        {/* <SearchBar
           searchTerm={searchTerm}
           handleSearchChange={handleSearchChange}
           placeholder="Search building"
-        />
+        /> */}
 
         {/* Add Button */}
-        <div className="ml-2">
+        {/* <div className="ml-2">
           <AddButton onClick={setShowAddModal} label="Add Building" />
-        </div>
+        </div> */}
       </div>
 
       <div>
-        <SuccessAlert message={successMessage} onClose={closeSuccessMessage} />
+        {/* <SuccessAlert message={successMessage} onClose={closeSuccessMessage} /> */}
       </div>
 
       <div className="overflow-x-auto flex flex-1">
@@ -273,7 +273,7 @@ const HNBuildingManager = () => {
                   <td>{building.status}</td>
                   <td>{building.managerId}</td>
                   <td className="flex space-x-2">
-                    <UpdateButton
+                    {/* <UpdateButton
                       onClick={() => {
                         setCurrentBuilding({ ...building, oldId: building.id });
                         setShowUpdateModal(true);
@@ -281,12 +281,12 @@ const HNBuildingManager = () => {
                     />
 
                     {/* Delete Button */}
-                    <DeleteButton
+                    {/* <DeleteButton
                       onClick={() => {
                         setBuildingToDelete(building);
                         setShowDeleteModal(true);
                       }}
-                    />
+                    /> */}
                   </td>
                 </tr>
               ))
@@ -301,16 +301,16 @@ const HNBuildingManager = () => {
         </table>
       </div>
 
-      <AddModal
+      {/* <AddModal
         show={showAddModal}
         onClose={() => setShowAddModal(false)}
         onSubmit={handleAddBuilding}
         currentItem={currentBuilding}
         onInputChange={handleInputChange}
         fields={addBuildingFields}
-      />
+      /> */}
 
-      <UpdateModal
+      {/* <UpdateModal
         show={showUpdateModal}
         onClose={() => setShowUpdateModal(false)}
         onSubmit={handleUpdateBuilding}
@@ -325,9 +325,9 @@ const HNBuildingManager = () => {
         onDelete={handleDeleteBuilding}
         itemToDelete={buildingToDelete}
         itemType="building"
-      />
+      /> */}
     </div>
   );
 };
 
-export default HNBuildingManager;
+export default HCMBuildingManager;

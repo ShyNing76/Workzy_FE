@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+
+import { getAmenity } from "../../../config/api.admin.js";
+import { getAmenityById } from "../../../config/api.admin.js";
 
 import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
 import AddModal from "../../../components/layout/Admin/Modals/AddModal.jsx";
@@ -15,7 +18,9 @@ import { useLocation } from "react-router-dom";
 const AmenitiesManagerPage = () => {
   const location = useLocation();
 
-  const [amenities, setAmenities] = useState(null);
+  const [amenity, setAmenity] = useState(null);
+  const [loading, setLoading] = useState(true); // State loading
+  const [error, setError] = useState(null); // State lỗi
   //const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -25,17 +30,48 @@ const AmenitiesManagerPage = () => {
   const [amenityToDelete, setAmenityToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [newAmenity, setNewAmenity] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    gender: '',
-    date_of_birth: '',
+    amenity_name: '',
+    image: null,
+    original_price: 0,
+    depreciation_price: '',
+    rent_price: '',
   });
 
   const [responseData, setResponseData] = useState(null);
 
   //Hiện data lên table
+  const fetchAmenity = async () => {
+    try {
+      const res = await getAmenity();
+      console.log("API response:", res); // Inspect API response
+      if (res && res.data && Array.isArray(res.data.rows)) {
+        setAmenity(res.data.rows);
+      } else {
+        setAmenity([]); // Initialize as an empty array if data is not as expected
+      }
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
+    fetchAmenity();
+  }, []);
+
+  //Hàm click lên hàng để hiện more details
+  const handleRowClick = async (amenity_id) => {
+    try {
+      const res = await getAmenityById(amenity_id);
+      if (res && res.data) {
+        setSelectedAmenityDetails(res.data);
+        setShowDetailsModal(true);
+      }
+    } catch (err) {
+      console.error("Error fetching amenity details", err);
+    }
+  };
   const addAmenityFields = [
     { name: "name", label: "Amenity Name", type: "text" },
     { name: "images", label: "Images", type: "file", multiple: true },
@@ -159,9 +195,9 @@ const AmenitiesManagerPage = () => {
 
       <div className="grid grid-cols-2">
         <SearchBar
-          searchTerm={searchTerm}
-          handleSearchChange={handleSearchChange}
-          placeholder="Search by ID, name, or status"
+          // searchTerm={searchTerm}
+          // handleSearchChange={handleSearchChange}
+          // placeholder="Search by ID, name, or status"
         />
 
         {/* Add Button */}
@@ -179,62 +215,44 @@ const AmenitiesManagerPage = () => {
         <table className="table w-full">
           <thead>
             <tr>
-              <th>Amenity ID</th>
               <th>Amenity Name</th>
-              <th>Images</th>
               <th>Original Price</th>
               <th>Depreciation Price</th>
               <th>Rent Price</th>
-              <th>Type</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {/* {filteredAmenities.length > 0 ? (
-              filteredAmenities.map((amenity) => ( */}
-                <tr
-                  key={amenity.id}
-                  onClick={() => handleRowClick(amenity)}
-                  className="cursor-pointer"
-                >
-                  <td>{amenity.id}</td>
-                  <td>{amenity.name}</td>
-                  <td>{amenity.images.join(", ")}</td>
-                  <td>{amenity.originalPrice}</td>
-                  <td>{amenity.depreciationPrice}</td>
-                  <td>{amenity.rentPrice}</td>
-                  <td>{amenity.type}</td>
+            {Array.isArray(amenity) && amenity.map((amenity) => (
+                <tr key={amenity.amenity_id}>
+                  <td>{amenity.amenity_name}</td>
+                  <td>{amenity.original_price}</td>
+                  <td>{amenity.depreciation_price}</td>
+                  <td>{amenity.rent_price}</td>
                   <td>{amenity.status}</td>
                   <td className="flex"></td>
                   <td className="flex space-x-2">
                     {/* Update Button */}
-                    <UpdateButton
+                    {/* <UpdateButton
                       onClick={(e) => {
                         e.stopPropagation(); // Prevent row click from being triggered
                         setCurrentAmenity({ ...amenity, oldId: amenity.id });
                         setShowUpdateModal(true);
                       }}
-                    />
+                    /> */}
                     
                     {/* Delete Button */}
-                    <DeleteButton
+                    {/* <DeleteButton
                       onClick={(e) => {
                         e.stopPropagation(); // Prevent row click from being triggered
                         setAmenityToDelete(amenity);
                         setShowDeleteModal(true);
                       }}
-                    />
+                    /> */}
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="9" className="text-center">
-                  No Amenities Found
-                </td>
-              </tr>
-            )}
+              ))}
           </tbody>
         </table>
       </div>

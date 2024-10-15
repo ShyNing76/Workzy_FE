@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import axios from 'axios';
 
 import { getWorkspaceType } from "../../../config/api.admin.js";
 import { getWorkspaceTypeById } from "../../../config/api.admin.js";
 import { postWorkspaceType } from "../../../config/api.admin.js";
 import { putWorkspaceType } from "../../../config/api.admin.js";
+import { deleteWorkspaceType } from "../../../config/api.admin.js";
 
 import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
 import AddModal from "../../../components/layout/Admin/Modals/AddModal.jsx";
@@ -35,7 +35,7 @@ const WorkspacesTypesManagerPage = () => {
       workspace_type_name: '',
       image: null,
       description: '',
-      status: '',
+      status: 'active',
     });
 
     const [responseData, setResponseData] = useState (null);
@@ -74,6 +74,22 @@ const WorkspacesTypesManagerPage = () => {
       }
     };
 
+    const checkIfNameExists = async (name) => {
+      try {
+        const res = await getWorkspaceType();
+        const existingTypes = res.data.rows || [];
+        
+        // Kiểm tra tên đã tồn tại không (không bao gồm tên hiện tại)
+        return existingTypes.some(type => 
+          type.workspace_type_name.toLowerCase() === name.toLowerCase() &&
+          type.workspace_type_id !== newWorkspaceType.workspace_type_id // loại trừ tên hiện tại
+        );
+      } catch (err) {
+        console.error("Error checking for existing workspace type names:", err);
+        return false; // Giả sử không tồn tại nếu có lỗi
+      }
+    };
+
     //Khu vực hàm dành cho add
     
      const handleAddWorkspaceType = async (e) => {
@@ -83,7 +99,7 @@ const WorkspacesTypesManagerPage = () => {
         formData.append('workspace_type_name', newWorkspaceType.name);
         formData.append('image', newWorkspaceType.image);
         formData.append('description', newWorkspaceType.description);
-        formData.append('status', newWorkspaceType.status); // Default to 'active' if not provided)
+        formData.append('status', newWorkspaceType.status);
     
        try {
          const WorkspaceType = await postWorkspaceType(newWorkspaceType);
@@ -121,22 +137,36 @@ const WorkspacesTypesManagerPage = () => {
 
   const handleUpdateWorkspaceType = async (e) => {
     e.preventDefault();
+
+    // Kiểm tra xem tên có tồn tại không
+    const nameExists = await checkIfNameExists(newWorkspaceType.workspace_type_name);
+    
+    if (nameExists) {
+      setError("Workspace type name already exists."); // Hiện thông báo lỗi
+      return;
+    }
+  
     try {
       const updatedWorkspaceType = {
         ...newWorkspaceType,
-        status: newWorkspaceType.status, // Ensure this is either "active" or "inactive"
+        status: newWorkspaceType.status === "active" ? "active" : "inactive", // Đảm bảo trạng thái chính xác
       };
+  
+      console.log('Updated Workspace Type:', updatedWorkspaceType); // Log để kiểm tra giá trị
       await putWorkspaceType(updatedWorkspaceType.workspace_type_id, updatedWorkspaceType);
-      fetchWorkspaceType();
+      fetchWorkspaceType(); // Tải lại dữ liệu
       setShowUpdateModal(false);
       setSuccessMessage('Workspace type updated successfully!');
+      setError(null); // Reset lỗi
     } catch (err) {
       console.error('Failed to update workspace type:', err);
+      setError(err.response?.data?.message || 'Update failed');
     }
   };
 
   const handleUpdateChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, type, value, checked } = e.target;
+  
     setNewWorkspaceType((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? (checked ? 'active' : 'inactive') : value,
@@ -152,31 +182,41 @@ const WorkspacesTypesManagerPage = () => {
   };
 
   const updateWorkspaceTypeFields = [
-    { label: "Name", type: "text", name: "workspace_type_name", value: newWorkspaceType.workspace_type_name },
-    { label: "Image", type: "file", name: "image", value: newWorkspaceType.image },
-    { label: "Description", type: "text", name: "description", value: newWorkspaceType.description },
+    { label: "Name", type: "text", name: "workspace_type_name", value: `${newWorkspaceType.workspace_type_name}` },
+    { label: "Image", type: "file", name: "image", value: `${newWorkspaceType.image}` },
+    { label: "Description", type: "text", name: "description", value: `${newWorkspaceType.description}` },
     { 
       label: "Status", 
       type: "checkbox", 
       name: "status", 
-      checked: newWorkspaceType.status === "active", 
+      checked: `${newWorkspaceType.status}` === "active", 
       onChange: handleUpdateChange,
-      checkboxLabels: { checked: "Active", unchecked: "Inactive" }
+      checkboxLabels: { checked: "active", unchecked: "inactive" }
     },
 
   ];
 
 //Khu vực hàm dành cho delete
   const handleDeleteWorkspaceType = async (e) => {
-    e.preventDefault();
+    if (!workspaceTypeToDelete) return;
+
     try {
-      const updatedWorkspaceType = { ...newWorkspaceType, status: newWorkspaceType.status ? "active" : "inactive" };
-      await putWorkspaceType(updatedWorkspaceType.workspace_type_id, updatedWorkspaceType);
-      fetchWorkspaceType();
-      setShowUpdateModal(false);
-      setSuccessMessage('Workspace type updated successfully!');
+      // Call the deleteWorkspaceType API to set the status to inactive
+      await deleteWorkspaceType(workspaceTypeToDelete.workspace_type_id);
+  
+      // Update the local state to reflect the change
+      setWorkspaceType(
+        workspaceType.map((type) => 
+          type.workspace_type_id === workspaceTypeToDelete.workspace_type_id
+            ? { ...type, status: "inactive" }
+            : type
+        )
+      );
+  
+      setShowDeleteModal(false);
+      setSuccessMessage('Workspace type status set to inactive successfully!');
     } catch (err) {
-      console.error('Failed to update workspace type:', err);
+      console.error('Failed to set workspace type status to inactive:', err);
     }
   }
 
@@ -224,8 +264,8 @@ const WorkspacesTypesManagerPage = () => {
         <table className="table w-full">
           <thead>
             <tr>
-              <th>Workspace Type ID</th>
               <th>Workspace Type Name</th>
+              <th>Description</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -233,8 +273,8 @@ const WorkspacesTypesManagerPage = () => {
           <tbody>
             {Array.isArray(workspaceType) && workspaceType.map((workspaceType) => (
               <tr key={workspaceType.workspace_type_id} className="cursor-pointer" onClick={() => handleRowClick(workspaceType.workspace_type_id)}>
-                <td>{workspaceType.workspace_type_id}</td>
                 <td>{workspaceType.workspace_type_name}</td>
+                <td>{workspaceType.description}</td>
                 <td>{workspaceType.status}</td>
                 <td className="flex space-x-2">
                   {/* Update Button */}

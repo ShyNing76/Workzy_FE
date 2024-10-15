@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { getStaff } from "../../../config/api.admin.js";
-
+import { getStaff, getStaffById } from "../../../config/api.admin.js";
 import { postStaff } from "../../../config/api.admin.js";
+import { putStaff } from "../../../config/api.admin.js";
+import { deleteStaff } from "../../../config/api.admin.js";
 
 import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
 import AddModal from "../../../components/layout/Admin/Modals/AddModal.jsx";
@@ -29,13 +30,24 @@ const StaffsManagerPage = () => {
   const [staffToDelete, setStaffToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [newStaff, setNewStaff] = useState({
-    name: '',
     email: '',
     password: '',
-    date_of_birth: '',
     phone: '',
+    name: '',
+    status: '',
   });
   const [response, setResponseData] = useState(null);
+  const [selectedStaffDetails, setSelectedStaffDetails] = useState(null);
+
+  //hàm chuyển đổi định dạng ngày
+  const formatDateToISO = (dateString) => {
+    if (!dateString || !dateString.includes('/')) {
+      return ''; // hoặc giá trị mặc định khác tùy trường hợp
+    }
+    const [day = '01', month = '01', year = '1970'] = dateString.split('/');
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  };
+  
 
   // const [successModal, setSuccessModal] = useState({
   //   show: false,
@@ -46,8 +58,8 @@ const StaffsManagerPage = () => {
   const fetchStaff = async () => {
     try {
       const res = await getStaff();
-      if(res && res.data){
-        setStaff(res.data);
+      if(res && res.data && Array.isArray(res.data.rows)){
+        setStaff(res.data.rows);
       } else {
         setStaff([]);
       }
@@ -62,43 +74,106 @@ const StaffsManagerPage = () => {
     fetchStaff();
   }, []);
 
+  //Hiện detail khi click vô 1 hàng
+  
+  const handleRowClick = async (user_id) => {
+    try {
+      const res = await getStaffById(user_id);
+      if(res && res.data){
+        setSelectedStaffDetails(res.data);
+        setShowDetailsModal(true);
+      }
+    }catch (err){
+      console.error("Error fetching staff type details: ", err);
+    }
+  }
+
   //Khu vực hàm dành cho add
    const handleAddStaff = async (e) => {
-     e.preventDefault();
-     const formData = new FormData();
-
-     formData.append('name', newStaff.name);
-     formData.append('email', newStaff.email);
-     formData.append('password', newStaff.password);
-     formData.append('date_of_birth', newStaff.date_of_birth);
-     formData.append('phone', newStaff.phone);
-
-     try {
-       const Staff = await postStaff(newStaff);
-       setResponseData(Staff);
-
-       fetchStaff();
-       setShowAddModal(false);
-       setSuccessMessage("Staff Added Successfully!");
-       setNewStaff({name: '', email: '', password: '', date_of_birth: '', phone: ''});
-     } catch(err){
-      console.error("Error adding Staff: ", err);
-     }
-     }
-
+    e.preventDefault();
+    try {
+      // Ensure we send only the necessary fields
+      const { email, password, phone, name } = newStaff;
+      const staffResponse = await postStaff({ email, password, phone, name });
+      setSuccessMessage(`Staff member ${staffResponse.data.name} added successfully!`);
+      setShowAddModal(false);
+      setNewStaff({ email: '', password: '', phone: '', name: '' }); // Reset form
+      fetchStaff();  // Refresh the staff list
+    } catch (err) {
+      console.error('Failed to add new staff member:', err);
+      setError(err.response?.data?.message || 'Failed to add new staff');
+    }
+  }
 
   const addStaffFields = [
-    { name: "fname", label: "First Name", type: "text" },
-    { name: "lname", label: "Last Name", type: "text" },
-    { name: "info", label: "Information", type: "text" },
+    { label: "Name",  type: "text", name: "name", value: `${newStaff.name}` },
+    { label: "Email", type: "text", name: "email", value: `${newStaff.email}`},
+    { label: "Password", type: "text", name: "password", value: `${newStaff.password}` },
+    { label: "Phone", type: "text", name: "phone", value: `${newStaff.phone}`}
+  ];
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewStaff({
+      ...newStaff,
+      [name]: value,
+    });
+  };
+
+  //Khu vực hàm dành cho update
+
+  const handleUpdateStaff = async (e) => {
+    e.preventDefault();
+    try{
+      await putStaff(newStaff.id, newStaff)
+      fetchStaff();
+      setShowUpdateModal(false);
+      setSuccessMessage("Staff Updated Successfully!");
+    } catch(err) {
+      console.error("Error updating Staff: ", err)
+    }
+  }
+
+  const handleUpdateChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setNewStaff((prev) => ({
+        ...prev,
+        [name]: type === 'checkbox' ? (checked ? 'active' : 'inactive') : value,
+    }));
+  }
+
+  const handleUpdateClick = (staff) => {
+    setNewStaff(staff);
+    setShowUpdateModal(true);
+  }
+
+  const genderOptions = [
+    { label: "Male", value: "male" },
+    { label: "Female", value: "female" },
+    { label: "Other", value: "other" },
   ];
 
   const updateStaffFields = [
-    { name: "id", label: "Staff ID", type: "text" },
-    { name: "fname", label: "First Name", type: "text" },
-    { name: "lname", label: "Last Name", type: "text" },
-    { name: "info", label: "Information", type: "text" },
+    { label: "Name",  type: "text", name: "name", value: `${newStaff.name}` },
+    { label: "Email", type: "text", name: "email", value: `${newStaff.email}`},
+    { label: "Password", type: "text", name: "password", value: `${newStaff.password}` },
+    { label: "Date of birth", type: "date", name: "date_of_birth", value: formatDateToISO(`${newStaff.date_of_birth}`) },
+    { label: "Phone", type: "text", name: "phone", value: `${newStaff.phone}`},
+    { label: "Gender", type: "select", name: "gender", value: `${newStaff.gender}`, options: genderOptions },
   ];
+
+  //Khu vực hàm dành cho delete
+  const handleDeleteStaff = async () => {
+    try {
+      await deleteStaff(staffToDelete.user_id);
+      setSuccessMessage(`Staff ${staffToDelete.name} set to inactive successfully!`);
+      setShowDeleteModal(false);
+      fetchStaff(); // Refresh the staff list
+    } catch (err) {
+      console.error("Error deleting staff: ", err);
+      setError(err.response?.data?.message || 'Failed to delete staff');
+    }
+  };
 
   // const handleInputChange = (e) => {
   //   const { name, value } = e.target;
@@ -198,34 +273,35 @@ const StaffsManagerPage = () => {
               <th>Email</th>
               <th>Gender</th>
               <th>Date of birth</th>
+              <th>Phone</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {Array.isArray(staff) && staff.map((staff) => (
-                <tr key={staff.user_id}>
-                  <td>{staff.id}</td>
-                  <td>
-                    {staff.lname} {staff.fname}
-                  </td>
-                  <td>{staff.info}</td>
+                <tr key={staff.user_id} className="cursor-pointer" onClick={() => handleRowClick(staff.user_id)}>
+                  <td>{staff.name}</td>
+                  <td>{staff.email}</td>
+                  <td>{staff.gender}</td>
+                  <td>{staff.date_of_birth}</td>
+                  <td>{staff.phone}</td>
+                  <td>{staff.status}</td>
                   <td>
                     {/* Update Button */}
                     <UpdateButton
-                      onClick={() => {
+                      onClick={(e) => {
                         // setCurrentStaff({ ...staff, oldId: staff.id });
-                        setShowUpdateModal(true);
+                        e.stopPropagation();
+                        handleUpdateClick(staff)
                       }}
                     />
 
                     {/* Delete Button */}
                     <DeleteButton
-                      onClick={() => {
-                        setStaffToDelete({
-                          ...staff,
-                          name: `${staff.lname} ${staff.fname}`,
-                        });
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setStaffToDelete(staff);
                         setShowDeleteModal(true);
                       }}
                     />
@@ -237,37 +313,43 @@ const StaffsManagerPage = () => {
       </div>
 
       {/* Add, Update, Delete, Success Modals */}
-      {/* <AddModal
+      <AddModal
         show={showAddModal}
         onClose={() => setShowAddModal(false)}
-        onSubmit={handleAddStaffSubmit}
-        currentItem={currentStaff}
+        onSubmit={handleAddStaff}
+        currentItem={newStaff}
         onInputChange={handleInputChange}
         fields={addStaffFields}
-      /> */}
+      />
 
-      {/* <UpdateModal
+      <UpdateModal
         show={showUpdateModal}
         onClose={() => setShowUpdateModal(false)}
-        onSubmit={handleUpdateStaffSubmit}
-        currentItem={currentStaff}
-        onInputChange={handleInputChange}
+        onSubmit={handleUpdateStaff}
+        currentItem={newStaff}
+        onInputChange={handleUpdateChange}
         fields={updateStaffFields}
-      /> */}
+      />
 
-      {/* <DeleteModal
+      <DeleteModal
         show={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onDelete={handleDeleteStaff}
         itemToDelete={staffToDelete}
         itemType="staff"
-      /> */}
+      />
 
       {/* <SuccessModal
         show={successModal.show}
         message={successModal.message}
         onClose={closeSuccessModal}
       /> */}
+
+      <DetailsModal
+      show={showDetailsModal}
+      onClose={() => setShowDetailsModal(false)}
+      details={selectedStaffDetails} 
+      />
     </div>
   );
 };

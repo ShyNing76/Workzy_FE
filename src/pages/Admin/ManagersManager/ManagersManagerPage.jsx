@@ -3,7 +3,7 @@ import { getManager } from "../../../config/api.admin.js";
 import { getManagerById } from "../../../config/api.admin.js";
 import { postManager } from "../../../config/api.admin.js";
 import { putManager } from "../../../config/api.admin.js";
-import { deleteManager } from "../../../config/api.admin.js"
+import { deleteManager } from "../../../config/api.admin.js";
 
 import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
 import AddModal from "../../../components/layout/Admin/Modals/AddModal.jsx";
@@ -37,6 +37,7 @@ const ManagersManagerPage = () => {
     password: '',
     date_of_birth: '',
     phone: '',
+    status: '',
   });
   const [responseData, setResponseData] = useState(null);
 
@@ -93,7 +94,13 @@ const handleAddManger = async (e) => {
     fetchManager();
     setShowAddModal(false);
     setSuccessMessage("Manager Added Successfully!");
-    setNewManager({ name: '', email: '', password: '', date_of_birth: '', phone: ''});
+    setNewManager({ 
+      name: '', 
+      email: '', 
+      password: '', 
+      date_of_birth: '', 
+      phone: ''
+    });
   } catch(err){
     console.error("Error adding Manager: ", err);
   }
@@ -130,10 +137,11 @@ const handleUpdateManager = async (e) => {
 }
 
 const handleUpdateChange = (e) => {
-  const { name, value } = e.target;
+  const { name, value, type, checked } = e.target;
   setNewManager((prev) => ({ 
     ...prev, 
-    [name]: value }));
+    [name]: type === 'checkbox' ? (checked ? 'active' : 'inactive') : value,
+  }));
 };
 
 
@@ -148,6 +156,14 @@ const updateManagerFields = [
   { label: "Password", type: "text", name: "password", value: newManager.password },
   { label: "Date of birth", type: "date", name: "date_of_birth", value: newManager.date_of_birth },
   { label: "Phone number:", type: "text", name: "phone", value: newManager.phone },
+  { 
+    label: "Status", 
+    type: "checkbox", 
+    name: "status", 
+    checked: `${newManager.status}` === "active", 
+    onChange: handleUpdateChange,
+    checkboxLabels: { checked: "active", unchecked: "inactive" }
+  },
 ];
 
 //Khu vực hàm dành cho delete
@@ -233,8 +249,8 @@ const handleDeleteManager = async () => {
           </thead>
           <tbody>
             {Array.isArray(manager) && manager.map((manager) => (
-                <tr key={manager.user_id} className="cursor-pointer">
-                {/*<tr key={manager.user_id} className="cursor-pointer" onClick={() => handleRowClick(manager.Manager.user_id)}>*/}
+                // <tr key={manager.user_id} className="cursor-pointer">
+                <tr key={manager.Manager.user_id} className="cursor-pointer" onClick={() => handleRowClick(manager.Manager.user_id)}>
                   <td>{manager.name}</td>
                   <td>{manager.email}</td>
                   <td>{manager.gender}</td>
