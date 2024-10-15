@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getAllStaffs } from "../../../config/apiManager";
+import { getAllStaffs, updateStaffStatus } from "../../../config/apiManager";
 
 const ManageStaff = () => {
   const [staffs, setStaffs] = useState([]);
@@ -27,24 +27,31 @@ const ManageStaff = () => {
 
   
   // Change Status "Block" or "Unblock"
-  const changeStatus = (staffId) => {
-    // Update staffs array
-    const updatedStaffs = staffs.map((staff) => {
-      if (staff.user_id === staffId) {
-        // return new object
-
-        // if status is "Block" then change to "Unblock"
-        return {
-          ...staff,
-          status: staff.status === "Block" ? "Unblock" : "Block",
-        };
+  const changeStatus = async (staffId) => {
+    console.log("staffId:", staffId)
+    try {
+      const response = await updateStaffStatus(staffId)
+      console.log("response:", response)  
+      if (response && response.data && response.err === 0) {
+        // Update staffs array
+        const updatedStaffs = staffs.map ((staffMember) => {
+          if (staffMember.user_id === staffId) {
+            return {
+              ...staffMember,
+              status: staffMember.status === "active" ? "inactive" : "active"
+            }
+            
+          }
+          return staffMember
+        })
+        setStaffs(updatedStaffs)
+        console.log("Updated staffs:", updatedStaffs)
+        console.log("response:", response)
       }
-      // else return staff
-      return staff;
-    });
-    // Update state of staffs array
-    setStaffs(updatedStaffs);
-  };
+    } catch (error) {
+      console.error("Error updating staff status:", error)
+    }
+  }
 
   return (
     <div className="manage-staff-container">
@@ -73,12 +80,12 @@ const ManageStaff = () => {
                   <button
                     onClick={() => changeStatus(staff.user_id)}
                     className={`px-4 py-2 rounded ${
-                      staff.status === "Block"
+                      staff.status === "inactive"
                         ? "bg-green-500 hover:bg-green-600"
                         : "bg-red-500 hover:bg-red-600"
                     } text-white`}
                   >
-                    {staff.status === "Block" ? "Unblock" : "Block"}
+                    {staff.status === "inactive" ? "Unblock" : "Block"}
                   </button>
                 </td>
               </tr>

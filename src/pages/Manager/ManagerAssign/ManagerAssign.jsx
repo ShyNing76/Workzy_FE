@@ -93,13 +93,15 @@ const ManagerAssign = () => {
       (staff) => staff.user_id === staffId && staff.Staff.building_id !== null // check if staff.user_id is the same as the staff id in the staff array and staff.building_id is not null this mean the staff is assigned to a building
     );
   };
-
+ 
+  // check if the building is assigned to any staff
   const isBuildingAssigned = (buildingId) => {
     return staff.some (
       (buildingAssigned) => buildingAssigned.Staff.building_id === buildingId
     )
   }
-
+  
+  
   // handle selected staff id
   const handleSelectedStaffId = (userId, buildingId) => {
     // Kiểm tra xem nhân viên đã được phân công chưa
@@ -325,6 +327,7 @@ const ManagerAssign = () => {
 
                       <button
                         onClick={() => handleUnassignStaffFromBuilding(building.building_id)}
+                        disabled = {!isBuildingAssigned(building.building_id)}
                         className="btn btn-error ml-5"
                         
                       >
