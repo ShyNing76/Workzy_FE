@@ -1,92 +1,77 @@
-import React, { useState } from "react";
-
+import React, { useEffect, useState } from "react";
+import {
+  getAllStaffs,
+  activeStaff,
+  inactiveStaff,
+} from "../../../config/apiManager";
+import Swal from "sweetalert2";
 const ManageStaff = () => {
-  const [location, setLocation] = useState("");
-  const [staffs, setStaffs] = useState([
-    {
-      id: "St01",
-      name: "Duy Long Do",
-      location: "HCM",
-      status: "Block",
-    },
-    {
-      id: "St02",
-      name: "Le Hoang Trong",
-      location: "HCM",
-      status: "Block",
-    },
-    {
-      id: "St03",
-      name: "Quang Tran",
-      location: "HN",
-      status: "Block",
-    },
-    {
-      id: "St04",
-      name: "Nguyen Van Haha",
-      location: "HCM",
-      status: "Block",
-    },
-    {
-      id: "St05",
-      name: "Nguyen Van HiHi",
-      location: "HN",
-      status: "Block",
-    },
-  ]);
-  const [filterLocation, setFilterLocation] = useState("");
-
-  // Handle filter location change
-  const handleFilterChange = (event) => {
-    setFilterLocation(event.target.value);
-  };
-
-  // Get filtered staff by location
-  const filterStaffByLocation = filterLocation
-    ? staffs.filter((staff) => staff.location === filterLocation)
-    : staffs;
+  const [staffs, setStaffs] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  useEffect(() => {
+    const fetchStaffs = async () => {
+      setIsLoading(true);
+      try {
+        const responseStaffs = await getAllStaffs();
+        if (responseStaffs && responseStaffs.data && responseStaffs.err === 0) {
+          setStaffs(responseStaffs.data.rows);
+          console.log("Staffs:", responseStaffs.data.rows);
+        }
+      } catch (error) {
+        console.error("Error fetching staffs:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    if (!isLoaded) {
+      // isLoaded là false thì fetchStaffs
+      fetchStaffs();
+      setIsLoaded(true);
+    }
+  }, [isLoaded]);
 
   // Change Status "Block" or "Unblock"
-  const changeStatus = (staffId) => {
-    // Update staffs array
-    const updatedStaffs = staffs.map((staff) => {
-      if (staff.id === staffId) {
-        // return new object
 
-        // if status is "Block" then change to "Unblock"
-        return {
-          ...staff,
-          status: staff.status === "Block" ? "Unblock" : "Block",
-        };
+  const changeStatus = async (staffId, currentStatus) => {
+    try {
+      let response;
+      if (currentStatus === "inactive") {
+        response = await activeStaff(staffId);
+        console.log("response activeStaff :", response);
+      } else {
+        response = await inactiveStaff(staffId);
+        console.log("response inactiveStaff :", response);
       }
-      // else return staff
-      return staff;
-    });
-    // Update state of staffs array
-    setStaffs(updatedStaffs);
+      if (response && response.err === 0) {
+        const updatedStatus =
+          currentStatus === "inactive" ? "active" : "inactive";
+
+        const updatedStaffs = staffs.map((staffMember) =>
+          staffMember.user_id === staffId
+            ? {
+                ...staffMember,
+                status: updatedStatus,
+              }
+            : staffMember
+        );
+        Swal.fire({
+          title: "Success",
+          text: `Staff status updated to ${updatedStatus} successfully.`,
+          icon: "success",
+        });
+        setStaffs(updatedStaffs);
+        setIsLoaded(false);
+        // set isLoaded là false để fetchStaffs lại
+      }
+    } catch (error) {
+      console.error("Error updating staff status:", error);
+    }
   };
 
   return (
     <div className="manage-staff-container">
       <h1 className="text-2xl font-bold top-10">Manage Staff</h1>
-
-      {/* Filter section */}
-      <div
-        className="manager-filter-section-container"
-        style={{ marginTop: "20px", marginBottom: "20px" }}
-      >
-        <label htmlFor="location-filter"></label>
-        <select
-          id="location-filter"
-          value={filterLocation}
-          onChange={handleFilterChange}
-          className="select select-bordered w-full max-w-xs"
-        >
-          <option value=""> Location</option>
-          <option value="HCM">HCM</option>
-          <option value="HN">HN</option>
-        </select>
-      </div>
 
       {/* Staff table */}
       <div className="overflow-x-auto">
@@ -95,29 +80,27 @@ const ManageStaff = () => {
             <tr>
               <th className="w-1/6">Staff ID</th>
               <th className="w-1/4">Staff Name</th>
-              <th className="w-1/6">Location</th>
               <th className="w-1/6">Status</th>
               <th className="w-1/4">Action</th>
             </tr>
           </thead>
 
           <tbody>
-            {filterStaffByLocation.map((staff) => (
-              <tr key={staff.id}>
-                <td className="w-1/6">{staff.id}</td>
+            {staffs.map((staff, index) => (
+              <tr key={index}>
+                <td className="w-1/6">{index + 1}</td>
                 <td className="w-1/4">{staff.name}</td>
-                <td className="w-1/6">{staff.location}</td>
                 <td className="w-1/6 font-bold">{staff.status}</td>
                 <td className="w-1/4">
                   <button
-                    onClick={() => changeStatus(staff.id)}
+                    onClick={() => changeStatus(staff.user_id, staff.status)}
                     className={`px-4 py-2 rounded ${
-                      staff.status === "Block"
+                      staff.status === "inactive"
                         ? "bg-green-500 hover:bg-green-600"
                         : "bg-red-500 hover:bg-red-600"
                     } text-white`}
                   >
-                    {staff.status === "Block" ? "Unblock" : "Block"}
+                    {staff.status === "inactive" ? "Unblock" : "Block"}
                   </button>
                 </td>
               </tr>

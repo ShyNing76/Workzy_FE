@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { getAllBuildings, getAllStaffs } from "../../../config/apiManager";
+import {
+  getAllBuildings,
+  getAllStaffs,
+  assignStaffToBuilding,
+  unassignStaffFromBuilding
+} from "../../../config/apiManager";
 
 const ManagerAssign = () => {
   // Buildings
@@ -9,45 +14,52 @@ const ManagerAssign = () => {
   // Staff
   const [staff, setStaff] = useState([]);
 
+  // Selected staff id
+  const [selectedStaffIds, setSelectedStaffIds] = useState({}); // object to store selected staff id for each building
+
   // Filter Location
   const [filterLocation, setFilterLocation] = useState("");
 
   // Search term
   const [searchTerm, setSearchTerm] = useState("");
 
-  useEffect(() => {
-    // call api to get all buildings
-    const fetchAllBuildings = async () => {
+  // Loading state
+  const [isLoading, setIsLoading] = useState(false);
+
+  
+    // call api to fetch Staff and building
+    const fetchStaffAndBuilding = async () => {
+      setIsLoading(true);
       try {
-        const response = await getAllBuildings();
-        if (response && response.data && response.err === 0) {
-          setBuildings(response.data);
-          console.log("Building:", response.data);
+        const [buildingResponse, staffResponse] = await Promise.all([
+          getAllBuildings(),
+          getAllStaffs(),
+        ]);
+        if (
+          buildingResponse &&
+          buildingResponse.data &&
+          buildingResponse.err === 0
+        ) {
+          setBuildings(buildingResponse.data);
+          console.log("Building:", buildingResponse);
+        }
+
+        if (staffResponse && staffResponse.data && staffResponse.err === 0) {
+          const activeStaff = staffResponse.data.rows.filter(
+            (staff) => staff.status === "active"
+          );
+          setStaff(activeStaff);
+          console.log("Staff:", activeStaff);
         }
       } catch (error) {
-        console.error("Error fetching buildings:", error);
+        console.error("Error fetching staff and building:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
-
-    fetchAllBuildings();
-  }, []);
-
-  useEffect(() => {
-    // call api to get all Staffs
-    const fetchAllStaffs = async () => {
-      try {
-        const response = await getAllStaffs();
-        if (response && response.data && response.err === 0) {
-          setStaff(response.data.rows);
-          console.log("Staffs:", response.data.rows);
-        }
-      } catch (error) {
-        console.error("Error fetching staffs:", error);
-      }
-    };
-
-    fetchAllStaffs();
-  }, []);
+    useEffect(() => {
+    fetchStaffAndBuilding();
+  }, []);  // call api when the component is mounted
 
   // Handle Search Change
   const handleSearchChange = (event) => {
@@ -68,37 +80,140 @@ const ManagerAssign = () => {
   const searchBuildings = searchTerm.trim()
     ? filteredBuildings.filter(
         (building) =>
-          building.building_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          building.building_name
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
           building.building_id.toString().includes(searchTerm)
       )
     : filteredBuildings;
 
-  // Assign staff to Buildings
-  const handleAssignStaff = (buildingId) => {
-    const updatedBuildings = buildings.map((building) => {
-      if (building.building_id === buildingId) {
-        return {
-          ...building,
-          staffAssigned: building.staffAssigned,
-          staffName: building.staffName,
-        };
-      }
-      return building;
-    });
-    setBuildings(updatedBuildings);
-    Swal.fire({
-      position: "center",
-      icon: "success",
-      title: "Assign staff successfully!",
-      showConfirmButton: false,
-      timer: 1500,
-    });
+    // check if staff is assigned to any building
+  const isStaffAssigned = (staffId) => {
+    return staff.some(
+      (staff) => staff.user_id === staffId && staff.Staff.building_id !== null // check if staff.user_id is the same as the staff id in the staff array and staff.building_id is not null this mean the staff is assigned to a building
+    );
+  };
+ 
+  // check if the building is assigned to any staff
+  const isBuildingAssigned = (buildingId) => {
+    return staff.some (
+      (buildingAssigned) => buildingAssigned.Staff.building_id === buildingId
+    )
+  }
+  
+  
+  // handle selected staff id
+  const handleSelectedStaffId = (userId, buildingId) => {
+    // Kiểm tra xem nhân viên đã được phân công chưa
+    if (isStaffAssigned(userId)) {
+      Swal.fire({
+        title: "Warning",
+        text: "This staff member is already assigned to another building.",
+        icon: "warning",
+      });
+    } else {
+      setSelectedStaffIds((prevSelectedStaffIds) => ({
+        ...prevSelectedStaffIds,
+        [buildingId]: userId,
+      }));
+    }
   };
 
-  // Check if staff is assigned to any building
-  const isStaffAssigned = (staffId) => {
-    return buildings.some((building) => building.staffAssigned === staffId);
+  // handle assign staff to building
+  const handleAssignStaffToBuilding = async (buildingId) => {
+    const newStaffId = selectedStaffIds[buildingId];
+    if (!newStaffId) return;
+  
+    try {
+      // Kiểm tra xem tòa nhà đã có nhân viên được gán chưa
+      const currentAssignedStaff = staff.find((staffMember) => staffMember.Staff.building_id === buildingId);
+      
+      if (currentAssignedStaff) {
+        // Nếu đã có nhân viên được gán, hiển thị xác nhận trước khi cập nhật
+        const result = await Swal.fire({
+          title: 'Confirm update',
+          text: 'This building already has a staff assigned. Do you want to update the staff?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, update',
+          cancelButtonText: 'Cancel'
+        });
+  
+        if (!result.isConfirmed) {
+          return; // Người dùng không muốn cập nhật, thoát khỏi hàm
+        }
+      }
+  
+      const response = await assignStaffToBuilding(newStaffId, buildingId);
+      if (response && response.err === 0) {
+        Swal.fire({
+          title: "Success",
+          text: currentAssignedStaff 
+            ? "Updated the new staff to the building." 
+            : "Assigned the staff to the building.",
+          icon: "success",
+        });
+        await fetchStaffAndBuilding();
+      } else {
+        throw new Error(response.message || "Có lỗi xảy ra khi gán/cập nhật nhân viên");
+      }
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: error.message || "An error occurred while assigning/updating the staff to the building",
+        icon: "error",
+      });
+      console.error("Error assigning/updating the staff to the building:", error);
+    }
   };
+  
+  // handle unassign staff from building
+  const handleUnassignStaffFromBuilding = async (buildingId) => { 
+    try {
+      // Tìm nhân viên được gán cho tòa nhà này
+      const assignedStaff = staff.find((staffMember) => staffMember.Staff.building_id === buildingId);
+      // nếu không có nhân viên nào được gán cho tòa nhà này thì hiển thị thông báo
+      if (!assignedStaff) {
+        Swal.fire({
+          title: "Notification",
+          text: "No staff is assigned to this building.",
+          icon: "info",
+        });
+        return;
+      }
+      // hiển thị thông báo xác nhận hủy gán nhân viên
+      const result = await Swal.fire({ 
+        title: 'Confirm unassign',
+        text: `Are you sure you want to unassign the staff ${assignedStaff.name} from this building?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, unassign',
+        cancelButtonText: 'Cancel'
+      });
+  
+      if (result.isConfirmed) {
+        const response = await unassignStaffFromBuilding(assignedStaff.user_id);
+        if (response && response.err === 0) {
+          Swal.fire({
+            title: "Success",
+            text: "Unassigned the staff from the building successfully",
+            icon: "success",
+          });
+          await fetchStaffAndBuilding();
+        } else {
+          throw new Error(response.message || "Error unassigning the staff from the building");
+        }
+      }
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: error.message || "An error occurred while unassigning the staff from the building",
+        icon: "error",
+      });
+      console.error("Error unassigning the staff from the building:", error);
+    }
+  }
+  
 
   return (
     <div className="assign-staff-container">
@@ -106,7 +221,10 @@ const ManagerAssign = () => {
 
       <div className="flex justify-between items-center">
         {/* Filter section */}
-        <div className="manager-filter-section-container flex-1 w-64" style={{ marginTop: "20px", marginBottom: "20px" }}>
+        <div
+          className="manager-filter-section-container flex-1 w-64"
+          style={{ marginTop: "20px", marginBottom: "20px" }}
+        >
           <select
             id="location-filter"
             value={filterLocation}
@@ -150,6 +268,7 @@ const ManagerAssign = () => {
         <table className="table">
           <thead>
             <tr>
+              <th>Index</th>
               <th>Building Name</th>
               <th>Location</th>
               <th>Staff Assigned</th>
@@ -157,64 +276,76 @@ const ManagerAssign = () => {
             </tr>
           </thead>
           <tbody>
-            {searchBuildings.map((building) => (
-              <tr key={building.building_id}>
-                <td>{building.building_name}</td>
-                <td>{building.location}</td>
-                <td>
-                  <select
-                    value={building.staffAssigned || ""}
-                    onChange={(e) => {
-                      const selectedStaffId = e.target.value;
-                      const selectedStaffName =
-                        staff.find((staff) => staff.id === selectedStaffId)?.name || "";
+            {!isLoading ? (
+              searchBuildings.map((building, index) => {
+                const isAssigned = isStaffAssigned(building.building_id); // check if the building is assigned to any staff
+                return (
+                  <tr key={building.building_id}>
+                    <td>{index + 1}</td>
+                    <td>{building.building_name}</td>
+                    <td>{building.location}</td>
+                    <td>
+                      <select
+                        className="select select-bordered w-full max-w-xs"
+                        value={selectedStaffIds[building.building_id] || staff.find(
+                          staffMember => staffMember.Staff.building_id === building.building_id
+                        )?.user_id || ""}
+                        onChange={(e) =>
+                          
+                          handleSelectedStaffId(
+                            e.target.value,
+                            building.building_id
+                          )
+                          
+                        }
+                      >
+                        <option value="">Select Staff</option>
+                        {staff.map((staffMember) => (
+                          
+                          <option
+                            key={staffMember.user_id}
+                            value={staffMember.user_id}
+                    
+                          >
+                            {staffMember.name}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td>
+                      <button
+                        onClick={() =>
+                          handleAssignStaffToBuilding(building.building_id)
+                        }
+                        disabled={
+                          !selectedStaffIds[building.building_id] || isAssigned
+                        }
+                        className="btn"
+                      >
+                        {isBuildingAssigned(building.building_id) ? "Update" : "Assign"}
+                      </button>
 
-                      if (isStaffAssigned(selectedStaffId)) {
-                        Swal.fire({
-                          icon: "error",
-                          title: "Oops...",
-                          text: "Staff is already assigned to another building!",
-                        });
-                        return;
-                      }
-
-                      setBuildings((currentBuildings) =>
-                        currentBuildings.map((currentBuilding) =>
-                          currentBuilding.building_id === building.building_id
-                            ? {
-                                ...currentBuilding,
-                                staffAssigned: selectedStaffId,
-                                staffName: selectedStaffName,
-                              }
-                            : currentBuilding
-                        )
-                      );
-                    }}
-                    className="select select-bordered w-full max-w-xs"
-                  >
-                    <option disabled value="">
-                      Select Staff
-                    </option>
-                    {staff
-                      .filter((staffMember) => staffMember.location === building.location)
-                      .map((filteredStaffMember) => (
-                        <option key={filteredStaffMember.id} value={filteredStaffMember.id}>
-                          {filteredStaffMember.name}
-                        </option>
-                      ))}
-                  </select>
-                </td>
-                <td>
-                  <button
-                    onClick={() => handleAssignStaff(building.building_id)}
-                    disabled={!building.staffAssigned}
-                    className="btn"
-                  >
-                    Assign
-                  </button>
+                      <button
+                        onClick={() => handleUnassignStaffFromBuilding(building.building_id)}
+                        disabled = {!isBuildingAssigned(building.building_id)}
+                        className="btn btn-error ml-5"
+                        
+                      >
+                        Unassign
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan="4">
+                  <div className="flex justify-center items-center h-64">
+                    <span className="loading loading-spinner loading-lg"></span>
+                  </div>
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
