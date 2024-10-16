@@ -30,10 +30,8 @@ import AdminDashboardPage from "../pages/Admin/AdminDashboard/AdminDashboardPage
 import ManagersManagerPage from "../pages/Admin/ManagersManager/ManagersManagerPage.jsx";
 import StaffsManagerPage from "../pages/Admin/StaffsManager/StaffsManagerPage.jsx";
 import CustomersManagerPage from "../pages/Admin/CustomersManager/CustomersManagerPage.jsx";
-import HCMBuildingsManagerPage from "../pages/Admin/BuildingsManager/HoChiMinh/HCMBuildingManagerPage.jsx";
-import HNBuildingsManagerPage from "../pages/Admin/BuildingsManager/HaNoi/HNBuildingManagerPage.jsx";
-import HCMWorkspacesManagerPage from "../pages/Admin/WorkspacesManager/HoChiMinh/HCMWorkspacesManagerPage.jsx";
-import HNWorkspacesManagerPage from "../pages/Admin/WorkspacesManager/HaNoi/HNWorkspacesManagerPage.jsx";
+import BuildingsManagerPage from "../pages/Admin/BuildingsManager/BuildingManagerPage";
+import WorkspacesManagerPage from "../pages/Admin/WorkspacesManager/WorkspacesManagerPage";
 import AmenitiesManagerPage from "../pages/Admin/AmenitiesManager/AmenitiesManagerPage.jsx";
 import WorkspacesTypesManagerPage from "../pages/Admin/WorkspaceTypesManager/WorkspaceTypesManager.jsx";
 import PaymentsManagerPage from "../pages/Admin/PaymentsManager/PaymentsManagerPage.jsx";
@@ -213,20 +211,12 @@ export const router = createBrowserRouter([
         element: <CustomersManagerPage />,
       },
       {
-        path: "hcmbuildingmanager",
-        element: <HCMBuildingsManagerPage />,
+        path: "buildingmanager",
+        element: <BuildingsManagerPage />,
       },
       {
-        path: "hnbuildingmanager",
-        element: <HNBuildingsManagerPage />,
-      },
-      {
-        path: "hcmworkspacesmanager",
-        element: <HCMWorkspacesManagerPage />,
-      },
-      {
-        path: "hnworkspacesmanager",
-        element: <HNWorkspacesManagerPage />,
+        path: "workspacesmanager",
+        element: <WorkspacesManagerPage />,
       },
       {
         path: "amenitiesmanager",

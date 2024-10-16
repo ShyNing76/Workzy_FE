@@ -70,43 +70,18 @@ const AdminSidebar = () => {
 
                 <h2 className="font-semibold ml-2 mb-2 mt-2 text-gray-500">WORKZY Branches</h2>
 
-                <li className="mb-1">
-                    <details open>
-                        <summary><IoLocationOutline className="text-2xl"/> &nbsp; Ho Chi Minh</summary>
-                            <ul>
-                                <li className="mb-1">
-                                    <Link to="/admin/hcmbuildingmanager" className= {`tab ${location.pathname === '/admin/hcmbuildingmanager' ? 'active' : ''}`}>
-                                        <div className="flex flex-1 items-center mb-2"><PiBuildingsLight className="text-2xl"/><p className="ml-4">Building List</p></div>
-                                    </Link>
-                                </li>
 
-                                <li className="mb-1">
-                                    <Link to="/admin/hcmworkspacesmanager" className= {`tab ${location.pathname === '/admin/hcmbuildingmanager' ? 'active' : ''}`}>
-                                        <div className="flex flex-1 items-center mb-2"><RxDashboard className="text-2xl"/><p className="ml-4">Workspace List</p></div>
-                                    </Link>
-                                </li>
-                            </ul> 
-                    </details>
-                </li>
+            <li className="mb-1">
+                <Link to="/admin/buildingmanager" className= {`tab ${location.pathname === '/admin/buildingmanager' ? 'active' : ''}`}>
+                    <div className="flex flex-1 items-center mb-2"><PiBuildingsLight className="text-2xl"/><p className="ml-4">Building List</p></div>
+                </Link>
+            </li>
 
-                <li className="mb-1">
-                    <details open>
-                        <summary><IoLocationOutline className="text-2xl"/> &nbsp;Ha Noi</summary>
-                            <ul>
-                                <li className="mb-1">
-                                    <Link to="/admin/hnbuildingmanager" className= {`tab ${location.pathname === '/admin/hnbuildingmanager' ? 'active' : ''}`}>
-                                        <div className="flex flex-1 items-center mb-2"><PiBuildingsLight className="text-2xl"/><p className="ml-4">Building List</p></div>
-                                    </Link>
-                                </li>
-
-                                <li className="mb-1">
-                                    <Link to="/admin/hnworkspacesmanager" className= {`tab ${location.pathname === '/admin/hnbuildingmanager' ? 'active' : ''}`}>
-                                        <div className="flex flex-1 items-center mb-2"><RxDashboard className="text-2xl"/><p className="ml-4">Workspace List</p></div>
-                                    </Link>
-                                </li>
-                            </ul>
-                    </details>
-                </li>
+            <li className="mb-1">
+                <Link to="/admin/workspacesmanager" className= {`tab ${location.pathname === '/admin/workspacesmanager' ? 'active' : ''}`}>
+                    <div className="flex flex-1 items-center mb-2"><RxDashboard className="text-2xl"/><p className="ml-4">Workspace List</p></div>
+                </Link>
+            </li>
 
                 <h2 className="font-semibold ml-2 mb-2 mt-2 text-gray-500">WORKZY Bookings</h2>
 

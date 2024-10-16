@@ -1,5 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+
+import { getWorkspaceType } from "../../../config/api.admin.js";
+import { getWorkspaceTypeById } from "../../../config/api.admin.js";
+import { postWorkspaceType } from "../../../config/api.admin.js";
+import { putWorkspaceType } from "../../../config/api.admin.js";
+import { deleteWorkspaceType } from "../../../config/api.admin.js";
 
 import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
 import AddModal from "../../../components/layout/Admin/Modals/AddModal.jsx";
@@ -9,149 +15,225 @@ import AddButton from "../../../components/layout/Admin/Buttons/AddButton.jsx";
 import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.jsx";
 import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
 import SuccessAlert from "../../../components/layout/Admin/SuccessAlert/SuccessAlert.jsx";
+import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal.jsx";
 
 const WorkspacesTypesManagerPage = () => {
   const location = useLocation();
 
-  const [workspaceType, setWorkspaceType] = useState([
-    {
-      id: "TY1",
-      name: "Type 1",
-      image: [],
-      description: "Loai 1",
-      status: "Active",
-    },
-    {
-      id: "TY2",
-      name: "Type 2",
-      image: [],
-      description: "Loai 2",
-      status: "Inactive",
-    },
-    {
-      id: "TY3",
-      name: "Type 3",
-      image: [],
-      description: "Loai 3",
-      status: "Active",
-    },
-  ]);
+    const [workspaceType, setWorkspaceType] = useState(null); // State để lưu trữ dữ liệu
+    const [loading, setLoading] = useState(true); // State loading
+    const [error, setError] = useState(null); // State lỗi
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [workspaceTypeToDelete, setWorkspaceTypeToDelete] = useState(null);
+    const [successMessage, setSuccessMessage] = useState('');
+    const [selectedWorkspaceTypeDetails, setSelectedWorkspaceTypeDetails] = useState(null);
+    
+    const [newWorkspaceType, setNewWorkspaceType] = useState({
+      workspace_type_name: '',
+      image: null,
+      description: '',
+      status: 'active',
+    });
 
-  const addWorkspaceTypeFields = [
-    { label: "Name", name: "name", type: "text" },
-    { label: "Image", name: "image", type: "file" },
-    { label: "Description", name: "description", type: "text" },
-  ];
+    const [responseData, setResponseData] = useState (null);
+
+    //Hiện data lên table
+    const fetchWorkspaceType = async () => {
+      try {
+        const res = await getWorkspaceType();
+        console.log("API response:", res); // Inspect API response
+        if (res && res.data && Array.isArray(res.data.rows)) {
+          setWorkspaceType(res.data.rows);
+        } else {
+          setWorkspaceType([]); // Initialize as an empty array if data is not as expected
+        }
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    useEffect(() => {
+      fetchWorkspaceType();
+    }, []);
+    
+    //Hàm click lên hàng để hiện more details
+    const handleRowClick = async (workspace_type_id) => {
+      try {
+        const res = await getWorkspaceTypeById(workspace_type_id);
+        if (res && res.data) {
+          setSelectedWorkspaceTypeDetails(res.data);
+          setShowDetailsModal(true);
+        }
+      } catch (err) {
+        console.error("Error fetching workspace type details", err);
+      }
+    };
+
+    const checkIfNameExists = async (name) => {
+      try {
+        const res = await getWorkspaceType();
+        const existingTypes = res.data.rows || [];
+        
+        // Kiểm tra tên đã tồn tại không (không bao gồm tên hiện tại)
+        return existingTypes.some(type => 
+          type.workspace_type_name.toLowerCase() === name.toLowerCase() &&
+          type.workspace_type_id !== newWorkspaceType.workspace_type_id // loại trừ tên hiện tại
+        );
+      } catch (err) {
+        console.error("Error checking for existing workspace type names:", err);
+        return false; // Giả sử không tồn tại nếu có lỗi
+      }
+    };
+
+    //Khu vực hàm dành cho add
+    
+     const handleAddWorkspaceType = async (e) => {
+       e.preventDefault();
+        const formData = new FormData();
+      
+        formData.append('workspace_type_name', newWorkspaceType.name);
+        formData.append('image', newWorkspaceType.image);
+        formData.append('description', newWorkspaceType.description);
+        formData.append('status', newWorkspaceType.status);
+    
+       try {
+         const WorkspaceType = await postWorkspaceType(newWorkspaceType);
+         setResponseData(WorkspaceType);
+        //  setWorkspaceType([...workspaceType, newWorkspaceType]); // Assuming you add the returned data to the state
+         fetchWorkspaceType(); // Re-fetch data after posting
+         setShowAddModal(false);
+         setSuccessMessage('Workspace type added successfully!');
+         setNewWorkspaceType({ name: '', image: null, description: '' });
+       } catch (err) {
+         console.error('Failed to add workspace type:', err);
+       }
+     };
+
+     const addWorkspaceTypeFields = [
+      { label: "Name", type: "text", name: "workspace_type_name", value: `${newWorkspaceType.workspace_type_name}` },
+      { label: "Image", type: "file", name: "image", value: `${newWorkspaceType.image}` },
+      { label: "Description", type: "text", name: "description", value: `${newWorkspaceType.description}`  },
+    ];
+
+     const handleInputChange = (e) => {
+      const { name, value } = e.target;
+      setNewWorkspaceType({
+        ...newWorkspaceType,
+        [name]: value,
+      });
+    };
+
+  // if (loading) 
+  //   return <p>Loading...</p>;
+  // if (error)
+  //   return <p>Something went wrong: {error.message}</p>;
+
+  //Khu vực hàm dành cho update
+
+  const handleUpdateWorkspaceType = async (e) => {
+    e.preventDefault();
+
+    // Kiểm tra xem tên có tồn tại không
+    const nameExists = await checkIfNameExists(newWorkspaceType.workspace_type_name);
+    
+    if (nameExists) {
+      setError("Workspace type name already exists."); // Hiện thông báo lỗi
+      return;
+    }
+  
+    try {
+      const updatedWorkspaceType = {
+        ...newWorkspaceType,
+        status: newWorkspaceType.status === "active" ? "active" : "inactive", // Đảm bảo trạng thái chính xác
+      };
+  
+      console.log('Updated Workspace Type:', updatedWorkspaceType); // Log để kiểm tra giá trị
+      await putWorkspaceType(updatedWorkspaceType.workspace_type_id, updatedWorkspaceType);
+      fetchWorkspaceType(); // Tải lại dữ liệu
+      setShowUpdateModal(false);
+      setSuccessMessage('Workspace type updated successfully!');
+      setError(null); // Reset lỗi
+    } catch (err) {
+      console.error('Failed to update workspace type:', err);
+      setError(err.response?.data?.message || 'Update failed');
+    }
+  };
+
+  const handleUpdateChange = (e) => {
+    const { name, type, value, checked } = e.target;
+  
+    setNewWorkspaceType((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? (checked ? 'active' : 'inactive') : value,
+    }));
+  };
+
+  const handleUpdateClick = (workspaceType) => {
+    setNewWorkspaceType({
+      ...workspaceType,
+      status: workspaceType.status === "active" ? "active" : "inactive"
+    });
+    setShowUpdateModal(true);
+  };
 
   const updateWorkspaceTypeFields = [
-    { label: "Type ID", name: "id", type: "text" },
-    { label: "Name", name: "name", type: "text" },
-    { label: "Image", name: "image", type: "file" },
-    { label: "Description", name: "description", type: "text" },
-    {
-      name: "status",
-      label: "Status",
-      type: "checkbox",
-      checkboxLabels: { checked: "Available", unchecked: "Unavailable" },
+    { label: "Name", type: "text", name: "workspace_type_name", value: `${newWorkspaceType.workspace_type_name}` },
+    { label: "Image", type: "file", name: "image", value: `${newWorkspaceType.image}` },
+    { label: "Description", type: "text", name: "description", value: `${newWorkspaceType.description}` },
+    { 
+      label: "Status", 
+      type: "checkbox", 
+      name: "status", 
+      checked: `${newWorkspaceType.status}` === "active", 
+      onChange: handleUpdateChange,
+      checkboxLabels: { checked: "active", unchecked: "inactive" }
     },
+
   ];
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentWorkspaceType, setCurrentWorkspaceType] = useState({
-    id: "",
-    name: "",
-    image: [],
-    description: "",
-    status: "",
-  });
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [workspaceTypeToDelete, setWorkspaceTypeToDelete] = useState(null);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [buildingFilter, setBuildingFilter] = useState("");
+//Khu vực hàm dành cho delete
+  const handleDeleteWorkspaceType = async (e) => {
+    if (!workspaceTypeToDelete) return;
 
-  const handleInputChange = (e) => {
-    const { name, value, checked, type } = e.target;
-    setCurrentWorkspaceType((prev) => ({ ...prev, [name]: value }));
-    const inputValue = type === "checkbox" ? checked : value;
-  };
-
-  const generateWorkspaceTypeId = () => {
-    const lastId =
-      workspaceType.length > 0
-        ? workspaceType[workspaceType.length - 1].id
-        : "TY0";
-    const newId = `TY${parseInt(lastId.slice(2)) + 1}`;
-    return newId;
-  };
-
-  const handleAddWorkspaceType = (e) => {
-    e.preventDefault();
-    const newWorkspace = {
-      ...currentWorkspaceType,
-      id: generateWorkspaceTypeId(),
-      status: "Active",
-    };
-    setWorkspaceType([...workspaceType, newWorkspace]);
-    setShowAddModal(false);
-    setSuccessMessage("Workspace type added successfully!");
-    setCurrentWorkspaceType({
-      id: "",
-      name: "",
-      image: [],
-      description: "",
-      status: "",
-    });
-  };
-
-  const handleUpdateWorkspaceType = (e) => {
-    e.preventDefault();
-    setWorkspaceType((prevWorkspaceTypes) => {
-      const workspaceTypeIndex = prevWorkspaceTypes.findIndex(
-        (workspaceType) => workspaceType.id === currentWorkspaceType.oldId
+    try {
+      // Call the deleteWorkspaceType API to set the status to inactive
+      await deleteWorkspaceType(workspaceTypeToDelete.workspace_type_id);
+  
+      // Update the local state to reflect the change
+      setWorkspaceType(
+        workspaceType.map((type) => 
+          type.workspace_type_id === workspaceTypeToDelete.workspace_type_id
+            ? { ...type, status: "inactive" }
+            : type
+        )
       );
-      if (workspaceTypeIndex !== -1) {
-        const updatedWorkspaceTypes = [...prevWorkspaceTypes];
-        updatedWorkspaceTypes[workspaceTypeIndex] = { ...currentWorkspaceType };
-        return updatedWorkspaceTypes;
-      }
-    });
-    setShowUpdateModal(false);
-    setSuccessMessage("Workspace type updated successfully!");
-    setCurrentWorkspaceType({
-      id: "",
-      name: "",
-      image: [],
-      description: "",
-      status: "",
-    });
-  };
+  
+      setShowDeleteModal(false);
+      setSuccessMessage('Workspace type status set to inactive successfully!');
+    } catch (err) {
+      console.error('Failed to set workspace type status to inactive:', err);
+    }
+  }
 
-  const handleDeleteWorkspaceType = () => {
-    setWorkspaceType((prevWorkspaceTypes) =>
-      prevWorkspaceTypes.filter(
-        (workspaceType) => workspaceType.id !== workspaceTypeToDelete.id
-      )
-    );
-    setShowDeleteModal(false);
-    setSuccessMessage("Workspace type deleted successfully!");
-  };
+  // const [searchTerm, setSearchTerm] = useState("");
 
-  const handleSearchChange = (e) => setSearchTerm(e.target.value);
+  // const handleSearchChange = (e) => setSearchTerm(e.target.value);
 
-  const closeSuccessMessage = () => setSuccessMessage("");
+  // const closeSuccessMessage = () => setSuccessMessage("");
 
-  const filteredWorkspaceType = workspaceType.filter((workspaceType) => {
-    return (
-      workspaceType.id.includes(searchTerm) ||
-      workspaceType.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      workspaceType.description
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      workspaceType.status.toLowerCase().includes(buildingFilter.toLowerCase())
-    );
-  });
+  // const filteredWorkspaceType = workspaceType.filter((workspaceType) => {
+  //   return (
+  //     workspaceType.id.includes(searchTerm) ||
+  //     workspaceType.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //     workspaceType.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //     workspaceType.status.toLowerCase().includes(buildingFilter.toLowerCase())
+  //   );
+  // });
 
   return (
     <div className="container mx-auto px-4 sm:px-8">
@@ -159,8 +241,8 @@ const WorkspacesTypesManagerPage = () => {
 
       <div className="grid grid-cols-2">
         <SearchBar
-          searchTerm={searchTerm}
-          handleSearchChange={handleSearchChange}
+          //searchTerm={searchTerm}
+          //handleSearchChange={handleSearchChange}
           placeholder="Search by ID, name, or status"
         />
 
@@ -168,21 +250,20 @@ const WorkspacesTypesManagerPage = () => {
         <div className="ml-2">
           <AddButton
             onClick={() => setShowAddModal(true)}
-            label="Add Service"
+            label="Add Workspace Type"
           />
         </div>
       </div>
 
-      <div>
+      {/* <div>
         <SuccessAlert message={successMessage} onClose={closeSuccessMessage} />
-      </div>
+      </div> */}
 
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="table w-full">
           <thead>
             <tr>
-              <th>Workspace Type ID</th>
               <th>Workspace Type Name</th>
               <th>Description</th>
               <th>Status</th>
@@ -190,62 +271,49 @@ const WorkspacesTypesManagerPage = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredWorkspaceType.length > 0 ? (
-              filteredWorkspaceType.map((workspaceType) => (
-                <tr key={workspaceType.id}>
-                  <td>{workspaceType.id}</td>
-                  <td>{workspaceType.name}</td>
-                  <td>{workspaceType.description}</td>
-                  <td>{workspaceType.status}</td>
-                  <td>
-                    {/* Update Button */}
-                    <UpdateButton
-                      onClick={() => {
-                        setCurrentWorkspaceType({
-                          ...workspaceType,
-                          oldId: workspaceType.id,
-                        });
-                        setShowUpdateModal(true);
-                      }}
-                    />
+            {Array.isArray(workspaceType) && workspaceType.map((workspaceType) => (
+              <tr key={workspaceType.workspace_type_id} className="cursor-pointer" onClick={() => handleRowClick(workspaceType.workspace_type_id)}>
+                <td>{workspaceType.workspace_type_name}</td>
+                <td>{workspaceType.description}</td>
+                <td>{workspaceType.status}</td>
+                <td className="flex space-x-2">
+                  {/* Update Button */}
+                  <UpdateButton onClick={(e) => {
+                    e.stopPropagation()
+                    handleUpdateClick(workspaceType)
+                  }}
+                  />
 
-                    {/* Delete Button */}
-                    <DeleteButton
-                      onClick={() => {
-                        setWorkspaceTypeToDelete(workspaceType);
-                        setShowDeleteModal(true);
-                      }}
-                    />
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="text-center">
-                  No Workspace Type Found
+                  {/* Delete Button */}
+                  <DeleteButton onClick={(e) => {
+                    e.stopPropagation();
+                    setWorkspaceTypeToDelete(workspaceType);
+                    setShowDeleteModal(true);
+                  }}
+                  />
                 </td>
-              </tr>
-            )}
+              </tr> 
+            ))}
           </tbody>
         </table>
       </div>
 
       {/* Add, Update, Delete, Success Modals */}
-      <AddModal
-        show={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onSubmit={handleAddWorkspaceType}
-        currentItem={currentWorkspaceType}
-        onInputChange={handleInputChange}
-        fields={addWorkspaceTypeFields}
-      />
+        <AddModal
+          show={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          onSubmit={handleAddWorkspaceType}
+          currentItem={newWorkspaceType}
+          onInputChange={handleInputChange}
+          fields={addWorkspaceTypeFields}
+        />
 
       <UpdateModal
         show={showUpdateModal}
         onClose={() => setShowUpdateModal(false)}
         onSubmit={handleUpdateWorkspaceType}
-        currentItem={currentWorkspaceType}
-        onInputChange={handleInputChange}
+        currentItem={newWorkspaceType}
+        onInputChange={handleUpdateChange}
         fields={updateWorkspaceTypeFields}
       />
 
@@ -255,6 +323,12 @@ const WorkspacesTypesManagerPage = () => {
         onDelete={handleDeleteWorkspaceType}
         itemToDelete={workspaceTypeToDelete}
         itemType="workspaceType"
+      />
+
+      <DetailsModal
+        show={showDetailsModal}
+        onClose={() => setShowDetailsModal(false)}
+        details={selectedWorkspaceTypeDetails}
       />
     </div>
   );

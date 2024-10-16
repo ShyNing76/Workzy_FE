@@ -13,56 +13,13 @@ import SuccessAlert from "../../../components/layout/Admin/SuccessAlert/SuccessA
 const BookingsManagerPage = () => {
   const location = useLocation();
 
-  const [bookings, setBookings] = useState([
-    {
-      id: "BK01",
-      customerID: "MB01",
-      totalAmenitiesPrice: "100000",
-      totalWorkspacePrice: "200000",
-      totalBrokenPrice: "0",
-      totalPrice: "300000",
-      startTimeDate: "",
-      endTimeDate: "",
-      workspaceID: "WS01",
-    },
-    {
-      id: "BK02",
-      customerID: "MB02",
-      totalAmenitiesPrice: "200000",
-      totalWorkspacePrice: "300000",
-      totalBrokenPrice: "400000",
-      totalPrice: "900000",
-      startTimeDate: "",
-      endTimeDate: "",
-      workspaceID: "WS02",
-    },
-    {
-      id: "BK03",
-      customerID: "V01",
-      totalAmenitiesPrice: "300000",
-      totalWorkspacePrice: "400000",
-      totalBrokenPrice: "0",
-      totalPrice: "700000",
-      startTimeDate: "",
-      endTimeDate: "",
-      workspaceID: "WS03",
-    }
-  ]);
-
+  const [booking, setBooking] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [currentBooking, setCurrentBooking] = useState({
-    id: "",
-    customerID: "",
-    totalAmenitiesPrice: "",
-    totalWorkspacePrice: "",
-    totalBrokenPrice: "",
-    totalPrice: "",
-    startTimeDate: "",
-    endTimeDate: "",
-    workspaceID: "",
+  const [newBooking, setNewBooking] = useState({
+
   });
   const [bookingToDelete, setBookingToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
@@ -157,34 +114,34 @@ const BookingsManagerPage = () => {
   ];
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setCurrentBooking((prev) => ({ ...prev, [name]: value }));
+    // const { name, value } = e.target;
+    // setCurrentBooking((prev) => ({ ...prev, [name]: value }));
   };
 
-  const generateBookingId = () => {
-    const lastId =
-      bookings.length > 0 ? bookings[bookings.length - 1].id : "BK00";
-    const newId = `BK${parseInt(lastId.substring(2)) + 1}`;
-    return newId;
-  };
+  // const generateBookingId = () => {
+  //   const lastId =
+  //     bookings.length > 0 ? bookings[bookings.length - 1].id : "BK00";
+  //   const newId = `BK${parseInt(lastId.substring(2)) + 1}`;
+  //   return newId;
+  // };
 
   const handleAddBookingSubmit = (e) => {
-    e.preventDefault();
-    const newBooking = { ...currentBooking, id: generateBookingId() };
-    setBookings([...bookings, newBooking]);
-    setShowAddModal(false);
-    setSuccessMessage("Booking added successfully!");
-    setCurrentBooking({
-      id: "",
-      customerID: "",
-      totalAmenitiesPrice: "",
-      totalWorkspacePrice: "",
-      totalBrokenPrice: "",
-      totalPrice: "",
-      startTimeDate: "",
-      endTimeDate: "",
-      workspaceID: "",
-    });
+    // e.preventDefault();
+    // const newBooking = { ...currentBooking, id: generateBookingId() };
+    // setBookings([...bookings, newBooking]);
+    // setShowAddModal(false);
+    // setSuccessMessage("Booking added successfully!");
+    // setCurrentBooking({
+    //   id: "",
+    //   customerID: "",
+    //   totalAmenitiesPrice: "",
+    //   totalWorkspacePrice: "",
+    //   totalBrokenPrice: "",
+    //   totalPrice: "",
+    //   startTimeDate: "",
+    //   endTimeDate: "",
+    //   workspaceID: "",
+    // });
   };
 
   const handleUpdateBookingSubmit = (e) => {
@@ -287,15 +244,6 @@ const BookingsManagerPage = () => {
               {filteredBookings.length > 0 ? (
                 filteredBookings.map((booking) => (
                   <tr key={booking.id}>
-                    <td>{booking.id}</td>
-                    <td>{booking.customerID}</td>
-                    <td>{booking.totalAmenitiesPrice}</td>
-                    <td>{booking.totalWorkspacePrice}</td>
-                    <td>{booking.totalBrokenPrice}</td>
-                    <td>{booking.totalPrice}</td>
-                    <td>{booking.startTimeDate}</td>
-                    <td>{booking.endTimeDate}</td>
-                    <td>{booking.workspaceID}</td>
 
                     <td className="flex space-x-2">
                       {/* Update Button */}

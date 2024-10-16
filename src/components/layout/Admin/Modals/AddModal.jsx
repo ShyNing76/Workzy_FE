@@ -108,7 +108,7 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
           ))}
 
           <div className="modal-action">
-            <button type="submit" className="btn btn-sm"><FiPlus />Add</button>
+            <button type="submit" className="btn btn-sm" onClick={onSubmit}><FiPlus />Add</button>
             <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}><RxCross2 />Cancel</button>
           </div>
         </form>
