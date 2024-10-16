@@ -2,7 +2,7 @@ import React from "react";
 
 const SupportCenter = () => {
   return (
-    <div className="max-w-5xl container mx-auto my-24 p-8 bg-white rounded-lg shadow-lg">
+    <div className="max-w-5xl container mx-auto my-20 p-8 bg-white rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold text-neutral mb-8 text-left">
         Support Center
       </h2>

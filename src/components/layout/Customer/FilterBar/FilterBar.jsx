@@ -64,7 +64,6 @@ const FilterBar = (props) => {
   useEffect(() => {
     const hasQueryParams =
       new URLSearchParams(currentLocation.search).toString() !== "";
-    console.log(currentLocation.search);
 
     // Nếu không có queryParams, nghĩa là không có thông tin từ `Submit`, thì reset form
     if (!hasQueryParams) {

@@ -84,7 +84,7 @@ const PaymentPage = () => {
           timer: 4000,
           allowOutsideClick: false,
         }).then(() => {
-          navigate("/");
+          navigate("/user/booking");
         });
       } else {
         Swal.fire({

@@ -51,6 +51,8 @@ import SupportCenter from "../pages/Customer/SupportCenter/SupportCenter.jsx";
 import NotificationPage from "../pages/Customer/Notification/NotificationPage.jsx";
 import PaymentPage from "../pages/Customer/Payment/Payment.jsx";
 import Wishlist from "../pages/Staff/Wishlist/Wishlist.jsx";
+import BookingDetail from "../pages/Customer/BookingDetail/BookingDetail.jsx";
+import BookingAmenities from "../pages/Customer/BookingAmenities/BookingAmenities.jsx";
 
 // Role id store in local Storage after login and register
 
@@ -154,6 +156,14 @@ export const router = createBrowserRouter([
             element: <MyBooking />,
           },
           {
+            path: "booking/:bookingId",
+            element: <BookingDetail />,
+          },
+          {
+            path: "booking/amenities/:bookingId",
+            element: <BookingAmenities />,
+          },
+          {
             path: "membership",
             element: <MemberShipPage />,
           },
@@ -173,7 +183,14 @@ export const router = createBrowserRouter([
   // Admin
   {
     path: "admin",
-    element: <AdminDashboardPage />,
+    element: (
+      <>
+        <PrivateRoute requiredRoleID="1">
+          <AdminDashboardPage />
+        </PrivateRoute>
+      </>
+    ),
+
     children: [
       {
         index: true,
@@ -234,7 +251,14 @@ export const router = createBrowserRouter([
   //Staff
   {
     path: "staff",
-    element: <MainPage />,
+    element: (
+      <>
+        <PrivateRoute requiredRoleID="3">
+          <MainPage />,
+        </PrivateRoute>
+      </>
+    ),
+
     children: [
       {
         index: true,
@@ -281,7 +305,13 @@ export const router = createBrowserRouter([
   // Manager
   {
     path: "manager",
-    element: <ManagerPage />,
+    element: (
+      <>
+        <PrivateRoute requiredRoleID="2">
+          <ManagerPage />
+        </PrivateRoute>
+      </>
+    ),
 
     children: [
       {

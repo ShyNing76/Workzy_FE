@@ -2,7 +2,7 @@ import React from "react";
 
 const BookingTab = (props) => {
   const { selectedTab, setSelectedTab } = props;
-  const tabs = ["All", "Current", "Upcoming", "Complete", "Cancelled"];
+  const tabs = ["All", "Current", "Upcoming", "Completed", "Canceled"];
 
   return (
     <div role="tablist" className="tabs tabs-bordered">
