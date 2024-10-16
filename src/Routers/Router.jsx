@@ -49,12 +49,8 @@ import NotificationPage from "../pages/Customer/Notification/NotificationPage.js
 
 import ManageStaff from "../pages/Manager/ManageStaff/ManageStaff.jsx";
 import ManageReview from "../pages/Manager/ManageReview/ManageReview.jsx";
-
-import PaymentPage from "../pages/Customer/Payment/Payment.jsx";
-
 import BookingDetail from "../pages/Customer/BookingDetail/BookingDetail.jsx";
 import BookingAmenities from "../pages/Customer/BookingAmenities/BookingAmenities.jsx";
-
 
 // Role id store in local Storage after login and register
 
