@@ -1,0 +1,28 @@
+.no-booking-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px; // Chiều cao toàn phần cho khung chứa
+  text-align: center;
+  color: #aaa; // Màu chữ
+
+  .no-data-icon {
+    width: 100px; // Kích thước icon
+    height: 100px;
+    margin-bottom: 10px;
+    opacity: 0.8;
+    transition: transform 0.3s ease; // Hiệu ứng khi hover
+
+    &:hover {
+      transform: scale(1.1); // Phóng to nhẹ khi hover
+      opacity: 1;
+    }
+  }
+
+  p {
+    font-size: 18px;
+    font-weight: 500;
+    color: #999; // Màu chữ
+  }
+}

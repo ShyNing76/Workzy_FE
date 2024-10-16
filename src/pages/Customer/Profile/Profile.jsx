@@ -147,7 +147,7 @@ const Profile = (props) => {
 
   return (
     <>
-      <div className="max-w-5xl container mx-auto my-24 p-8 bg-white rounded-lg shadow-lg">
+      <div className="max-w-5xl container mx-auto my-20 p-8 bg-white rounded-lg shadow-lg">
         <div className="flex">
           {/* Left Content */}
 

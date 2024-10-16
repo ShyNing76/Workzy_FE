@@ -8,6 +8,7 @@ import {
   MdOutlineSupportAgent,
   MdOutlineNotificationsNone,
 } from "react-icons/md";
+import { TbCalendarCheck } from "react-icons/tb";
 
 import { GoSidebarCollapse } from "react-icons/go";
 
@@ -75,7 +76,7 @@ const Sidebar = (props) => {
             </li>
             <li className="menu-item">
               <Link to="/user/booking">
-                <MdOutlinePayment className="icon" />
+                <TbCalendarCheck className="icon" />
                 My Booking
               </Link>
             </li>
