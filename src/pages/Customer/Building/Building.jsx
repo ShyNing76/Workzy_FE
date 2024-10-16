@@ -133,8 +133,6 @@ const Building = () => {
 
   // Count Total page
   useEffect(() => {
-    console.log("Total Workspace: ", totalWorkspaces);
-
     if (totalWorkspaces > 0) {
       setTotalPages(Math.ceil(totalWorkspaces / limit)); // Calculate total pages
     } else {

@@ -20,6 +20,9 @@ const FilterBar = (props) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    // Lưu vị trí hiện tại của cuộn (scroll position)
+    const currentScrollPosition = window.scrollY;
+
     const queryParams = {};
 
     if (officeSize) {
@@ -37,18 +40,30 @@ const FilterBar = (props) => {
 
     const queryString = new URLSearchParams(queryParams).toString();
     navigate(`/location/${buildingId}?${queryString}`);
+
+    // Đặt lại vị trí cuộn sau khi điều hướng
+    setTimeout(() => {
+      window.scrollTo(0, currentScrollPosition);
+    }, 0);
   };
 
   const handleReset = (e) => {
     e.preventDefault();
+    // Lưu vị trí hiện tại của cuộn (scroll position)
+    const currentScrollPosition = window.scrollY;
+
     navigate((`/location/${buildingId}`, { replace: true }));
+
+    // Đặt lại vị trí cuộn sau khi điều hướng
+    setTimeout(() => {
+      window.scrollTo(0, currentScrollPosition);
+    }, 0);
   };
 
   // Reset state khi người dùng điều hướng tới trang /location mà không có query string (không phải từ Submit)
   useEffect(() => {
     const hasQueryParams =
       new URLSearchParams(currentLocation.search).toString() !== "";
-    console.log(currentLocation.search);
 
     // Nếu không có queryParams, nghĩa là không có thông tin từ `Submit`, thì reset form
     if (!hasQueryParams) {

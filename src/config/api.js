@@ -112,13 +112,13 @@ const putUpdateImage = (image) => {
 };
 
 const getWorkspaceByBuildingId = (buildingId, limit, page, queryString) => {
-  const URL_API = `api/v1/workspace/?building_id=${buildingId}&limit=${limit}&page=${page}&${queryString}`;
+  const URL_API = `api/v1/workspace/?building_id=${buildingId}&limit=${limit}&page=${page}&${queryString}&status=active`;
 
   return axios.get(URL_API);
 };
 
 const getAllWorkspacesByBuildingId = (buildingId, queryString) => {
-  const URL_API = `api/v1/workspace/?building_id=${buildingId}&${queryString}`; // No pagination in this call
+  const URL_API = `api/v1/workspace/?building_id=${buildingId}&${queryString}&status=active`; // No pagination in this call
   return axios.get(URL_API);
 };
 
@@ -178,6 +178,75 @@ const postApprovePaypalOrder = (orderId, bookingId) => {
   return axios.post(URL_API, data);
 };
 
+const getBookingOfCustomer = () => {
+  const URL_API = `api/v1/booking/customer`;
+
+  return axios.get(URL_API);
+};
+
+const getAllBookingType = () => {
+  const URL_API = `api/v1/bookingType/`;
+
+  return axios.get(URL_API);
+};
+
+const putCancelBooking = (bookingId) => {
+  const URL_API = `api/v1/booking/cancel/${bookingId}`;
+
+  return axios.put(URL_API);
+};
+
+const getBookingById = (booking_id) => {
+  const URL_API = `api/v1/booking/get/${booking_id}`;
+
+  return axios.get(URL_API);
+};
+
+const putChangeStatus = (bookingId, status) => {
+  const URL_API = `api/v1/customer/change-status/${bookingId}`;
+  const data = {
+    status,
+  };
+
+  return axios.put(URL_API, data);
+};
+
+const getAllAmenities = () => {
+  const URL_API = `api/v1/amenity`;
+
+  return axios.get(URL_API);
+};
+
+const postCreatePaypalOrderAmenities = (
+  addAmenities,
+  booking_id,
+  total_amenities_price
+) => {
+  const URL_API = "api/v1/booking/checkout/paypal/amenities";
+
+  const data = {
+    addAmenities,
+    booking_id,
+    total_amenities_price,
+  };
+
+  console.log("booking id:", booking_id);
+  console.log("addAmenities:", addAmenities);
+  console.log("Total Price:", total_amenities_price);
+
+  return axios.post(URL_API, data);
+};
+
+const postApprovePaypalOrderAmenities = (orderId, bookingId) => {
+  const URL_API = "api/v1/booking/checkout/paypal/amenities/success";
+  const data = {
+    booking_id: bookingId,
+    order_id: orderId,
+  };
+
+  return axios.post(URL_API, data);
+};
+
 export {
   loginApi,
   registerApi,
@@ -198,4 +267,12 @@ export {
   getWorkSpaceAmenitiesById,
   postCreatePaypalOrder,
   postApprovePaypalOrder,
+  getBookingOfCustomer,
+  getAllBookingType,
+  putCancelBooking,
+  getBookingById,
+  putChangeStatus,
+  getAllAmenities,
+  postCreatePaypalOrderAmenities,
+  postApprovePaypalOrderAmenities,
 };
