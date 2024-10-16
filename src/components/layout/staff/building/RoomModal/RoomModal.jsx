@@ -20,7 +20,7 @@ const Modal = ({ isOpen, onClose, room, bookingType }) => {
                     const workspaceResponse = await getWorkspaceByBuildingId(buildingId);
                     if (workspaceResponse && workspaceResponse.err === 0) {
                         const foundWorkspace = workspaceResponse.data.find(ws => ws.id === room.id);
-                        console.log('Found Workspace:', foundWorkspace); // Kiểm tra xem foundWorkspace có chứa giá không
+                        console.log('Found Workspace:', foundWorkspace); 
                         setWorkspaceDetails(foundWorkspace);
                     } else {
                         setError('Error when fetching workspaces.');

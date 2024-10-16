@@ -1,5 +1,6 @@
 import React from 'react';
 
+
 const DetailModal = ({ booking, onClose }) => {
     if (!booking) return null;
 

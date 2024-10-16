@@ -45,6 +45,11 @@ import BookingManagement from "../pages/Staff/Bookings/BookingManagement.jsx";
 import BuildingRoomPage from "../pages/Staff/BuildingRoom/BuildingRoomPage.jsx";
 import PaymentPage from "../pages/Customer/Payment/Payment.jsx";
 import Wishlist from "../pages/Staff/Wishlist/Wishlist.jsx";
+import MyBooking from "../pages/Customer/MyBooking/MyBooking.jsx";
+import SupportCenter from "../pages/Customer/SupportCenter/SupportCenter.jsx";
+import NotificationPage from "../pages/Customer/Notification/NotificationPage.jsx";
+import ManageStaff from "../pages/Manager/ManageStaff/ManageStaff.jsx";
+import ManageReview from "../pages/Manager/ManageReview/ManageReview.jsx";
 
 // Role id store in local Storage after login and register
 

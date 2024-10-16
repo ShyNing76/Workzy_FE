@@ -1,16 +1,7 @@
 import axios from "./axios.customize"
 
-const getStaffBuildingId = () => {
-    
-  const URL_API = "/api/v1/staff/building";
-  
-  return axios.get(URL_API);
-};
-
-const getBuildingById = (building_id) => {
-   
-  const URL_API = `/api/v1/building/${building_id}`;
-  
+const getStaffBuildingId = () => {   
+  const URL_API = "/api/v1/staff/building";  
   return axios.get(URL_API);
 };
 
@@ -19,20 +10,35 @@ const getWorkspaceByBuildingId = (building_id) => {
   return axios.get(URL_API);
 }; 
 
-const getWorkspaceById = (workspace_id) => {
-  const URL_API = `/api/v1/workspace/${workspace_id}`;
+const getBooking = (building_id) => {
+  const URL_API = `/api/v1/booking/get/?building_id=${building_id}`;
   return axios.get(URL_API);
 };
 
-const getBooking = () =>{
-  const URL_API = "/api/v1/booking/get";
+
+const postBookingStatus = (booking_id, status) => {
+  const URL_API = `/api/v1/staff/change-status/${booking_id}`;
+  const data = {
+    status
+  };
+  return axios.post(URL_API, data);
+};
+
+const getAmenitiesByBookingId = (booking_id) => {
+  const URL_API = `/api/v1/staff/check-amenities/booking/${booking_id}`;
   return axios.get(URL_API);
+};
+
+const sendBrokenAmenities = (data) => {
+  const URL_API = "/api/v1/staff/broken-amenities-booking"; 
+  return axios.post(URL_API, data);  
 };
 
 export {
   getStaffBuildingId,
-  getBuildingById,
   getWorkspaceByBuildingId,
   getBooking,
-  getWorkspaceById,
+  postBookingStatus,
+  getAmenitiesByBookingId,
+  sendBrokenAmenities 
 };

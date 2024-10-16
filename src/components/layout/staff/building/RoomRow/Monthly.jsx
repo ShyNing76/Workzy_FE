@@ -26,7 +26,7 @@ const Monthly = ({ selectedStatus, workspaces = [] }) => {
             <table>
                 <thead>
                     <tr>
-                        <th>Workspace</th>
+                        <th style={{ width: '110px'}}>Workspace</th>
                         {months.map((month, index) => (
                             <th key={index}>{month}</th>
                         ))}
@@ -38,7 +38,7 @@ const Monthly = ({ selectedStatus, workspaces = [] }) => {
                             // Nếu statuses không tồn tại hoặc không phải là mảng, gán giá trị mặc định
                             const statuses = Array.isArray(workspace.statuses) && workspace.statuses.length === 12 
                                 ? workspace.statuses 
-                                : Array(12).fill('N/A'); // Mảng mặc định với 12 phần tử N/A
+                                : Array(12).fill(''); // Mảng mặc định với 12 phần tử N/A
 
                             return (
                                 <tr key={workspace.workspace_id}>

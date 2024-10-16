@@ -3,56 +3,46 @@ import './RoomControls.scss';
 import Hourly from '../RoomRow/Hourly';
 import Daily from '../RoomRow/Daily';
 import Monthly from '../RoomRow/Monthly';
-import { getWorkspaceByBuildingId, getStaffBuildingId } from '../../../../../config/api.staff';
+import { getWorkspaceByBuildingId } from '../../../../../config/api.staff';
+import { useOutletContext } from "react-router-dom";
 
 const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSelectedType, selectedDate, setSelectedDate }) => {
     const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0]); 
     const [workspaceType, setWorkspaceType] = useState(''); 
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear()); 
-    const [workspaces, setWorkspaces] = useState([]); 
-    const [workspaceTypes, setWorkspaceTypes] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedWorkspace, setSelectedWorkspace] = useState(null); // Thêm state cho workspace được chọn
+    const [selectedWorkspace, setSelectedWorkspace] = useState(null); 
+    const [workspaces, setWorkspaces] = useState([]);
+    const [workspaceTypes, setWorkspaceTypes] = useState([]);
+    const { buildingId } = useOutletContext();
 
     useEffect(() => {
-        const fetchBuildingAndWorkspaces = async () => {
+        const fetchWorkspaces = async () => {
+            if (!buildingId) {
+                console.error('Building ID is undefined');
+                return;
+            }
             try {
-                const buildingResponse = await getStaffBuildingId();
-                if (buildingResponse && buildingResponse.err === 0) {
-                    const buildingId = buildingResponse.data.building_id;
-                    await fetchWorkspaces(buildingId);
+                const response = await getWorkspaceByBuildingId(buildingId);
+                if (response?.err === 0) {
+                    setWorkspaces(response.data);
+                    setWorkspaceTypes([...new Set(response.data.map(ws => ws.WorkspaceType.workspace_type_name))]);
                 }
             } catch (error) {
-                console.error('Error when getting building_id:', error);
+                console.error('Error fetching workspaces:', error);
             }
         };
-
-        fetchBuildingAndWorkspaces();
-    }, []);
-
-    const fetchWorkspaces = async (id) => {
-        try {
-            const response = await getWorkspaceByBuildingId(id);
-            if (response && response.err === 0) {
-                setWorkspaces(response.data); 
-                const types = [...new Set(response.data.map(ws => ws.WorkspaceType.workspace_type_name))];
-                setWorkspaceTypes(types);
-            }
-        } catch (error) {
-            console.error('Error when fetching workspaces:', error);
-        }
-    };
+    
+        fetchWorkspaces();
+    }, [buildingId]);
+    
 
     const getDateInputType = () => {
         switch (selectedType) {
-            case 'hourly':
-                return 'date';
-            case 'daily':
-                return 'month';
-            case 'monthly':
-                return 'number';
-            default:
-                return 'date';
+            case 'hourly': return 'date';
+            case 'daily': return 'month';
+            case 'monthly': return 'number';
+            default: return 'date';
         }
     };
 
@@ -67,25 +57,23 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
     };
 
     const handleWorkspaceClick = (workspace) => {
-        setSelectedWorkspace(workspace); // Cập nhật workspace được chọn
-        setIsModalOpen(true); // Mở modal
+        setSelectedWorkspace(workspace);
+        setIsModalOpen(true);
     };
 
     const renderTable = () => {
+        const filteredWorkspaces = workspaceType ? workspaces.filter(workspace => workspace.WorkspaceType.workspace_type_name === workspaceType) : workspaces;
+        
         switch (selectedType) {
             case 'hourly':
-                return <Hourly selectedDate={currentDate} selectedStatus={selectedStatus} workspaces={filteredWorkspaces()} onWorkspaceClick={handleWorkspaceClick} />;
+                return <Hourly selectedDate={currentDate} selectedStatus={selectedStatus} workspaces={filteredWorkspaces} onWorkspaceClick={handleWorkspaceClick} />;
             case 'daily':
-                return <Daily selectedDate={currentDate} selectedStatus={selectedStatus} workspaces={filteredWorkspaces()} onWorkspaceClick={handleWorkspaceClick} />;
+                return <Daily selectedDate={currentDate} selectedStatus={selectedStatus} workspaces={filteredWorkspaces} onWorkspaceClick={handleWorkspaceClick} />;
             case 'monthly':
-                return <Monthly selectedStatus={selectedStatus} workspaces={filteredWorkspaces()} onWorkspaceClick={handleWorkspaceClick} />;
+                return <Monthly selectedStatus={selectedStatus} workspaces={filteredWorkspaces} onWorkspaceClick={handleWorkspaceClick} />;
             default:
                 return null;
         }
-    };
-
-    const filteredWorkspaces = () => {
-        return workspaceType ? workspaces.filter(workspace => workspace.WorkspaceType.workspace_type_name === workspaceType) : workspaces;
     };
 
     return (
@@ -94,12 +82,7 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
                 <div className="control-row">
                     <div className="control">
                         <label htmlFor="status-select">Select Status</label>
-                        <select 
-                            className="form-select" 
-                            id="status-select" 
-                            value={selectedStatus} 
-                            onChange={(e) => setSelectedStatus(e.target.value)}
-                        >
+                        <select className="form-select" id="status-select" value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
                             <option value="">Status</option>
                             <option value="available">Available</option>
                             <option value="booked">Booked</option>
@@ -109,12 +92,7 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
                     </div>
                     <div className="control">
                         <label htmlFor="workspace-type-select">Select Workspace Type</label>
-                        <select 
-                            className="form-select" 
-                            id="workspace-type-select" 
-                            value={workspaceType} 
-                            onChange={(e) => setWorkspaceType(e.target.value)} 
-                        >
+                        <select className="form-select" id="workspace-type-select" value={workspaceType} onChange={(e) => setWorkspaceType(e.target.value)}>
                             <option value="">All Workspace Type</option>
                             {workspaceTypes.map((type, index) => (
                                 <option key={index} value={type}>{type}</option>
@@ -123,12 +101,7 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
                     </div>
                     <div className="control">
                         <label htmlFor="type-select">Select Booking Type</label>
-                        <select 
-                            className="form-select" 
-                            id="type-select" 
-                            value={selectedType} 
-                            onChange={(e) => setSelectedType(e.target.value)}
-                        >
+                        <select className="form-select" id="type-select" value={selectedType} onChange={(e) => setSelectedType(e.target.value)}>
                             <option value="hourly">Hourly</option>
                             <option value="daily">Daily</option>
                             <option value="monthly">Monthly</option>
@@ -136,12 +109,7 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
                     </div>
                     <div className="control">
                         <label htmlFor="date-picker">Select {selectedType === 'hourly' ? 'Date' : selectedType === 'daily' ? 'Month' : 'Year'}</label>
-                        <input 
-                            type={getDateInputType()} 
-                            id="date-picker" 
-                            value={selectedType === 'daily' ? selectedYear : currentDate} 
-                            onChange={handleDateChange}
-                        />
+                        <input type={getDateInputType()} id="date-picker" value={selectedType === 'daily' ? selectedYear : currentDate} onChange={handleDateChange} />
                     </div>
                 </div>
                 <div className="room-table">
