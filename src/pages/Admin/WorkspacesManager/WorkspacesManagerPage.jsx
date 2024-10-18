@@ -16,94 +16,20 @@ import BuildingFilter from "../../../components/layout/Admin/Filters/BuildingFil
 const HCMWorkspacesManager = () => {
   const location = useLocation();
 
-  const [workspaces, setWorkspaces] = useState([
-    {
-      id: "WS01",
-      type: "type1",
-      buildingId: "Bui1",
-      name: "Sapphire",
-      priceperhour: "12300",
-      priceperday: "123000",
-      pricepermonth: "1230000",
-      capacity: "5",
-      description: "Phong thuong",
-      status: "Available",
-      images: [],
-    },
-    {
-      id: "WS02",
-      type: "type2",
-      buildingId: "Bui2",
-      name: "Deluxe",
-      priceperhour: "45600",
-      priceperday: "456000",
-      pricepermonth: "4560000",
-      capacity: "15",
-      description: "Phong lon",
-      status: "Available",
-      images: [],
-    },
-  ]);
-
-  const [buildings, setBuildings] = useState([
-    { id: "Bui1", name: "Phan Văn Trị" },
-    { id: "Bui2", name: "Khu CNC Hồ Chí Minh" },
-  ]); // DB manager giả
-
-  const addWorkspaceFields = [
-    { name: "type", label: "Workspace Type", type: "text" },
-    { name: "name", label: "Workspace Name", type: "text" },
-    {
-      name: "buildingId",
-      label: "Building",
-      type: "select",
-      options: buildings.map((buildings) => ({
-        label: buildings.name,
-        value: buildings.id,
-      })),
-      className: "select select-bordered w-full",
-    },
-    { name: "priceperhour", label: "Price/hour", type: "number" },
-    { name: "priceperday", label: "Price/day", type: "number" },
-    { name: "pricepermonth", label: "Price/month", type: "number" },
-    { name: "capacity", label: "Capacity", type: "number" },
-    { name: "description", label: "Description", type: "text" },
-    { name: "images", label: "Workspace Images", type: "file", multiple: true },
-  ];
-
-  const updateWorkspaceFields = [
-    { name: "id", label: "Workspace ID", type: "text" },
-    { name: "type", label: "Workspace Type", type: "text" },
-    { name: "name", label: "Workspace Name", type: "text" },
-    {
-      name: "buildingId",
-      label: "Building",
-      type: "select",
-      options: buildings.map((buildings) => ({
-        label: buildings.name,
-        value: buildings.id,
-      })),
-      className: "select select-bordered w-full",
-    },
-    { name: "priceperhour", label: "Price/hour", type: "number" },
-    { name: "priceperday", label: "Price/day", type: "number" },
-    { name: "pricepermonth", label: "Price/month", type: "number" },
-    { name: "capacity", label: "Capacity", type: "number" },
-    { name: "description", label: "Description", type: "text" },
-    {
-      name: "status",
-      label: "Status",
-      type: "checkbox",
-      checkboxLabels: { checked: "Available", unchecked: "Unavailable" },
-    },
-    { name: "images", label: "Workspace Images", type: "file", multiple: true },
-  ];
-
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentWorkspace, setCurrentWorkspace] = useState({
+  const [workspaces, setWorkspaces] = useState(null);
+  const [loading, setLoading] = useState(true); // State loading
+  const [error, setError] = useState(null); // State lỗi
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [workspaceToDelete, setWorkspaceToDelete] = useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [newWorkspace, setNewWorkspace] = useState({
+    workspace_name: "",
     id: "",
     type: "",
-    name: "",
+
     buildingId: "",
     priceperday: "",
     priceperhour: "",
@@ -113,25 +39,78 @@ const HCMWorkspacesManager = () => {
     status: "",
     images: [],
   });
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [workspaceToDelete, setWorkspaceToDelete] = useState(null);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [buildingFilter, setBuildingFilter] = useState("");
 
-  const handleInputChange = (e) => {
-    const { name, type, number, value, checked } = e.target;
-    setCurrentWorkspace((prev) => ({ ...prev, [name]: value }));
-    const inputValue = type === "checkbox" ? checked : value;
-  };
+  const [buildings, setBuildings] = useState([
+    { id: "Bui1", name: "Phan Văn Trị" },
+    { id: "Bui2", name: "Khu CNC Hồ Chí Minh" },
+  ]); // DB manager giả
 
-  const generateWorkspaceId = () => {
-    const lastId =
-      workspaces.length > 0 ? workspaces[workspaces.length - 1].id : "WS";
-    const newId = `WS${parseInt(lastId.slice(2)) + 1}`;
-    return newId;
-  };
+  // const addWorkspaceFields = [
+  //   { name: "type", label: "Workspace Type", type: "text" },
+  //   { name: "name", label: "Workspace Name", type: "text" },
+  //   {
+  //     name: "buildingId",
+  //     label: "Building",
+  //     type: "select",
+  //     options: buildings.map((buildings) => ({
+  //       label: buildings.name,
+  //       value: buildings.id,
+  //     })),
+  //     className: "select select-bordered w-full",
+  //   },
+  //   { name: "priceperhour", label: "Price/hour", type: "number" },
+  //   { name: "priceperday", label: "Price/day", type: "number" },
+  //   { name: "pricepermonth", label: "Price/month", type: "number" },
+  //   { name: "capacity", label: "Capacity", type: "number" },
+  //   { name: "description", label: "Description", type: "text" },
+  //   { name: "images", label: "Workspace Images", type: "file", multiple: true },
+  // ];
+
+  // const updateWorkspaceFields = [
+  //   { name: "id", label: "Workspace ID", type: "text" },
+  //   { name: "type", label: "Workspace Type", type: "text" },
+  //   { name: "name", label: "Workspace Name", type: "text" },
+  //   {
+  //     name: "buildingId",
+  //     label: "Building",
+  //     type: "select",
+  //     options: buildings.map((buildings) => ({
+  //       label: buildings.name,
+  //       value: buildings.id,
+  //     })),
+  //     className: "select select-bordered w-full",
+  //   },
+  //   { name: "priceperhour", label: "Price/hour", type: "number" },
+  //   { name: "priceperday", label: "Price/day", type: "number" },
+  //   { name: "pricepermonth", label: "Price/month", type: "number" },
+  //   { name: "capacity", label: "Capacity", type: "number" },
+  //   { name: "description", label: "Description", type: "text" },
+  //   {
+  //     name: "status",
+  //     label: "Status",
+  //     type: "checkbox",
+  //     checkboxLabels: { checked: "Available", unchecked: "Unavailable" },
+  //   },
+  //   { name: "images", label: "Workspace Images", type: "file", multiple: true },
+  // ];
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+
+  // const [buildingFilter, setBuildingFilter] = useState("");
+
+  // const handleInputChange = (e) => {
+  //   const { name, type, number, value, checked } = e.target;
+  //   setCurrentWorkspace((prev) => ({ ...prev, [name]: value }));
+  //   const inputValue = type === "checkbox" ? checked : value;
+  // };
+
+  // const generateWorkspaceId = () => {
+  //   const lastId =
+  //     workspaces.length > 0 ? workspaces[workspaces.length - 1].id : "WS";
+  //   const newId = `WS${parseInt(lastId.slice(2)) + 1}`;
+  //   return newId;
+  // };
 
   const handleAddWorkspace = (e) => {
     e.preventDefault();
@@ -206,29 +185,29 @@ const HCMWorkspacesManager = () => {
     setSuccessMessage("");
   };
 
-  const handleBuildingFilterChange = (e) => {
-    setBuildingFilter(e.target.value);
-  };
+  // const handleBuildingFilterChange = (e) => {
+  //   setBuildingFilter(e.target.value);
+  // };
 
-  const filteredWorkspaces = workspaces.filter((workspace) => {
-    const matchesSearchTerm =
-      workspace.id.includes(searchTerm) ||
-      workspace.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      workspace.priceperday.toString().includes(searchTerm) ||
-      workspace.priceperhour.toString().includes(searchTerm) ||
-      workspace.buildingId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      workspace.pricepermonth.toString().includes(searchTerm) ||
-      workspace.capacity.toString().includes(searchTerm) ||
-      workspace.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      workspace.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      workspace.images.some((image) =>
-        image.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+  // const filteredWorkspaces = workspaces.filter((workspace) => {
+  //   const matchesSearchTerm =
+  //     workspace.id.includes(searchTerm) ||
+  //     workspace.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //     workspace.priceperday.toString().includes(searchTerm) ||
+  //     workspace.priceperhour.toString().includes(searchTerm) ||
+  //     workspace.buildingId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //     workspace.pricepermonth.toString().includes(searchTerm) ||
+  //     workspace.capacity.toString().includes(searchTerm) ||
+  //     workspace.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //     workspace.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //     workspace.images.some((image) =>
+  //       image.toLowerCase().includes(searchTerm.toLowerCase())
+  //     );
 
-    const matchesBuildingFilter =
-      !buildingFilter || workspace.buildingId === buildingFilter;
-    return matchesSearchTerm && matchesBuildingFilter;
-  });
+  //   const matchesBuildingFilter =
+  //     !buildingFilter || workspace.buildingId === buildingFilter;
+  //   return matchesSearchTerm && matchesBuildingFilter;
+  // });
 
   return (
     <div className="container mx-auto p-4">
@@ -332,31 +311,31 @@ const HCMWorkspacesManager = () => {
         </table>
       </div>
 
-      <AddModal
+      {/* <AddModal
         show={showAddModal}
         onClose={() => setShowAddModal(false)}
         onSubmit={handleAddWorkspace}
         currentItem={currentWorkspace}
         onInputChange={handleInputChange}
         fields={addWorkspaceFields}
-      />
+      /> */}
 
-      <UpdateModal
+      {/* <UpdateModal
         show={showUpdateModal}
         onClose={() => setShowUpdateModal(false)}
         onSubmit={handleUpdateWorkspace}
         currentItem={currentWorkspace}
         onInputChange={handleInputChange}
         fields={updateWorkspaceFields}
-      />
+      /> */}
 
-      <DeleteModal
+      {/* <DeleteModal
         show={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onDelete={handleDeleteWorkspace}
         itemToDelete={workspaceToDelete}
         itemType="workspace"
-      />
+      /> */}
     </div>
   );
 };

@@ -6,12 +6,8 @@ import { getCustomerById } from "../../../config/api.admin.js"
 import { removeCustomer } from "../../../config/api.admin.js";
 
 import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
-import AddModal from "../../../components/layout/Admin/Modals/AddModal.jsx";
 import DeleteModal from "../../../components/layout/Admin/Modals/DeleteModal.jsx";
-import UpdateModal from "../../../components/layout/Admin/Modals/UpdateModal.jsx";
 import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal.jsx";
-import AddButton from "../../../components/layout/Admin/Buttons/AddButton.jsx";
-import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.jsx";
 import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
 import SuccessAlert from "../../../components/layout/Admin/SuccessAlert/SuccessAlert.jsx";
 import { set } from "date-fns";
@@ -64,9 +60,10 @@ const CustomersManagerPage = () => {
   }, []); 
 
       //Hàm click lên hàng để hiện more details
-      const handleRowClick = async (customer_id) => {
+      const handleRowClick = async (user_id) => {
+        console.log("Clicked user_id: ", user_id);
         try {
-          const res = await getCustomerById(customer_id);
+          const res = await getCustomerById(user_id);
           if (res && res.data) {
             setSelectedCustomerDetails(res.data);
             setShowDetailsModal(true);
@@ -76,94 +73,28 @@ const CustomersManagerPage = () => {
         }
       };
 
-  const addCustomerFields = [
-    // { name: "fname", label: "First Name", type: "text" },
-    // { name: "lname", label: "Last Name", type: "text" },
-    // {
-    //   name: "role",
-    //   label: "Role",
-    //   type: "select",
-    //   options: role.map((role) => ({
-    //     label: role.name,
-    //     value: role.id,
-    //   })),
-    //   className: "select select-bordered w-full",
-    // },
-    // { name: "info", label: "Information", type: "text" },
-  ];
-
-  const updateCustomerFields = [
-    // { name: "id", label: "Staff ID", type: "text" },
-    // { name: "fname", label: "First Name", type: "text" },
-    // { name: "lname", label: "Last Name", type: "text" },
-    // {
-    //   name: "role",
-    //   label: "Role",
-    //   type: "select",
-    //   options: role.map((role) => ({
-    //     label: role.name,
-    //     value: role.id,
-    //   })),
-    //   className: "select select-bordered w-full",
-    // },
-    // { name: "info", label: "Information", type: "text" },
-  ];
-
-  const handleInputChange = (e) => {
-    // const { name, value } = e.target;
-    // setCurrentCustomer((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleAddCustomerSubmit = (e) => {
-    // e.preventDefault();
-    // const rolePrefix = currentCustomer.role || "MB"; // Default to "MB" if role not set
-    // const newCustomer = {
-    //   ...currentCustomer,
-    //   id: generateCustomerId(rolePrefix),
-    //   name: `${currentCustomer.fname} ${currentCustomer.lname}`,
-    // };
-    // setCustomers([...customers, newCustomer]);
-    // setShowAddModal(false);
-    // setSuccessMessage("Customer Added Successfully!");
-    // setCurrentCustomer({ id: "", fname: "", lname: "", role: "", info: "" });
-  };
-
-  const handleUpdateCustomerSubmit = (e) => {
-    // e.preventDefault();
-    // setCustomers((prevCustomers) => {
-    //   const customerIndex = prevCustomers.findIndex(
-    //     (customer) => customer.id === currentCustomer.oldId
-    //   );
-    //   if (customerIndex !== -1) {
-    //     const updatedCustomers = [...prevCustomers];
-    //     updatedCustomers[customerIndex] = {
-    //       ...currentCustomer,
-    //       name: `${currentCustomer.fname} ${currentCustomer.lname}`,
-    //     };
-    //     return updatedCustomers;
-    //   }
-    //   return prevCustomers;
-    // });
-    // setShowUpdateModal(false);
-    // setSuccessMessage("Customer Updated Successfully!");
-    // setCurrentCustomer({ id: "", fname: "", lname: "", role: "", info: "" });
-  };
-
   const handleDeleteCustomer = async () => {
     try {
       if (customerToDelete) {
-        await removeCustomer(customerToDelete.customer_id);
-        setCustomer((prevCustomers) =>
-          prevCustomers.map((cust) => 
-            cust.customer_id === customerToDelete.customer_id 
-              ? { ...cust, status: "inactive" } 
-              : cust
-          )
-        );
-        setSuccessMessage("Customer status set to inactive successfully!");
+        // Make sure to use the correct identifier, assumed to be customer_id
+        const response = await removeCustomer(customerToDelete.user_id);
+  
+        if (response && response.status === 200) { // Check if response is successful
+          setCustomer((prevCustomers) =>
+            prevCustomers.map((cust) => 
+              // Update only the selected customer
+              cust.user_id === customerToDelete.user_id 
+                ? { ...cust, status: "inactive" } 
+                : cust
+            )
+          );
+          setSuccessMessage("Customer status set to inactive successfully!");
+        } else {
+          throw new Error("Failed to update status");
+        }
       }
     } catch (error) {
-      console.error("Error deleting customer:", error);
+      console.error("Error setting customer to inactive:", error);
     } finally {
       setShowDeleteModal(false);
     }
@@ -198,9 +129,9 @@ const CustomersManagerPage = () => {
         />
 
         {/* Add Button */}
-        <div className="ml-2">
+        {/* <div className="ml-2">
           <AddButton onClick={() => setShowAddModal(true)} label="Add Customer" />
-        </div>
+        </div> */}
       </div>
 
       <div>
@@ -223,7 +154,7 @@ const CustomersManagerPage = () => {
           </thead>
           <tbody>
             {Array.isArray(customer) && customer.map((customer) => (
-                <tr key={customer.user_id} className="cursor-pointer" onClick={() => handleRowClick(customer.customer_id)}>
+                <tr key={customer.user_id} className="cursor-pointer" onClick={() => handleRowClick(customer.Customer.user_id)}>
                   <td>{customer.name}</td>
                   <td>{customer.email}</td>
                   <td>{customer.phone}</td>
@@ -231,21 +162,12 @@ const CustomersManagerPage = () => {
                   <td>{customer.date_of_birth}</td>
                   <td>{customer.status}</td>
                   <td className="flex space-x-2">
-                    {/* Update Button */}
-                    <UpdateButton
-                      // onClick={() => {
-                      //   setCurrentCustomer({ ...customer, oldId: customer.id });
-                      //   setShowUpdateModal(true);
-                      // }}
-                    />
 
                     {/* Delete Button */}
                     <DeleteButton
-                      onClick={() => {
-                        setCustomerToDelete({
-                          ...customer,
-                          name: `${customer.lname} ${customer.fname}`,
-                        });
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCustomerToDelete(customer);
                         setShowDeleteModal(true);
                       }}
                     />
@@ -257,23 +179,6 @@ const CustomersManagerPage = () => {
       </div>
 
       {/* Add, Update, Delete, Success Modals */}
-      {/* <AddModal
-        show={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onSubmit={handleAddCustomerSubmit}
-        currentItem={currentCustomer}
-        onInputChange={handleInputChange}
-        fields={addCustomerFields}
-      />
-
-      <UpdateModal
-        show={showUpdateModal}
-        onClose={() => setShowUpdateModal(false)}
-        onSubmit={handleUpdateCustomerSubmit}
-        currentItem={currentCustomer}
-        onInputChange={handleInputChange}
-        fields={updateCustomerFields}
-      />
 
       <DeleteModal
         show={showDeleteModal}
@@ -281,7 +186,7 @@ const CustomersManagerPage = () => {
         onDelete={handleDeleteCustomer}
         itemToDelete={customerToDelete}
         itemType="customer"
-      /> */}
+      /> 
 
       <DetailsModal
         show={showDetailsModal}

@@ -37,6 +37,7 @@ import WorkspacesTypesManagerPage from "../pages/Admin/WorkspaceTypesManager/Wor
 import PaymentsManagerPage from "../pages/Admin/PaymentsManager/PaymentsManagerPage.jsx";
 import BookingsManagerPage from "../pages/Admin/BookingsManager/BookingsManagerPage.jsx";
 import ReviewsManagerPage from "../pages/Admin/ReviewsManager/ReviewsManagerPage.jsx";
+import VouchersManagerPage from "../pages/Admin/VouchersManager/VouchersManagerPage";
 
 import MainPage from "../pages/Staff/MainPage/MainPage.jsx";
 import BookingManagement from "../pages/Staff/Bookings/BookingManagement.jsx";
@@ -233,6 +234,10 @@ export const router = createBrowserRouter([
       {
         path: "reviewsmanager",
         element: <ReviewsManagerPage />,
+      },
+      {
+        path: "vouchersmanager",
+        element: <VouchersManagerPage />
       },
     ],
     // condition: (user) => user.isAdmin, // Add condition to check if user is admin before rendering the routes

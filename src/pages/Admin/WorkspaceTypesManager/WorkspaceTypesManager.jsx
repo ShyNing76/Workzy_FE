@@ -100,7 +100,7 @@ const WorkspacesTypesManagerPage = () => {
         formData.append('image', newWorkspaceType.image);
         formData.append('description', newWorkspaceType.description);
         formData.append('status', newWorkspaceType.status);
-    
+      console.log('FormData:', Object.fromEntries(formData.entries())); // Log FormData content
        try {
          const WorkspaceType = await postWorkspaceType(newWorkspaceType);
          setResponseData(WorkspaceType);
@@ -152,7 +152,7 @@ const WorkspacesTypesManagerPage = () => {
         status: newWorkspaceType.status === "active" ? "active" : "inactive", // Đảm bảo trạng thái chính xác
       };
   
-      console.log('Updated Workspace Type:', updatedWorkspaceType); // Log để kiểm tra giá trị
+      console.log('newWorkspaceType:', newWorkspaceType); // Log để kiểm tra giá trị
       await putWorkspaceType(updatedWorkspaceType.workspace_type_id, updatedWorkspaceType);
       fetchWorkspaceType(); // Tải lại dữ liệu
       setShowUpdateModal(false);
@@ -197,7 +197,7 @@ const WorkspacesTypesManagerPage = () => {
   ];
 
 //Khu vực hàm dành cho delete
-  const handleDeleteWorkspaceType = async (e) => {
+  const handleDeleteWorkspaceType = async () => {
     if (!workspaceTypeToDelete) return;
 
     try {

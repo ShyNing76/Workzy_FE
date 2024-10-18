@@ -9,7 +9,7 @@ const UpdateModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fiel
 
   return (
     <div className="modal modal-open">
-      <div className="modal-box">
+      <div className="modal-box w-3/4 max-w-2xl">
         <h3 className="font-bold text-lg">Update Info</h3>
         <form onSubmit={onSubmit}>
           {fields.map((field) => (
@@ -34,6 +34,7 @@ const UpdateModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fiel
                   value={currentItem[field.name] || 0} // Make sure there is a default value
                   onChange={onInputChange}
                   className="input input-bordered"
+                  step="0.01"
                   required
                 />
               )}
@@ -81,12 +82,12 @@ const UpdateModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fiel
                   <input
                     type="checkbox"
                     name={field.name}
-                    checked={currentItem[field.name] === 'Active'}
-                    onChange={(e) => onInputChange({ target: { name: field.name, value: e.target.checked ? 'Active' : 'Inactive' } })}
+                    checked={currentItem[field.name] === 'active'}
+                    onChange={(e) => onInputChange({ target: { name: field.name, value: e.target.checked ? 'active' : 'inactive' } })}
                     className={field.className || "checkbox"}
                   />
                   <span className="label-text">
-                    {currentItem[field.name] === 'Active' ? field.checkboxLabels.checked : field.checkboxLabels.unchecked}
+                    {currentItem[field.name] === 'active' ? field.checkboxLabels.checked : field.checkboxLabels.unchecked}
                   </span>
                 </label>
               )}
@@ -116,7 +117,7 @@ const UpdateModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fiel
                     />
                     <span className="slider round"></span>
                   </label>
-                  <span className='mb-2'>{!currentItem[field.name] || currentItem[field.name] === 'inactive' ? 'Inactive' : 'Active'}</span>
+                  <span className='mb-2'>{!currentItem[field.name] || currentItem[field.name] === 'inactive' ? 'inactive' : 'ictive'}</span>
                 </div>
               )}
 

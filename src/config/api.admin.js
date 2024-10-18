@@ -20,6 +20,21 @@ const getAmenityById = (amenity_id) =>  {
   return axios.get(URL_API);
 }
 
+const postAmenity = (newAmenity) => {
+  const URL_API = "api/v1/amenity"
+  return axios.post(URL_API, newAmenity)
+}
+
+const putAmenity = (amenity_id, updatedAmenity) => {
+  const URL_API = `api/v1/amenity/${amenity_id}`
+  return axios.put(URL_API, updatedAmenity)
+}
+
+const deleteAmenity = (amenity_id) => {
+  const URL_API = `api/v1/amenity/${amenity_id}`
+  return axios.delete(URL_API)
+}
+
 
 
 
@@ -124,8 +139,8 @@ const getWorkspaceType = (workspace_type_id, workspace_type_name, image, descrip
   }
 
   const deleteStaff = (user_id) => {
-    const URL_API = `/api/v1/staff/${user_id}`
-    return axios.delete(URL_API)
+    const URL_API = `/api/v1/staff/unactive/${user_id}`
+    return axios.put(URL_API)
   }
 
   //Customers Manager APIs___________________________________________________________
@@ -143,22 +158,154 @@ const getWorkspaceType = (workspace_type_id, workspace_type_name, image, descrip
     return axios.get(URL_API, data)
   }
 
-  const getCustomerById = (customer_id) => {
-    const URL_API = `/api/v1/customer/${customer_id}`
+  const getCustomerById = (user_id) => {
+    const URL_API = `/api/v1/customer/${user_id}`
     return axios.get(URL_API)
   }
 
-  const removeCustomer = (customer_id) => {
-    const URL_API = `/api/v1/customer/${customer_id}`
+  const removeCustomer = (user_id) => {
+    const URL_API = `/api/v1/customer/remove/${user_id}`
     return axios.put(URL_API)
   }
 
   //Bookings Manager APIs___________________________________________________________
-  
 
+
+  //Buildings Manager APIs_________________________________________________________
+  const getBuilding = (building_id, manager_id, building_name, location, address, google_address, description, rating, status, BuildingImages) => {
+    const URL_API = "/api/v1/building"
+    const data =  {
+      building_id,
+      manager_id,
+      building_name,
+      location,
+      address,
+      google_address,
+      description,
+      rating,
+      status,
+      BuildingImages
+    }
+    return axios.get(URL_API, data)
+  }
+
+  const getBuildingById = (building_id) => {
+    const URL_API = `/api/v1/building/${building_id}`
+    return axios.get(URL_API)
+  }
+
+  const postBuilding = (newBuilding) => {
+    const URL_API = "api/v1/building/";
+    const formData = new FormData();
+    
+    // Giả sử `newBuilding` là một đối tượng có các thuộc tính cần gửi
+    // Bạn sẽ thêm các thuộc tính này vào formData
+    for (const key in newBuilding) {
+      formData.append(key, newBuilding[key]);
+    }
+  
+    try {
+      // Có thể thêm xử lý khác trong khối này nếu cần
+    } catch (error) {
+      console.error("Error creating new building:", error);
+    }
+  
+    return axios.post(URL_API, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  };
+
+  const putBuilding = (building_id, updatedBuilding) => {
+    const URL_API = `/api/v1/building/${building_id}`
+    return axios.put(URL_API, updatedBuilding)
+  }
+
+  const assignManagerToBuilding = (building_id, manager_id) => {
+    const URL_API = `/api/v1/building/${building_id}/manager`
+    return axios.put(URL_API, { manager_id })
+  }
+
+  const removeManagerFromBuilding = (building_id) => {
+    const URL_API = `/api/v1/building/${building_id}/manager/remove`
+    return axios.put(URL_API)
+  }
+
+  const deleteBuilding = (building_id) => {
+    const URL_API = `/api/v1/building/${building_id}`
+    return axios.delete(URL_API)
+  }
+
+  //Workspace Manager APIs_________________________________________________________
+
+  //Voucher Manager APIs___________________________________________________________
+const getVoucher = (voucher_id, voucher_name, voucher_code, description, discount, quantity, expired_date, status) => {
+  const URL_API = "/api/v1/voucher";
+  const data = {
+    voucher_id,
+    voucher_name,
+    voucher_code,
+    description,
+    discount,
+    quantity,
+    expired_date,
+    status
+  }
+  return axios.get(URL_API)
+}
+
+const getVoucherById = (voucher_id) => {
+  const URL_API = `/api/v1/voucher/${voucher_id}`
+  return axios.get(URL_API)
+}
+
+const postVoucher = (newVoucher) => {
+  const URL_API = "/api/v1/voucher"
+  return axios.post(URL_API, newVoucher)
+}
+
+const putVoucher = (voucher_id, updatedVoucher) => {
+  const URL_API = `/api/v1/voucher/${voucher_id}`
+  return axios.put(URL_API, updatedVoucher)
+}
+
+const deleteVoucher = (voucher_id) => {
+  const URL_API = `/api/v1/voucher/${voucher_id}`
+  return axios.put(URL_API)
+}
+
+//Review manager APIs___________________________________________________________
+const getReview = (review_id, booking_id, workspace_id, review_content, rating) => {
+  const URL_API = "/api/v1/review"
+  const data = {
+    review_id,
+    booking_id,
+    workspace_id,
+    review_content,
+    rating
+  }
+  return axios.get(URL_API, data)
+}
+
+const getReviewById = (review_id) => {
+  const URL_API = `/api/v1/review/${review_id}`
+  return axios.get(URL_API)
+}
+
+const deleteReview = (review_id) => {
+  const URL_API = `/api/v1/review/delete/${review_id}`
+  return axios.put(URL_API)
+}
+
+  
+//=========================================================================================================================
   export {
     getAmenity,
     getAmenityById,
+    postAmenity,
+    putAmenity,
+    deleteAmenity,
     
     getWorkspaceType,
     getWorkspaceTypeById,
@@ -181,4 +328,23 @@ const getWorkspaceType = (workspace_type_id, workspace_type_name, image, descrip
     getCustomer,
     getCustomerById,
     removeCustomer,
+
+    getBuilding,
+    getBuildingById,
+    postBuilding,
+    putBuilding,
+    assignManagerToBuilding,
+    removeManagerFromBuilding,
+    deleteBuilding,
+
+    getVoucher,
+    getVoucherById,
+    postVoucher,
+    putVoucher,
+    deleteVoucher,
+
+    getReview,
+    getReviewById,
+    deleteReview,
+    
   };

@@ -98,8 +98,8 @@ const handleAddManger = async (e) => {
       name: '', 
       email: '', 
       password: '', 
-      date_of_birth: '', 
-      phone: ''
+      phone: '',
+      status: 'active'
     });
   } catch(err){
     console.error("Error adding Manager: ", err);
@@ -110,7 +110,6 @@ const addManagerFields = [
   { label: "Name", type: "text", name: "name", value: `${newManager.name}` },
   { label: "Email", type: "text", name: "email", value: `${newManager.email}` },
   { label: "Password", type: "text", name: "password", value: `${newManager.password}` },
-  { label: "Date of birth:", type: "date", name: "date_of_birth", value: `${newManager.date_of_birth}`},
   { label: "Phone number:", type: "text", name: "phone", value: `${newManager.phone}` },
 ];
 
@@ -122,77 +121,28 @@ const handleInputChange = (e) => {
   });
 };
 
-//Khu vực hàm dành cho update
-
-const handleUpdateManager = async (e) => {
-  e.preventDefault();
-  try{
-    await putManager(newManager.Manager.user_id, newManager);
-    fetchManager();
-    setShowUpdateModal(false);
-    setSuccessMessage("Manager Updated Successfully!");
-  } catch (err) {
-    console.error("Error updating Manager: ", err)
-  }
-}
-
-const handleUpdateChange = (e) => {
-  const { name, value, type, checked } = e.target;
-  setNewManager((prev) => ({ 
-    ...prev, 
-    [name]: type === 'checkbox' ? (checked ? 'active' : 'inactive') : value,
-  }));
-};
-
-
-const handleUpdateClick = (manager) => {
-  setNewManager(manager);
-  setShowUpdateModal(true);
-};
-
-const updateManagerFields = [
-  { label: "Name", type: "text", name: "name", value: newManager.name },
-  { label: "Email", type: "text", name: "email", value: newManager.email },
-  { label: "Password", type: "text", name: "password", value: newManager.password },
-  { label: "Date of birth", type: "date", name: "date_of_birth", value: newManager.date_of_birth },
-  { label: "Phone number:", type: "text", name: "phone", value: newManager.phone },
-  { 
-    label: "Status", 
-    type: "checkbox", 
-    name: "status", 
-    checked: `${newManager.status}` === "active", 
-    onChange: handleUpdateChange,
-    checkboxLabels: { checked: "active", unchecked: "inactive" }
-  },
-];
-
 //Khu vực hàm dành cho delete
 
 const handleDeleteManager = async () => {
-  if (managerToDelete) {
-    const updatedManager = {
-      ...managerToDelete,
-      status: "inactive"
-    };
-    try {
-      await putManager(managerToDelete.Manager.user_id, updatedManager);
-      fetchManager(); // Refresh the manager list
-      setSuccessMessage("Manager Inactivated Successfully!");
+  if (!managerToDelete) return;
+
+  try {
+    // Call the deleteWorkspaceType API to set the status to inactive
+    await deleteManager(managerToDelete.Manager.user_id);
+
+    // Update the local state to reflect the change
+    setManager(
+      manager.map((type) => 
+        type.Manager.user_id === managerToDelete.Manager.user_id
+          ? { ...type, status: "inactive" }
+          : type
+      ))
+      setShowDeleteModal(false);
+      setSuccessMessage('Manager status set to inactive successfully!');
     } catch (err) {
-      console.error("Error inactivating manager: ", err);
+      console.error('Failed to set manager status to inactive:', err);
     }
-    setShowDeleteModal(false);
   }
-};
-
-
-  // const handleDeleteManager = () => {
-  //   setManagers((prevManagers) =>
-  //     prevManagers.filter((manager) => manager.id !== managerToDelete.id)
-  //   );
-  //   setSuccessMessage("Manager Deleted Successfully!");
-  //   setShowDeleteModal(false);
-  // };
 
   // const handleSearchChange = (e) => {
   //   setSearchTerm(e.target.value);
@@ -257,12 +207,6 @@ const handleDeleteManager = async () => {
                   <td>{manager.date_of_birth}</td>
                   <td>{manager.status}</td>
                   <td>
-                    {/* Update Button */}
-                    <UpdateButton onClick={(e) => {
-                      e.stopPropagation();
-                      handleUpdateClick(manager)
-                    }} 
-                    />
 
                     {/* Delete Button */}
                    <DeleteButton
@@ -287,15 +231,6 @@ const handleDeleteManager = async () => {
         currentItem={newManager}
         onInputChange={handleInputChange}
         fields={addManagerFields}
-      />
-
-      <UpdateModal
-        show={showUpdateModal}
-        onClose={() => setShowUpdateModal(false)}
-        onSubmit={handleUpdateManager}
-        currentItem={newManager}
-        onInputChange={handleUpdateChange}
-        fields={updateManagerFields}
       />
 
       <DeleteModal

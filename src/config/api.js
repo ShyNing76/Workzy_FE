@@ -100,6 +100,7 @@ const putUpdateImage = (image) => {
   formData.append("image", image);
 
   try {
+    // Check if the image is a valid file type (e.g., JPEG, PNG, GIF) before uploading
   } catch (error) {
     console.error("Error uploading image:", error);
   }
