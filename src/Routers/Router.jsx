@@ -237,7 +237,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "vouchersmanager",
-        element: <VouchersManagerPage />
+        element: <VouchersManagerPage />,
       },
     ],
     // condition: (user) => user.isAdmin, // Add condition to check if user is admin before rendering the routes
