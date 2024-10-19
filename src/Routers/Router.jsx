@@ -297,9 +297,9 @@ export const router = createBrowserRouter([
     path: "manager",
     element: (
       <>
-        <PrivateRoute requiredRoleID="2">
+        {/* <PrivateRoute requiredRoleID="2"> */}
           <ManagerPage />
-        </PrivateRoute>
+        {/* </PrivateRoute> */}
       </>
     ),
 
