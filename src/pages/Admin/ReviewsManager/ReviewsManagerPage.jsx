@@ -1,5 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+
+import { getReview } from "../../../config/api.admin.js";
+import { getReviewById } from "../../../config/api.admin.js";
+import { deleteReview } from "../../../config/api.admin.js";
 
 import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
 import AddModal from "../../../components/layout/Admin/Modals/AddModal.jsx";
@@ -14,169 +18,85 @@ import { set } from "date-fns";
 const ReviewsManagerPage = () => {
   const location = useLocation();
 
-  const [reviews, setReviews] = useState([
-    {
-      id: "RV01",
-      bookingId: "BK01",
-      reviewContent: "Không gian thoải mái",
-      rating: "5",
-    },
-    {
-      id: "RV02",
-      bookingId: "BK02",
-      reviewContent: "Nhiều tiện ích",
-      rating: "5",
-    },
-    {
-      id: "RV03",
-      bookingId: "BK03",
-      reviewContent: "Nhân viên tận tình",
-      rating: "5",
-    },
-  ]);
-
-  const [bookings, setBookings] = useState([
-    { id: "BK01", customerName: "Le Van A" },
-    { id: "BK02", customerName: "Luu Thuy B" },
-    { id: "BK03", customerName: "Do Duy C" },
-  ]);
-
-  const addReviewFields = [
-    { label: "Booking ID", name: "bookingId", type: "select", 
-      options: bookings.map((booking) => ({
-          label: booking.id + " - " + booking.customerName,
-          value: booking.id,
-      })),
-      className: "select select-bordered w-full",
-    },
-    { label: "Review Content", name: "reviewContent", type: "text" },
-    {
-      name: "rating",
-      label: "Rating",
-      type: "select",
-      options: [
-        { label: "1", number: 1 },
-        { label: "2", number: 2 },
-        { label: "3", number: 3 },
-        { label: "4", number: 4 },
-        { label: "5", number: 5 },
-      ],
-      className: "select select-bordered w-full max-w-xs",
-    },
-  ];
-
-  const updateReviewFields = [
-    { label: "Review ID", name: "id", type: "text" },
-    { label: "Booking ID", name: "bookingId", type: "select", 
-      options: bookings.map((booking) => ({
-          label: booking.id + " - " + booking.customerName,
-          value: booking.id,
-      })),
-      className: "select select-bordered w-full",
-    },
-    { label: "Review Content", name: "reviewContent", type: "text" },
-    {
-      name: "rating",
-      label: "Rating",
-      type: "select",
-      options: [
-        { label: "1", number: 1 },
-        { label: "2", number: 2 },
-        { label: "3", number: 3 },
-        { label: "4", number: 4 },
-        { label: "5", number: 5 },
-      ],
-      className: "select select-bordered w-full max-w-xs",
-    },
-  ];
-
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentReview, setCurrentReview] = useState({
-    id: "",
-    bookingId: "",
-    reviewContent: "",
-    rating: "",
-  })
-
+  const [review, setReview] = useState(null);
+  const [loading, setLoading] = useState(true); // State loading
+  const [error, setError] = useState(null); // State lỗi
   const [showAddModal, setShowAddModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [reviewToDelete, setReviewToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
+  const [newReview, setNewReview] = useState({
+    booking_id: '',
+    rating: '',
+    review_content: '',
+  })
 
-  const handleInputChange = (e) => {
-    const { name, value, type, number } = e.target;
-    setCurrentReview((prev) => ({...prev, [name]: value}));
-  };
+  const [responseData, setResponseData] = useState(null);
 
-  const generateReviewId = () => {
-    const lastId = 
-        reviews.length > 0 ? reviews[reviews.length - 1].id : "RV00";
-    const newId = `RV${parseInt(lastId.slice(2)) + 1}`;
-    return newId;
-  };
-
-  const handleAddReview = (e) => {
-    e.preventDefault();
-    const newReview = { 
-      ...currentReview, 
-      id: generateReviewId() 
-    };
-    setReviews([...reviews, newReview])
-    setShowAddModal(false);
-    setSuccessMessage("Review added successfully!");
-    setCurrentReview({
-      id: "",
-      bookingId: "",
-      reviewContent: "",
-      rating: "",
-    });
-  };
-
-  const handleUpdateReview = (e) => {
-    e.preventDefault();
-    setReviews((prevReviews) => {
-    const reviewIndex = prevReviews.findIndex(
-      (review) => review.id === currentReview.oldId);
-
-      if (reviewIndex !== -1) {
-        const updatedReviews = [...prevReviews];
-        updatedReviews[reviewIndex] = { ...currentReview};
-        return updatedReviews;
+  const fetchReview = async () => {
+    try {
+      const res = await getReview();
+      console.log("API response:", res); // Inspect API response
+      if (res && res.data && Array.isArray(res.data.rows)) {
+        setReview(res.data.rows);
+      } else {
+        setReview([]); // Initialize as an empty array if data is not as expected
       }
-      return prevReviews;
-    });
-    setShowUpdateModal(false);
-    setSuccessMessage("Review updated successfully!");
-    setCurrentReview({
-      id: "",
-      bookingId: "",
-      reviewContent: "",
-      rating: "",
-    });
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDeleteReview = () => {
-    setReviews((prevReviews) => 
-      prevReviews.filter(
-        (review) => review.id !== reviewToDelete.id)
-      )
+  useEffect(() => {
+    fetchReview();
+  }, []);
+
+  // const [searchTerm, setSearchTerm] = useState("");
+
+  const handleDeleteReview = async () => {
+    if (!reviewToDelete) return;
+
+    try {
+      // Call the deleteReview API with the selected review ID
+      const response = await deleteReview(reviewToDelete.review_id);
+  
+      if (response && response.success) {
+        // If the deletion is successful, update the reviews list
+        setReview((prevReviews) =>
+          prevReviews.filter((r) => r.review_id !== reviewToDelete.review_id)
+        );
+  
+        // Show a success message
+        setSuccessMessage("Review deleted successfully.");
+      } else {
+        setError("Failed to delete the review.");
+      }
+    } catch (err) {
+      setError("An error occurred while deleting the review.");
+    } finally {
+      // Close the delete modal
       setShowDeleteModal(false);
-      setSuccessMessage("Review deleted successfully!");
+      // Clear the review to delete
+      setReviewToDelete(null)
     };
+  }
 
-    const handleSearchChange = (e) => setSearchTerm(e.target.value);
+    // const handleSearchChange = (e) => setSearchTerm(e.target.value);
 
-    const closeSuccessMessage = () => setSuccessMessage("");
+    // const closeSuccessMessage = () => setSuccessMessage("");
 
-    const filteredReviews = reviews.filter((review) => {
-      return(
-        review.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        review.bookingId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        review.reviewContent.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        review.rating.toString().includes(searchTerm)
-      )
-    });
+    // const filteredReviews = reviews.filter((review) => {
+    //   return(
+    //     review.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    //     review.bookingId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    //     review.reviewContent.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    //     review.rating.toString().includes(searchTerm)
+    //   )
+    // });
+    
 
 
   return (
@@ -185,88 +105,53 @@ const ReviewsManagerPage = () => {
 
       <div className="grid grid-cols-2">
           <SearchBar
-            searchTerm={searchTerm}
-            handleSearchChange={handleSearchChange}
-            placeholder="Search payments"
+            // searchTerm={searchTerm}
+            // handleSearchChange={handleSearchChange}
+            // placeholder="Search payments"
           />
   
           {/* Add Button */}
           <div className="ml-2">
-            <AddButton onClick={setShowAddModal} label="Add Payment info" />
+            {/* <AddButton onClick={setShowAddModal} label="Add Payment info" /> */}
           </div>
       </div>
   
       <div>
-        <SuccessAlert message={successMessage} onClose={closeSuccessMessage} />
+        {/* <SuccessAlert message={successMessage} onClose={closeSuccessMessage} /> */}
       </div>
 
       <div className="overflow-x-auto flex flex-1">
         <table className="table table-zebra w-full">
           <thead>
             <tr>
-              <th>Review ID</th>
               <th>Booking ID</th>
               <th>Content</th>
               <th>Rating</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredReviews.length > 0 ? (
-              filteredReviews.map((review) => (
-                <tr key={review.id}>
-                  <td>{review.id}</td>
-                  <td>{review.bookingId}</td>
-                  <td>{review.reviewContent}</td>
+            {Array.isArray(review) && review.map((review) => (
+                <tr key={review.review_id}>
+                  <td>{review.booking_id}</td>
+                  <td>{review.review_content}</td>
                   <td>{review.rating}</td>
                   <td className="flex space-x-2">
-                    <UpdateButton
-                      onClick={() => {
-                        setCurrentReview({
-                          ...review,
-                          oldId: review.id,
-                        });
-                        setShowUpdateModal(true);
-                      }}
-                    />
 
                     {/* Delete Button */}
                     <DeleteButton
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         setReviewToDelete(review);
                         setShowDeleteModal(true);
                       }}
                     />
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="text-center">
-                  No review found.
-                </td>
-              </tr>
-            )}
+              ))}
           </tbody>
         </table>
       </div>
-
-      <AddModal
-        show={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onSubmit={handleAddReview}
-        currentItem={currentReview}
-        onInputChange={handleInputChange}
-        fields={addReviewFields}
-      />
-
-      <UpdateModal
-        show={showUpdateModal}
-        onClose={() => setShowUpdateModal(false)}
-        onSubmit={handleUpdateReview}
-        currentItem={currentReview}
-        onInputChange={handleInputChange}
-        fields={updateReviewFields}
-      />
 
       <DeleteModal
         show={showDeleteModal}

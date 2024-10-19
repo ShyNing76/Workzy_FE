@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
@@ -9,114 +9,87 @@ import AddButton from "../../../components/layout/Admin/Buttons/AddButton.jsx";
 import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.jsx";
 import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
 import SuccessAlert from "../../../components/layout/Admin/SuccessAlert/SuccessAlert.jsx";
+import { getBookingByBuildingId } from "../../../config/api.admin.js";
+import { getBuilding } from "../../../config/api.admin.js" // Assuming similar structure to getBooking
 
 const BookingsManagerPage = () => {
   const location = useLocation();
 
   const [booking, setBooking] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [loading, setLoading] = useState(true); // State loading
+  const [error, setError] = useState(null); // State lỗi
+  const [building, setBuilding] = useState([]);
+  const [selectedBuildingId, setSelectedBuildingId] = useState('');
+
+  // const [searchTerm, setSearchTerm] = useState("");
+  // const [showAddModal, setShowAddModal] = useState(false);
+  // const [showUpdateModal, setShowUpdateModal] = useState(false);
+  // const [showDeleteModal, setShowDeleteModal] = useState(false);
+  // const [bookingToDelete, setBookingToDelete] = useState(null);
+  // const [successMessage, setSuccessMessage] = useState("");
   const [newBooking, setNewBooking] = useState({
-
+    booking_id: '',
+    workspace_id: '',
+    start_time: '',
+    end_time: '',
+    total_price: ''
   });
-  const [bookingToDelete, setBookingToDelete] = useState(null);
-  const [successMessage, setSuccessMessage] = useState("");
 
-  const addBookingFields = [
-    { 
-      label: "Customer ID", 
-      name: "customerID", 
-      type: "text" 
-    },
-    {
-      label: "Total Amenities Price",
-      name: "totalAmenitiesPrice",
-      type: "number",
-    },
-    {
-      label: "Total Workspace Price",
-      name: "totalWorkspacePrice",
-      type: "value",
-    },
-    { 
-      label: "Total Broken Price", 
-      name: "totalBrokenPrice", 
-      type: "value" 
-    },
-    { 
-      label: "Total Price", 
-      name: "totalPrice", 
-      type: "value" 
-    },
-    { 
-      label: "Start Time Date", 
-      name: "startTimeDate", 
-      type: "datetime" 
-    },
-    { 
-      label: "End Time Date", 
-      name: "endTimeDate", 
-      type: "datetime" 
-    },
-    { 
-      label: "Workspace ID", 
-      name: "workspaceID", 
-      type: "text" 
-    },
-  ];
+  const [responseData, setResponseData] = useState(null);
 
-  const updateBookingFields = [
-    { 
-      label: "Booking ID", 
-      name: "id", 
-      type: "text" 
-    },
-    { 
-      label: "Customer ID", 
-      name: "customerID", 
-      type: "text" 
-    },
-    {
-      label: "Total Amenities Price",
-      name: "totalAmenitiesPrice",
-      type: "number",
-    },
-    {
-      label: "Total Workspace Price",
-      name: "totalWorkspacePrice",
-      type: "number",
-    },
-    { 
-      label: "Total Broken Price", 
-      name: "totalBrokenPrice", 
-      type: "number" 
-    },
-    { 
-      label: "Total Price", 
-      name: "totalPrice", 
-      type: "number" },
-    { 
-      label: "Start Time Date", 
-      name: "startTimeDate", 
-      type: "datetime" },
-    { 
-      label: "End Time Date", 
-      name: "endTimeDate", 
-      type: "datetime" 
-    },
-    { 
-      label: "Workspace ID", 
-      name: "workspaceID", 
-      type: "text" 
-    },
-  ];
+    //Hiện data lên table
+    
+    useEffect(() => {
+      const fetchBooking = async () => {
+        if (!selectedBuildingId) {
+          setBooking([]); // Clear bookings if no building is selected
+          return;
+        }
+    
+        setLoading(true); // Start loading state while fetching
+        try {
+          
+          const res = await getBookingByBuildingId(selectedBuildingId);
+          console.log('Fetching bookings for building:', selectedBuildingId)
+          
+          if (res && res.data && res.data.err === 0) { // Validate structure and success
+            const rows = res.data.rows;
+            setBooking(res.data.rows);
+            console.log('Abs')
+          } else {
+            console.error('Unexpected data format or error from API:', res);
+            setBooking([]); // Initialize with empty array if data is not as expected
+          }
+        } catch (err) {
+          console.error('Error fetching bookings:', err);
+          setError(err);
+          setBooking([]); // Optionally reset bookings on error
+        } finally {
+          setLoading(false); // End loading state
+        }
+      };
+    
+      fetchBooking();
+    }, [selectedBuildingId]);
 
-  const handleInputChange = (e) => {
-    // const { name, value } = e.target;
-    // setCurrentBooking((prev) => ({ ...prev, [name]: value }));
+useEffect(() => {
+  const fetchBuildings = async () => {
+    try {
+      const res = await getBuilding();
+      if (res && res.data) {
+        setBuilding(res.data.rows || res.data); // Adjust based on your response structure
+      }
+    } catch (err) {
+      console.error('Failed to fetch buildings:', err);
+    }
   };
+
+  fetchBuildings();
+}, []);
+
+  // const handleInputChange = (e) => {
+
+  // };
 
   // const generateBookingId = () => {
   //   const lastId =
@@ -125,77 +98,22 @@ const BookingsManagerPage = () => {
   //   return newId;
   // };
 
-  const handleAddBookingSubmit = (e) => {
-    // e.preventDefault();
-    // const newBooking = { ...currentBooking, id: generateBookingId() };
-    // setBookings([...bookings, newBooking]);
-    // setShowAddModal(false);
-    // setSuccessMessage("Booking added successfully!");
-    // setCurrentBooking({
-    //   id: "",
-    //   customerID: "",
-    //   totalAmenitiesPrice: "",
-    //   totalWorkspacePrice: "",
-    //   totalBrokenPrice: "",
-    //   totalPrice: "",
-    //   startTimeDate: "",
-    //   endTimeDate: "",
-    //   workspaceID: "",
-    // });
-  };
+  // const handleSearchChange = (e) => {
+  //   setSearchTerm(e.target.value);
+  // };
 
-  const handleUpdateBookingSubmit = (e) => {
-    e.preventDefault();
-    setBookings((prevBookings) => {
-      const bookingIndex = prevBookings.findIndex(
-        (booking) => booking.id === currentBooking.id
-      );
-      if (bookingIndex !== -1) {
-        const updatedBookings = [...prevBookings];
-        updatedBookings[bookingIndex] = { ...currentBooking };
-        return updatedBookings;
-      }
-      return prevBookings;
-    });
-    setShowUpdateModal(false);
-    setSuccessMessage("Booking updated successfully!");
-    setCurrentBooking({
-      id: "",
-      customerID: "",
-      totalAmenitiesPrice: "",
-      totalWorkspacePrice: "",
-      totalBrokenPrice: "",
-      totalPrice: "",
-      startTimeDate: "",
-      endTimeDate: "",
-      workspaceID: "",
-    });
-  };
+  // const closeSuccessMessage = () => {
+  //   setSuccessMessage("");
+  // };
 
-  const handleDeleteBooking = () => {
-    setBookings((prevBookings) =>
-      prevBookings.filter((booking) => booking.id !== bookingToDelete.id)
-    );
-    setShowDeleteModal(false);
-    setSuccessMessage("Booking deleted successfully!");
-  };
-
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const closeSuccessMessage = () => {
-    setSuccessMessage("");
-  };
-
-  const filteredBookings = bookings.filter((booking) => {
-      return(
-        booking.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        booking.customerID.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        booking.workspaceID.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    }
-  );
+  // const filteredBookings = bookings.filter((booking) => {
+  //     return(
+  //       booking.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       booking.customerID.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       booking.workspaceID.toLowerCase().includes(searchTerm.toLowerCase())
+  //     )
+  //   }
+  // );
 
   return (
     <div className="container mx-auto px-4 sm:px-8">
@@ -203,51 +121,63 @@ const BookingsManagerPage = () => {
 
       <div className="grid grid-cols-2">
         <SearchBar
-          searchTerm={searchTerm}
-          handleSearchChange={handleSearchChange}
-          placeholder="Search by ID, name, or status"
+          // searchTerm={searchTerm}
+          // handleSearchChange={handleSearchChange}
+          // placeholder="Search by ID, name, or status"
         />
 
         {/* Add Button */}
         <div className="ml-2">
-          <AddButton
+          {/* <AddButton
             onClick={() => setShowAddModal(true)}
             label="Add Booking"
-          />
+          /> */}
         </div>
       </div>
 
         <div>
-          <SuccessAlert
+          {/* <SuccessAlert
             message={successMessage}
             onClose={closeSuccessMessage}
-          />
+          /> */}
         </div>
+        
+        <select
+  className="select select-bordered select-sm w-full max-w-xs"
+  value={selectedBuildingId}
+  onChange={(e) => setSelectedBuildingId(e.target.value)}
+>
+  <option value="">All Buildings</option>
+  {building.map((building) => (
+    <option key={building.building_id} value={building.building_id}>
+      {building.building_name}
+    </option>
+  ))}
+</select>
 
         <div className="overflow-x-auto flex flex-1">
           <table className="table table-zebra w-full">
             <thead>
               <tr>
                 <th>Booking ID</th>
-                <th>Customer ID</th>
-                <th>Total Amenities Price</th>
-                <th>Total Workspace Price</th>
-                <th>Total Broken Price</th>
-                <th>Total Price</th>
-                <th>Start Time Date</th>
-                <th>End Time Date</th>
                 <th>Workspace ID</th>
+                <th>Total Price</th>
+                <th>Start Time</th>
+                <th>End Time</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredBookings.length > 0 ? (
-                filteredBookings.map((booking) => (
+              {Array.isArray(booking) && booking.map((booking) => (
                   <tr key={booking.id}>
-
+                    <td>{booking.booking_id}</td>
+                    <td>{booking.workspace_id}</td>
+                    <td>{booking.total_price}</td>
+                    <td>{booking.start_time}</td>
+                    <td>{booking.end_time}</td>
                     <td className="flex space-x-2">
                       {/* Update Button */}
-                      <UpdateButton
+                      {/* <UpdateButton
                         onClick={() => {
                           setCurrentBooking({ 
                             ...booking, 
@@ -255,40 +185,34 @@ const BookingsManagerPage = () => {
                           });
                           setShowUpdateModal(true);
                         }}
-                      />
+                      /> */}
 
                       {/* Delete Button */}
-                      <DeleteButton
+                      {/* <DeleteButton
                         onClick={() => {
                           setBookingToDelete(booking);
                           setShowDeleteModal(true);
                         }}
-                      />
+                      /> */}
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="4" className="text-center">
-                    No Booking Found
-                  </td>
-                </tr>
-              )}
+                ))}
+              
             </tbody>
           </table>
         </div>
 
         {/* Add, Update, Delete, Success Modals */}
-        <AddModal
+        {/* <AddModal
           show={showAddModal}
           onClose={() => setShowAddModal(false)}
           onSubmit={handleAddBookingSubmit}
           currentItem={currentBooking}
           onInputChange={handleInputChange}
           fields={addBookingFields}
-        />
+        /> */}
 
-        <UpdateModal
+        {/* <UpdateModal
           show={showUpdateModal}
           onClose={() => setShowUpdateModal(false)}
           onSubmit={handleUpdateBookingSubmit}
@@ -303,7 +227,7 @@ const BookingsManagerPage = () => {
           onDelete={handleDeleteBooking}
           itemToDelete={bookingToDelete}
           itemType="booking"
-        />
+        /> */}
     </div>
   );
 };

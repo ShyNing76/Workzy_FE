@@ -14,6 +14,7 @@ import { MdOutlineWorkspaces } from "react-icons/md";
 import { CiCreditCard2 } from "react-icons/ci";
 import { VscFeedback } from "react-icons/vsc";
 import { GoReport } from "react-icons/go";
+import { RiCoupon3Line } from "react-icons/ri";
 
 import { Link, Outlet, useLocation } from "react-router-dom";
 
@@ -83,6 +84,20 @@ const AdminSidebar = () => {
                 </Link>
             </li>
 
+                <h2 className="font-semibold ml-2 mb-2 mt-2 text-gray-500">WORKZY Assign</h2>
+
+                <li className="mb-1">
+                    <div className="flex flex-1 items-center mb-2"><PiBuildingsLight className="text-2xl"/><p className="ml-4">Assign Staff</p></div>
+                </li>
+
+                <li className="mb-1">
+                    <div className="flex flex-1 items-center mb-2"><PiBuildingsLight className="text-2xl"/><p className="ml-4">Assign Manager</p></div>
+                </li>
+
+                <li className="mb-1">
+                    <div className="flex flex-1 items-center mb-2"><PiBuildingsLight className="text-2xl"/><p className="ml-4">Assign Workspace</p></div>
+                </li>
+
                 <h2 className="font-semibold ml-2 mb-2 mt-2 text-gray-500">WORKZY Bookings</h2>
 
                 <li className="mb-1">
@@ -92,10 +107,16 @@ const AdminSidebar = () => {
                 </li>
 
                 <li className="mb-1">
+                    <Link to="/admin/vouchersmanager" className= {`tab ${location.pathname === '/admin/vouchersmanager' ? 'active' : ''}`}>
+                        <div className="flex flex-1 items-center mb-2"><RiCoupon3Line className="text-2xl"/><p className="ml-4">Vouchers</p></div>
+                    </Link>
+                </li>
+
+                {/* <li className="mb-1">
                     <Link to="/admin/paymentsmanager" className= {`tab ${location.pathname === '/admin/paymentsmanager' ? 'active' : ''}`}>
                         <div className="flex flex-1 items-center mb-2"><CiCreditCard2 className="text-2xl"/><p className="ml-4">Payments</p></div>
                     </Link>
-                </li>
+                </li> */}
 
                 <li className="mb-1">
                     <Link to="/admin/reviewsmanager" className= {`tab ${location.pathname === '/admin/reviewsmanager' ? 'active' : ''}`}>

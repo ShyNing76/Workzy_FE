@@ -15,6 +15,7 @@ import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.
 import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
 
 import { useLocation } from "react-router-dom";
+import Swal from 'sweetalert2';
 
 const StaffsManagerPage = () => {
   const location = useLocation();
@@ -34,7 +35,6 @@ const StaffsManagerPage = () => {
     password: '',
     phone: '',
     name: '',
-    status: '',
   });
   const [response, setResponseData] = useState(null);
   const [selectedStaffDetails, setSelectedStaffDetails] = useState(null);
@@ -42,9 +42,9 @@ const StaffsManagerPage = () => {
   //hàm chuyển đổi định dạng ngày
   const formatDateToISO = (dateString) => {
     if (!dateString || !dateString.includes('/')) {
-      return ''; // hoặc giá trị mặc định khác tùy trường hợp
+      return ''; // Default or handle missing date
     }
-    const [day = '01', month = '01', year = '1970'] = dateString.split('/');
+    const [day, month, year] = dateString.split('/');
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
   };
   
@@ -74,6 +74,21 @@ const StaffsManagerPage = () => {
     fetchStaff();
   }, []);
 
+  useEffect(() => {
+    if (successMessage) {
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: successMessage,
+        position: "top-end",
+        toast: true, // makes it a toast message
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      }).then(() => setSuccessMessage("")); // clear the message after showing
+    }
+  }, [successMessage]);
+
   //Hiện detail khi click vô 1 hàng
   
   const handleRowClick = async (user_id) => {
@@ -91,6 +106,64 @@ const StaffsManagerPage = () => {
   //Khu vực hàm dành cho add
    const handleAddStaff = async (e) => {
     e.preventDefault();
+
+        // Validation logic with SweetAlert
+        if (!newStaff.name) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Staff name is required.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+    
+        if (!newStaff.email) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Staff email is required.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+    
+        if (!newStaff.password) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Staff password is required.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+    
+        if (!newStaff.phone) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Staff phone is required.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+
     try {
       // Ensure we send only the necessary fields
       const { email, password, phone, name } = newStaff;
@@ -119,48 +192,6 @@ const StaffsManagerPage = () => {
       [name]: value,
     });
   };
-
-  //Khu vực hàm dành cho update
-
-  const handleUpdateStaff = async (e) => {
-    e.preventDefault();
-    try{
-      await putStaff(newStaff.id, newStaff)
-      fetchStaff();
-      setShowUpdateModal(false);
-      setSuccessMessage("Staff Updated Successfully!");
-    } catch(err) {
-      console.error("Error updating Staff: ", err)
-    }
-  }
-
-  const handleUpdateChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setNewStaff((prev) => ({
-        ...prev,
-        [name]: type === 'checkbox' ? (checked ? 'active' : 'inactive') : value,
-    }));
-  }
-
-  const handleUpdateClick = (staff) => {
-    setNewStaff(staff);
-    setShowUpdateModal(true);
-  }
-
-  const genderOptions = [
-    { label: "Male", value: "male" },
-    { label: "Female", value: "female" },
-    { label: "Other", value: "other" },
-  ];
-
-  const updateStaffFields = [
-    { label: "Name",  type: "text", name: "name", value: `${newStaff.name}` },
-    { label: "Email", type: "text", name: "email", value: `${newStaff.email}`},
-    { label: "Password", type: "text", name: "password", value: `${newStaff.password}` },
-    { label: "Date of birth", type: "date", name: "date_of_birth", value: formatDateToISO(`${newStaff.date_of_birth}`) },
-    { label: "Phone", type: "text", name: "phone", value: `${newStaff.phone}`},
-    { label: "Gender", type: "select", name: "gender", value: `${newStaff.gender}`, options: genderOptions },
-  ];
 
   //Khu vực hàm dành cho delete
   const handleDeleteStaff = async () => {
@@ -288,14 +319,6 @@ const StaffsManagerPage = () => {
                   <td>{staff.phone}</td>
                   <td>{staff.status}</td>
                   <td>
-                    {/* Update Button */}
-                    <UpdateButton
-                      onClick={(e) => {
-                        // setCurrentStaff({ ...staff, oldId: staff.id });
-                        e.stopPropagation();
-                        handleUpdateClick(staff)
-                      }}
-                    />
 
                     {/* Delete Button */}
                     <DeleteButton
@@ -320,15 +343,6 @@ const StaffsManagerPage = () => {
         currentItem={newStaff}
         onInputChange={handleInputChange}
         fields={addStaffFields}
-      />
-
-      <UpdateModal
-        show={showUpdateModal}
-        onClose={() => setShowUpdateModal(false)}
-        onSubmit={handleUpdateStaff}
-        currentItem={newStaff}
-        onInputChange={handleUpdateChange}
-        fields={updateStaffFields}
       />
 
       <DeleteModal

@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { formatCurrency } from "../../../components/context/priceFormat.jsx";
+import Swal from 'sweetalert2';
+
 
 import { getAmenity } from "../../../config/api.admin.js";
 import { getAmenityById } from "../../../config/api.admin.js";
+import { postAmenity } from "../../../config/api.admin.js";
+import { putAmenity } from "../../../config/api.admin.js";
+import { deleteAmenity } from "../../../config/api.admin.js";
 
 import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
 import AddModal from "../../../components/layout/Admin/Modals/AddModal.jsx";
@@ -14,6 +20,7 @@ import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.
 import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
 
 import { useLocation } from "react-router-dom";
+import { set } from "date-fns";
 
 const AmenitiesManagerPage = () => {
   const location = useLocation();
@@ -33,8 +40,9 @@ const AmenitiesManagerPage = () => {
     amenity_name: '',
     image: null,
     original_price: 0,
-    depreciation_price: '',
-    rent_price: '',
+    depreciation_price: 0,
+    rent_price: 0,
+    status: 'active'
   });
 
   const [responseData, setResponseData] = useState(null);
@@ -60,6 +68,21 @@ const AmenitiesManagerPage = () => {
     fetchAmenity();
   }, []);
 
+  useEffect(() => {
+    if (successMessage) {
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: successMessage,
+        position: "top-end",
+        toast: true, // makes it a toast message
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      }).then(() => setSuccessMessage("")); // clear the message after showing
+    }
+  }, [successMessage]);
+
   //Hàm click lên hàng để hiện more details
   const handleRowClick = async (amenity_id) => {
     try {
@@ -72,107 +95,186 @@ const AmenitiesManagerPage = () => {
       console.error("Error fetching amenity details", err);
     }
   };
+
+  //Khu vực hàm dành cho add
+  const handleAddAmenity = async (e) => {
+    e.preventDefault();
+
+        // Validation logic
+        if (!newAmenity.amenity_name) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Amenity name is required.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+      
+        if (newAmenity.original_price <= 0) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Original price must be greater than 0.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+
+    const formData = new FormData();
+    formData.append('amenity_name', newAmenity.amenity_name);
+    formData.append('image', newAmenity.image);
+    formData.append('original_price', newAmenity.original_price);
+
+    try{
+      const Amenity = await postAmenity(newAmenity);
+      setResponseData(Amenity);
+      fetchAmenity();
+      setShowAddModal(false);
+      setSuccessMessage("Amenity added successfully!"); // Set success message
+    } catch (err) {
+      console.error("Error adding amenity", err);
+    }
+  }
+
+  
+
   const addAmenityFields = [
-    { name: "name", label: "Amenity Name", type: "text" },
-    { name: "images", label: "Images", type: "file", multiple: true },
-    { name: "originalPrice", label: "Original Price", type: "number" },
-    { name: "depreciationPrice", label: "Depreciation Price", type: "number" },
-    { name: "rentPrice", label: "Rent Price", type: "number" },
-    { name: "type", label: "Type", type: "text" },
+    { name: "amenity_name", label: "Amenity Name", type: "text", value: `${newAmenity.amenity_name}` },
+    { name: "image", label: "Images", type: "file", multiple: true, value: `${newAmenity.image}` },
+    { name: "original_price", label: "Original Price", type: "number", value: `${newAmenity.original_price}` },
   ];
 
+  const handleInputChange = (e) => {
+    const { name, value, files } = e.target
+    setNewAmenity({
+      ...newAmenity,
+      [name]: files ? files[0] : value,
+    })
+  };
+
+//Khu vực hàm dành cho update
+  const handleUpdateAmenity = async (e) => {
+    e.preventDefault();
+
+    
+  // Check for duplicate amenity name
+    const isDuplicateName = amenity.some(a => a.amenity_name.toLowerCase() === newAmenity.amenity_name.toLowerCase());
+
+        // Validation logic
+        if (isDuplicateName) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Amenity name already exists. Please enter a unique name.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+
+        if (!newAmenity.amenity_name) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Amenity name is required.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+      
+        if (newAmenity.original_price <= 0) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Original price must be greater than 0.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+
+    try{
+      await putAmenity(newAmenity.amenity_id, newAmenity)
+      fetchAmenity();
+      setShowUpdateModal(false);
+      setSuccessMessage("Amenity updated successfully!");
+    } catch (err) {
+      console.error("Error updating amenity", err);
+    }
+  }
+
+  const handleUpdateChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setNewAmenity((prev) => ({ 
+      ...prev, 
+      [name]: type === 'checkbox' ? (checked ? 'active' : 'inactive') : value,
+    }));
+  }
+
+  const handleUpdateClick = (amenity) => {
+    setNewAmenity(amenity);
+    setShowUpdateModal(true);
+  }
+
   const updateAmenityFields = [
-    { name: "id", label: "Amenity ID", type: "text" },
-    { name: "name", label: "Amenity name", type: "text" },
-    { name: "images", label: "Images", type: "file", multiple: true },
-    { name: "originalPrice", label: "Original Price", type: "number" },
-    { name: "depreciationPrice", label: "Depreciation Price", type: "number" },
-    { name: "rentPrice", label: "Rent Price", type: "number" },
-    { name: "type", label: "Type", type: "text" },
-    {
-      name: "status",
-      label: "Status",
-      type: "checkbox",
-      checkboxLabels: { checked: "Available", unchecked: "Unavailable" },
+    { name: "amenity_name", label: "Amenity Name", type: "text", value: `${newAmenity.amenity_name}` },
+    { name: "image", label: "Images", type: "file", multiple: true, value: `${newAmenity.image}` },
+    { name: "original_price", label: "Original Price", type: "number", value: `${newAmenity.original_price}` },
+    { 
+      label: "Status", 
+      type: "checkbox", 
+      name: "status", 
+      checked: `${newAmenity.status}` === "active", 
+      onChange: handleUpdateChange,
+      checkboxLabels: { checked: "active", unchecked: "inactive" }
     },
   ];
 
-  // const handleInputChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setCurrentAmenity((prev) => ({ ...prev, [name]: value }));
-  // };
+  //Khu vực hàm dành cho delete
 
-  // const handleRowClick = (amenity) => {
-  //   // Set the current amenity details in a structured form
-  //   setCurrentAmenityDetails({
-  //     ID: amenity.id,
-  //     Name: amenity.name,
-  //     "Original Price": amenity.originalPrice,
-  //     "Depreciation Price": amenity.depreciationPrice,
-  //     "Rent Price": amenity.rentPrice,
-  //     Type: amenity.type,
-  //     Status: amenity.status,
-  //     Images: amenity.images.join(", ") // Assuming images are URLs
-  //   });
-  //   setShowDetailsModal(true);
-  // };
 
-  // const handleAddAmenitySubmit = (e) => {
-  //   e.preventDefault();
-  //   const newAmenity = {
-  //     ...currentAmenity,
-  //     id: generateAmenityId(),
-  //     status: "Active",
-  //   };
-  //   setAmenities([...amenities, newAmenity]);
-  //   setShowAddModal(false);
-  //   setSuccessMessage("Amenity Added Successfully!");
-  //   setCurrentAmenity({
-  //     id: "",
-  //     name: "",
-  //     images: "",
-  //     originalPrice: "",
-  //     depreciationPrice: "",
-  //     rentPrice: "",
-  //     type: "",
-  //     status: "",
-  //   });
-  // };
 
-  // const handleUpdateAmenitySubmit = (e) => {
-  //   e.preventDefault();
-  //   setAmenities((prevAmenities) => {
-  //     const amenityIndex = prevAmenities.findIndex(
-  //       (amenity) => amenity.id === currentAmenity.oldId
-  //     );
-  //     if (amenityIndex !== -1) {
-  //       const updatedAmenities = [...prevAmenities];
-  //       updatedAmenities[amenityIndex] = { ...currentAmenity };
-  //       return updatedAmenities;
-  //     }
-  //     return prevAmenities;
-  //   });
-  //   setShowUpdateModal(false);
-  //   setSuccessMessage("Amenity Updated Successfully!");
-  //   setCurrentAmenity({
-  //     id: "",
-  //     name: "",
-  //     images: "",
-  //     originalPrice: "",
-  //     depreciationPrice: "",
-  //     rentPrice: "",
-  //     type: "",
-  //     status: "",
-  //   });
-  // };
+    const handleDeleteAmenity = async () => {
+      if (!amenityToDelete) return;
 
-  // const handleDeleteAmenity = () => {
-  //   setAmenities((prevAmenities) =>
-  //     prevAmenities.filter((amenity) => amenity.id !== amenityToDelete.id)
-  //   );
-  //   setShowDeleteModal(false);
-  //   setSuccessMessage("Amenity Deleted Successfully!");
-  // };
+      try {
+        // Call the deleteWorkspaceType API to set the status to inactive
+        await deleteAmenity(amenityToDelete.amenity_id);
+    
+        // Update the local state to reflect the change
+        setAmenity(
+          amenity.map((type) => 
+            type.amenity_id === amenityToDelete.amenity_id
+              ? { ...type, status: "inactive" }
+              : type
+          )
+        );
+    
+        setShowDeleteModal(false);
+        setSuccessMessage('Amenity status set to inactive successfully!');
+      } catch (err) {
+        console.error('Failed to set amenty status to inactive:', err);
+      }
+    };
 
   // const handleSearchChange = (e) => {
   //   setSearchTerm(e.target.value);
@@ -202,7 +304,9 @@ const AmenitiesManagerPage = () => {
 
         {/* Add Button */}
         <div className="ml-2">
-          {/* <AddButton onClick={() => setShowAddModal(true)} label="Add Amenity" /> */}
+          <AddButton 
+            onClick={() => setShowAddModal(true)} 
+            label="Add Amenity" />
         </div>
       </div>
 
@@ -227,29 +331,28 @@ const AmenitiesManagerPage = () => {
             {Array.isArray(amenity) && amenity.map((amenity) => (
                 <tr key={amenity.amenity_id}>
                   <td>{amenity.amenity_name}</td>
-                  <td>{amenity.original_price}</td>
-                  <td>{amenity.depreciation_price}</td>
-                  <td>{amenity.rent_price}</td>
+                  <td>{formatCurrency(amenity.original_price)}</td>
+                  <td>{formatCurrency(amenity.depreciation_price)}</td>
+                  <td>{formatCurrency(amenity.rent_price)}</td>
                   <td>{amenity.status}</td>
                   <td className="flex"></td>
                   <td className="flex space-x-2">
                     {/* Update Button */}
-                    {/* <UpdateButton
+                    <UpdateButton
                       onClick={(e) => {
                         e.stopPropagation(); // Prevent row click from being triggered
-                        setCurrentAmenity({ ...amenity, oldId: amenity.id });
-                        setShowUpdateModal(true);
+                        handleUpdateClick(amenity);
                       }}
-                    /> */}
+                    />
                     
                     {/* Delete Button */}
-                    {/* <DeleteButton
+                    <DeleteButton
                       onClick={(e) => {
                         e.stopPropagation(); // Prevent row click from being triggered
                         setAmenityToDelete(amenity);
                         setShowDeleteModal(true);
                       }}
-                    /> */}
+                    />
                   </td>
                 </tr>
               ))}
@@ -265,31 +368,31 @@ const AmenitiesManagerPage = () => {
       />
 
       {/* Add, Update, Delete Modals */}
-      {/* <AddModal
+      <AddModal
         show={showAddModal}
         onClose={() => setShowAddModal(false)}
-        onSubmit={handleAddAmenitySubmit}
-        currentItem={currentAmenity}
+        onSubmit={handleAddAmenity}
+        currentItem={newAmenity}
         onInputChange={handleInputChange}
         fields={addAmenityFields}
-      /> */}
+      />
 
-      {/* <UpdateModal
+      <UpdateModal
         show={showUpdateModal}
         onClose={() => setShowUpdateModal(false)}
-        onSubmit={handleUpdateAmenitySubmit}
-        currentItem={currentAmenity}
-        onInputChange={handleInputChange}
+        onSubmit={handleUpdateAmenity}
+        currentItem={newAmenity}
+        onInputChange={handleUpdateChange}
         fields={updateAmenityFields}
-      /> */}
+      />
 
-      {/* <DeleteModal
+      <DeleteModal
         show={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onDelete={handleDeleteAmenity}
         itemToDelete={amenityToDelete}
         itemType="amenity"
-      /> */}
+      />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import Swal from 'sweetalert2';
 
 import { getWorkspaceType } from "../../../config/api.admin.js";
 import { getWorkspaceTypeById } from "../../../config/api.admin.js";
@@ -60,6 +61,21 @@ const WorkspacesTypesManagerPage = () => {
     useEffect(() => {
       fetchWorkspaceType();
     }, []);
+
+    useEffect(() => {
+      if (successMessage) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: successMessage,
+          position: "top-end",
+          toast: true, // makes it a toast message
+          timer: 3000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        }).then(() => setSuccessMessage("")); // clear the message after showing
+      }
+    }, [successMessage]);
     
     //Hàm click lên hàng để hiện more details
     const handleRowClick = async (workspace_type_id) => {
@@ -100,7 +116,7 @@ const WorkspacesTypesManagerPage = () => {
         formData.append('image', newWorkspaceType.image);
         formData.append('description', newWorkspaceType.description);
         formData.append('status', newWorkspaceType.status);
-    
+      console.log('FormData:', Object.fromEntries(formData.entries())); // Log FormData content
        try {
          const WorkspaceType = await postWorkspaceType(newWorkspaceType);
          setResponseData(WorkspaceType);
@@ -152,7 +168,7 @@ const WorkspacesTypesManagerPage = () => {
         status: newWorkspaceType.status === "active" ? "active" : "inactive", // Đảm bảo trạng thái chính xác
       };
   
-      console.log('Updated Workspace Type:', updatedWorkspaceType); // Log để kiểm tra giá trị
+      console.log('newWorkspaceType:', newWorkspaceType); // Log để kiểm tra giá trị
       await putWorkspaceType(updatedWorkspaceType.workspace_type_id, updatedWorkspaceType);
       fetchWorkspaceType(); // Tải lại dữ liệu
       setShowUpdateModal(false);
@@ -197,7 +213,7 @@ const WorkspacesTypesManagerPage = () => {
   ];
 
 //Khu vực hàm dành cho delete
-  const handleDeleteWorkspaceType = async (e) => {
+  const handleDeleteWorkspaceType = async () => {
     if (!workspaceTypeToDelete) return;
 
     try {
