@@ -12,6 +12,10 @@ const BookingCard = (props) => {
     type,
     handleCancelBooking,
     handleCheckinBooking,
+    handleCheckoutBooking,
+    handleOpenReviewModal,
+    handleRefundBooking,
+    handlAddToCalendar,
   } = props;
   const navigate = useNavigate(); // For navigating to detail page
 
@@ -42,8 +46,8 @@ const BookingCard = (props) => {
         return "badge badge-error"; // Màu đỏ cho "damaged-payment"
       case "completed":
         return "badge badge-success"; // Màu tím cho "completed"
-      case "canceled":
-        return "badge badge-error"; // Màu đỏ cho "canceled"
+      case "cancelled":
+        return "badge badge-error"; // Màu đỏ cho "cancelled"
       default:
         return "badge"; // Mặc định cho các trạng thái khác
     }
@@ -74,12 +78,16 @@ const BookingCard = (props) => {
               {booking.BookingStatuses[0].status}
             </div>{" "}
           </h2>
-          {booking.BookingStatuses[0].status === "canceled" ? (
-            <></>
-          ) : (
-            <button className="btn btn-outline btn-neutral btn-sm">
+          {booking.BookingStatuses[0].status === "confirmed" ||
+          booking.BookingStatuses[0].status === "paid" ? (
+            <button
+              className="btn btn-outline btn-neutral btn-sm"
+              onClick={(e) => handlAddToCalendar(e, booking.booking_id)}
+            >
               Add to Calendar
             </button>
+          ) : (
+            <></>
           )}
         </div>
 
@@ -126,13 +134,15 @@ const BookingCard = (props) => {
             <>
               <button
                 className="btn btn-outline btn-error"
-                onClick={(e) => handleCancelBooking(e, booking.booking_id)}
+                onClick={(e) => handleRefundBooking(e, booking.booking_id)}
               >
                 Cancel Booking
               </button>
               <button
                 className="btn btn-outline btn-primary"
-                onClick={(e) => handleCheckinBooking(e, booking.booking_id)}
+                onClick={(e) =>
+                  handleCheckinBooking(e, booking.booking_id, booking)
+                }
               >
                 Check-in
               </button>
@@ -140,7 +150,14 @@ const BookingCard = (props) => {
           )}
           {booking.BookingStatuses[0].status === "in-process" && (
             <>
-              <button className="btn btn-outline btn-info">Checkout</button>
+              <button
+                className="btn btn-outline btn-info"
+                onClick={(e) =>
+                  handleCheckoutBooking(e, booking.booking_id, booking)
+                }
+              >
+                Checkout
+              </button>
               <button
                 className="btn btn-outline btn-primary"
                 onClick={handleAddAmenitiesClick}
@@ -155,7 +172,12 @@ const BookingCard = (props) => {
             </button>
           )}
           {booking.BookingStatuses[0].status === "completed" && (
-            <button className="btn btn-outline btn-accent">Review</button>
+            <button
+              className="btn btn-outline btn-accent"
+              onClick={(e) => handleOpenReviewModal(e)}
+            >
+              Rating
+            </button>
           )}
         </div>
       </div>

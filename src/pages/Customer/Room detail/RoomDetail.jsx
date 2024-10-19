@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { PiMonitor } from "react-icons/pi";
 import GallerySwiper from "../../../components/layout/Customer/GallerySwiper/GallerySwiper";
 import "./RoomDetail.scss";
 import Googlemap from "../../../components/layout/Customer/Googlemap/Googlemap";
@@ -11,9 +10,8 @@ import {
   getWorkSpaceTypeNameById,
 } from "../../../config/api";
 import { toast } from "react-toastify";
-import { RiHomeWifiLine } from "react-icons/ri";
-import { LiaFaxSolid } from "react-icons/lia";
 import { TbHomeOff } from "react-icons/tb";
+import { getAmenityIcon } from "../../../components/context/iconGenerate";
 
 const RoomDetail = () => {
   const { roomid } = useParams();
@@ -85,19 +83,6 @@ const RoomDetail = () => {
     fetchWorkSpaceTypeName();
   }, [roomData]); // Trigger this effect when roomData changes
 
-  const getAmenityIcon = (amenityName) => {
-    switch (amenityName) {
-      case "Moniter Machine":
-        return <PiMonitor className="text-2xl mr-2" />;
-      case "Fax Machine":
-        return <LiaFaxSolid className="text-2xl mr-2" />;
-      case "Printer Machine":
-        return <PiPrinter className="text-2xl mr-2" />;
-      default:
-        return <RiHomeWifiLine className="text-2xl mr-2" />; // Default icon
-    }
-  };
-
   return (
     <>
       {!isLoading ? (
@@ -145,31 +130,26 @@ const RoomDetail = () => {
             </div>
 
             <div className="room-amenities-container">
-              <h2 className="text-2xl font-bold mb-4">Amenities</h2>
-              <ul className="amenities-list mx-auto grid grid-cols-1 items-start gap-y-6 px-4 py-12 sm:px-6 sm:py-10 lg:max-w-7xl lg:grid-cols-2 lg:px-8 item-center">
+              <h2 className="text-2xl font-bold ">Amenities</h2>
+              <ul className="amenities-list mx-auto grid grid-cols-1 items-start gap-6 sm:p-6 lg:grid-cols-2 item-center">
                 {workSpaceAmenities.length > 1 ? (
                   workSpaceAmenities.map((amenities, index) => (
-                    <li key={`amenities-${index}`} className="amenities-1 flex">
-                      {getAmenityIcon(amenities)} &nbsp;
-                      {amenities}
+                    <li
+                      key={`amenities-${index}`}
+                      className="amenities-1 flex items-center gap-2 bg-white shadow-md p-4 rounded-lg border border-gray-100 hover:bg-gray-50"
+                    >
+                      {getAmenityIcon(amenities)}
+                      <span className="text-gray-800 font-medium">
+                        {amenities}
+                      </span>
                     </li>
                   ))
                 ) : (
-                  <li className="amenities-2 flex">
-                    <TbHomeOff className="text-2xl" /> &nbsp; No Amenities in
-                    Workspace
+                  <li className="amenities-2 flex items-center gap-2 bg-red-100 text-red-700 p-4 rounded-lg border border-red-300 shadow-md">
+                    <TbHomeOff className="text-2xl" />
+                    <span>No Amenities in Workspace</span>
                   </li>
                 )}
-
-                {/* <li className="amenities-2 flex">
-              <PiNoteBlankLight className="text-2xl" /> &nbsp; Note paper
-            </li>
-            <li className="amenities-3 flex">
-              <BsProjector className="text-2xl" /> &nbsp; Projector
-            </li>
-            <li className="amenities-4 flex">
-              <IoCafeOutline className="text-2xl" /> &nbsp; Beverages
-            </li> */}
               </ul>
             </div>
 

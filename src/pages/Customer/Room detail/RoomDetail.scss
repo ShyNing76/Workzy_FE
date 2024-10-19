@@ -30,21 +30,20 @@
     .time-slot-grid {
       display: grid;
       grid-template-columns: repeat(12, 1fr);
-      gap: 2px;
       flex-grow: 1;
 
       .time-slot {
-        background-color: #ccc;
+        background-color: #fff;
         padding: 10px 0px;
         text-align: center;
-        border: 1px solid #000;
+        border: 1px solid #ccc;
         // border-radius: 0 10px 10px 0;
         font-size: 14px;
         font-weight: 600;
         cursor: pointer;
 
         &:hover {
-          background-color: #999;
+          background-color: #ccc;
           transition: background-color 0.3s;
         }
       }

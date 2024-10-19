@@ -1,5 +1,6 @@
 import { format, parseISO } from "date-fns";
 import React from "react";
+import "./BookingTimeLine.scss";
 
 const BookingTimeLine = (props) => {
   const { bookingStatuses } = props;
@@ -8,9 +9,9 @@ const BookingTimeLine = (props) => {
     confirmed: "Booking has been confirmed.",
     paid: "Payment has been received.",
     "check-in": "You have checked in.",
-    "in-process": "Your booking is currently in process.",
+    "in-process": "Your booking is currently in usage.",
     "check-out": "You have checked out.",
-    "check-amenities": "Please check for any damaged amenities.",
+    "check-amenities": "Staff check for any damaged amenities.",
     completed: "Booking has been successfully completed.",
     "damaged-payment": "There are damaged amenities that need payment.",
     cancelled: "Your booking has been cancelled.",
@@ -25,14 +26,16 @@ const BookingTimeLine = (props) => {
 
         <hr className="border-l-2 border-gray-300 h-96 my-4 mx-6" />
 
-        <ul className="steps steps-vertical w-full mr-8">
+        <ul className="steps steps-vertical  w-full mr-8">
           {bookingStatuses
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             .map((status, index) => (
               <li
                 key={index}
-                className={`step steps-vertical `}
-                data-content=""
+                className={`step steps-vertical ${
+                  status.status === "cancelled" ? "step-error" : "step-warning"
+                } ${status.status !== "cancelled" ? "keep-warning" : ""} `}
+                data-content={status.status === "cancelled" ? "✕" : "✓"}
               >
                 <div className=" pl-3 flex justify-between w-full">
                   <span className="font-semibold">

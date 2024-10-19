@@ -1,4 +1,5 @@
 import React from "react";
+import "./ProgressBar.scss";
 
 const ProgressBar = (props) => {
   const { statusOrder, booking, currentStatusIndex } = props;
@@ -9,12 +10,21 @@ const ProgressBar = (props) => {
         {statusOrder.map((status, index) => (
           <li
             key={status}
-            data-content={booking.status === "canceled" ? "✕" : `${index + 1}`}
-            className={`uppercase	font-semibold step ${
-              booking.status === "canceled"
-                ? "step-error" // Entire progress bar turns red when canceled
+            data-content={
+              booking.BookingStatuses[0].status === "cancelled"
+                ? "✕"
+                : `${index + 1}`
+            }
+            className={`step uppercase font-semibold relative ${
+              booking.BookingStatuses[0].status === "cancelled"
+                ? "step-error"
                 : index <= currentStatusIndex
-                ? "step-warning" // Normal color for active steps
+                ? "step-warning"
+                : ""
+            } ${
+              (status === "check-in" || status === "check-out") &&
+              index === currentStatusIndex
+                ? "half-circle-step"
                 : ""
             }`}
           >
