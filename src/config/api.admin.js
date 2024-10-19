@@ -170,6 +170,10 @@ const getWorkspaceType = (workspace_type_id, workspace_type_name, image, descrip
 
   //Bookings Manager APIs___________________________________________________________
 
+  const getBookingByBuildingId = (building_id) =>  {
+    const URL_API = `/api/v1/booking/get?building_id=${building_id}`
+    return axios.get(URL_API)
+  }
 
   //Buildings Manager APIs_________________________________________________________
   const getBuilding = (building_id, manager_id, building_name, location, address, google_address, description, rating, status, BuildingImages) => {
@@ -238,6 +242,44 @@ const getWorkspaceType = (workspace_type_id, workspace_type_name, image, descrip
   }
 
   //Workspace Manager APIs_________________________________________________________
+const getWorkspace = (workspace_id, workspace_type_name, building_id, workspace_name, price_per_hour, price_per_day, price_per_month, area, capacity, description, status) => {
+  const URL_API = "/api/v1/workspace"
+  const data = {
+    workspace_id,
+    workspace_type_name,
+    building_id,
+    workspace_name,
+    price_per_hour,
+    price_per_day,
+    price_per_month,
+    area,
+    capacity,
+    description,
+    status,
+  }
+  return axios.get(URL_API)
+}
+
+const getWorkspaceById = (workspace_id) => {
+  const URL_API = `/api/v1/workspace/${workspace_id}`
+  return axios.get(URL_API)
+}
+
+const postWorkspace = (newWorkspace) => {
+  const URL_API = "/api/v1/workspace"
+  return axios.post(URL_API, newWorkspace)
+}
+
+const putWorkspace = (workspace_id, updatedWorkspace) => {
+  const URL_API = `/api/v1/workspace/${workspace_id}`
+  return axios.put(URL_API, updatedWorkspace)
+}
+
+const deleteWorkspace = (workspace_id) => {
+  const URL_API = `/api/v1/workspace/delete/${workspace_id}`
+  return axios.delete(URL_API)
+}
+
 
   //Voucher Manager APIs___________________________________________________________
 const getVoucher = (voucher_id, voucher_name, voucher_code, description, discount, quantity, expired_date, status) => {
@@ -313,6 +355,12 @@ const deleteReview = (review_id) => {
     putWorkspaceType,
     deleteWorkspaceType,
 
+    getWorkspace,
+    getWorkspaceById,
+    postWorkspace,
+    putWorkspace,
+    deleteWorkspace,
+
     getManager,
     getManagerById,
     postManager,
@@ -328,6 +376,8 @@ const deleteReview = (review_id) => {
     getCustomer,
     getCustomerById,
     removeCustomer,
+
+    getBookingByBuildingId,
 
     getBuilding,
     getBuildingById,

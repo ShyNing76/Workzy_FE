@@ -127,6 +127,7 @@ const ReviewsManagerPage = () => {
               <th>Booking ID</th>
               <th>Content</th>
               <th>Rating</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>

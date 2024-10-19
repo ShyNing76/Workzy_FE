@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import Swal from 'sweetalert2';
 
 import { getVoucher } from "../../../config/api.admin.js";
 import { getVoucherById } from "../../../config/api.admin.js";
@@ -59,7 +60,7 @@ const VouchersManagerPage = () => {
         day = day.length > 1 ? day : "0" + day;
       
         // Return the formatted date
-        return month + "/" + day + "/" + year;
+        return day + "/" + month + "/" + year;
       };
 
       //Hiện data lên table
@@ -82,6 +83,21 @@ const VouchersManagerPage = () => {
   useEffect(() => {
     fetchVoucher();
   }, []);
+
+  useEffect(() => {
+    if (successMessage) {
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: successMessage,
+        position: "top-end",
+        toast: true, // makes it a toast message
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      }).then(() => setSuccessMessage("")); // clear the message after showing
+    }
+  }, [successMessage]);
 
     //Khu vực hàm dành cho add
     const handleAddVoucher = async (e) => {

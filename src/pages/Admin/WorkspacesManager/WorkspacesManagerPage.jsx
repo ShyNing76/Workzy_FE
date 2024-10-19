@@ -16,7 +16,7 @@ import BuildingFilter from "../../../components/layout/Admin/Filters/BuildingFil
 const HCMWorkspacesManager = () => {
   const location = useLocation();
 
-  const [workspaces, setWorkspaces] = useState(null);
+  const [workspace, setWorkspace] = useState(null);
   const [loading, setLoading] = useState(true); // State loading
   const [error, setError] = useState(null); // State lỗi
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -27,7 +27,7 @@ const HCMWorkspacesManager = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [newWorkspace, setNewWorkspace] = useState({
     workspace_name: "",
-    id: "",
+    building_id: "",
     type: "",
 
     buildingId: "",
@@ -39,11 +39,6 @@ const HCMWorkspacesManager = () => {
     status: "",
     images: [],
   });
-
-  const [buildings, setBuildings] = useState([
-    { id: "Bui1", name: "Phan Văn Trị" },
-    { id: "Bui2", name: "Khu CNC Hồ Chí Minh" },
-  ]); // DB manager giả
 
   // const addWorkspaceFields = [
   //   { name: "type", label: "Workspace Type", type: "text" },

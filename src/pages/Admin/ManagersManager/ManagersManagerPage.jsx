@@ -16,6 +16,7 @@ import SuccessAlert from "../../../components/layout/Admin/SuccessAlert/SuccessA
 import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal.jsx";
 
 import { useLocation } from "react-router-dom";
+import Swal from 'sweetalert2';
 
 
 const ManagersManagerPage = () => {
@@ -62,6 +63,21 @@ const ManagersManagerPage = () => {
     fetchManager();
 }, []);
 
+useEffect(() => {
+  if (successMessage) {
+    Swal.fire({
+      icon: "success",
+      title: "Success",
+      text: successMessage,
+      position: "top-end",
+      toast: true, // makes it a toast message
+      timer: 3000,
+      timerProgressBar: true,
+      showConfirmButton: false,
+    }).then(() => setSuccessMessage("")); // clear the message after showing
+  }
+}, [successMessage]);
+
 //Hiện detail khi click vô 1 hàng
 
 const handleRowClick = async (user_id) => {
@@ -80,6 +96,64 @@ const handleRowClick = async (user_id) => {
 
 const handleAddManger = async (e) => {
   e.preventDefault();
+
+    // Validation logic with SweetAlert
+    if (!newManager.name) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Manager name is required.',
+        position: 'top-end',
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    if (!newManager.email) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Manager email is required.',
+        position: 'top-end',
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    if (!newManager.password) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Manager password is required.',
+        position: 'top-end',
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    if (!newManager.phone) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Manager phone is required.',
+        position: 'top-end',
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
   const formData = new FormData();
 
   formData.append('name', newManager.name);

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import Swal from 'sweetalert2';
 
 import { getWorkspaceType } from "../../../config/api.admin.js";
 import { getWorkspaceTypeById } from "../../../config/api.admin.js";
@@ -60,6 +61,21 @@ const WorkspacesTypesManagerPage = () => {
     useEffect(() => {
       fetchWorkspaceType();
     }, []);
+
+    useEffect(() => {
+      if (successMessage) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: successMessage,
+          position: "top-end",
+          toast: true, // makes it a toast message
+          timer: 3000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        }).then(() => setSuccessMessage("")); // clear the message after showing
+      }
+    }, [successMessage]);
     
     //Hàm click lên hàng để hiện more details
     const handleRowClick = async (workspace_type_id) => {

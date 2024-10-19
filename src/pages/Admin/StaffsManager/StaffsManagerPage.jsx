@@ -15,6 +15,7 @@ import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.
 import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
 
 import { useLocation } from "react-router-dom";
+import Swal from 'sweetalert2';
 
 const StaffsManagerPage = () => {
   const location = useLocation();
@@ -73,6 +74,21 @@ const StaffsManagerPage = () => {
     fetchStaff();
   }, []);
 
+  useEffect(() => {
+    if (successMessage) {
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: successMessage,
+        position: "top-end",
+        toast: true, // makes it a toast message
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      }).then(() => setSuccessMessage("")); // clear the message after showing
+    }
+  }, [successMessage]);
+
   //Hiện detail khi click vô 1 hàng
   
   const handleRowClick = async (user_id) => {
@@ -90,6 +106,64 @@ const StaffsManagerPage = () => {
   //Khu vực hàm dành cho add
    const handleAddStaff = async (e) => {
     e.preventDefault();
+
+        // Validation logic with SweetAlert
+        if (!newStaff.name) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Staff name is required.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+    
+        if (!newStaff.email) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Staff email is required.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+    
+        if (!newStaff.password) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Staff password is required.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+    
+        if (!newStaff.phone) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Staff phone is required.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+
     try {
       // Ensure we send only the necessary fields
       const { email, password, phone, name } = newStaff;

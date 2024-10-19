@@ -11,6 +11,7 @@ import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal.j
 import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
 import SuccessAlert from "../../../components/layout/Admin/SuccessAlert/SuccessAlert.jsx";
 import { set } from "date-fns";
+import Swal from 'sweetalert2';
 
 
 const CustomersManagerPage = () => {

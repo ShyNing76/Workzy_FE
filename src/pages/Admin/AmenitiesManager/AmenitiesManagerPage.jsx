@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { formatCurrency } from "../../../components/context/priceFormat.jsx";
+import Swal from 'sweetalert2';
+
 
 import { getAmenity } from "../../../config/api.admin.js";
 import { getAmenityById } from "../../../config/api.admin.js";
@@ -66,6 +68,21 @@ const AmenitiesManagerPage = () => {
     fetchAmenity();
   }, []);
 
+  useEffect(() => {
+    if (successMessage) {
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: successMessage,
+        position: "top-end",
+        toast: true, // makes it a toast message
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      }).then(() => setSuccessMessage("")); // clear the message after showing
+    }
+  }, [successMessage]);
+
   //Hàm click lên hàng để hiện more details
   const handleRowClick = async (amenity_id) => {
     try {
@@ -82,6 +99,36 @@ const AmenitiesManagerPage = () => {
   //Khu vực hàm dành cho add
   const handleAddAmenity = async (e) => {
     e.preventDefault();
+
+        // Validation logic
+        if (!newAmenity.amenity_name) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Amenity name is required.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+      
+        if (newAmenity.original_price <= 0) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Original price must be greater than 0.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+
     const formData = new FormData();
     formData.append('amenity_name', newAmenity.amenity_name);
     formData.append('image', newAmenity.image);
@@ -97,6 +144,8 @@ const AmenitiesManagerPage = () => {
       console.error("Error adding amenity", err);
     }
   }
+
+  
 
   const addAmenityFields = [
     { name: "amenity_name", label: "Amenity Name", type: "text", value: `${newAmenity.amenity_name}` },
@@ -115,6 +164,54 @@ const AmenitiesManagerPage = () => {
 //Khu vực hàm dành cho update
   const handleUpdateAmenity = async (e) => {
     e.preventDefault();
+
+    
+  // Check for duplicate amenity name
+    const isDuplicateName = amenity.some(a => a.amenity_name.toLowerCase() === newAmenity.amenity_name.toLowerCase());
+
+        // Validation logic
+        if (isDuplicateName) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Amenity name already exists. Please enter a unique name.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+
+        if (!newAmenity.amenity_name) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Amenity name is required.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+      
+        if (newAmenity.original_price <= 0) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Original price must be greater than 0.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+
     try{
       await putAmenity(newAmenity.amenity_id, newAmenity)
       fetchAmenity();
