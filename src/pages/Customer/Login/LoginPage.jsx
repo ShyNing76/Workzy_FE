@@ -16,10 +16,10 @@ const LoginPage = () => {
   const location = useLocation();
   const redirectTo = new URLSearchParams(location.search).get("redirect");
   const env_backend = import.meta.env.VITE_BACKEND_URL;
+  const [loginLoading, setLoginLoading] = useState(false);
 
   //   Check Authentication
-  const { setRoleId, setAuth, loginLoading, setLoginLoading } =
-    useContext(AuthContext);
+  const { setRoleId, setAuth } = useContext(AuthContext);
 
   // Show password
   const handleShowPassword = () => {
@@ -42,7 +42,7 @@ const LoginPage = () => {
 
       if (userRes && userRes.data && userRes.err == 0) {
         const { role_id } = userRes.data;
-        localStorage.setItem("role_id", role_id);
+        localStorage.setItem("roleId", role_id);
         setRoleId(role_id);
 
         switch (role_id) {

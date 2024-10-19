@@ -8,8 +8,11 @@ const PrivateRoute = (props) => {
   //   auth from auth Context (use context)
   const { roleId, auth } = useContext(AuthContext);
 
+  console.log("authen: ", auth?.isAuthenticated);
+  console.log("roldId", roleId);
+
   //   Check auth from user has login or not
-  if (!auth.isAuthenticated) {
+  if (!auth?.isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
@@ -19,11 +22,13 @@ const PrivateRoute = (props) => {
   // roleId = 3 => Staff Homepage
   // roleId = 4 => Customer Homepage
 
-  return +roleId === +requiredRoleID ? (
-    children
-  ) : (
-    <Navigate to="/login" replace />
-  );
+  // Check if the role matches the requiredRoleID for the route
+  if (+roleId === +requiredRoleID) {
+    return children;
+  }
+
+  // If role doesn't match, redirect the user to the login page or another appropriate page
+  return <Navigate to="/login" replace />;
 };
 
 export default PrivateRoute;

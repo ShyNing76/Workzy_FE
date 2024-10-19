@@ -1,13 +1,11 @@
-import Navbar from "./components/layout/Customer/Navbar/Navbar.jsx";
+import React, { useContext, useEffect } from "react";
+import { AuthContext } from "../../../components/context/auth.context";
+import { getUserAuthen } from "../../../config/api";
+import AdminHeader from "../../../components/layout/Admin/AdminHeader/AdminHeader";
 import { Outlet } from "react-router-dom";
-import Footer from "./components/layout/Customer/Footer/Footer.jsx";
-import { AuthContext } from "./components/context/auth.context.jsx";
-import { useContext, useEffect, useState } from "react";
-import { getUserAuthen } from "./config/api.js";
+import AdminSidebar from "../../../components/layout/Admin/AdminSidebar/AdminSidebar";
 
-function App() {
-  const [refresh, setRefresh] = useState(false);
-
+const Admin = () => {
   const { auth, setAuth, appLoading, setAppLoading, setRoleId, roleId } =
     useContext(AuthContext);
 
@@ -50,16 +48,28 @@ function App() {
           <span className="loading loading-spinner loading-lg"></span>
         </div>
       ) : (
-        <div className="flex flex-col min-h-screen">
-          <Navbar refresh={refresh} />
-          <div className="flex-grow">
-            <Outlet context={{ refresh, setRefresh }} />
+        <>
+          <AdminHeader />
+          <div className="sidebar-container drawer lg:drawer-open">
+            {/* Sidebar */}
+            <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
+            <main className="drawer-content flex flex-col items-start w-full h-full p-4">
+              {/* Page content here */}
+              <Outlet />
+            </main>
+            <div className="sidebar-container drawer lg:drawer-open">
+              <input
+                id="my-drawer-2"
+                type="checkbox"
+                className="drawer-toggle"
+              />
+              <AdminSidebar />
+            </div>
           </div>
-          <Footer />
-        </div>
+        </>
       )}
     </>
   );
-}
+};
 
-export default App;
+export default Admin;

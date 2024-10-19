@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getAmenitiesByBookingId, sendBrokenAmenities } from '../../../../../config/api.staff';
+import { getAmenitiesByBookingId } from '../../../../../config/api.staff';
 import Swal from "sweetalert2";
 
 const isValidGUID = (guid) => {
@@ -55,16 +55,9 @@ const CheckAmenitiesModal = ({ bookingId, onClose, handleChangeStatus, handleSen
     const handleDone = async () => {
       try {
         if (selectedAmenities.length === 0) {
-          // Trường hợp 1: Không có thiết bị lỗi -> Cập nhật trạng thái thành "completed"
           await handleChangeStatus(bookingId, "completed");
 
         } else {
-          // Trường hợp 2: Gửi thiết bị lỗi và cập nhật trạng thái thành "damaged-payment"
-        //   const data = {
-        //     amenity_name: selectedAmenities,
-        //     booking_id: bookingId,
-        //   };
-        //   const response = await sendBrokenAmenities(data);
             console.log(selectedAmenities);
             await handleSendBrokenAmenities(bookingId, selectedAmenities);
         }
@@ -72,11 +65,11 @@ const CheckAmenitiesModal = ({ bookingId, onClose, handleChangeStatus, handleSen
         console.error("Error handling Done:", err);
         Swal.fire({
           icon: "error",
-          title: "Lỗi",
-          text: "Có lỗi xảy ra khi cập nhật trạng thái!",
+          title: "Error",
+          text: "An error occurred while updating the status!",
         });
       } finally {
-        onClose(); // Đóng modal sau khi hoàn thành
+        onClose();
       }
     };
   

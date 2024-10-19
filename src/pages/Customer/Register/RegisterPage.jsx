@@ -14,12 +14,12 @@ const RegisterPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const location = useLocation();
   const redirectTo = new URLSearchParams(location.search).get("redirect");
+  const [registerLoading, setRegisterLoading] = useState(false);
 
   const navigate = useNavigate();
 
   //   Check Authentication
-  const { setRoleId, setAuth, registerLoading, setRegisterLoading } =
-    useContext(AuthContext);
+  const { setRoleId, setAuth } = useContext(AuthContext);
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -51,7 +51,7 @@ const RegisterPage = () => {
 
         if (userRes && userRes.data && userRes.err === 0) {
           const { role_id } = userRes.data;
-          localStorage.setItem("role_id", role_id);
+          localStorage.setItem("roleId", role_id);
           setRoleId(role_id);
 
           // Điều hướng theo vai trò của người dùng

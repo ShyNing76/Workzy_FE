@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import AmenitiesIcon from '../../booking/Amenities/AmenitiesIcon'; 
 import { getWorkspaceByBuildingId, getStaffBuildingId } from '../../../../../config/api.staff.js'; 
 import './RoomModal.scss';
 
@@ -73,9 +72,6 @@ const Modal = ({ isOpen, onClose, room, bookingType }) => {
                 </div>
                 <div className="status">
                     <h3>Status: </h3>
-                </div>
-                <div className="amenities">
-                    <AmenitiesIcon workspaceType={workspaceDetails?.WorkspaceType?.workspace_type_name} />
                 </div>
             </div>
         </div>
