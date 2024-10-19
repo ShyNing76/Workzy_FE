@@ -183,9 +183,9 @@ export const router = createBrowserRouter([
     path: "admin",
     element: (
       <>
-        <PrivateRoute requiredRoleID="1">
-          <AdminDashboardPage />
-        </PrivateRoute>
+        {/* <PrivateRoute requiredRoleID="1"> */}
+        <AdminDashboardPage />
+        {/* </PrivateRoute> */}
       </>
     ),
 
@@ -243,9 +243,8 @@ export const router = createBrowserRouter([
     path: "staff",
     element: (
       <>
-        <PrivateRoute requiredRoleID="3">
-          <MainPage />,
-        </PrivateRoute>
+        {/* <PrivateRoute requiredRoleID="3"> */}
+        <MainPage />,{/* </PrivateRoute> */}
       </>
     ),
 
@@ -297,9 +296,9 @@ export const router = createBrowserRouter([
     path: "manager",
     element: (
       <>
-        <PrivateRoute requiredRoleID="2">
-          <ManagerPage />
-        </PrivateRoute>
+        {/* <PrivateRoute requiredRoleID="2"> */}
+        <ManagerPage />
+        {/* </PrivateRoute> */}
       </>
     ),
 

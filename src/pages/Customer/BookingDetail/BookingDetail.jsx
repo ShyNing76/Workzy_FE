@@ -20,12 +20,17 @@ const BookingDetail = () => {
     "check-in",
     "in-process",
     "check-out",
-    booking.BookingStatuses[0].status === "canceled" ? "canceled" : "completed",
+    booking.BookingStatuses[0].status === "cancelled"
+      ? "cancelled"
+      : "completed",
   ];
 
   const currentStatusIndex = statusOrder.indexOf(
-    booking.BookingStatuses[0].status === "canceled"
-      ? "canceled"
+    booking.BookingStatuses[0].status === "check-amenities" ||
+      booking.BookingStatuses[0].status === "damaged-payment"
+      ? "check-out"
+      : booking.BookingStatuses[0].status === "cancelled"
+      ? "cancelled"
       : booking.BookingStatuses[0].status
   );
 
@@ -64,8 +69,8 @@ const BookingDetail = () => {
         return "badge badge-error"; // Màu đỏ cho "damaged-payment"
       case "completed":
         return "badge badge-success"; // Màu tím cho "completed"
-      case "canceled":
-        return "badge badge-error"; // Màu đỏ cho "canceled"
+      case "cancelled":
+        return "badge badge-error"; // Màu đỏ cho "cancelled"
       default:
         return "badge"; // Mặc định cho các trạng thái khác
     }
@@ -103,7 +108,7 @@ const BookingDetail = () => {
 
       <hr />
 
-      {booking.BookingStatuses[0].status !== "canceled" ? (
+      {booking.BookingStatuses[0].status !== "cancelled" ? (
         <PriceBreakDown booking={booking} />
       ) : (
         <></>

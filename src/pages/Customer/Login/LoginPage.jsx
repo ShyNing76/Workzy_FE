@@ -15,6 +15,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const redirectTo = new URLSearchParams(location.search).get("redirect");
+  const env_backend = import.meta.env.VITE_BACKEND_URL;
 
   //   Check Authentication
   const { setRoleId, setAuth, loginLoading, setLoginLoading } =
@@ -83,8 +84,8 @@ const LoginPage = () => {
   };
 
   // Handle Login With Google
-  const handleLoginWithGoogle = () => {
-    window.location.href = "http://localhost:5000/api/v1/auth/google";
+  const handleLoginWithGoogle = async () => {
+    window.location.href = `${env_backend}api/v1/auth/google`;
   };
 
   return (

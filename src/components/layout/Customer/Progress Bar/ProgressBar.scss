@@ -1,0 +1,17 @@
+.half-circle-step::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 2rem;
+  height: 2rem;
+  background-color: #e5e7eb; /* Màu mặc định */
+  border-radius: 9999px;
+  transform: translateY(-60%);
+  z-index: 1;
+  overflow: hidden;
+}
+
+.half-circle-step::after {
+  background-image: linear-gradient(to right, #ffbe00 50%, #e5e7eb 50%);
+}

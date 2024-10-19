@@ -247,6 +247,22 @@ const postApprovePaypalOrderAmenities = (orderId, bookingId) => {
   return axios.post(URL_API, data);
 };
 
+const postBookingAddToCalendar = (bookingId) => {
+  const URL_API = "api/v1/booking/add-to-calendar";
+
+  const data = {
+    booking_id: bookingId,
+  };
+
+  return axios.post(URL_API, data);
+};
+
+const postBookingRefund = (bookingId) => {
+  const URL_API = `api/v1/booking/refund/${bookingId}`;
+
+  return axios.post(URL_API);
+};
+
 export {
   loginApi,
   registerApi,
@@ -275,4 +291,6 @@ export {
   getAllAmenities,
   postCreatePaypalOrderAmenities,
   postApprovePaypalOrderAmenities,
+  postBookingAddToCalendar,
+  postBookingRefund,
 };

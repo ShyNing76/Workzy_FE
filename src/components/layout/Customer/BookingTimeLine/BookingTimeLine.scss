@@ -1,0 +1,3 @@
+.keep-warning::before {
+  background-color: #ffbe00 !important; /* Đảm bảo màu warning vẫn giữ khi trạng thái là cancelled */
+}
