@@ -15,6 +15,11 @@ const getBooking = (building_id) => {
   return axios.get(URL_API);
 };
 
+const getBookingWorkspace = (building_id, workspace_id) => {
+  const URL_API = `/api/v1/booking/get/?building_id=${building_id}&workspace_id=${workspace_id}`;
+  return axios.get(URL_API);
+}
+
 
 const postBookingStatus = (booking_id, status) => {
   const URL_API = `/api/v1/staff/change-status/${booking_id}`;
@@ -40,5 +45,5 @@ export {
   getBooking,
   postBookingStatus,
   getAmenitiesByBookingId,
-  sendBrokenAmenities 
+  sendBrokenAmenities, getBookingWorkspace
 };

@@ -40,7 +40,7 @@ import ReviewsManagerPage from "../pages/Admin/ReviewsManager/ReviewsManagerPage
 
 import MainPage from "../pages/Staff/MainPage/MainPage.jsx";
 import BookingManagement from "../pages/Staff/Bookings/BookingManagement.jsx";
-import BuildingRoomPage from "../pages/Staff/BuildingRoom/BuildingRoomPage.jsx";
+import BuildingWorkspaces from "../pages/Staff/BuildingRoom/BuildingWorkspaces.jsx";
 import PaymentPage from "../pages/Customer/Payment/Payment.jsx";
 import Wishlist from "../pages/Staff/Wishlist/Wishlist.jsx";
 import MyBooking from "../pages/Customer/MyBooking/MyBooking.jsx";
@@ -135,6 +135,7 @@ export const router = createBrowserRouter([
           </>
         ),
       },
+      
       {
         path: "user",
         element: (
@@ -243,9 +244,9 @@ export const router = createBrowserRouter([
     path: "staff",
     element: (
       <>
-        <PrivateRoute requiredRoleID="3">
+        {/* <PrivateRoute requiredRoleID="3"> */}
           <MainPage />,
-        </PrivateRoute>
+        {/* </PrivateRoute> */}
       </>
     ),
 
@@ -256,7 +257,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "buildingroom",
-        element: <BuildingRoomPage />,
+        element: <BuildingWorkspaces />,
       },
       {
         path: "bookings",

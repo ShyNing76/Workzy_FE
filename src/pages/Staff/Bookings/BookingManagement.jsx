@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './BookingManagement.scss';
 import Swal from "sweetalert2";
 import DetailModal from '../../../components/layout/staff/booking/Modal/DetailModal';
-import CheckAmenitiesModal from '../../../components/layout/staff/booking/Modal/CheckAmenitiesModal.jsx'
-import SearchBar from '../../../components/layout/staff/booking/SearchBar/SearchBar';
+import CheckAmenitiesModal from '../../../components/layout/staff/booking/Modal/CheckAmenitiesModal.jsx';
 import { getBooking, postBookingStatus, sendBrokenAmenities } from '../../../config/api.staff.js';
 import { useOutletContext } from 'react-router-dom';
 
@@ -13,24 +12,18 @@ const BookingManagement = () => {
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [bookings, setBookings] = useState([]);
     const [filteredBookings, setFilteredBookings] = useState([]);
-    const { workspaces, buildingId } = useOutletContext();
+    const { buildingId } = useOutletContext();
 
-    const formatCurrency = (amount) =>
+    const formatCurrency = (amount) => 
         new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(amount));
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
-        const options = { 
-            year: 'numeric', 
-            month: '2-digit', 
-            day: '2-digit', 
-            hour: '2-digit', 
-            minute: '2-digit', 
-            hour12: false 
-        };
-        return date.toLocaleString('vi-VN', options).replace(',', ''); 
+        return date.toLocaleString('vi-VN', { 
+            year: 'numeric', month: '2-digit', day: '2-digit', 
+            hour: '2-digit', minute: '2-digit', hour12: false 
+        }).replace(',', ''); 
     };
-    
 
     const bookingTypeMap = {
         "4d0018e8-f983-4e3e-a8aa-50706a5130ce": "Hourly",
@@ -42,26 +35,38 @@ const BookingManagement = () => {
         try {
             if (!buildingId) throw new Error("Building ID is not valid.");
             const response = await getBooking(buildingId);
-            if (!response || !response.data || !Array.isArray(response.data.rows)) {
-                throw new Error("Unexpected data format.");
-            }
+            if (!response?.data?.rows) throw new Error("Unexpected data format.");
 
-            const bookingsData = response.data.rows.map(booking => ({
-                booking_id: booking.booking_id,
-                workspace_id: booking.workspace_id,
-                workspace_name: booking.Workspace?.workspace_name || "Không xác định",
-                start_time_date: formatDate(booking.start_time_date),
-                end_time_date: formatDate(booking.end_time_date),
-                createdAt: formatDate(booking.createdAt),
-                workspace_price: formatCurrency(booking.workspace_price),
-                total_price: formatCurrency(booking.total_price),
-                status: booking.BookingStatuses?.at(-1)?.status || "N/A",
-                booking_type: bookingTypeMap[booking.booking_type_id] || "Không xác định",
-                total_amenities_price: formatCurrency(booking.total_amenities_price || 0),
-                total_broken_price: formatCurrency(booking.total_broken_price || 0),
-                customer_name: booking.Customer?.User?.name || "Không xác định"
-            }));
-
+            const bookingsData = response.data.rows.map(booking  => {
+                // Extracting amenities data from BookingAmenities
+                const bookingAmenities = booking.Amenities?.map(amenity => {
+                const bookingAmenityDetails = amenity.BookingAmenities || {};
+                
+                return {
+                    amenity_name: amenity.amenity_name,
+                    rent_price: formatCurrency(bookingAmenityDetails.price || 0),
+                    quantity: bookingAmenityDetails.quantity || 0,
+                    total_price: formatCurrency(bookingAmenityDetails.total_price || 0)
+                };
+            });             
+                                                       
+                return {
+                    booking_id: booking.booking_id,
+                    workspace_id: booking.workspace_id,
+                    workspace_name: booking.Workspace?.workspace_name || "Unknown",
+                    start_time_date: formatDate(booking.start_time_date),
+                    end_time_date: formatDate(booking.end_time_date),
+                    workspace_price: formatCurrency(booking.workspace_price),
+                    total_price: formatCurrency(booking.total_price),
+                    total_workspace_price: formatCurrency(booking.total_workspace_price),
+                    status: booking.BookingStatuses?.at(-1)?.status || "N/A",
+                    booking_type: bookingTypeMap[booking.booking_type_id] || "Unknown",
+                    total_amenities_price: formatCurrency(booking.total_amenities_price || 0),
+                    total_broken_price: formatCurrency(booking.total_broken_price || 0),
+                    customer_name: booking.Customer?.User?.name || "Unknown",
+                    amenities: bookingAmenities 
+                };
+            });
             setBookings(bookingsData);
             setFilteredBookings(bookingsData);
         } catch (error) {
@@ -73,25 +78,15 @@ const BookingManagement = () => {
         if (buildingId) fetchBookingData();
     }, [buildingId]);
 
-    const handleSearch = (bookingId) => {
-        const filtered = bookingId 
-            ? bookings.filter(booking => booking.booking_id.includes(bookingId)) 
-            : bookings;
-        setFilteredBookings(filtered);
-    };
-
-    const handleSendBrokenAmenities = async (bookingId, selectedAmenities) =>{
+    const handleSendBrokenAmenities = async (bookingId, selectedAmenities) => {
         try {
-            console.log(selectedAmenities);
             const data = {
-                    amenity_name: selectedAmenities,
-                    booking_id: bookingId,
-                  };
-            const response = await sendBrokenAmenities(data); // Replace with your actual API function
-            
+                amenity_name: selectedAmenities,
+                booking_id: bookingId,
+            };
+            const response = await sendBrokenAmenities(data);
             if (response?.data?.err) throw new Error("Unable to report broken amenities.");
-    
-            // Success message
+
             Swal.fire({
                 position: "center",
                 icon: "success",
@@ -99,18 +94,15 @@ const BookingManagement = () => {
                 showConfirmButton: false,
                 timer: 1500,
             });
+
             setFilteredBookings(prevBookings =>
                 prevBookings.map(booking =>
-                    booking.booking_id === bookingId ? { ...booking,status: "damage-payment" } : booking
+                    booking.booking_id === bookingId ? { ...booking, status: "damage-payment" } : booking
                 )
             );
 
-            const selected = bookings.find(b => b.booking_id === bookingId); 
-            setSelectedBooking(selected);
-            setShowAmenitiesModal(true); 
-            // Optionally, update UI or state here if needed
-            // Example: refresh bookings, close modal, etc.
-    
+            setSelectedBooking(bookings.find(b => b.booking_id === bookingId));
+            setShowAmenitiesModal(true);
         } catch (error) {
             console.error("Error reporting broken amenities:", error);
             Swal.fire({
@@ -120,18 +112,17 @@ const BookingManagement = () => {
                 showConfirmButton: true,
             });
         }
-    
-    }
+    };
 
     const handleChangeStatus = async (booking_id, status) => {
         try {
             const response = await postBookingStatus(booking_id, status);
-            if (response?.data?.err) throw new Error("Lỗi không xác định.");
+            if (response?.data?.err) throw new Error("Unknown error.");
 
             Swal.fire({
                 position: "center",
                 icon: "success",
-                title: "Cập nhật trạng thái thành công!",
+                title: "Status updated successfully!",
                 showConfirmButton: false,
                 timer: 1500,
             });
@@ -143,48 +134,51 @@ const BookingManagement = () => {
             );
 
             if (status === "check-amenities") {
-                const selected = bookings.find(b => b.booking_id === booking_id); 
-                setSelectedBooking(selected);
-                setShowAmenitiesModal(true); 
+                setSelectedBooking(bookings.find(b => b.booking_id === booking_id));
+                setShowAmenitiesModal(true);
             }
         } catch (error) {
-            console.error("Lỗi khi cập nhật trạng thái:", error);
+            console.error("Error while updating status:", error);
         }
     };
 
     const handleAmenitiesDone = () => {
         if (selectedBooking) {
-            handleChangeStatus(selectedBooking.booking_id, "completed"); // Gọi hàm để cập nhật trạng thái
-            setShowAmenitiesModal(false); // Đóng modal
+            handleChangeStatus(selectedBooking.booking_id, "completed");
+            setShowAmenitiesModal(false);
         }
     };
 
     const renderBookingRow = (booking, index) => (
         <tr key={booking.booking_id}>
-            <td>{index + 1}</td>
-            <td>{booking.customer_name}</td>
-            <td>{booking.workspace_name}</td>
-            <td>{booking.start_time_date}</td>
-            <td>{booking.end_time_date}</td>
-            <td>{booking.booking_type}</td>
-            <td>{booking.total_price}</td>
-            <td>{booking.status}</td>
-            <td>
-                <div className="buttons">
+            <td style={{fontSize: '13px'}}>{index + 1}</td>
+            <td style={{fontSize: '13px'}}>{booking.customer_name}</td>
+            <td style={{fontSize: '13px'}}>{booking.workspace_name}</td>
+            <td style={{fontSize: '13px'}}>{booking.start_time_date}</td>
+            <td style={{fontSize: '13px'}}>{booking.end_time_date}</td>
+            <td style={{fontSize: '13px'}}>{booking.booking_type}</td>
+            <td style={{fontSize: '13px'}}>{booking.total_price}</td>
+            <td style={{fontSize: '13px'}}>{booking.status}</td>
+            <td style={{fontSize: '13px'}}>
+                <div className="buttons" style={{ display: 'flex', gap: '30px' }}>
                     <button
-                        style={{ backgroundColor: 'rgba(0, 130, 0, 0.64)', color: 'white' }}
+                        className="btn btn-outline"                       
                         onClick={() => { setSelectedBooking(booking); setShowDetailModal(true); }}
                     >
                         Detail
                     </button>
                     {booking.status === "check-in" && (
-                        <button onClick={() => handleChangeStatus(booking.booking_id, "in-process")}>
-                            Confirm Check-In 
+                        <button 
+                            className="btn btn-outline btn-accent"
+                            onClick={() => handleChangeStatus(booking.booking_id, "in-process")}>
+                                Confirm Check-In 
                         </button>
                     )}
                     {booking.status === "check-out" && (
-                        <button onClick={() => handleChangeStatus(booking.booking_id, "check-amenities")}>
-                            Check Amenities 
+                        <button 
+                            className="btn btn-outline btn-accent"
+                            onClick={() => handleChangeStatus(booking.booking_id, "check-amenities")}>
+                                Check Amenities 
                         </button>
                     )}
                 </div>
@@ -195,25 +189,24 @@ const BookingManagement = () => {
     return (
         <div className="booking-container">
             <div className="main-bookings-content">
-                <SearchBar onSearch={handleSearch} />
-                <div className="table-responsive">
-                    <table className="booking-table">
+                <div className="overflow-x-auto">
+                    <table className="table table-xs table-pin-rows table-pin-cols">
                         <thead>
                             <tr>
-                                <th style={{ width: '120px'}}>Booking ID</th>
-                                <th style={{ width: '160px'}}>Customer Name</th>
-                                <th style={{ width: '170px'}}>Workspace Name</th>
-                                <th style={{ width: '170px'}}>Start Time</th>
-                                <th style={{ width: '170px'}}>End Time</th>
-                                <th style={{ width: '130px'}}>Booking Type</th>
-                                <th style={{ width: '140px'}}>Total Price</th>
-                                <th style={{ width: '170px'}}>Status</th>
-                                <th>Action</th>
+                                <th style={{ width: '80px', fontSize: '15px'}}>Index</th>
+                                <th style={{ width: '160px', fontSize: '15px'}}>Customer Name</th>
+                                <th style={{ width: '170px', fontSize: '15px'}}>Workspace Name</th>
+                                <th style={{ width: '160px', fontSize: '15px'}}>Start Time</th>
+                                <th style={{ width: '160px', fontSize: '15px'}}>End Time</th>
+                                <th style={{ width: '130px', fontSize: '15px'}}>Booking Type</th>
+                                <th style={{ width: '140px', fontSize: '15px'}}>Total Price</th>
+                                <th style={{ width: '170px', fontSize: '15px'}}>Status</th>
+                                <th style={{ width: '270px', fontSize: '15px'}}>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {filteredBookings.length > 0 ? (
-                                filteredBookings.map((booking, index) => renderBookingRow(booking, index))
+                                filteredBookings.map(renderBookingRow)
                             ) : (
                                 <tr>
                                     <td colSpan="9">No bookings available</td>

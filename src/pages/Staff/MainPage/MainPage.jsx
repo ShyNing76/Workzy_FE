@@ -55,7 +55,7 @@ const MainPage = () => {
             location.pathname === "/staff/buildingroom" ? "active" : ""
           }`}
         >
-          Building's Room
+          Building's Workspaces
         </Link>
         <Link
           to="/staff/bookings"
