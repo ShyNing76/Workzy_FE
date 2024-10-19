@@ -17,6 +17,7 @@ import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.
 import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
 import SuccessAlert from "../../../components/layout/Admin/SuccessAlert/SuccessAlert.jsx";
 import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal.jsx";
+import BlockButton from "../../../components/layout/Admin/Buttons/BlockButton.jsx";
 
 const VouchersManagerPage = () => {
     const location = useLocation();
@@ -99,9 +100,114 @@ const VouchersManagerPage = () => {
     }
   }, [successMessage]);
 
+      //Hàm click lên hàng để hiện more details
+      const handleRowClick = async (voucher_id) => {
+        try {
+          const res = await getVoucherById(voucher_id);
+          if (res && res.data) {
+            const formattedDetails = {
+              ...res.data,
+              discount: `${res.data.discount * 100}%`,
+              expired_date: convertDateToMMDDYYYY(res.data.expired_date),
+            };
+            setSelectedVoucherDetails(formattedDetails);
+            setShowDetailsModal(true);
+          }
+        } catch (err) {
+          console.error("Error fetching voucher details", err);
+        }
+      };
+
     //Khu vực hàm dành cho add
     const handleAddVoucher = async (e) => {
         e.preventDefault();
+
+        // Validation logic
+        if (!newVoucher.voucher_name) {
+          Swal.fire({
+            icon: 'error',
+              title: 'Validation Error',
+              text: 'Voucher name is required.',
+              position: 'top-end',
+              toast: true,
+              timer: 3000,
+              timerProgressBar: true,
+              showConfirmButton: false,
+            });
+          return;
+        }
+
+        if (!newVoucher.voucher_code) {
+          Swal.fire({
+            icon: 'error',
+              title: 'Validation Error',
+              text: 'Voucher code is required.',
+              position: 'top-end',
+              toast: true,
+              timer: 3000,
+              timerProgressBar: true,
+              showConfirmButton: false,
+            });
+          return;
+        }
+
+        if (!newVoucher.description) {
+          Swal.fire({
+            icon: 'error',
+              title: 'Validation Error',
+              text: 'Description is required.',
+              position: 'top-end',
+              toast: true,
+              timer: 3000,
+              timerProgressBar: true,
+              showConfirmButton: false,
+            });
+          return;
+        }
+
+        if (newVoucher.discount <= 0) {
+          Swal.fire({
+            icon: 'error',
+              title: 'Validation Error',
+              text: 'Discount must be greater than 0.',
+              position: 'top-end',
+              toast: true,
+              timer: 3000,
+              timerProgressBar: true,
+              showConfirmButton: false,
+            });
+          return;
+        }
+
+        if (newVoucher.quantity <= 0) {
+          Swal.fire({
+            icon: 'error',
+              title: 'Validation Error',
+              text: 'Quantity must be greater than 0.',
+              position: 'top-end',
+              toast: true,
+              timer: 3000,
+              timerProgressBar: true,
+              showConfirmButton: false,
+            });
+          return;
+        }
+
+        if (!newVoucher.expired_date) {
+          Swal.fire({
+            icon: 'error',
+              title: 'Validation Error',
+              text: 'Expired date is required.',
+              position: 'top-end',
+              toast: true,
+              timer: 3000,
+              timerProgressBar: true,
+              showConfirmButton: false,
+            });
+          return;
+        }
+
+
         const formData = new FormData();
         formData.append('voucher_name', newVoucher.voucher_name);
         formData.append('voucher_code', newVoucher.voucher_code);
@@ -151,6 +257,48 @@ const VouchersManagerPage = () => {
       }
     };
 
+      //Khu vực hàm dành cho block/unblock
+  const handleToggleStatus = async (voucher) => {
+    const newStatus = voucher.status === "active" ? "inactive" : "active";
+    const action = newStatus === "active" ? "unblock" : "block";
+  
+    const result = await Swal.fire({
+      title: `Are you sure you want to ${action} this voucher?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: `Yes`,
+      cancelButtonText: 'Cancel',
+    });
+  
+    if (result.isConfirmed) {
+      try {
+        await putVoucher(voucher.voucher_id, { ...voucher, status: newStatus });
+        
+        setVoucher((prevVoucher) =>
+          prevVoucher.map((v) =>
+            v.voucher_id === voucher.voucher_id
+              ? { ...v, status: newStatus }
+              : v
+          )
+        );
+        
+        Swal.fire({
+          icon: 'success',
+          title: `Voucher status has been set to ${newStatus} successfully!`,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } catch (error) {
+        console.error("Error toggling voucher status:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `Failed to set voucher status to ${newStatus}. Try again later.`,
+        });
+      }
+    }
+  };
+
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-4xl font-black mb-4">Manage Vouchers</h1>
@@ -190,24 +338,22 @@ const VouchersManagerPage = () => {
           </thead>
           <tbody>
             {Array.isArray(voucher) && voucher.map((voucher) => (
-                <tr key={voucher.voucher_id}>
+                <tr key={voucher.voucher_id} className="hover:bg-gray-100" onClick={() => handleRowClick(voucher.voucher_id)}>
                   <td>{voucher.voucher_name}</td>
                   <td>{voucher.voucher_code}</td>
-                  <td>{voucher.discount}</td>
+                  <td>{voucher.discount * 100}%</td>
                   <td>{voucher.quantity}</td>
                   <td>{convertDateToMMDDYYYY(voucher.expired_date)}</td>
                   <td>{voucher.status}</td>
-                  <td className="flex"></td>
                   <td className="flex space-x-2">
-                    
-                    {/* Delete Button */}
-                    <DeleteButton
-                       onClick={(e) => {
-                            e.stopPropagation(); // Prevent row click from being triggered
-                            setVoucherToDelete(voucher);
-                            setShowDeleteModal(true);
-                       }}
-                    />
+
+                  <BlockButton
+                    status={voucher.status}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleStatus(voucher);
+                    }}
+                  />
                   </td>
                 </tr>
               ))}
@@ -238,6 +384,12 @@ const VouchersManagerPage = () => {
         onDelete={handleDeleteVoucher}
         itemToDelete={voucherToDelete}
         itemType="voucher"
+      />
+
+      <DetailsModal
+        show={showDetailsModal}
+        onClose={() => setShowDetailsModal(false)}
+        details={selectedVoucherDetails}
       />
       </div>
     )

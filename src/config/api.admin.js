@@ -30,6 +30,11 @@ const putAmenity = (amenity_id, updatedAmenity) => {
   return axios.put(URL_API, updatedAmenity)
 }
 
+const toggleAmenityStatus = (amenity_id, status) => {
+  const URL_API = `api/v1/amenity/${amenity_id}`;
+  return axios.put(URL_API, { status });
+};
+
 const deleteAmenity = (amenity_id) => {
   const URL_API = `api/v1/amenity/${amenity_id}`
   return axios.delete(URL_API)
@@ -163,7 +168,7 @@ const getWorkspaceType = (workspace_type_id, workspace_type_name, image, descrip
     return axios.get(URL_API)
   }
 
-  const removeCustomer = (user_id) => {
+  const putCustomer = (user_id) => {
     const URL_API = `/api/v1/customer/remove/${user_id}`
     return axios.put(URL_API)
   }
@@ -347,6 +352,7 @@ const deleteReview = (review_id) => {
     getAmenityById,
     postAmenity,
     putAmenity,
+    toggleAmenityStatus,
     deleteAmenity,
     
     getWorkspaceType,
@@ -375,7 +381,7 @@ const deleteReview = (review_id) => {
 
     getCustomer,
     getCustomerById,
-    removeCustomer,
+    putCustomer,
 
     getBookingByBuildingId,
 

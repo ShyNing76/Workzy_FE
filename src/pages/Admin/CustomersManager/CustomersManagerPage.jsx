@@ -3,13 +3,14 @@ import { useLocation } from "react-router-dom";
 
 import { getCustomer } from "../../../config/api.admin.js";
 import { getCustomerById } from "../../../config/api.admin.js"
-import { removeCustomer } from "../../../config/api.admin.js";
+import { putCustomer } from "../../../config/api.admin.js";
 
 import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
 import DeleteModal from "../../../components/layout/Admin/Modals/DeleteModal.jsx";
 import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal.jsx";
 import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
 import SuccessAlert from "../../../components/layout/Admin/SuccessAlert/SuccessAlert.jsx";
+import BlockButton from "../../../components/layout/Admin/Buttons/BlockButton.jsx";
 import { set } from "date-fns";
 import Swal from 'sweetalert2';
 
@@ -65,8 +66,8 @@ const CustomersManagerPage = () => {
         console.log("Clicked user_id: ", user_id);
         try {
           const res = await getCustomerById(user_id);
-          if (res && res.data) {
-            setSelectedCustomerDetails(res.data);
+          if (res && res.data && Array.isArray(res.data.rows)) {
+            setSelectedCustomerDetails(res.data.rows);
             setShowDetailsModal(true);
           }
         } catch (err) {
@@ -74,32 +75,74 @@ const CustomersManagerPage = () => {
         }
       };
 
-  const handleDeleteCustomer = async () => {
-    try {
-      if (customerToDelete) {
-        // Make sure to use the correct identifier, assumed to be customer_id
-        const response = await removeCustomer(customerToDelete.user_id);
+  // const handleDeleteCustomer = async () => {
+  //   try {
+  //     if (customerToDelete) {
+  //       // Make sure to use the correct identifier, assumed to be customer_id
+  //       const response = await removeCustomer(customerToDelete.user_id);
   
-        if (response && response.status === 200) { // Check if response is successful
-          setCustomer((prevCustomers) =>
-            prevCustomers.map((cust) => 
-              // Update only the selected customer
-              cust.user_id === customerToDelete.user_id 
-                ? { ...cust, status: "inactive" } 
-                : cust
-            )
-          );
-          setSuccessMessage("Customer status set to inactive successfully!");
-        } else {
-          throw new Error("Failed to update status");
-        }
-      }
+  //       if (response && response.status === 200) { // Check if response is successful
+  //         setCustomer((prevCustomers) =>
+  //           prevCustomers.map((cust) => 
+  //             // Update only the selected customer
+  //             cust.user_id === customerToDelete.user_id 
+  //               ? { ...cust, status: "inactive" } 
+  //               : cust
+  //           )
+  //         );
+  //         setSuccessMessage("Customer status set to inactive successfully!");
+  //       } else {
+  //         throw new Error("Failed to update status");
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Error setting customer to inactive:", error);
+  //   } finally {
+  //     setShowDeleteModal(false);
+  //   }
+  // };
+
+//Khu vực hàm dành cho block/unblock
+const handleToggleStatus = async (customer) => {
+  const newStatus = customer.status === "active" ? "inactive" : "active";
+  const action = newStatus === "active" ? "unblock" : "block";
+
+  const result = await Swal.fire({
+    title: `Are you sure you want to ${action} this customer?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: `Yes`,
+    cancelButtonText: 'Cancel',
+  });
+
+  if (result.isConfirmed) {
+    try {
+      await putCustomer(customer.user_id, { ...customer, status: newStatus });
+      
+      setCustomer((prevCustomer) =>
+        prevCustomer.map((c) =>
+          c.user_id === customer.user_id
+            ? { ...c, status: newStatus }
+            : c
+        )
+      );
+      
+      Swal.fire({
+        icon: 'success',
+        title: `Workspace type status has been set to ${newStatus} successfully!`,
+        showConfirmButton: false,
+        timer: 1500,
+      });
     } catch (error) {
-      console.error("Error setting customer to inactive:", error);
-    } finally {
-      setShowDeleteModal(false);
+      console.error("Error toggling workspace type status:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: `Failed to set workspace type status to ${newStatus}. Try again later.`,
+      });
     }
-  };
+  }
+};
 
   // const handleSearchChange = (e) => {
   //   setSearchTerm(e.target.value);
@@ -155,7 +198,7 @@ const CustomersManagerPage = () => {
           </thead>
           <tbody>
             {Array.isArray(customer) && customer.map((customer) => (
-                <tr key={customer.user_id} className="cursor-pointer" onClick={() => handleRowClick(customer.Customer.user_id)}>
+                <tr key={customer.user_id} className="hover:bg-gray-100" onClick={() => handleRowClick(customer.user_id)}>
                   <td>{customer.name}</td>
                   <td>{customer.email}</td>
                   <td>{customer.phone}</td>
@@ -165,13 +208,22 @@ const CustomersManagerPage = () => {
                   <td className="flex space-x-2">
 
                     {/* Delete Button */}
-                    <DeleteButton
+                    {/* <DeleteButton
                       onClick={(e) => {
                         e.stopPropagation();
                         setCustomerToDelete(customer);
                         setShowDeleteModal(true);
                       }}
-                    />
+                    /> */}
+
+                                        {/* Block/Unblock Button */}
+                  <BlockButton
+                    status={customer.status}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleStatus(customer);
+                    }}
+                  />
                   </td>
                 </tr>
               ))}
@@ -181,13 +233,13 @@ const CustomersManagerPage = () => {
 
       {/* Add, Update, Delete, Success Modals */}
 
-      <DeleteModal
+      {/* <DeleteModal
         show={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onDelete={handleDeleteCustomer}
         itemToDelete={customerToDelete}
         itemType="customer"
-      /> 
+      />  */}
 
       <DetailsModal
         show={showDetailsModal}

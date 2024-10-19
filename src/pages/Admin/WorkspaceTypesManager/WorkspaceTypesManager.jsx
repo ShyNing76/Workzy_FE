@@ -17,6 +17,8 @@ import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.
 import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
 import SuccessAlert from "../../../components/layout/Admin/SuccessAlert/SuccessAlert.jsx";
 import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal.jsx";
+import BlockButton from "../../../components/layout/Admin/Buttons/BlockButton.jsx";
+
 
 const WorkspacesTypesManagerPage = () => {
   const location = useLocation();
@@ -110,6 +112,22 @@ const WorkspacesTypesManagerPage = () => {
     
      const handleAddWorkspaceType = async (e) => {
        e.preventDefault();
+
+               // Validation logic
+               if (!newWorkspaceType.workspace_type_name) {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Validation Error',
+                  text: 'Workspace type name is required.',
+                  position: 'top-end',
+                  toast: true,
+                  timer: 3000,
+                  timerProgressBar: true,
+                  showConfirmButton: false,
+                });
+                return;
+              }
+
         const formData = new FormData();
       
         formData.append('workspace_type_name', newWorkspaceType.name);
@@ -212,29 +230,47 @@ const WorkspacesTypesManagerPage = () => {
 
   ];
 
-//Khu vực hàm dành cho delete
-  const handleDeleteWorkspaceType = async () => {
-    if (!workspaceTypeToDelete) return;
-
-    try {
-      // Call the deleteWorkspaceType API to set the status to inactive
-      await deleteWorkspaceType(workspaceTypeToDelete.workspace_type_id);
+  //Khu vực hàm dành cho block/unblock
+  const handleToggleStatus = async (workspaceType) => {
+    const newStatus = workspaceType.status === "active" ? "inactive" : "active";
+    const action = newStatus === "active" ? "unblock" : "block";
   
-      // Update the local state to reflect the change
-      setWorkspaceType(
-        workspaceType.map((type) => 
-          type.workspace_type_id === workspaceTypeToDelete.workspace_type_id
-            ? { ...type, status: "inactive" }
-            : type
-        )
-      );
+    const result = await Swal.fire({
+      title: `Are you sure you want to ${action} this workspace type?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: `Yes`,
+      cancelButtonText: 'Cancel',
+    });
   
-      setShowDeleteModal(false);
-      setSuccessMessage('Workspace type status set to inactive successfully!');
-    } catch (err) {
-      console.error('Failed to set workspace type status to inactive:', err);
+    if (result.isConfirmed) {
+      try {
+        await putWorkspaceType(workspaceType.workspace_type_id, { ...workspaceType, status: newStatus });
+        
+        setWorkspaceType((prevTypes) =>
+          prevTypes.map((type) =>
+            type.workspace_type_id === workspaceType.workspace_type_id
+              ? { ...type, status: newStatus }
+              : type
+          )
+        );
+        
+        Swal.fire({
+          icon: 'success',
+          title: `Workspace type status has been set to ${newStatus} successfully!`,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } catch (error) {
+        console.error("Error toggling workspace type status:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `Failed to set workspace type status to ${newStatus}. Try again later.`,
+        });
+      }
     }
-  }
+  };
 
   // const [searchTerm, setSearchTerm] = useState("");
 
@@ -276,7 +312,7 @@ const WorkspacesTypesManagerPage = () => {
       </div> */}
 
       {/* Table */}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto flex flex-1">
         <table className="table w-full">
           <thead>
             <tr>
@@ -288,7 +324,7 @@ const WorkspacesTypesManagerPage = () => {
           </thead>
           <tbody>
             {Array.isArray(workspaceType) && workspaceType.map((workspaceType) => (
-              <tr key={workspaceType.workspace_type_id} className="cursor-pointer" onClick={() => handleRowClick(workspaceType.workspace_type_id)}>
+              <tr key={workspaceType.workspace_type_id} className="hover:bg-gray-100" onClick={() => handleRowClick(workspaceType.workspace_type_id)}>
                 <td>{workspaceType.workspace_type_name}</td>
                 <td>{workspaceType.description}</td>
                 <td>{workspaceType.status}</td>
@@ -300,12 +336,13 @@ const WorkspacesTypesManagerPage = () => {
                   }}
                   />
 
-                  {/* Delete Button */}
-                  <DeleteButton onClick={(e) => {
-                    e.stopPropagation();
-                    setWorkspaceTypeToDelete(workspaceType);
-                    setShowDeleteModal(true);
-                  }}
+                    {/* Block/Unblock Button */}
+                  <BlockButton
+                    status={workspaceType.status}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleStatus(workspaceType);
+                    }}
                   />
                 </td>
               </tr> 
@@ -331,14 +368,6 @@ const WorkspacesTypesManagerPage = () => {
         currentItem={newWorkspaceType}
         onInputChange={handleUpdateChange}
         fields={updateWorkspaceTypeFields}
-      />
-
-      <DeleteModal
-        show={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onDelete={handleDeleteWorkspaceType}
-        itemToDelete={workspaceTypeToDelete}
-        itemType="workspaceType"
       />
 
       <DetailsModal

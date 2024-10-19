@@ -13,6 +13,7 @@ import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal.j
 import AddButton from "../../../components/layout/Admin/Buttons/AddButton.jsx";
 import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.jsx";
 import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
+import BlockButton from "../../../components/layout/Admin/Buttons/BlockButton.jsx";
 
 import { useLocation } from "react-router-dom";
 import Swal from 'sweetalert2';
@@ -194,15 +195,44 @@ const StaffsManagerPage = () => {
   };
 
   //Khu vực hàm dành cho delete
-  const handleDeleteStaff = async () => {
-    try {
-      await deleteStaff(staffToDelete.user_id);
-      setSuccessMessage(`Staff ${staffToDelete.name} set to inactive successfully!`);
-      setShowDeleteModal(false);
-      fetchStaff(); // Refresh the staff list
-    } catch (err) {
-      console.error("Error deleting staff: ", err);
-      setError(err.response?.data?.message || 'Failed to delete staff');
+  const handleStatusToggle = async (staff) => {
+    const newStatus = staff.status === "active" ? "inactive" : "active";
+    const action = newStatus === "active" ? "unblock" : "block";
+  
+    const result = await Swal.fire({
+      title: `Are you sure you want to ${action} this staff?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: `Yes`,
+      cancelButtonText: 'Cancel',
+    });
+  
+    if (result.isConfirmed) {
+      try {
+        await putStaff(staff.user_id, { ...staff, status: newStatus });
+        
+        setStaff((prevStaff) =>
+          prevStaff.map((s) =>
+            s.user_id === staff.user_id
+              ? { ...s, status: newStatus }
+              : s
+          )
+        );
+        
+        Swal.fire({
+          icon: 'success',
+          title: `Staff status has been set to ${newStatus} successfully!`,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } catch (error) {
+        console.error("Error toggling workspace type status:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `Failed to set staff status to ${newStatus}. Try again later.`,
+        });
+      }
     }
   };
 
@@ -311,7 +341,7 @@ const StaffsManagerPage = () => {
           </thead>
           <tbody>
             {Array.isArray(staff) && staff.map((staff) => (
-                <tr key={staff.user_id} className="cursor-pointer" onClick={() => handleRowClick(staff.user_id)}>
+                <tr key={staff.user_id} className="hover:bg-gray-100" onClick={() => handleRowClick(staff.user_id)}>
                   <td>{staff.name}</td>
                   <td>{staff.email}</td>
                   <td>{staff.gender}</td>
@@ -319,14 +349,12 @@ const StaffsManagerPage = () => {
                   <td>{staff.phone}</td>
                   <td>{staff.status}</td>
                   <td>
-
-                    {/* Delete Button */}
-                    <DeleteButton
+                    <BlockButton
                       onClick={(e) => {
                         e.stopPropagation();
-                        setStaffToDelete(staff);
-                        setShowDeleteModal(true);
+                        handleStatusToggle(staff);
                       }}
+                      status={staff.status}
                     />
                   </td>
                 </tr>
@@ -343,14 +371,6 @@ const StaffsManagerPage = () => {
         currentItem={newStaff}
         onInputChange={handleInputChange}
         fields={addStaffFields}
-      />
-
-      <DeleteModal
-        show={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onDelete={handleDeleteStaff}
-        itemToDelete={staffToDelete}
-        itemType="staff"
       />
 
       {/* <SuccessModal

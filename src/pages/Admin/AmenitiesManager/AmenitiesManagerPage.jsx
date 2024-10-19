@@ -7,6 +7,7 @@ import { getAmenity } from "../../../config/api.admin.js";
 import { getAmenityById } from "../../../config/api.admin.js";
 import { postAmenity } from "../../../config/api.admin.js";
 import { putAmenity } from "../../../config/api.admin.js";
+import { toggleAmenityStatus } from "../../../config/api.admin.js";
 import { deleteAmenity } from "../../../config/api.admin.js";
 
 import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
@@ -18,6 +19,7 @@ import SuccessAlert from "../../../components/layout/Admin/SuccessAlert/SuccessA
 import AddButton from "../../../components/layout/Admin/Buttons/AddButton.jsx";
 import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.jsx";
 import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
+import BlockButton from "../../../components/layout/Admin/Buttons/BlockButton.jsx";
 
 import { useLocation } from "react-router-dom";
 import { set } from "date-fns";
@@ -88,7 +90,17 @@ const AmenitiesManagerPage = () => {
     try {
       const res = await getAmenityById(amenity_id);
       if (res && res.data) {
-        setSelectedAmenityDetails(res.data);
+        const amenityDetails = res.data;
+  
+        // Format price fields using formatCurrency function
+        const formattedDetails = {
+          ...amenityDetails,
+          original_price: formatCurrency(amenityDetails.original_price),
+          depreciation_price: formatCurrency(amenityDetails.depreciation_price),
+          rent_price: formatCurrency(amenityDetails.rent_price),
+        };
+  
+        setSelectedAmenityDetails(formattedDetails);
         setShowDetailsModal(true);
       }
     } catch (err) {
@@ -134,14 +146,29 @@ const AmenitiesManagerPage = () => {
     formData.append('image', newAmenity.image);
     formData.append('original_price', newAmenity.original_price);
 
-    try{
+    try {
+      // Attempt to add the amenity
       const Amenity = await postAmenity(newAmenity);
       setResponseData(Amenity);
       fetchAmenity();
       setShowAddModal(false);
-      setSuccessMessage("Amenity added successfully!"); // Set success message
+      setSuccessMessage("Amenity added successfully!");
     } catch (err) {
-      console.error("Error adding amenity", err);
+      // Handle the duplicate error response
+      if (err.res === 1) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: err.res.data.message || "An error occurred.",
+          position: 'top-end',
+          toast: true,
+          timer: 3000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        });
+      } else {
+        console.error("Unexpected error:", err);
+      }
     }
   }
 
@@ -164,25 +191,6 @@ const AmenitiesManagerPage = () => {
 //Khu vực hàm dành cho update
   const handleUpdateAmenity = async (e) => {
     e.preventDefault();
-
-    
-  // Check for duplicate amenity name
-    const isDuplicateName = amenity.some(a => a.amenity_name.toLowerCase() === newAmenity.amenity_name.toLowerCase());
-
-        // Validation logic
-        if (isDuplicateName) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Validation Error',
-            text: 'Amenity name already exists. Please enter a unique name.',
-            position: 'top-end',
-            toast: true,
-            timer: 3000,
-            timerProgressBar: true,
-            showConfirmButton: false,
-          });
-          return;
-        }
 
         if (!newAmenity.amenity_name) {
           Swal.fire({
@@ -249,30 +257,48 @@ const AmenitiesManagerPage = () => {
     },
   ];
 
-  //Khu vực hàm dành cho delete
-
-
-
-    const handleDeleteAmenity = async () => {
-      if (!amenityToDelete) return;
-
-      try {
-        // Call the deleteWorkspaceType API to set the status to inactive
-        await deleteAmenity(amenityToDelete.amenity_id);
     
-        // Update the local state to reflect the change
-        setAmenity(
-          amenity.map((type) => 
-            type.amenity_id === amenityToDelete.amenity_id
-              ? { ...type, status: "inactive" }
-              : type
-          )
-        );
+    //Khu vực hàm dành cho nut block/unblock
+    const handleToggleStatus = async (amenity) => {
+      const newStatus = amenity.status === "inactive" ? "active" : "inactive";
+      const action = newStatus === "active" ? "unblock" : "block";
     
-        setShowDeleteModal(false);
-        setSuccessMessage('Amenity status set to inactive successfully!');
-      } catch (err) {
-        console.error('Failed to set amenty status to inactive:', err);
+      // Trigger a confirmation dialog
+      const result = await Swal.fire({
+        icon: 'warning',
+        title: `Are you sure you want to ${action} this amenity?`,
+        showCancelButton: true,
+        confirmButtonText: `Yes, ${action} it!`,
+        cancelButtonText: "Cancel",
+        reverseButtons: true,
+      });
+    
+      // If the user confirms, proceed with toggling
+      if (result.isConfirmed) {
+        try {
+          await putAmenity(amenity.amenity_id, { ...amenity, status: newStatus });
+    
+          setAmenity((prevAmenities) =>
+            prevAmenities.map((item) =>
+              item.amenity_id === amenity.amenity_id ? { ...item, status: newStatus } : item
+            )
+          );
+    
+          Swal.fire({
+            icon: 'success',
+            title: `Amenity status has been set to ${newStatus} successfully!`,
+            showConfirmButton: false,
+            timer: 1500,
+          });
+    
+        } catch (err) {
+          console.error(`Error updating amenity status to ${newStatus}:`, err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: `Failed to set amenity status to ${newStatus}. Try again later.`,
+          });
+        }
       }
     };
 
@@ -315,7 +341,7 @@ const AmenitiesManagerPage = () => {
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto flex flex-1">
         <table className="table w-full">
           <thead>
             <tr>
@@ -329,13 +355,12 @@ const AmenitiesManagerPage = () => {
           </thead>
           <tbody>
             {Array.isArray(amenity) && amenity.map((amenity) => (
-                <tr key={amenity.amenity_id}>
+                <tr key={amenity.amenity_id} className="hover:bg-gray-100" onClick={() => handleRowClick(amenity.amenity_id)}>
                   <td>{amenity.amenity_name}</td>
                   <td>{formatCurrency(amenity.original_price)}</td>
                   <td>{formatCurrency(amenity.depreciation_price)}</td>
                   <td>{formatCurrency(amenity.rent_price)}</td>
                   <td>{amenity.status}</td>
-                  <td className="flex"></td>
                   <td className="flex space-x-2">
                     {/* Update Button */}
                     <UpdateButton
@@ -344,13 +369,13 @@ const AmenitiesManagerPage = () => {
                         handleUpdateClick(amenity);
                       }}
                     />
-                    
-                    {/* Delete Button */}
-                    <DeleteButton
+
+                     {/* Block/Unblock Button */}
+                    <BlockButton
+                      status={amenity.status}
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent row click from being triggered
-                        setAmenityToDelete(amenity);
-                        setShowDeleteModal(true);
+                      e.stopPropagation(); // Prevent row click from being triggered
+                      handleToggleStatus(amenity);
                       }}
                     />
                   </td>
@@ -386,12 +411,10 @@ const AmenitiesManagerPage = () => {
         fields={updateAmenityFields}
       />
 
-      <DeleteModal
-        show={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onDelete={handleDeleteAmenity}
-        itemToDelete={amenityToDelete}
-        itemType="amenity"
+      <DetailsModal
+        show={showDetailsModal}
+        onClose={() => setShowDetailsModal(false)}
+        details={selectedAmenityDetails}
       />
     </div>
   );

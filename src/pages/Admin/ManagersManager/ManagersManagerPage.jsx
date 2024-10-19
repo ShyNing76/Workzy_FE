@@ -14,6 +14,7 @@ import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.
 import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
 import SuccessAlert from "../../../components/layout/Admin/SuccessAlert/SuccessAlert.jsx";
 import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal.jsx";
+import BlockButton from '../../../components/layout/Admin/Buttons/BlockButton.jsx'; 
 
 import { useLocation } from "react-router-dom";
 import Swal from 'sweetalert2';
@@ -218,6 +219,47 @@ const handleDeleteManager = async () => {
     }
   }
 
+  //Khu vực dành cho hàm blovk/unblock
+  const handleToggleStatus = async (manager) => {
+    const newStatus = manager.status === "active" ? "inactive" : "active"; // Toggle status
+    const action = newStatus === "active" ? "unblock" : "block";
+
+    const result = await Swal.fire({
+      title: `Are you sure you want to ${action} this manager?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: `Yes`,
+      cancelButtonText: 'Cancel',
+    });
+
+    try {
+      // Make API call to update status
+      await putManager(manager.Manager.user_id, {...manager, status: newStatus });
+  
+      // Update local state to reflect the new status
+      setManager((prevManagers) =>
+        prevManagers.map((m) =>
+          m.Manager.user_id === manager.Manager.user_id
+            ? { ...m, status: newStatus }
+            : m
+        )
+      );
+      Swal.fire({
+        icon: 'success',
+        title: `Manager status has been set to ${newStatus} successfully!`,
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    } catch (error) {
+      console.error("Error toggling manager status:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: `Failed to set manager status to ${newStatus}. Try again later.`,
+      });
+    }
+  };
+
   // const handleSearchChange = (e) => {
   //   setSearchTerm(e.target.value);
   // };
@@ -274,7 +316,7 @@ const handleDeleteManager = async () => {
           <tbody>
             {Array.isArray(manager) && manager.map((manager) => (
                 // <tr key={manager.user_id} className="cursor-pointer">
-                <tr key={manager.Manager.user_id} className="cursor-pointer" onClick={() => handleRowClick(manager.Manager.user_id)}>
+                <tr key={manager.Manager.user_id} className="hover:bg-gray-100" onClick={() => handleRowClick(manager.Manager.user_id)}>
                   <td>{manager.name}</td>
                   <td>{manager.email}</td>
                   <td>{manager.gender}</td>
@@ -282,13 +324,12 @@ const handleDeleteManager = async () => {
                   <td>{manager.status}</td>
                   <td>
 
-                    {/* Delete Button */}
-                   <DeleteButton
+                    <BlockButton
                     onClick={(e) => {
                       e.stopPropagation();
-                      setManagerToDelete(manager);
-                      setShowDeleteModal(true);
+                      handleToggleStatus(manager);
                     }}
+                    status={manager.status}
                     />
                   </td>
                 </tr>
@@ -305,14 +346,6 @@ const handleDeleteManager = async () => {
         currentItem={newManager}
         onInputChange={handleInputChange}
         fields={addManagerFields}
-      />
-
-      <DeleteModal
-        show={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onDelete={handleDeleteManager}
-        itemToDelete={managerToDelete}
-        itemType="manager"
       />
 
       <DetailsModal
