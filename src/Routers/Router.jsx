@@ -41,7 +41,7 @@ import VouchersManagerPage from "../pages/Admin/VouchersManager/VouchersManagerP
 
 import MainPage from "../pages/Staff/MainPage/MainPage.jsx";
 import BookingManagement from "../pages/Staff/Bookings/BookingManagement.jsx";
-import BuildingRoomPage from "../pages/Staff/BuildingRoom/BuildingRoomPage.jsx";
+import BuildingWorkspaces from "../pages/Staff/BuildingRoom/BuildingWorkspaces.jsx";
 import PaymentPage from "../pages/Customer/Payment/Payment.jsx";
 import Wishlist from "../pages/Staff/Wishlist/Wishlist.jsx";
 import MyBooking from "../pages/Customer/MyBooking/MyBooking.jsx";
@@ -52,6 +52,8 @@ import ManageStaff from "../pages/Manager/ManageStaff/ManageStaff.jsx";
 import ManageReview from "../pages/Manager/ManageReview/ManageReview.jsx";
 import BookingDetail from "../pages/Customer/BookingDetail/BookingDetail.jsx";
 import BookingAmenities from "../pages/Customer/BookingAmenities/BookingAmenities.jsx";
+import Admin from "../pages/Admin/AdminMain/Admin.jsx";
+import Staff from "../pages/Staff/StaffMain/Staff.jsx";
 
 // Role id store in local Storage after login and register
 
@@ -136,6 +138,7 @@ export const router = createBrowserRouter([
           </>
         ),
       },
+
       {
         path: "user",
         element: (
@@ -184,16 +187,16 @@ export const router = createBrowserRouter([
     path: "admin",
     element: (
       <>
-        {/* <PrivateRoute requiredRoleID="1"> */}
-        <AdminDashboardPage />
-        {/* </PrivateRoute> */}
+        <PrivateRoute requiredRoleID="1">
+          <Admin />
+        </PrivateRoute>
       </>
     ),
 
     children: [
       {
         index: true,
-        element: <Navigate to="/admin" />,
+        element: <AdminDashboardPage />,
       },
       {
         path: "managersmanager",
@@ -237,7 +240,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "vouchersmanager",
-        element: <VouchersManagerPage />
+        element: <VouchersManagerPage />,
       },
     ],
     // condition: (user) => user.isAdmin, // Add condition to check if user is admin before rendering the routes
@@ -248,19 +251,20 @@ export const router = createBrowserRouter([
     path: "staff",
     element: (
       <>
-        {/* <PrivateRoute requiredRoleID="3"> */}
-        <MainPage />,{/* </PrivateRoute> */}
+        <PrivateRoute requiredRoleID="3">
+          <Staff />
+        </PrivateRoute>
       </>
     ),
 
     children: [
       {
         index: true,
-        element: <Navigate to="/staff" />,
+        element: <MainPage />,
       },
       {
         path: "buildingroom",
-        element: <BuildingRoomPage />,
+        element: <BuildingWorkspaces />,
       },
       {
         path: "bookings",

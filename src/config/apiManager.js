@@ -33,6 +33,16 @@ const inactiveStaff = (staffId) => {
     return axios.put(URL_API);
 }
 
+const getAllReview = () => {
+    const URL_API = `/api/v1/review/`
+    return axios.get(URL_API)
+}
+
+const deleteReview = (reviewId) => {
+    const URL_API = `/api/v1/review/delete/${reviewId}`
+    return axios.delete(URL_API)
+}
+
 
 export {
     getAllBuildings,
@@ -40,5 +50,7 @@ export {
     assignStaffToBuilding,
     unassignStaffFromBuilding,
     activeStaff,
-    inactiveStaff
+    inactiveStaff,
+    getAllReview,
+    deleteReview
 }

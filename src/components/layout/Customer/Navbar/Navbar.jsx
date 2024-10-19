@@ -8,7 +8,7 @@ import Notification from "../../Customer/Notification/Notification";
 import { getUserAuthen } from "../../../../config/api";
 
 const Navbar = (props) => {
-  const { auth, setAuth } = useContext(AuthContext);
+  const { auth, setAuth, setRoleId } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const { refresh } = props;
@@ -27,11 +27,12 @@ const Navbar = (props) => {
   }, [refresh]);
 
   const handleLogout = () => {
-    localStorage.clear("access_token", "role_id");
-    navigate("/");
+    localStorage.clear("access_token", "roleId");
     setAuth({
       isAuthenticated: false,
     });
+    setRoleId(null);
+    navigate("/");
   };
 
   return (

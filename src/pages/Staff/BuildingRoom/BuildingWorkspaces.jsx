@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import RoomControls from "../../../components/layout/staff/building/RoomControls/RoomControls";
-import "./BuildingRoomPage.scss";
+import "./BuildingWorkspaces.scss";
 
-const BuildingRoomPage = () => {
+const BuildingWorkspaces = () => {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedType, setSelectedType] = useState("hourly");
   const [selectedDate, setSelectedDate] = useState("");
@@ -22,4 +22,4 @@ const BuildingRoomPage = () => {
   );
 };
 
-export default BuildingRoomPage;
+export default BuildingWorkspaces;

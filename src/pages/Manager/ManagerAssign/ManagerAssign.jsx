@@ -348,7 +348,9 @@ const ManagerAssign = () => {
             )}
           </tbody>
         </table>
+        
       </div>
+      
     </div>
   );
 };

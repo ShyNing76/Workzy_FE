@@ -7,26 +7,14 @@
     margin-top: -10px;
 
     .main-bookings-content {
-        flex: 1;
-        overflow: auto;
-        width: 100%;
-        max-width: 100%;
-        padding: 15px;
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-
-        .search-bar {
+        .input{
             display: flex;
             justify-content: flex-start;
             margin-bottom: 20px;
-
-            input {
-                padding: 10px;
-                border: 1px solid #ccc;
-                border-radius: 5px;
-                width: 100%;
-                max-width: 300px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            max-width: 400px;
 
                 &:focus {
                     outline: none;
@@ -34,39 +22,14 @@
                 }
             }
 
-            .search-button {
-                padding: 10px 15px;
-                background-color: #007bff;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                margin-left: 10px;
-                transition: background-color 0.3s;
-
-                &:hover {
-                    background-color: #0056b3;
-                }
-
-                &:disabled {
-                    background-color: #c0c0c0;
-                    cursor: not-allowed;
-                }
-            }
-        }
-
-        .table-responsive {
-            overflow-y: auto;  
+        overflow-x-auto {
             overflow-x: auto;
-            margin-top: 5px;
-            width: 100%;
-            max-width: 100%;
-            max-height: 450px;
+            margin-top: 1px;
 
-            .booking-table {
+            .table {
                 width: 100%;
                 border-collapse: collapse;
-                table-layout: fixed; 
+                table-layout: fixed;
 
                 thead {
                     background-color: #8695a5;
@@ -78,7 +41,8 @@
                         border: 1px solid #ddd;
                         text-align: center;
                         color: #fff;
-                        white-space: nowrap; 
+                        white-space: nowrap;
+                        font-size: 16px; 
                     }
                 }
 
@@ -92,69 +56,16 @@
                             padding: 10px;
                             border: 1px solid #ddd;
                             text-align: center;
-                            word-wrap: break-word; 
-                            white-space: nowrap; 
-                            overflow: hidden; 
+                            word-wrap: break-word;
+                            white-space: nowrap;
+                            overflow: hidden;
                             text-overflow: ellipsis;
-
-                            .buttons {
-                                display: flex; 
-                                align-items: center; 
-                                justify-content: center; 
-                                gap: 10px; 
-
-                                button {
-                                    padding: 5px 10px;
-                                    background-color: #82b7f0;
-                                    
-                                    color: black;
-                                    border: none;
-                                    border-radius: 5px;
-                                    cursor: pointer;
-                                    transition: background-color 0.3s;
-
-                                    &:hover {
-                                        background-color: #0056b3;
-                                    }
-                                }
-                            }
+                            font-size: 16px;
                         }
                     }
                 }
             }
         }
-
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
-        
-            button {
-                padding: 10px 15px;
-                margin: 0 5px;
-                background-color: #007bff;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                transition: background-color 0.3s;
-        
-                &:hover {
-                    background-color: #0056b3;
-                }
-        
-                &:disabled {
-                    background-color: #c0c0c0;
-                    cursor: not-allowed;
-                }
-            }
-        
-            span {
-                align-self: center;
-                margin: 0 10px;
-                font-weight: bold;
-            }
-        }        
 
         .modal {
             .modal-box {

@@ -3,7 +3,7 @@ import './RoomControls.scss';
 import Hourly from '../RoomRow/Hourly';
 import Daily from '../RoomRow/Daily';
 import Monthly from '../RoomRow/Monthly';
-import { getWorkspaceByBuildingId } from '../../../../../config/api.staff';
+import { getWorkspaceByBuildingId, getBookingWorkspace } from '../../../../../config/api.staff';
 import { useOutletContext } from "react-router-dom";
 
 const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSelectedType, selectedDate, setSelectedDate }) => {
@@ -63,7 +63,32 @@ const RoomControls = ({ selectedStatus, setSelectedStatus, selectedType, setSele
 
     const renderTable = () => {
         const filteredWorkspaces = workspaceType ? workspaces.filter(workspace => workspace.WorkspaceType.workspace_type_name === workspaceType) : workspaces;
+        filteredWorkspaces.forEach(async (workspace) => {
+            // console.log(workspace.Building.building_id);
+            // console.log(workspace.workspace_id);
         
+            const getBookingWorkspaceResponse = await getBookingWorkspace(
+                workspace.Building.building_id, 
+                workspace.workspace_id
+            );
+        
+            if (getBookingWorkspaceResponse?.data) {
+                // console.log("Booking data found:", getBookingWorkspaceResponse.data.rows);
+        
+                // Extract bookings and assign to workspace
+                const bookings = getBookingWorkspaceResponse.data.rows.map((booking) => ({
+                    startTime: booking.start_time_date,
+                    endTime: booking.end_time_date
+                }));
+        
+                workspace.bookings = bookings; // Assign bookings to the workspace
+                // console.log("Updated Workspace:", workspace);
+            } else {
+                // console.log("No booking data available.");
+                workspace.bookings = []; // Assign empty bookings if none found
+            }
+        });
+        // console.log("FFFFF: " + filteredWorkspaces);
         switch (selectedType) {
             case 'hourly':
                 return <Hourly selectedDate={currentDate} selectedStatus={selectedStatus} workspaces={filteredWorkspaces} onWorkspaceClick={handleWorkspaceClick} />;
