@@ -12,6 +12,7 @@ import { postCreateBooking } from "../../../../config/api";
 import { toast, ToastContainer } from "react-toastify";
 import { AuthContext } from "../../../context/auth.context";
 import { useNavigate } from "react-router-dom";
+import "./BookingRoom.scss";
 
 const BookingRoom = (props) => {
   // Props room data
@@ -224,7 +225,7 @@ const BookingRoom = (props) => {
         <h1 className="room-name text-3xl font-black tracking-tight sm:text-5xl text-left">
           {roomData?.workspace_name}
         </h1>
-        <div className="status-badge badge badge-success text-white text-xm p-3 font-bold ml-6">
+        <div className="status-badge badge badge-success text-white text-xl p-5 font-bold ml-6">
           Available
         </div>
       </div>
@@ -239,33 +240,40 @@ const BookingRoom = (props) => {
         </div>
       </div>
 
-      <div className="font-semibold mb-2">Type Booking: </div>
       <div role="tablist" className="tabs tabs-lifted">
         {/* Tab for Hour */}
 
         <input
           type="radio"
-          name="my_tabs_2"
+          name="booking_tabs"
           role="tab"
           className="tab"
           aria-label="Hourly"
           defaultChecked={currentTab === "Hourly"}
-          onClick={() => setCurrentTab("Hourly")}
+          onChange={() => setCurrentTab("Hourly")}
         />
         <div
           role="tabpanel"
-          className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+          className={`tab-content bg-base-100 border-base-300 rounded-box p-6 ${
+            currentTab === "Hourly" ? "block" : "hidden"
+          }`}
         >
           {/* Price section */}
-          <div className="flex justify-between font-semibold items-center">
+          <div className="flex justify-between font-semibold items-center my-1">
             <div>Price:</div>
             <div className="text-amber-500 text-xl font-bold">
               {roomData && formatCurrency(roomData?.price_per_hour)}/h
             </div>
           </div>
 
+          <div className="flex justify-between font-semibold items-center my-1">
+            <div className="font-semibold mb-2">
+              Type Booking: <strong>{currentTab}</strong>
+            </div>
+          </div>
+
           {/* Remaining Time section */}
-          <div className="font-semibold my-4">Remaining Time:</div>
+          <div className="font-semibold my-1">Remaining Time:</div>
 
           <div className="container mx-auto">
             {/* Custom Date Picker */}
@@ -325,23 +333,31 @@ const BookingRoom = (props) => {
 
         <input
           type="radio"
-          name="my_tabs_2"
+          name="booking_tabs"
           role="tab"
           className="tab"
           aria-label="Daily"
-          onClick={() => setCurrentTab("Daily")}
+          checked={currentTab === "Daily"}
+          onChange={() => setCurrentTab("Daily")}
         />
         <div
           role="tabpanel"
-          className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+          className={`tab-content bg-base-100 border-base-300 rounded-box p-6 ${
+            currentTab === "Daily" ? "block" : "hidden"
+          }`}
         >
-          <div className=" flex justify-between font-semibold items-center">
+          <div className=" flex justify-between font-semibold items-center my-1">
             <div>Price: </div>
             <div className="text-amber-500 text-xl font-bold">
               {roomData && formatCurrency(roomData?.price_per_day)}/day
             </div>
           </div>
-          <div className="font-semibold mt-4 mb-2">Remaining Time: </div>
+          <div className="flex justify-between font-semibold items-center my-1">
+            <div className="font-semibold mb-2">
+              Type Booking: <strong>{currentTab}</strong>
+            </div>
+          </div>
+          <div className="font-semibold mt-1 mb-2 ">Remaining Time: </div>
           <div className="my-4">
             <DateRangePicker
               startDate={startDate}
@@ -382,23 +398,31 @@ const BookingRoom = (props) => {
 
         <input
           type="radio"
-          name="my_tabs_2"
+          name="booking_tabs"
           role="tab"
           className="tab"
           aria-label="Monthly"
-          onClick={() => setCurrentTab("Monthly")}
+          checked={currentTab === "Monthly"}
+          onChange={() => setCurrentTab("Monthly")}
         />
         <div
           role="tabpanel"
-          className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+          className={`tab-content bg-base-100 border-base-300 rounded-box p-6 ${
+            currentTab === "Monthly" ? "block" : "hidden"
+          }`}
         >
-          <div className=" flex justify-between font-semibold items-center">
+          <div className=" flex justify-between font-semibold items-center my-1">
             <div>Price: </div>
             <div className="text-amber-500 text-xl font-bold">
               {roomData && formatCurrency(roomData?.price_per_month)}/month
             </div>
           </div>
-          <div className="font-semibold mt-4 mb-2">Remaining Time: </div>
+          <div className="flex justify-between font-semibold items-center my-1">
+            <div className="font-semibold mb-2">
+              Type Booking: <strong>{currentTab}</strong>
+            </div>
+          </div>
+          <div className="font-semibold mt-1 mb-2">Remaining Time: </div>
           <div className="pb-4">
             <MonthRangePicker
               startDate={startDate}
