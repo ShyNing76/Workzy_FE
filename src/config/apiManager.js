@@ -43,6 +43,10 @@ const deleteReview = (reviewId) => {
     return axios.delete(URL_API)
 }
 
+const getAllWorkSpaces = (buildingId) => {
+    const URL_API = `/api/v1/workspace?building_id=${buildingId}`
+    return axios.get(URL_API)
+}   
 
 export {
     getAllBuildings,
@@ -52,5 +56,6 @@ export {
     activeStaff,
     inactiveStaff,
     getAllReview,
-    deleteReview
+    deleteReview,
+    getAllWorkSpaces
 }
