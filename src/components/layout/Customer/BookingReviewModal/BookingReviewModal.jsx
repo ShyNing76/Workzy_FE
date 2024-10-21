@@ -55,7 +55,10 @@ const BookingReviewModal = (props) => {
                 onChange={handleCommentChange}
               ></textarea>
               <div className="modal-action">
-                <button className="btn btn-accent" onClick={handleSubmitReview}>
+                <button
+                  className="btn btn-accent"
+                  onClick={() => handleSubmitReview(booking.booking_id)}
+                >
                   Done
                 </button>
               </div>

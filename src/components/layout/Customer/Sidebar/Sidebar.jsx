@@ -23,11 +23,15 @@ const Sidebar = (props) => {
 
   useEffect(() => {
     const fetchUserInfo = async () => {
-      const res = await getUserAuthen();
+      try {
+        const res = await getUserAuthen();
 
-      if (res && res.data && res.err === 0) {
-        setName(res?.data?.name);
-        setAvatar(res?.data?.image);
+        if (res && res.data && res.err === 0) {
+          setName(res?.data?.name);
+          setAvatar(res?.data?.image);
+        }
+      } catch (error) {
+        console.error(error);
       }
     };
 

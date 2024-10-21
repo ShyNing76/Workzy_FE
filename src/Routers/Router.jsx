@@ -55,127 +55,146 @@ import BookingAmenities from "../pages/Customer/BookingAmenities/BookingAmenitie
 import Admin from "../pages/Admin/AdminMain/Admin.jsx";
 import Staff from "../pages/Staff/StaffMain/Staff.jsx";
 
+import AccessDenied from "../pages/Customer/AccessDenied/AccessDenied.jsx";
+import NotFound from "../pages/Customer/NotFound/NotFound.jsx";
+
+import AnimatedRoutes from "../Routers/AnimatedRoute.jsx";
+
 // Role id store in local Storage after login and register
 
 export const router = createBrowserRouter([
   // Customer
   {
     path: "/",
-    element: (
-      <>
-        <ScrollToTop />
-        <App />
-      </>
-    ),
+    element: <AnimatedRoutes />,
 
     children: [
       {
-        index: true,
-        element: <HomePage />,
-      },
-      //path of services
-      {
-        path: "services/single-pod",
-        element: <SinglePOD />,
-      },
-
-      {
-        path: "services/double-pod",
-        element: <DoublePOD />,
-      },
-
-      {
-        path: "services/quad-pod",
-        element: <QuadPOD />,
-      },
-
-      {
-        path: "services/meeting-room",
-        element: <MeetingRoom />,
-      },
-
-      {
-        path: "services/working-room",
-        element: <WorkingRoom />,
-      },
-
-      {
-        path: "services/event-space",
-        element: <EventSpace />,
-      },
-
-      {
-        path: "services",
-        element: <ServicesPage />,
-      },
-      {
-        path: "location",
-        element: <LocationPage />,
-      },
-      {
-        path: "/location/:buildingId",
-        element: <Building />,
-      },
-      {
-        path: "/location/building/:roomid",
-        element: <RoomDetail />,
-      },
-      {
-        path: "about",
-        element: <AboutPage />,
-      },
-      {
-        path: "contact",
-        element: <ContactPage />,
-      },
-      {
-        path: "/booking/payment",
         element: (
           <>
-            <PrivateRoute requiredRoleID="4">
-              <PaymentPage />
-            </PrivateRoute>
-          </>
-        ),
-      },
-
-      {
-        path: "user",
-        element: (
-          <>
-            <PrivateRoute requiredRoleID="4">
-              <User />
-            </PrivateRoute>
+            <ScrollToTop />
+            <App />
           </>
         ),
         children: [
           {
-            path: "account",
-            element: <Profile />,
+            index: true,
+            element: <HomePage />,
+          },
+          //path of services
+          {
+            path: "services/single-pod",
+            element: <SinglePOD />,
+          },
+
+          {
+            path: "services/double-pod",
+            element: <DoublePOD />,
+          },
+
+          {
+            path: "services/quad-pod",
+            element: <QuadPOD />,
+          },
+
+          {
+            path: "services/meeting-room",
+            element: <MeetingRoom />,
+          },
+
+          {
+            path: "services/working-room",
+            element: <WorkingRoom />,
+          },
+
+          {
+            path: "services/event-space",
+            element: <EventSpace />,
+          },
+
+          {
+            path: "services",
+            element: <ServicesPage />,
           },
           {
-            path: "booking",
-            element: <MyBooking />,
+            path: "location",
+            element: <LocationPage />,
           },
           {
-            path: "booking/:bookingId",
-            element: <BookingDetail />,
+            path: "/location/:buildingId",
+            element: <Building />,
           },
           {
-            path: "booking/amenities/:bookingId",
-            element: <BookingAmenities />,
+            path: "/location/building/:roomid",
+            element: <RoomDetail />,
           },
           {
-            path: "membership",
-            element: <MemberShipPage />,
+            path: "about",
+            element: <AboutPage />,
           },
           {
-            path: "support",
-            element: <SupportCenter />,
+            path: "contact",
+            element: <ContactPage />,
           },
           {
-            path: "notification",
-            element: <NotificationPage />,
+            path: "/booking/payment",
+            element: (
+              <>
+                <PrivateRoute requiredRoleID="4">
+                  <PaymentPage />
+                </PrivateRoute>
+              </>
+            ),
+          },
+
+          {
+            path: "restricted",
+            element: <AccessDenied />,
+          },
+          {
+            path: "*",
+            element: <NotFound />,
+          },
+
+          {
+            path: "user",
+            element: (
+              <>
+                <PrivateRoute requiredRoleID="4">
+                  <User />
+                </PrivateRoute>
+              </>
+            ),
+            children: [
+              {
+                path: "account",
+                element: <Profile />,
+              },
+              {
+                path: "booking",
+                element: <MyBooking />,
+              },
+              {
+                path: "booking/:bookingId",
+                element: <BookingDetail />,
+              },
+              {
+                path: "booking/amenities/:bookingId",
+                element: <BookingAmenities />,
+              },
+              {
+                path: "membership",
+                element: <MemberShipPage />,
+              },
+              {
+                path: "support",
+                element: <SupportCenter />,
+              },
+              {
+                path: "notification",
+                element: <NotificationPage />,
+              },
+            ],
           },
         ],
       },
@@ -295,19 +314,14 @@ export const router = createBrowserRouter([
     element: <GoogleCallback />,
   },
 
-  {
-    path: "*",
-    element: <LoginPage />,
-  },
-
   // Manager
   {
     path: "manager",
     element: (
       <>
-        {/* <PrivateRoute requiredRoleID="2"> */}
-        <ManagerPage />
-        {/* </PrivateRoute> */}
+        <PrivateRoute requiredRoleID="2">
+          <ManagerPage />
+        </PrivateRoute>
       </>
     ),
 
