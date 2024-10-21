@@ -163,8 +163,8 @@ const getWorkspaceType = (workspace_type_id, workspace_type_name, image, descrip
     return axios.get(URL_API, data)
   }
 
-  const getCustomerById = (user_id) => {
-    const URL_API = `/api/v1/customer/${user_id}`
+  const getCustomerById = (customer_id) => {
+    const URL_API = `/api/v1/customer/${customer_id}`
     return axios.get(URL_API)
   }
 

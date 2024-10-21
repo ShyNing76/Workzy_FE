@@ -4,6 +4,8 @@ import { useLocation } from "react-router-dom";
 import { getCustomer } from "../../../config/api.admin.js";
 import { getCustomerById } from "../../../config/api.admin.js"
 import { putCustomer } from "../../../config/api.admin.js";
+import { getStaff } from "../../../config/api.admin.js";
+import { getManager } from "../../../config/api.admin.js";
 
 import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
 import DeleteModal from "../../../components/layout/Admin/Modals/DeleteModal.jsx";
@@ -19,6 +21,8 @@ const CustomersManagerPage = () => {
   const location = useLocation();
 
   const [customer, setCustomer] = useState(null);
+  const [staff, setStaff] = useState([]);
+  const [manager, setManager] = useState([]);
   const [loading, setLoading] = useState(true); // State loading
   const [error, setError] = useState(null); // State lỗi
   //const [searchTerm, setSearchTerm] = useState("");
@@ -27,6 +31,8 @@ const CustomersManagerPage = () => {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState('all');
   const [newCustomer, setNewCustomer] = useState({
     name: '',
     email: '',
@@ -39,6 +45,22 @@ const CustomersManagerPage = () => {
   const [customerToDelete, setCustomerToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [responseData, setResponseData] = useState(null);
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "None";
+    
+    const date = new Date(dateString);
+    
+    if (isNaN(date.getTime())) {
+      return "None";
+    }
+  
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); 
+    const year = date.getFullYear();
+  
+    return `${day}/${month}/${year}`;
+  };
 
   //Hiện data lên table
   const fetchCustomer = async () => {
@@ -62,45 +84,26 @@ const CustomersManagerPage = () => {
   }, []); 
 
       //Hàm click lên hàng để hiện more details
-      const handleRowClick = async (user_id) => {
-        console.log("Clicked user_id: ", user_id);
+      const handleRowClick = async (customer_id) => {
         try {
-          const res = await getCustomerById(user_id);
-          if (res && res.data && Array.isArray(res.data.rows)) {
-            setSelectedCustomerDetails(res.data.rows);
+          const res = await getCustomerById(customer_id);
+          if (res && res.data.User) {
+            const userDetails = res.data.User;
+            // Format the date_of_birth before setting details
+            const formattedDetails = {
+              ...userDetails,
+              date_of_birth: formatDate(userDetails.date_of_birth)
+            };
+      
+            console.log("API response for user_id: ", formattedDetails);
+            setSelectedCustomerDetails(formattedDetails);
             setShowDetailsModal(true);
           }
         } catch (err) {
-          console.error("Error fetching workspace type details", err);
+          console.error("Error fetching customer details", err);
         }
       };
 
-  // const handleDeleteCustomer = async () => {
-  //   try {
-  //     if (customerToDelete) {
-  //       // Make sure to use the correct identifier, assumed to be customer_id
-  //       const response = await removeCustomer(customerToDelete.user_id);
-  
-  //       if (response && response.status === 200) { // Check if response is successful
-  //         setCustomer((prevCustomers) =>
-  //           prevCustomers.map((cust) => 
-  //             // Update only the selected customer
-  //             cust.user_id === customerToDelete.user_id 
-  //               ? { ...cust, status: "inactive" } 
-  //               : cust
-  //           )
-  //         );
-  //         setSuccessMessage("Customer status set to inactive successfully!");
-  //       } else {
-  //         throw new Error("Failed to update status");
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error("Error setting customer to inactive:", error);
-  //   } finally {
-  //     setShowDeleteModal(false);
-  //   }
-  // };
 
 //Khu vực hàm dành cho block/unblock
 const handleToggleStatus = async (customer) => {
@@ -144,6 +147,14 @@ const handleToggleStatus = async (customer) => {
   }
 };
 
+const filteredCustomer = Array.isArray(customer)
+? customer.filter((item) => {
+    const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
+    const matchesSearchTerm = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesStatus && matchesSearchTerm;
+  })
+: [];
+
   // const handleSearchChange = (e) => {
   //   setSearchTerm(e.target.value);
   // };
@@ -167,15 +178,23 @@ const handleToggleStatus = async (customer) => {
 
       <div className="grid grid-cols-2">
         <SearchBar
-          // searchTerm={searchTerm}
-          // handleSearchChange={handleSearchChange}
-          // placeholder="Search by ID, name, or information"
+          searchTerm={searchTerm}
+          handleSearchChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search by Customer Name"
         />
+      </div>
 
-        {/* Add Button */}
-        {/* <div className="ml-2">
-          <AddButton onClick={() => setShowAddModal(true)} label="Add Customer" />
-        </div> */}
+      <div className="mb-4">
+        <select
+          id="statusFilter"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="select select-bordered select-sm max-w-xs"
+        >
+          <option value="all">All</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
       </div>
 
       <div>
@@ -197,26 +216,17 @@ const handleToggleStatus = async (customer) => {
             </tr>
           </thead>
           <tbody>
-            {Array.isArray(customer) && customer.map((customer) => (
-                <tr key={customer.user_id} className="hover:bg-gray-100" onClick={() => handleRowClick(customer.user_id)}>
+            {filteredCustomer.map((customer) => (
+                <tr key={customer.user_id} className="hover:bg-gray-100 cursor-pointer" onClick={() => handleRowClick(customer.Customer.customer_id)}>
                   <td>{customer.name}</td>
                   <td>{customer.email}</td>
                   <td>{customer.phone}</td>
                   <td>{customer.gender}</td>
-                  <td>{customer.date_of_birth}</td>
+                  <td>{formatDate(customer.date_of_birth)}</td>
                   <td>{customer.status}</td>
                   <td className="flex space-x-2">
 
-                    {/* Delete Button */}
-                    {/* <DeleteButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setCustomerToDelete(customer);
-                        setShowDeleteModal(true);
-                      }}
-                    /> */}
-
-                                        {/* Block/Unblock Button */}
+                  {/* Block/Unblock Button */}
                   <BlockButton
                     status={customer.status}
                     onClick={(e) => {

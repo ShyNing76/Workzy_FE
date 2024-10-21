@@ -7,7 +7,6 @@ import { getAmenity } from "../../../config/api.admin.js";
 import { getAmenityById } from "../../../config/api.admin.js";
 import { postAmenity } from "../../../config/api.admin.js";
 import { putAmenity } from "../../../config/api.admin.js";
-import { toggleAmenityStatus } from "../../../config/api.admin.js";
 import { deleteAmenity } from "../../../config/api.admin.js";
 
 import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
@@ -30,7 +29,6 @@ const AmenitiesManagerPage = () => {
   const [amenity, setAmenity] = useState(null);
   const [loading, setLoading] = useState(true); // State loading
   const [error, setError] = useState(null); // State lỗi
-  //const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -38,6 +36,8 @@ const AmenitiesManagerPage = () => {
   const [selectedAmenityDetails, setSelectedAmenityDetails] = useState("");
   const [amenityToDelete, setAmenityToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState('all');
   const [newAmenity, setNewAmenity] = useState({
     amenity_name: '',
     image: null,
@@ -111,82 +111,108 @@ const AmenitiesManagerPage = () => {
   //Khu vực hàm dành cho add
   const handleAddAmenity = async (e) => {
     e.preventDefault();
-
-        // Validation logic
-        if (!newAmenity.amenity_name) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Validation Error',
-            text: 'Amenity name is required.',
-            position: 'top-end',
-            toast: true,
-            timer: 3000,
-            timerProgressBar: true,
-            showConfirmButton: false,
-          });
-          return;
-        }
-      
-        if (newAmenity.original_price <= 0) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Validation Error',
-            text: 'Original price must be greater than 0.',
-            position: 'top-end',
-            toast: true,
-            timer: 3000,
-            timerProgressBar: true,
-            showConfirmButton: false,
-          });
-          return;
-        }
-
+  
+    // Validation logic
+    if (!newAmenity.amenity_name) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Amenity name is required.',
+        position: 'top-end',
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+      return;
+    }
+    
+    if (newAmenity.original_price <= 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Original price must be greater than 0.',
+        position: 'top-end',
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+      return;
+    }
+  
     const formData = new FormData();
     formData.append('amenity_name', newAmenity.amenity_name);
     formData.append('image', newAmenity.image);
     formData.append('original_price', newAmenity.original_price);
 
+    const isDuplicate = amenity && amenity.some((item) => item.amenity_name === newAmenity.amenity_name);
+    if (isDuplicate) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'An amenity with this name already exists.',
+        position: 'top-end',
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+      return;
+    }
+  
     try {
-      // Attempt to add the amenity
       const Amenity = await postAmenity(newAmenity);
       setResponseData(Amenity);
       fetchAmenity();
       setShowAddModal(false);
       setSuccessMessage("Amenity added successfully!");
     } catch (err) {
-      // Handle the duplicate error response
-      if (err.res === 1) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: err.res.data.message || "An error occurred.",
-          position: 'top-end',
-          toast: true,
-          timer: 3000,
-          timerProgressBar: true,
-          showConfirmButton: false,
-        });
-      } else {
-        console.error("Unexpected error:", err);
-      }
+      // Check detailed logging to understand error structure
+      console.error("Caught Error:", err);
+  
+      // Safely access the message or provide a default
+      const message = err.res?.data?.message || "An unknown error occurred.";
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: message,
+        position: 'top-end',
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
     }
-  }
+  };
 
   
 
   const addAmenityFields = [
-    { name: "amenity_name", label: "Amenity Name", type: "text", value: `${newAmenity.amenity_name}` },
-    { name: "image", label: "Images", type: "file", multiple: true, value: `${newAmenity.image}` },
-    { name: "original_price", label: "Original Price", type: "number", value: `${newAmenity.original_price}` },
+    { name: "amenity_name", label: "Amenity Name", type: "text", value: `${newAmenity.amenity_name}`, required: true },
+    { name: "original_price", label: "Original Price", type: "text", value: `${newAmenity.original_price}`, required: true },
+    { name: "image", label: "Images", type: "file", multiple: true, value: `${newAmenity.image}`, required: true },
   ];
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target
     setNewAmenity({
       ...newAmenity,
-      [name]: files ? files[0] : value,
+      [name]: files ? files[0] : name === "original_price" ? Math.floor(value) : value,
     })
   };
+
+  const resetNewAmenity = () => {
+    setNewAmenity({
+      amenity_name: '',
+      image: null,
+      original_price: 0,
+      depreciation_price: 0,
+      rent_price: 0,
+      status: 'active'
+    });
+  };
+
 
 //Khu vực hàm dành cho update
   const handleUpdateAmenity = async (e) => {
@@ -231,11 +257,13 @@ const AmenitiesManagerPage = () => {
   }
 
   const handleUpdateChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setNewAmenity((prev) => ({ 
-      ...prev, 
-      [name]: type === 'checkbox' ? (checked ? 'active' : 'inactive') : value,
+    const { name, value, files } = e.target;
+    setNewAmenity((prev) => ({
+      ...prev,
+      [name]: name === "original_price" ? Math.floor(Number(value)) : (files ? files[0] : value),
     }));
+
+    console.log("Updated newAmenity:", newAmenity)
   }
 
   const handleUpdateClick = (amenity) => {
@@ -245,16 +273,8 @@ const AmenitiesManagerPage = () => {
 
   const updateAmenityFields = [
     { name: "amenity_name", label: "Amenity Name", type: "text", value: `${newAmenity.amenity_name}` },
+    { name: "original_price", label: "Original Price", type: "text", value: Math.floor(Number(newAmenity.original_price)) },
     { name: "image", label: "Images", type: "file", multiple: true, value: `${newAmenity.image}` },
-    { name: "original_price", label: "Original Price", type: "number", value: `${newAmenity.original_price}` },
-    { 
-      label: "Status", 
-      type: "checkbox", 
-      name: "status", 
-      checked: `${newAmenity.status}` === "active", 
-      onChange: handleUpdateChange,
-      checkboxLabels: { checked: "active", unchecked: "inactive" }
-    },
   ];
 
     
@@ -302,13 +322,23 @@ const AmenitiesManagerPage = () => {
       }
     };
 
+    const filteredAmenities = Array.isArray(amenity)
+    ? amenity.filter((item) => {
+        const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
+        const matchesSearchTerm = item.amenity_name.toLowerCase().includes(searchTerm.toLowerCase());
+        return matchesStatus && matchesSearchTerm;
+      })
+    : [];
+
+  // // Handle search input changes
   // const handleSearchChange = (e) => {
   //   setSearchTerm(e.target.value);
   // };
 
-  // const closeSuccessMessage = () => {
-  //   setSuccessMessage("");
-  // };
+  //   // Filter amenities based on search term
+  //   const filteredAmenities = amenity.filter((amen) =>
+  //     amen.amenity_name.toLowerCase().includes(searchTerm.toLowerCase())
+  //   );
 
   // const filteredAmenities = amenities.filter(
   //   (amenity) =>
@@ -323,17 +353,34 @@ const AmenitiesManagerPage = () => {
 
       <div className="grid grid-cols-2">
         <SearchBar
-          // searchTerm={searchTerm}
-          // handleSearchChange={handleSearchChange}
-          // placeholder="Search by ID, name, or status"
+          searchTerm={searchTerm}
+          handleSearchChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search by Amenity Name"
         />
 
         {/* Add Button */}
         <div className="ml-2">
           <AddButton 
-            onClick={() => setShowAddModal(true)} 
+            
+            onClick={() =>{
+              resetNewAmenity();
+              setShowAddModal(true)
+            } } 
             label="Add Amenity" />
         </div>
+      </div>
+
+      <div className="mb-4">
+        <select
+          id="statusFilter"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="select select-bordered select-sm max-w-xs"
+        >
+          <option value="all">All</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
       </div>
 
       <div>
@@ -354,8 +401,8 @@ const AmenitiesManagerPage = () => {
             </tr>
           </thead>
           <tbody>
-            {Array.isArray(amenity) && amenity.map((amenity) => (
-                <tr key={amenity.amenity_id} className="hover:bg-gray-100" onClick={() => handleRowClick(amenity.amenity_id)}>
+            {filteredAmenities.map((amenity) => (
+                <tr key={amenity.amenity_id} className="hover:bg-gray-100 cursor-pointer" onClick={() => handleRowClick(amenity.amenity_id)}>
                   <td>{amenity.amenity_name}</td>
                   <td>{formatCurrency(amenity.original_price)}</td>
                   <td>{formatCurrency(amenity.depreciation_price)}</td>

@@ -33,7 +33,8 @@ const WorkspacesTypesManagerPage = () => {
     const [workspaceTypeToDelete, setWorkspaceTypeToDelete] = useState(null);
     const [successMessage, setSuccessMessage] = useState('');
     const [selectedWorkspaceTypeDetails, setSelectedWorkspaceTypeDetails] = useState(null);
-    
+    const [searchTerm, setSearchTerm] = useState("");
+    const [statusFilter, setStatusFilter] = useState('all');
     const [newWorkspaceType, setNewWorkspaceType] = useState({
       workspace_type_name: '',
       image: null,
@@ -134,7 +135,22 @@ const WorkspacesTypesManagerPage = () => {
         formData.append('image', newWorkspaceType.image);
         formData.append('description', newWorkspaceType.description);
         formData.append('status', newWorkspaceType.status);
-      console.log('FormData:', Object.fromEntries(formData.entries())); // Log FormData content
+
+        const isDuplicate = workspaceType && workspaceType.some((item) => item.workspace_type_name === newWorkspaceType.workspace_type_name);
+        if (isDuplicate) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'A workspace type with this name already exists.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+
        try {
          const WorkspaceType = await postWorkspaceType(newWorkspaceType);
          setResponseData(WorkspaceType);
@@ -150,8 +166,8 @@ const WorkspacesTypesManagerPage = () => {
 
      const addWorkspaceTypeFields = [
       { label: "Name", type: "text", name: "workspace_type_name", value: `${newWorkspaceType.workspace_type_name}` },
-      { label: "Image", type: "file", name: "image", value: `${newWorkspaceType.image}` },
       { label: "Description", type: "text", name: "description", value: `${newWorkspaceType.description}`  },
+      { label: "Image", type: "file", name: "image", value: `${newWorkspaceType.image}` },
     ];
 
      const handleInputChange = (e) => {
@@ -159,6 +175,14 @@ const WorkspacesTypesManagerPage = () => {
       setNewWorkspaceType({
         ...newWorkspaceType,
         [name]: value,
+      });
+    };
+
+    const resetNewWorkspaceType = () => {
+      setNewWorkspaceType({
+        workspace_type_name: '',
+        description: '',
+        image: null,
       });
     };
 
@@ -217,17 +241,8 @@ const WorkspacesTypesManagerPage = () => {
 
   const updateWorkspaceTypeFields = [
     { label: "Name", type: "text", name: "workspace_type_name", value: `${newWorkspaceType.workspace_type_name}` },
-    { label: "Image", type: "file", name: "image", value: `${newWorkspaceType.image}` },
     { label: "Description", type: "text", name: "description", value: `${newWorkspaceType.description}` },
-    { 
-      label: "Status", 
-      type: "checkbox", 
-      name: "status", 
-      checked: `${newWorkspaceType.status}` === "active", 
-      onChange: handleUpdateChange,
-      checkboxLabels: { checked: "active", unchecked: "inactive" }
-    },
-
+    { label: "Image", type: "file", name: "image", value: `${newWorkspaceType.image}` },
   ];
 
   //Khu vực hàm dành cho block/unblock
@@ -272,6 +287,14 @@ const WorkspacesTypesManagerPage = () => {
     }
   };
 
+  const filteredWorkspaceType = Array.isArray(workspaceType)
+  ? workspaceType.filter((item) => {
+      const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
+      const matchesSearchTerm = item.workspace_type_name.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesStatus && matchesSearchTerm;
+    })
+  : [];
+
   // const [searchTerm, setSearchTerm] = useState("");
 
   // const handleSearchChange = (e) => setSearchTerm(e.target.value);
@@ -293,19 +316,35 @@ const WorkspacesTypesManagerPage = () => {
 
       <div className="grid grid-cols-2">
         <SearchBar
-          //searchTerm={searchTerm}
-          //handleSearchChange={handleSearchChange}
-          placeholder="Search by ID, name, or status"
+          searchTerm={searchTerm}
+          handleSearchChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search by Workspace Type Name"
         />
 
         {/* Add Button */}
         <div className="ml-2">
           <AddButton
-            onClick={() => setShowAddModal(true)}
+            onClick={() => {
+              resetNewWorkspaceType();
+              setShowAddModal(true);
+            } }
             label="Add Workspace Type"
           />
         </div>
       </div>
+
+      <div className="mb-4">
+        <select
+          id="statusFilter"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="select select-bordered select-sm max-w-xs"
+        >
+        <option value="all">All</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+    </div>
 
       {/* <div>
         <SuccessAlert message={successMessage} onClose={closeSuccessMessage} />
@@ -323,8 +362,8 @@ const WorkspacesTypesManagerPage = () => {
             </tr>
           </thead>
           <tbody>
-            {Array.isArray(workspaceType) && workspaceType.map((workspaceType) => (
-              <tr key={workspaceType.workspace_type_id} className="hover:bg-gray-100" onClick={() => handleRowClick(workspaceType.workspace_type_id)}>
+            {filteredWorkspaceType.map((workspaceType) => (
+              <tr key={workspaceType.workspace_type_id} className="hover:bg-gray-100 cursor-pointer" onClick={() => handleRowClick(workspaceType.workspace_type_id)}>
                 <td>{workspaceType.workspace_type_name}</td>
                 <td>{workspaceType.description}</td>
                 <td>{workspaceType.status}</td>

@@ -28,7 +28,8 @@ const DetailsModal = ({ show, onClose, details }) => {
               .filter(([key]) => key !== "Manager"
                               && key !== "Staff" 
                               && key !== "image"
-                              && key !== "google_token")
+                              && key !== "google_token"
+                              && key !== "User")
               .map(([key, value]) => (
                 <li key={key} className="flex justify-between">
                   <span className="font-medium">{formatKey(key)}:</span> {/* Sử dụng hàm formatKey */}

@@ -27,6 +27,17 @@ const UpdateModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fiel
                 />
               )}
 
+              {field.type === 'password' && (
+                <input
+                  type="password"
+                  name={field.name}
+                  value={currentItem[field.name] || ""}
+                  onChange={onInputChange}
+                  className="input input-bordered"
+                  required={field.required}
+                />
+              )}
+
               {field.type === 'number' && (
                 <input
                   type="number" // Render as number input
@@ -34,7 +45,6 @@ const UpdateModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fiel
                   value={currentItem[field.name] || 0} // Make sure there is a default value
                   onChange={onInputChange}
                   className="input input-bordered"
-                  step="0.01"
                   required
                 />
               )}
@@ -126,8 +136,8 @@ const UpdateModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fiel
             </div>
           ))}
           <div className="modal-action">
-            <button type="submit" className="btn btn-sm" onClick={onSubmit}><FiEdit3/>Confirm</button>
-            <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}><RxCross2/>Cancel</button>
+            <button type="submit" className="btn btn-neutral btn-sm" onClick={onSubmit}><FiEdit3/>Confirm</button>
+            <button type="button" className="btn btn-active btn-sm" onClick={onClose}><RxCross2/>Cancel</button>
           </div>
         </form>
       </div>

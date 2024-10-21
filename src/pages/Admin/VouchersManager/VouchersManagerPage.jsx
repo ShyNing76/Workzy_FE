@@ -33,6 +33,8 @@ const VouchersManagerPage = () => {
     const [selectedVoucherDetails, setSelectedVoucherDetails] = useState("");
     const [voucherToDelete, setVoucherToDelete] = useState(null);
     const [successMessage, setSuccessMessage] = useState("");
+    const [statusFilter, setStatusFilter] = useState('all');
+    const [searchTerm, setSearchTerm] = useState("");
     const [newVoucher, setNewVoucher] = useState({
       voucher_name: '',
       voucher_code: '',
@@ -45,24 +47,46 @@ const VouchersManagerPage = () => {
     const [responseData, setResponseData] = useState(null);
 
     const convertDateToMMDDYYYY = (dateStr) => {
+      if (!dateStr) {
+        return "none"; // Handle undefined or empty strings
+      }
+    
+      try {
         // Check if dateStr contains a 'T' indicating a date-time format
         if (dateStr.includes('T')) {
           dateStr = dateStr.split('T')[0]; // Remove the time part
         }
-      
-        // Now perform your existing splitting
-        let parts = dateStr.split("-");
-        let year = parts[0];
-        let month = parts[1];
-        let day = parts[2].split('Z')[0]; // Ensure 'day' is clean from any trailing characters
-      
+    
+        // Split into parts
+        const parts = dateStr.split("-");
+        
+        if (parts.length !== 3) {
+          return "none"; // If format is incorrect, return "none"
+        }
+    
+        const [year, month, day] = parts;
+    
+        if (!year || !month || !day) {
+          return "none"; // Handle missing date parts
+        }
+    
         // Ensure month and day are two digits
-        month = month.length > 1 ? month : "0" + month;
-        day = day.length > 1 ? day : "0" + day;
-      
+        const formattedMonth = month.length > 1 ? month : "0" + month;
+        const formattedDay = day.split('Z')[0].length > 1 ? day.split('Z')[0] : "0" + day.split('Z')[0];
+    
+        // Check if formed date is valid
+        const dateCheck = new Date(`${year}-${formattedMonth}-${formattedDay}`);
+        if (isNaN(dateCheck.getTime())) {
+          return "none"; // Return "none" for invalid date checks
+        }
+    
         // Return the formatted date
-        return day + "/" + month + "/" + year;
-      };
+        return `${formattedDay}/${formattedMonth}/${year}`;
+    
+      } catch (error) {
+        return "none"; // Return "none" if any error occurs in processing
+      }
+    };
 
       //Hiện data lên table
   const fetchVoucher = async () => {
@@ -207,6 +231,37 @@ const VouchersManagerPage = () => {
           return;
         }
 
+          // Duplicate checking for voucher_name and voucher_code
+  const isDuplicateName = voucher && voucher.some((item) => item.voucher_name === newVoucher.voucher_name);
+  const isDuplicateCode = voucher && voucher.some((item) => item.voucher_code === newVoucher.voucher_code);
+
+  if (isDuplicateName) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Validation Error',
+      text: 'A voucher with this name already exists.',
+      position: 'top-end',
+      toast: true,
+      timer: 3000,
+      timerProgressBar: true,
+      showConfirmButton: false,
+    });
+    return;
+  }
+
+  if (isDuplicateCode) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Validation Error',
+      text: 'A voucher with this code already exists.',
+      position: 'top-end',
+      toast: true,
+      timer: 3000,
+      timerProgressBar: true,
+      showConfirmButton: false,
+    });
+    return;
+  }
 
         const formData = new FormData();
         formData.append('voucher_name', newVoucher.voucher_name);
@@ -216,6 +271,22 @@ const VouchersManagerPage = () => {
         formData.append('quantity', newVoucher.quantity);
         formData.append('expired_date', newVoucher.expired_date);
         console.log("Form Data:", newVoucher); // Log form data for debugging
+
+        const isDuplicate = voucher && voucher.some((item) => item.voucher_name === newVoucher.voucher_name);
+        if (isDuplicate) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'A voucher with this name already exists.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+
         try{
           const Voucher = await postVoucher(newVoucher);
           setResponseData(Voucher);
@@ -242,6 +313,17 @@ const VouchersManagerPage = () => {
           ...newVoucher,
           [name]: value,
         })
+      };
+
+      const resetNewVoucher = () => {
+        setNewVoucher({
+          voucher_name: '',
+          voucher_code: '',
+          description: '',
+          discount: 0,
+          quantity: 0,
+          expired_date: '',
+        });
       };
 
     //Khu vực dành cho hàm delete
@@ -299,23 +381,47 @@ const VouchersManagerPage = () => {
     }
   };
 
+  const filteredVoucher = Array.isArray(voucher)
+  ? voucher.filter((item) => {
+      const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
+      const matchesSearchTerm = item.voucher_name.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesStatus && matchesSearchTerm;
+    })
+  : [];
+
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-4xl font-black mb-4">Manage Vouchers</h1>
 
             <div className="grid grid-cols-2">
         <SearchBar
-          // searchTerm={searchTerm}
-          // handleSearchChange={handleSearchChange}
-          // placeholder="Search by ID, name, or status"
+          searchTerm={searchTerm}
+          handleSearchChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search by Voucher Name"
         />
 
         {/* Add Button */}
         <div className="ml-2">
           <AddButton 
-            onClick={() => setShowAddModal(true)} 
+            onClick={() => {
+              resetNewVoucher();
+              setShowAddModal(true);
+            } } 
             label="Add Voucher" />
         </div>
+      </div>
+
+      <div className="mb-4">
+        <select
+          id="statusFilter"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="select select-bordered select-sm max-w-xs"
+        >
+          <option value="all">All</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
       </div>
 
       <div>
@@ -337,8 +443,8 @@ const VouchersManagerPage = () => {
             </tr>
           </thead>
           <tbody>
-            {Array.isArray(voucher) && voucher.map((voucher) => (
-                <tr key={voucher.voucher_id} className="hover:bg-gray-100" onClick={() => handleRowClick(voucher.voucher_id)}>
+            {filteredVoucher.map((voucher) => (
+                <tr key={voucher.voucher_id} className="hover:bg-gray-100 cursor-pointer" onClick={() => handleRowClick(voucher.voucher_id)}>
                   <td>{voucher.voucher_name}</td>
                   <td>{voucher.voucher_code}</td>
                   <td>{voucher.discount * 100}%</td>

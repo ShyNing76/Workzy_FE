@@ -1,11 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { FiPlus } from "react-icons/fi";
 import { RxCross2 } from "react-icons/rx";
 
 const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields }) => {
+  const [missingFields, setMissingFields] = useState([]);
+
   if (!show) return null;
+
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const missing = fields
+      .filter(field => field.required && !currentItem[field.name])
+      .map(field => field.name);
+
+    if (missing.length > 0) {
+      setMissingFields(missing);
+    } else {
+      onSubmit();
+      setMissingFields([]); // Reset missing fields if successfully submitted
+    }
+  };
 
   return (
     <div className="modal modal-open">
@@ -14,7 +31,10 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
         <form onSubmit={onSubmit}>
           {fields.map((field) => (
             <div key={field.name} className="form-control">
-              <label className="label">{field.label}</label>
+              <label className="label">
+                {field.label}
+                {missingFields.includes(field.name) && <span className="text-red-500 text-sm"> *required</span>}
+                </label>
 
               {/* Handle different input types */}
               {field.type === 'text' && (
@@ -24,19 +44,18 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
                   value={currentItem[field.name] || ""}
                   onChange={onInputChange}
                   className="input input-bordered"
-                  step="0.01"
                   required
                 />
               )}
 
-              {field.type === 'number' && (
+              {field.type === 'password' && (
                 <input
-                  type="number" // Render as number input
+                  type="password"
                   name={field.name}
-                  value={currentItem[field.name] || 0} // Make sure there is a default value
+                  value={currentItem[field.name] || ""}
                   onChange={onInputChange}
                   className="input input-bordered"
-                  required
+                  required={field.required}
                 />
               )}
 
@@ -109,8 +128,8 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
           ))}
 
           <div className="modal-action">
-            <button type="submit" className="btn btn-sm" onClick={onSubmit}><FiPlus />Add</button>
-            <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}><RxCross2 />Cancel</button>
+            <button type="submit" className="btn btn-neutral btn-sm" onClick={onSubmit}><FiPlus />Add</button>
+            <button type="button" className="btn btn-active btn-sm" onClick={onClose}><RxCross2 />Cancel</button>
           </div>
         </form>
       </div>
@@ -141,6 +160,7 @@ AddModal.propTypes = {
       }),
       className: PropTypes.string,
       multiple: PropTypes.bool,
+      required: PropTypes.bool,
     })
   ).isRequired,
 };
