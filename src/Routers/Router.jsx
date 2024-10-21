@@ -11,7 +11,6 @@ import Profile from "../pages/Customer/Profile/Profile.jsx";
 import User from "../pages/Customer/User/User.jsx";
 import RoomDetail from "../pages/Customer/Room detail/RoomDetail.jsx";
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import ScrollToTop from "../components/context/scrollToTop.jsx";
 import PrivateRoute from "./PrivateRoute.jsx";
 import ManagerPage from "../pages/Manager/ManagerPage.jsx";
 import ManagerAssign from "../pages/Manager/ManagerAssign/ManagerAssign.jsx";
@@ -59,6 +58,7 @@ import AccessDenied from "../pages/Customer/AccessDenied/AccessDenied.jsx";
 import NotFound from "../pages/Customer/NotFound/NotFound.jsx";
 
 import AnimatedRoutes from "../Routers/AnimatedRoute.jsx";
+import ScrollToTop from "../components/context/ScrollToTop.jsx";
 
 // Role id store in local Storage after login and register
 
