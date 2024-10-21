@@ -10,6 +10,7 @@ import {
   getWorkSpaceById,
   postBookingAddToCalendar,
   postBookingRefund,
+  postCreateReview,
   putCancelBooking,
   putChangeStatus,
 } from "../../../config/api";
@@ -105,7 +106,7 @@ const MyBooking = () => {
     if (selectedTab === "Current") {
       return bookingData.filter((booking) =>
         [
-          "in-process",
+          "usage",
           "check-out",
           "check-in",
           "check-amenities",
@@ -264,7 +265,7 @@ const MyBooking = () => {
       confirmButtonText: "Yes, check-out it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        putChangeStatus(bookingId, "check-out");
+        const res = putChangeStatus(bookingId, "check-out");
 
         if (res && res.err === 0) {
           Swal.fire({
@@ -313,10 +314,28 @@ const MyBooking = () => {
     setIsOpenReviewModal(true);
   };
 
-  const handleSubmitReview = () => {
-    // Xử lý gửi đánh giá, ví dụ gọi API
-    console.log("Rating:", rating);
-    console.log("Comment:", comment);
+  const handleSubmitReview = async (bookingId) => {
+    const res = await postCreateReview(bookingId, rating, comment);
+
+    if (res && res.err === 0) {
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Review Workspace Successful",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+      setRefreshData((prev) => !prev);
+    } else {
+      Swal.fire({
+        position: "center",
+        icon: "error",
+        title: res.message,
+        text: "Fail to Review Workspace",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    }
 
     // Đóng modal sau khi gửi đánh giá
     setRating(5);
@@ -392,7 +411,7 @@ const MyBooking = () => {
                     <br />
                     <div
                       className={`card-actions ${
-                        booking.BookingStatuses[0].status === "in-process" ||
+                        booking.BookingStatuses[0].status === "usage" ||
                         booking.BookingStatuses[0].status === "confirmed"
                           ? "justify-between"
                           : "justify-end"
@@ -418,7 +437,7 @@ const MyBooking = () => {
                           </button>
                         </>
                       )}
-                      {booking.BookingStatuses[0].status === "in-process" && (
+                      {booking.BookingStatuses[0].status === "usage" && (
                         <>
                           <button className="btn btn-outline btn-info skeleton">
                             Checkout

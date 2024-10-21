@@ -18,7 +18,7 @@ const BookingDetail = () => {
     "confirmed",
     "paid",
     "check-in",
-    "in-process",
+    "usage",
     "check-out",
     booking.BookingStatuses[0].status === "cancelled"
       ? "cancelled"
@@ -53,8 +53,8 @@ const BookingDetail = () => {
 
   const getStatusBadgeClass = (status) => {
     switch (status) {
-      case "in-process":
-        return "badge badge-warning"; // Màu vàng cho trạng thái "in-process"
+      case "usage":
+        return "badge badge-warning"; // Màu vàng cho trạng thái "usage"
       case "check-out":
         return "badge badge-info"; // Màu xanh dương cho "checkout"
       case "check-amenities":

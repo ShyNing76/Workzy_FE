@@ -30,8 +30,8 @@ const BookingCard = (props) => {
 
   const getStatusBadgeClass = (status) => {
     switch (status) {
-      case "in-process":
-        return "badge badge-warning"; // Màu vàng cho trạng thái "in-process"
+      case "usage":
+        return "badge badge-warning"; // Màu vàng cho trạng thái "usage"
       case "check-out":
         return "badge badge-info"; // Màu xanh dương cho "checkout"
       case "check-amenities":
@@ -113,7 +113,7 @@ const BookingCard = (props) => {
         </p>
         <div
           className={`card-actions ${
-            booking.BookingStatuses[0].status === "in-process" ||
+            booking.BookingStatuses[0].status === "usage" ||
             booking.BookingStatuses[0].status === "confirmed"
               ? "justify-between"
               : "justify-end"
@@ -148,7 +148,7 @@ const BookingCard = (props) => {
               </button>
             </>
           )}
-          {booking.BookingStatuses[0].status === "in-process" && (
+          {booking.BookingStatuses[0].status === "usage" && (
             <>
               <button
                 className="btn btn-outline btn-info"
