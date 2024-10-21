@@ -179,7 +179,7 @@ const BookingRoom = (props) => {
   const handleConfirmBooking = async () => {
     if (!auth.isAuthenticated) {
       // If not login => Navigate to login page to login
-      navigate(`login?redirect=${window.location.pathname}`);
+      navigate(`/login?redirect=${window.location.pathname}`);
       return;
     }
 

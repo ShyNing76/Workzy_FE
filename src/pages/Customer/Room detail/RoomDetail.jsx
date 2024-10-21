@@ -134,7 +134,7 @@ const RoomDetail = () => {
                   <div className="time-slot-grid">
                     {Array.from({ length: 12 }, (_, i) => (
                       <div key={i} className="time-slot">
-                        {`${i.toString().padStart(2, "0")}:00`}
+                        {`${(i + 1).toString().padStart(2, "0")}:00`}
                       </div>
                     ))}
                   </div>
@@ -146,7 +146,7 @@ const RoomDetail = () => {
                   <div className="time-slot-grid">
                     {Array.from({ length: 12 }, (_, i) => (
                       <div key={i} className="time-slot">
-                        {`${(i + 12).toString().padStart(2, "0")}:00`}
+                        {`${(i + 13).toString().padStart(2, "0")}:00`}
                       </div>
                     ))}
                   </div>
