@@ -10,8 +10,9 @@ import { LuCalendarCheck } from "react-icons/lu";
 import { RiCoupon3Line } from "react-icons/ri";
 import { IoIosArrowRoundForward } from "react-icons/io";
 import React, { PureComponent } from 'react';
+import { format } from 'date-fns';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-
+import io from "socket.io-client";
 import "./AdminDashboardPage.scss";
 import { useState } from "react";
 
@@ -47,33 +48,107 @@ const data2 = [
   { name: '12', uv: 3490, pv: 4300, amt: 2100, },
 ];
 
-const bookings = [
-  {
-    name: 'Le Van A',
-    room: 'Room no.01',
-    type: 'Double POD',
-    time: '12:45',
-    status: 'Booked',
-  },
-  {
-    name: 'Le Van A',
-    room: 'Room no.01',
-    type: 'Double POD',
-    time: '12:45',
-    status: 'Booked',
-  },
-];
-
-const vipCustomers = [
-  { name: 'Le Van A', points: 900 },
-  { name: 'Le Van A', points: 900 },
-  { name: 'Le Van A', points: 900 },
-  { name: 'Le Van A', points: 900 },
-  { name: 'Le Van A', points: 900 },
-];
-
 const AdminDashboard = () => {
+  const socket = io('http://localhost:5000');
   const [ravenue, setRavenue] = useState();
+  const [booking, setBookings] = useState();
+  const [voucher, setVoucher] = useState();
+  const [manager, setManager] = useState();
+  const [staff, setStaff] = useState();
+  const [customer, setCustomer] = useState();
+  const [building, setBuilding] = useState();
+  const [amenity, setAmenity] = useState();
+  const [workspace, setWorkspace] = useState();
+  const [top5Customers, setTop5Customers] = useState([]);
+  const [top5Bookings, setTop5Bookings] = useState([]);
+
+  const handleRavenueSubmit = (event) => {
+    event.preventDefault();
+    socket.emit("newCompletedBookingInMonth");
+    socket.on("totalPricesInMonth", (data) => {
+      setRavenue(data);
+    });
+  }
+
+  const handleBookingsSubmit = (event) => {
+    event.preventDefault();
+    socket.emit("newBooking");
+    socket.on("totalBooking", (data) => {
+      setBookings(data);
+    });
+  }
+
+  const handleVoucherSubmit = (event) => {
+    event.preventDefault();
+    socket.emit("newVoucher");
+    socket.on("totalVoucher", (data) => {
+      setVoucher(data);
+    });
+  }
+
+  const handleManagerSubmit = (event) => {
+    event.preventDefault();
+    socket.emit("newManager");
+    socket.on("totalManager", (data) => {
+      setManager(data);
+    });
+  }
+
+  const handleStaffSubmit = (event) => {
+    event.preventDefault();
+    socket.emit("newStaff");
+    socket.on("totalStaff", (data) => {
+      setStaff(data);
+    });
+  }
+
+  const handleCustomerSubmit = (event) => {
+    event.preventDefault();
+    socket.emit("newCustomer");
+    socket.on("totalCustomer", (data) => {
+      setCustomer(data);
+    });
+  }
+
+  const handleBuildingSubmit = (event) => {
+    event.preventDefault();
+    socket.emit("newBuilding");
+    socket.on("totalBuilding", (data) => {
+      setBuilding(data);
+    });
+  }
+
+  const handleAmenitySubmit = (event) => {
+    event.preventDefault();
+    socket.emit("newAmenities");
+    socket.on("totalAmenities", (data) => {
+      setAmenity(data);
+    });
+  }
+
+  const handleWorkspaceSubmit = (event) => {
+    event.preventDefault();
+    socket.emit("newWorkspace");
+    socket.on("totalWorkspace", (data) => {
+      setWorkspace(data);
+    });
+  }
+
+  const handleTop5CustomersSubmit = (event) => {
+    event.preventDefault();
+    socket.emit("newFiveCustomer");
+    socket.on("fiveCustomer", (data) => {
+      setTop5Customers(data);
+    });
+  }
+
+  const handleTop5BookingsSubmit = (event) => {
+    event.preventDefault();
+    socket.emit("newFiveBooking");
+    socket.on("fiveBooking", (data) => {
+      setTop5Bookings(data);
+    });
+  }
   return (
     <div className="max-w-screen *:box-border w-full h-full flex flex-col overflow-hidden">
 
@@ -89,8 +164,8 @@ const AdminDashboard = () => {
                 <TfiStatsUp className="mt-1 size-5"/>
                 <div className="stat-title ml-2 text-xl">Total Ravenue in Month</div>
               </div>
-              <div className="stat-value text-5xl">15.000.000</div>
-              <button>Send</button>
+              <div className="stat-value text-5xl">{ravenue}</div>
+              <button onClick={handleRavenueSubmit}>Send</button>
             </div>
           </div>
 
@@ -100,7 +175,8 @@ const AdminDashboard = () => {
                 <LuCalendarCheck className="mt-1 size-5"/>
                 <div className="stat-title ml-2 text-xl">Total Bookings</div>
               </div>
-              <div className="stat-value text-5xl">200</div>
+              <div className="stat-value text-5xl">{booking}</div>
+              <button onClick={handleBookingsSubmit}>Send</button>
             </div>
           </div>
 
@@ -110,7 +186,8 @@ const AdminDashboard = () => {
                 <RiCoupon3Line className="mt-1 size-5"/>
                 <div className="stat-title ml-2 text-xl">Total Vouchers</div>
               </div>
-              <div className="stat-value text-5xl">30</div>
+              <div className="stat-value text-5xl">{voucher}</div>
+              <button onClick={handleVoucherSubmit}>Send</button>
             </div>
           </div>
 
@@ -120,7 +197,9 @@ const AdminDashboard = () => {
                 <PiIdentificationBadge className="mt-1 size-5"/>
                 <div className="stat-title ml-2 text-xl">Total Managers</div>
               </div>
-              <div className="stat-value text-5xl">95</div>
+              <div className="stat-value text-5xl">{manager}</div>
+              <button onClick={handleManagerSubmit}>Send</button>
+
             </div>
           </div>
 
@@ -130,7 +209,9 @@ const AdminDashboard = () => {
                 <GoPerson className="mt-1 size-5"/>
                 <div className="stat-title ml-2 text-xl">Total Staffs</div>
               </div>
-              <div className="stat-value text-5xl">15</div>
+              <div className="stat-value text-5xl">{staff}</div>
+              <button onClick={handleStaffSubmit}>Send</button>
+
             </div>
           </div>
 
@@ -140,7 +221,9 @@ const AdminDashboard = () => {
                 <GoPeople className="mt-1 size-5"/>
                 <div className="stat-title ml-2 text-xl">Total Customers</div>
               </div>
-              <div className="stat-value text-5xl">15</div>
+              <div className="stat-value text-5xl">{customer}</div>
+              <button onClick={handleCustomerSubmit}>Send</button>
+
             </div>
           </div>
 
@@ -150,7 +233,9 @@ const AdminDashboard = () => {
                 <IoExtensionPuzzleOutline className="mt-1 size-5"/>
                 <div className="stat-title ml-2 text-xl">Total Amenities</div>
               </div>
-              <div className="stat-value text-5xl">15</div>
+              <div className="stat-value text-5xl">{amenity}</div>
+              <button onClick={handleAmenitySubmit}>Send</button>
+
             </div>
           </div>
 
@@ -160,7 +245,9 @@ const AdminDashboard = () => {
                 <PiBuildingsLight className="mt-1 size-5"/>
                 <div className="stat-title ml-2 text-xl">Total Buildings</div>
               </div>
-              <div className="stat-value text-5xl">15</div>
+              <div className="stat-value text-5xl">{building}</div>
+              <button onClick={handleBuildingSubmit}>Send</button>
+
             </div>
           </div>
 
@@ -170,7 +257,9 @@ const AdminDashboard = () => {
                 <RxDashboard className="mt-1 size-5"/>
                 <div className="stat-title ml-2 text-xl">Total Workspaces</div>
               </div>
-              <div className="stat-value text-5xl">15</div>
+              <div className="stat-value text-5xl">{workspace}</div>
+              <button onClick={handleWorkspaceSubmit}>Send</button>
+
             </div>
           </div>
 
@@ -238,33 +327,35 @@ const AdminDashboard = () => {
             <div className="rounded-box grid flex-grow">
               <p className="text-xl font-semibold mb-4">Recent overview</p>
               <div className="bg-base-200 p-4 rounded-lg shadow-lg">
-                {bookings.map((booking, index) => (
+                {top5Bookings.map((booking, index) => (
                   <div key={index} className="border-b py-2 flex justify-between items-center">
                     <div>
-                      <p className="font-semibold">{booking.name}</p>
-                      <p>{booking.room}</p>
-                      <p className="text-sm">{booking.type}</p>
+                      <p className="font-semibold">{booking.Customer.User.name}</p>
+                      <p>{booking.Workspace.workspace_name}</p>
+                      <p className="text-sm">{booking.Workspace.WorkspaceType.workspace_type_name}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold">{booking.time}</p>
-                      <p>{booking.status}</p>
+                      <p className="font-semibold">{format(new Date(booking.createdAt), "dd/MM/yyyy HH:mm:ss")}</p>
+                      {booking.BookingStatuses.map((status, index) => (
+                        <p key={index}>{status.status}</p>
+                      ))}
                     </div>
                   </div>
                 ))}
                 <div className="mt-7 text-right">
                   <button className="btn btn-neutral btn-sm">See more<IoIosArrowRoundForward className="size-5"/></button>
                 </div>
+                <button onClick={handleTop5BookingsSubmit}>Send</button>
               </div>
             </div>
 
           <div className="divider-horizontal"></div>
-
             <div className="rounded-box grid flex-grow">
               <p className="text-xl font-semibold mb-4">Top 5 VIP Customer</p>
               <div className="bg-base-200 p-4 rounded-lg shadow-lg">
                 <table className="table-auto w-full">
                   <tbody>
-                    {vipCustomers.map((customer, index) => (
+                    {top5Customers.map((customer, index) => (
                       <tr key={index} className="border-b">
                         <td className="px-4 py-2 text-3xl font-bold"
                           style={{
@@ -273,11 +364,12 @@ const AdminDashboard = () => {
                         >
                           #{index + 1}
                         </td>
-                        <td className="px-4 py-2 text-2xl font-semibold">{customer.name}</td>
-                        <td className="px-4 py-2 text-right text-xl font-medium">{customer.points} ZyCoin</td>
+                        <td className="px-4 py-2 text-2xl font-semibold">{customer.User.name}</td>
+                        <td className="px-4 py-2 text-right text-xl font-medium">{customer.point} ZyCoin</td>
                       </tr>
                     ))}
                   </tbody>
+                  <button onClick={handleTop5CustomersSubmit}>Send</button>
                 </table>
               </div>
             </div>
