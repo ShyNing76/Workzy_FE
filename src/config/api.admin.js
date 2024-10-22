@@ -75,18 +75,13 @@ const getWorkspaceType = (workspace_type_id, workspace_type_name, image, descrip
 
   //Managers Manager APIs__________________________________________________________
 
-  const getManager = (user_id, name, gender, date_of_birth, status) =>  {
-    const URL_API = "/api/v1/manager"
-    const data = {
-      user_id,
-      name,
-      gender,
-      date_of_birth,
-      status,
-    }
-    return axios.get(URL_API, data)
+  const getManager = () =>  {
+    const URL_API = "/api/v1/manager/"   
+    return axios.get(URL_API)
   }
 
+  
+  
   const getManagerById = (user_id) => {
     const URL_API = `/api/v1/manager/${user_id}`
     return axios.get(URL_API);
@@ -109,18 +104,9 @@ const getWorkspaceType = (workspace_type_id, workspace_type_name, image, descrip
 
   //Staffs Manager APIs__________________________________________________________
 
-  const getStaff = (user_id, name, email, phone, gender, date_of_birth, status) => {
-    const URL_API = "/api/v1/staff"
-    const data =  {
-      user_id,
-      name,
-      email,
-      phone,
-      gender,
-      date_of_birth,
-      status,
-    }
-    return axios.get(URL_API, data)
+  const getStaff = () => {
+    const URL_API = "/api/v1/staff/"
+    return axios.get(URL_API)
   }
 
   const getStaffById = (user_id) => {
@@ -137,6 +123,16 @@ const getWorkspaceType = (workspace_type_id, workspace_type_name, image, descrip
     const URL_API = `/api/v1/staff/${user_id}`
     return axios.put(URL_API, updatedStaff)
   }
+
+  const unassignStaffFromBuilding = (staffId) => {
+    const URL_API = `/api/v1/staff/unassign/${staffId}`;
+    return axios.put(URL_API);
+}
+
+const assignStaffToBuilding = (staffId, buildingId) => {
+    const URL_API = `/api/v1/staff/assign/${staffId}`;     // URL_API is the api to assign staff to building with staffId on header
+    return axios.put(URL_API, {building_id: buildingId});  // put request to assign staff to building with buildingId in body
+}   // ==> need to have building_id in body to assign staff to building
 
   const deleteStaff = (user_id) => {
     const URL_API = `/api/v1/staff/unactive/${user_id}`
@@ -176,21 +172,10 @@ const getWorkspaceType = (workspace_type_id, workspace_type_name, image, descrip
   }
 
   //Buildings Manager APIs_________________________________________________________
-  const getBuilding = (building_id, manager_id, building_name, location, address, google_address, description, rating, status, BuildingImages) => {
-    const URL_API = "/api/v1/building"
-    const data =  {
-      building_id,
-      manager_id,
-      building_name,
-      location,
-      address,
-      google_address,
-      description,
-      rating,
-      status,
-      BuildingImages
-    }
-    return axios.get(URL_API, data)
+  const getBuilding = () => {
+    const URL_API = "/api/v1/building/"
+    return axios.get(URL_API)
+
   }
 
   const getBuildingById = (building_id) => {
@@ -372,6 +357,8 @@ const deleteReview = (review_id) => {
     postStaff,
     putStaff,
     deleteStaff,
+    unassignStaffFromBuilding,
+    assignStaffToBuilding,
 
     getCustomer,
     getCustomerById,
