@@ -5,20 +5,57 @@ import { FiPlus } from "react-icons/fi";
 import { RxCross2 } from "react-icons/rx";
 
 const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields }) => {
-  const [errrorMissing, setErrrorMissing] = useState([]);
+  const [errorMissing, setErrorMissing] = useState([]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (e.target === document.querySelector('.modal')) {
+        onClose();
+      }
+    };
+
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    setErrorMissing([]);  
+    window.addEventListener('click', handleClickOutside);
+    window.addEventListener('keydown', handleEscape);
+    return () => {
+      window.removeEventListener('click', handleClickOutside);
+      window.removeEventListener('keydown', handleEscape);
+    };
+  }, [onClose]);
+
   if (!show) return null;
-
+  
   const handleOnClick = (e) => {
-    const { name, value } = e.target;
+    e.preventDefault();
+    let missing = [];
+    fields.forEach((field) => {
+      if (!currentItem[field.name]) {
+        missing.push(field.label);
+      }
+    });
 
-    // Ví dụ, nếu giá trị nhập không hợp lệ, bạn có thể kiểm tra và đặt thông báo lỗi
-    if (value === "") {
-      setErrrorMissing('This field is required');
-    } else {
-      setErrrorMissing(''); // Xóa lỗi nếu hợp lệ
+    if (missing.length > 0) {
+        setErrorMissing(missing);
+        return;
     }
 
-    // Gọi hàm onSubmit để xử lý dữ liệu khi nhấn nút Add
+    setErrorMissing(null);
+    onSubmit(e);
+  }
+
+  const handleOnClose = (e) => {
+    e.preventDefault();
+    onClose();
+  }
+
+  const isFieldMissing = (fieldLabel) => {
+    return errorMissing && errorMissing.includes(fieldLabel);
   }
 
   return (
@@ -30,9 +67,10 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
             <div key={field.name} className="form-control">
               <label className="label">{field.label}</label>
               {/* Handle different input types */}
+              {isFieldMissing(field.label) && (
+                <span className="text-red-500 text-sm">This field is required</span>
+              )}
               {field.type === 'text' && (
-                <>
-                  {errrorMissing && <p className="text-red-500">{errrorMissing}</p>} {/* Hiển thị lỗi */}
                   <input
                     type="text"
                     name={field.name}
@@ -42,42 +80,38 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
                     step="0.01"
                     required
                   />
-                </>
               )}
-
               {field.type === 'number' && (
-                <input
-                  type="number" // Render as number input
-                  name={field.name}
-                  value={currentItem[field.name] || 0} // Make sure there is a default value
-                  onChange={onInputChange}
-                  className="input input-bordered"
-                  required
-                />
+                  <input
+                    type="number" // Render as number input
+                    name={field.name}
+                    value={currentItem[field.name] || 0} // Make sure there is a default value
+                    onChange={onInputChange}
+                    className="input input-bordered"
+                    required
+                    />
               )}
 
-
-              
               {field.type === 'datetime' && (
-                <input
-                  type="datetime-local"
-                  name={field.name}
-                  value={currentItem[field.name] || ""}
-                  onChange={onInputChange}
-                  className="input input-bordered"
-                  required
-                />
+                  <input
+                    type="datetime-local"
+                    name={field.name}
+                    value={currentItem[field.name] || ""}
+                    onChange={onInputChange}
+                    className="input input-bordered"
+                    required
+                  />
               )}
 
               {field.type === 'date' && (
-                <input
-                  type="date"
-                  name={field.name}
-                  value={currentItem[field.name] || ""}
-                  onChange={onInputChange}
-                  className="input input-bordered"
-                  required
-                />
+                  <input
+                    type="date"
+                    name={field.name}
+                    value={currentItem[field.name] || ""}
+                    onChange={onInputChange}
+                    className="input input-bordered"
+                    required
+                  />
               )}
 
 
@@ -113,20 +147,20 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
               )}
 
               {field.type === 'file' && (
-                <input
-                  type="file"
-                  name={field.name}
-                  multiple={field.multiple || false}
-                  onChange={onInputChange}
-                  className="file-input file-input-bordered w-full max-w-xs"
-                />
+                  <input
+                    type="file"
+                    name={field.name}
+                    multiple={field.multiple || false}
+                    onChange={onInputChange}
+                    className="file-input file-input-bordered w-full"
+                  />
               )}
             </div>
           ))}
 
           <div className="modal-action">
             <button type="submit" className="btn btn-sm" onClick={handleOnClick}><FiPlus />Add</button>
-            <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}><RxCross2 />Cancel</button>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={handleOnClose}><RxCross2 />Cancel</button>
           </div>
         </form>
       </div>
