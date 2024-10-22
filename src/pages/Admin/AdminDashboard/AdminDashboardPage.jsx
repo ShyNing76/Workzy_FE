@@ -14,7 +14,7 @@ import { format } from 'date-fns';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import io from "socket.io-client";
 import "./AdminDashboardPage.scss";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 
 
@@ -61,6 +61,44 @@ const AdminDashboard = () => {
   const [workspace, setWorkspace] = useState();
   const [top5Customers, setTop5Customers] = useState([]);
   const [top5Bookings, setTop5Bookings] = useState([]);
+
+  useEffect(() => {
+    socket.emit("newCompletedBookingInMonth");
+    socket.on("totalPricesInMonth", (data) => setRavenue(data));
+
+    socket.emit("newBooking");
+    socket.on("totalBooking", (data) => setBookings(data));
+
+    socket.emit("newVoucher");
+    socket.on("totalVoucher", (data) => setVoucher(data));
+
+    socket.emit("newManager");
+    socket.on("totalManager", (data) => setManager(data));
+
+    socket.emit("newStaff");
+    socket.on("totalStaff", (data) => setStaff(data));
+
+    socket.emit("newCustomer");
+    socket.on("totalCustomer", (data) => setCustomer(data));
+
+    socket.emit("newBuilding");
+    socket.on("totalBuilding", (data) => setBuilding(data));
+
+    socket.emit("newAmenities");
+    socket.on("totalAmenities", (data) => setAmenity(data));
+
+    socket.emit("newWorkspace");
+    socket.on("totalWorkspace", (data) => setWorkspace(data));
+
+    socket.emit("newFiveCustomer");
+    socket.on("fiveCustomer", (data) => setTop5Customers(data));
+
+    socket.emit("newFiveBooking");
+    socket.on("fiveBooking", (data) => setTop5Bookings(data));
+
+    // Cleanup socket connections on unmount
+    return () => socket.disconnect();
+  }, []);
 
   const handleRavenueSubmit = (event) => {
     event.preventDefault();
@@ -151,21 +189,19 @@ const AdminDashboard = () => {
   }
   return (
     <div className="max-w-screen *:box-border w-full h-full flex flex-col overflow-hidden">
-
       {/* Main Content */}
       <main className="flex-1 p-6">
-        <h2 className="text-2xl font-bold mb-4">Gernaral Overview</h2>
+        <h2 className="text-2xl font-bold mb-4">General Overview</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/*General Overview*/}
+          {/* General Overview */}
           <div className="card shadow-xl">
             <div className="card-body">
               <div className="flex flex-2">
                 <TfiStatsUp className="mt-1 size-5"/>
-                <div className="stat-title ml-2 text-xl">Total Ravenue in Month</div>
+                <div className="stat-title ml-2 text-xl">Total Revenue in Month</div>
               </div>
               <div className="stat-value text-5xl">{ravenue}</div>
-              <button onClick={handleRavenueSubmit}>Send</button>
             </div>
           </div>
 
@@ -176,7 +212,6 @@ const AdminDashboard = () => {
                 <div className="stat-title ml-2 text-xl">Total Bookings</div>
               </div>
               <div className="stat-value text-5xl">{booking}</div>
-              <button onClick={handleBookingsSubmit}>Send</button>
             </div>
           </div>
 
@@ -187,7 +222,6 @@ const AdminDashboard = () => {
                 <div className="stat-title ml-2 text-xl">Total Vouchers</div>
               </div>
               <div className="stat-value text-5xl">{voucher}</div>
-              <button onClick={handleVoucherSubmit}>Send</button>
             </div>
           </div>
 
@@ -198,8 +232,6 @@ const AdminDashboard = () => {
                 <div className="stat-title ml-2 text-xl">Total Managers</div>
               </div>
               <div className="stat-value text-5xl">{manager}</div>
-              <button onClick={handleManagerSubmit}>Send</button>
-
             </div>
           </div>
 
@@ -210,8 +242,6 @@ const AdminDashboard = () => {
                 <div className="stat-title ml-2 text-xl">Total Staffs</div>
               </div>
               <div className="stat-value text-5xl">{staff}</div>
-              <button onClick={handleStaffSubmit}>Send</button>
-
             </div>
           </div>
 
@@ -222,8 +252,6 @@ const AdminDashboard = () => {
                 <div className="stat-title ml-2 text-xl">Total Customers</div>
               </div>
               <div className="stat-value text-5xl">{customer}</div>
-              <button onClick={handleCustomerSubmit}>Send</button>
-
             </div>
           </div>
 
@@ -234,8 +262,6 @@ const AdminDashboard = () => {
                 <div className="stat-title ml-2 text-xl">Total Amenities</div>
               </div>
               <div className="stat-value text-5xl">{amenity}</div>
-              <button onClick={handleAmenitySubmit}>Send</button>
-
             </div>
           </div>
 
@@ -246,8 +272,6 @@ const AdminDashboard = () => {
                 <div className="stat-title ml-2 text-xl">Total Buildings</div>
               </div>
               <div className="stat-value text-5xl">{building}</div>
-              <button onClick={handleBuildingSubmit}>Send</button>
-
             </div>
           </div>
 
@@ -258,20 +282,14 @@ const AdminDashboard = () => {
                 <div className="stat-title ml-2 text-xl">Total Workspaces</div>
               </div>
               <div className="stat-value text-5xl">{workspace}</div>
-              <button onClick={handleWorkspaceSubmit}>Send</button>
-
             </div>
           </div>
-
         </div>
 
-        
-
-        {/*Revenue & Guest*/}
+        {/* Revenue & Guest */}
         <div className="mt-6">
           <h2 className="text-2xl font-bold mb-4">Revenue & Booking Analysis</h2>
           <div className="flex w-full flex-col lg:flex-row">
-            
             <div className="rounded-box grid h-32 flex-grow">
             <p className="text-xl font-semibold mb-4">Revenue</p>
               <div style={{ width: '100%', height: 400 }}>
@@ -297,15 +315,15 @@ const AdminDashboard = () => {
             <div className="divider"></div>
             
             <div className="rounded-box grid h-32 flex-grow">
-            <p className="text-xl font-semibold mb-4">Guest Bookings</p>
+              <p className="text-xl font-semibold mb-4">Guest Bookings</p>
               <div style={{ width: '100%', height: 400 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart width={730} height={250} data={data2}
-                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
+                        <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <XAxis dataKey="name" />
@@ -317,7 +335,6 @@ const AdminDashboard = () => {
                 </ResponsiveContainer>
               </div>
             </div>
-
           </div>
         </div>
 
@@ -336,20 +353,24 @@ const AdminDashboard = () => {
                     </div>
                     <div className="text-right">
                       <p className="font-semibold">{format(new Date(booking.createdAt), "dd/MM/yyyy HH:mm:ss")}</p>
-                      {booking.BookingStatuses.map((status, index) => (
-                        <p key={index}>{status.status}</p>
+                      {booking.BookingStatuses.map((status, idx) => (
+                        <p key={idx}>{status.status}</p>
                       ))}
                     </div>
                   </div>
                 ))}
                 <div className="mt-7 text-right">
-                  <button className="btn btn-neutral btn-sm">See more<IoIosArrowRoundForward className="size-5"/></button>
+                  <Link to="/admin/bookingsmanager" className= {`tab ${location.pathname === '/admin/bookingsmanager' ? 'active' : ''}`}>
+                    <button className="btn btn-neutral btn-sm">
+                      See more<IoIosArrowRoundForward className="size-5" />
+                    </button>
+                  </Link>
                 </div>
-                <button onClick={handleTop5BookingsSubmit}>Send</button>
               </div>
             </div>
 
-          <div className="divider-horizontal"></div>
+            <div className="divider-horizontal"></div>
+
             <div className="rounded-box grid flex-grow">
               <p className="text-xl font-semibold mb-4">Top 5 VIP Customer</p>
               <div className="bg-base-200 p-4 rounded-lg shadow-lg">
@@ -357,7 +378,8 @@ const AdminDashboard = () => {
                   <tbody>
                     {top5Customers.map((customer, index) => (
                       <tr key={index} className="border-b">
-                        <td className="px-4 py-2 text-3xl font-bold"
+                        <td
+                          className="px-4 py-2 text-3xl font-bold"
                           style={{
                             color: index === 0 ? '#d4af37' : index === 1 ? 'silver' : index === 2 ? '#cd7f32' : 'inherit',
                           }}
@@ -369,16 +391,14 @@ const AdminDashboard = () => {
                       </tr>
                     ))}
                   </tbody>
-                  <button onClick={handleTop5CustomersSubmit}>Send</button>
                 </table>
               </div>
             </div>
           </div>
-
         </div>
       </main>
     </div>
-  )
+  );
 }
 
 export default AdminDashboard;
