@@ -1,11 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-
+import { useState } from 'react';
 import { FiPlus } from "react-icons/fi";
 import { RxCross2 } from "react-icons/rx";
 
 const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields }) => {
+  const [errrorMissing, setErrrorMissing] = useState([]);
   if (!show) return null;
+
+  const handleOnClick = (e) => {
+    const { name, value } = e.target;
+
+    // Ví dụ, nếu giá trị nhập không hợp lệ, bạn có thể kiểm tra và đặt thông báo lỗi
+    if (value === "") {
+      setErrrorMissing('This field is required');
+    } else {
+      setErrrorMissing(''); // Xóa lỗi nếu hợp lệ
+    }
+
+    // Gọi hàm onSubmit để xử lý dữ liệu khi nhấn nút Add
+  }
 
   return (
     <div className="modal modal-open">
@@ -15,18 +29,20 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
           {fields.map((field) => (
             <div key={field.name} className="form-control">
               <label className="label">{field.label}</label>
-
               {/* Handle different input types */}
               {field.type === 'text' && (
-                <input
-                  type="text"
-                  name={field.name}
-                  value={currentItem[field.name] || ""}
-                  onChange={onInputChange}
-                  className="input input-bordered"
-                  step="0.01"
-                  required
-                />
+                <>
+                  {errrorMissing && <p className="text-red-500">{errrorMissing}</p>} {/* Hiển thị lỗi */}
+                  <input
+                    type="text"
+                    name={field.name}
+                    value={currentItem[field.name] || ""}
+                    onChange={onInputChange}
+                    className="input input-bordered"
+                    step="0.01"
+                    required
+                  />
+                </>
               )}
 
               {field.type === 'number' && (
@@ -109,7 +125,7 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
           ))}
 
           <div className="modal-action">
-            <button type="submit" className="btn btn-sm" onClick={onSubmit}><FiPlus />Add</button>
+            <button type="submit" className="btn btn-sm" onClick={handleOnClick}><FiPlus />Add</button>
             <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}><RxCross2 />Cancel</button>
           </div>
         </form>

@@ -129,16 +129,12 @@ const AmenitiesManagerPage = () => {
           return;
         }
 
-    const formData = new FormData();
-    formData.append('amenity_name', newAmenity.amenity_name);
-    formData.append('image', newAmenity.image);
-    formData.append('original_price', newAmenity.original_price);
-
     try{
       const Amenity = await postAmenity(newAmenity);
       setResponseData(Amenity);
       fetchAmenity();
       setShowAddModal(false);
+      setAmenity([...amenity, newAmenity]);
       setSuccessMessage("Amenity added successfully!"); // Set success message
     } catch (err) {
       console.error("Error adding amenity", err);

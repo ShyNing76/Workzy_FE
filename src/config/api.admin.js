@@ -22,7 +22,16 @@ const getAmenityById = (amenity_id) =>  {
 
 const postAmenity = (newAmenity) => {
   const URL_API = "api/v1/amenity"
-  return axios.post(URL_API, newAmenity)
+  newAmenity
+  const formData = new FormData();
+  formData.append("amenity_name", newAmenity.amenity_name);
+  formData.append("image", newAmenity.image);
+  formData.append("original_price", newAmenity.original_price);
+  return axios.put(URL_API, formData, {
+      headers: {
+          "Content-Type": "multipart/form-data",
+      },
+  });
 }
 
 const putAmenity = (amenity_id, updatedAmenity) => {
