@@ -299,8 +299,10 @@ const AmenitiesManagerPage = () => {
                         ? "active"
                         : "inactive"
                     : type === "file"
-                    ? e.target.files[0]
-                    : value,
+                    ? files.length > 1 // Kiểm tra nếu có nhiều file
+                        ? Array.from(files) // Chuyển thành mảng nếu có nhiều file
+                        : files[0] // Nếu chỉ có một file
+                    : value, // Cho các input khác
         }));
     };
 

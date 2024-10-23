@@ -254,8 +254,10 @@ const WorkspacesTypesManagerPage = () => {
     const handleUpdateClick = (workspaceType) => {
         setNewWorkspaceType({
             ...workspaceType,
+            image: Array.isArray(workspaceType.image) ? workspaceType.image : [workspaceType.image],
             status: workspaceType.status === "active" ? "active" : "inactive",
         });
+
         setShowUpdateModal(true);
     };
 
