@@ -1,28 +1,62 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-
+import { useState } from 'react';
 import { FiPlus } from "react-icons/fi";
 import { RxCross2 } from "react-icons/rx";
 
 const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields }) => {
-  const [missingFields, setMissingFields] = useState([]);
+  const [errorMissing, setErrorMissing] = useState([]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (e.target === document.querySelector('.modal')) {
+        onClose();
+      }
+    };
+
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    setErrorMissing([]);  
+    window.addEventListener('click', handleClickOutside);
+    window.addEventListener('keydown', handleEscape);
+    return () => {
+      window.removeEventListener('click', handleClickOutside);
+      window.removeEventListener('keydown', handleEscape);
+    };
+  }, [onClose]);
 
   if (!show) return null;
-
   
-  const handleSubmit = (e) => {
+  const handleOnClick = (e) => {
     e.preventDefault();
-    const missing = fields
-      .filter(field => field.required && !currentItem[field.name])
-      .map(field => field.name);
+    let missing = [];
+    fields.forEach((field) => {
+      if (!currentItem[field.name]) {
+        missing.push(field.label);
+      }
+    });
 
     if (missing.length > 0) {
-      setMissingFields(missing);
-    } else {
-      onSubmit();
-      setMissingFields([]); // Reset missing fields if successfully submitted
+        setErrorMissing(missing);
+        return;
     }
-  };
+
+    setErrorMissing(null);
+    onSubmit(e);
+  }
+
+  const handleOnClose = (e) => {
+    e.preventDefault();
+    onClose();
+  }
+
+  const isFieldMissing = (fieldLabel) => {
+    return errorMissing && errorMissing.includes(fieldLabel);
+  }
 
   return (
     <div className="modal modal-open">
@@ -31,56 +65,53 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
         <form onSubmit={onSubmit}>
           {fields.map((field) => (
             <div key={field.name} className="form-control">
-              <label className="label">
-                {field.label}
-                {missingFields.includes(field.name) && <span className="text-red-500 text-sm"> *required</span>}
-                </label>
-
+              <label className="label">{field.label}</label>
               {/* Handle different input types */}
+              {isFieldMissing(field.label) && (
+                <span className="text-red-500 text-sm">This field is required</span>
+              )}
               {field.type === 'text' && (
-                <input
-                  type="text"
-                  name={field.name}
-                  value={currentItem[field.name] || ""}
-                  onChange={onInputChange}
-                  className="input input-bordered"
-                  required
-                />
+                  <input
+                    type="text"
+                    name={field.name}
+                    value={currentItem[field.name] || ""}
+                    onChange={onInputChange}
+                    className="input input-bordered"
+                    step="0.01"
+                    required
+                  />
+              )}
+              {field.type === 'number' && (
+                  <input
+                    type="number" // Render as number input
+                    name={field.name}
+                    value={currentItem[field.name] || 0} // Make sure there is a default value
+                    onChange={onInputChange}
+                    className="input input-bordered"
+                    required
+                    />
               )}
 
-              {field.type === 'password' && (
-                <input
-                  type="password"
-                  name={field.name}
-                  value={currentItem[field.name] || ""}
-                  onChange={onInputChange}
-                  className="input input-bordered"
-                  required={field.required}
-                />
-              )}
-
-
-              
               {field.type === 'datetime' && (
-                <input
-                  type="datetime-local"
-                  name={field.name}
-                  value={currentItem[field.name] || ""}
-                  onChange={onInputChange}
-                  className="input input-bordered"
-                  required
-                />
+                  <input
+                    type="datetime-local"
+                    name={field.name}
+                    value={currentItem[field.name] || ""}
+                    onChange={onInputChange}
+                    className="input input-bordered"
+                    required
+                  />
               )}
 
               {field.type === 'date' && (
-                <input
-                  type="date"
-                  name={field.name}
-                  value={currentItem[field.name] || ""}
-                  onChange={onInputChange}
-                  className="input input-bordered"
-                  required
-                />
+                  <input
+                    type="date"
+                    name={field.name}
+                    value={currentItem[field.name] || ""}
+                    onChange={onInputChange}
+                    className="input input-bordered"
+                    required
+                  />
               )}
 
 
@@ -116,20 +147,20 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
               )}
 
               {field.type === 'file' && (
-                <input
-                  type="file"
-                  name={field.name}
-                  multiple={field.multiple || false}
-                  onChange={onInputChange}
-                  className="file-input file-input-bordered w-full max-w-xs"
-                />
+                  <input
+                    type="file"
+                    name={field.name}
+                    multiple={field.multiple || false}
+                    onChange={onInputChange}
+                    className="file-input file-input-bordered w-full"
+                  />
               )}
             </div>
           ))}
 
           <div className="modal-action">
-            <button type="submit" className="btn btn-neutral btn-sm" onClick={onSubmit}><FiPlus />Add</button>
-            <button type="button" className="btn btn-active btn-sm" onClick={onClose}><RxCross2 />Cancel</button>
+            <button type="submit" className="btn btn-sm" onClick={handleOnClick}><FiPlus />Add</button>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={handleOnClose}><RxCross2 />Cancel</button>
           </div>
         </form>
       </div>

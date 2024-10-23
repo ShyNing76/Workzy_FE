@@ -9,7 +9,7 @@ const BookingTimeLine = (props) => {
     confirmed: "Booking has been confirmed.",
     paid: "Payment has been received.",
     "check-in": "You have checked in.",
-    "in-process": "Your booking is currently in usage.",
+    usage: "Your booking is currently in usage.",
     "check-out": "You have checked out.",
     "check-amenities": "Staff check for any damaged amenities.",
     completed: "Booking has been successfully completed.",

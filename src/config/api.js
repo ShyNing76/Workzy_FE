@@ -264,6 +264,27 @@ const postBookingRefund = (bookingId) => {
   return axios.post(URL_API);
 };
 
+const getAllWorkspacesByWorkspaceTypeName = (WorkspaceTypeName) => {
+  const URL_API = `api/v1/workspace/?workspace_type_name=${WorkspaceTypeName}&status=active`; // No pagination in this call
+  return axios.get(URL_API);
+};
+
+const getReviewByWorkspaceName = (WorkspaceName) => {
+  const URL_API = `api/v1/review/?workspace_name=${WorkspaceName}`;
+  return axios.get(URL_API);
+};
+
+const postCreateReview = (booking_id, rating, review_content) => {
+  const URL_API = `api/v1/review`;
+  const data = {
+    booking_id,
+    rating,
+    review_content,
+  };
+
+  return axios.post(URL_API, data);
+};
+
 export {
   loginApi,
   registerApi,
@@ -294,4 +315,7 @@ export {
   postApprovePaypalOrderAmenities,
   postBookingAddToCalendar,
   postBookingRefund,
+  getAllWorkspacesByWorkspaceTypeName,
+  getReviewByWorkspaceName,
+  postCreateReview,
 };

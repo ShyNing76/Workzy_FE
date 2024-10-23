@@ -32,19 +32,19 @@ const AdminSidebar = () => {
             <h2 className="font-semibold ml-2 mb-2 text-gray-500">WORKZY Manager</h2>
 
             <li className="mb-1">
-                <Link to="/admin" className={`tab ${location.pathname === '/admin' ? 'active' : ''}`}>
+                        <Link to="/admin" className={`tab h-11 ${location.pathname === '/admin' ? 'active' : ''} `}>
                     <div className="flex flex-1 items-center mb-2"><GoHome className="text-2xl" /><p className="ml-4">Dashboard</p></div>
                 </Link>
             </li>
 
             <li className="mb-1">
-                <Link to="/admin/amenitiesmanager" className={`tab ${location.pathname === '/admin/amenitiesmanager' ? 'active' : ''}`}>    
+                <Link to="/admin/amenitiesmanager" className={`tab h-11 ${location.pathname === '/admin/amenitiesmanager' ? 'active' : ''}`}>    
                     <div className="flex flex-1 items-center mb-2"><IoExtensionPuzzleOutline className="text-2xl"/> <p className="ml-4">Amenities</p> </div>
                 </Link>
             </li>
  
             <li className="mb-1">
-                <Link to="/admin/workspacetypesmanager" className={`tab ${location.pathname === '/admin/workspacetypesmanager' ? 'active' : ''}`}>    
+                <Link to="/admin/workspacetypesmanager" className={`tab h-11 ${location.pathname === '/admin/workspacetypesmanager' ? 'active' : ''}`}>    
                     <div className="flex flex-1 items-center mb-2"><MdOutlineWorkspaces className="text-2xl"/> <p className="ml-4">Workspace Types</p> </div>
                 </Link>
             </li>
@@ -52,19 +52,19 @@ const AdminSidebar = () => {
             <h2 className="font-semibold te ml-2 mb-2 mt-2 text-gray-500">WORKZY Accounts</h2>
                 
             <li className="mb-1">
-                <Link to="/admin/managersmanager" className={`tab ${location.pathname === '/admin/managersmanager' ? 'active' : ''}`}>
+                <Link to="/admin/managersmanager" className={`tab h-11 ${location.pathname === '/admin/managersmanager' ? 'active' : ''}`}>
                     <div className="flex flex-1 items-center mb-2"><PiIdentificationBadge className="text-2xl"/><p className="ml-4">Managers</p></div>
                 </Link>
             </li>
 
             <li className="mb-1">
-                <Link to="/admin/staffsmanager" className={`tab ${location.pathname === '/admin/staffsmanager' ? 'active' : ''}`}>
+                <Link to="/admin/staffsmanager" className={`tab h-11 ${location.pathname === '/admin/staffsmanager' ? 'active' : ''}`}>
                     <div className="flex flex-1 items-center mb-2"><GoPerson className="text-2xl"/><p className="ml-4">Staffs</p></div>
                 </Link>
             </li>
 
             <li className="mb-1">
-                <Link to="/admin/customersmanager" className={`tab ${location.pathname === '/admin/customersmanager' ? 'active' : ''}`}>
+                <Link to="/admin/customersmanager" className={`tab h-11 ${location.pathname === '/admin/customersmanager' ? 'active' : ''}`}>
                     <div className="flex flex-1 items-center mb-2"><GoPeople className="text-2xl"/><p className="ml-4">Customers</p></div>
                 </Link>
             </li>
@@ -73,13 +73,13 @@ const AdminSidebar = () => {
 
 
             <li className="mb-1">
-                <Link to="/admin/buildingmanager" className= {`tab ${location.pathname === '/admin/buildingmanager' ? 'active' : ''}`}>
+                <Link to="/admin/buildingmanager" className= {`tab h-11 ${location.pathname === '/admin/buildingmanager' ? 'active' : ''}`}>
                     <div className="flex flex-1 items-center mb-2"><PiBuildingsLight className="text-2xl"/><p className="ml-4">Building List</p></div>
                 </Link>
             </li>
 
             <li className="mb-1">
-                <Link to="/admin/workspacesmanager" className= {`tab ${location.pathname === '/admin/workspacesmanager' ? 'active' : ''}`}>
+                <Link to="/admin/workspacesmanager" className= {`tab h-11 ${location.pathname === '/admin/workspacesmanager' ? 'active' : ''}`}>
                     <div className="flex flex-1 items-center mb-2"><RxDashboard className="text-2xl"/><p className="ml-4">Workspace List</p></div>
                 </Link>
             </li>
@@ -101,25 +101,25 @@ const AdminSidebar = () => {
                 <h2 className="font-semibold ml-2 mb-2 mt-2 text-gray-500">WORKZY Bookings</h2>
 
                 <li className="mb-1">
-                    <Link to="/admin/bookingsmanager" className= {`tab ${location.pathname === '/admin/bookingsmanager' ? 'active' : ''}`}>
+                    <Link to="/admin/bookingsmanager" className= {`tab h-11 ${location.pathname === '/admin/bookingsmanager' ? 'active' : ''}`}>
                         <div className="flex flex-1 items-center mb-2"><LuCalendarCheck className="text-2xl"/><p className="ml-4">Bookings</p></div>
                     </Link>
                 </li>
 
                 <li className="mb-1">
-                    <Link to="/admin/vouchersmanager" className= {`tab ${location.pathname === '/admin/vouchersmanager' ? 'active' : ''}`}>
+                    <Link to="/admin/vouchersmanager" className= {`tab h-11 ${location.pathname === '/admin/vouchersmanager' ? 'active' : ''}`}>
                         <div className="flex flex-1 items-center mb-2"><RiCoupon3Line className="text-2xl"/><p className="ml-4">Vouchers</p></div>
                     </Link>
                 </li>
 
                 {/* <li className="mb-1">
-                    <Link to="/admin/paymentsmanager" className= {`tab ${location.pathname === '/admin/paymentsmanager' ? 'active' : ''}`}>
+                    <Link to="/admin/paymentsmanager" className= {`tab h-11 ${location.pathname === '/admin/paymentsmanager' ? 'active' : ''}`}>
                         <div className="flex flex-1 items-center mb-2"><CiCreditCard2 className="text-2xl"/><p className="ml-4">Payments</p></div>
                     </Link>
                 </li> */}
 
                 <li className="mb-1">
-                    <Link to="/admin/reviewsmanager" className= {`tab ${location.pathname === '/admin/reviewsmanager' ? 'active' : ''}`}>
+                    <Link to="/admin/reviewsmanager" className= {`tab h-11 ${location.pathname === '/admin/reviewsmanager' ? 'active' : ''}`}>
                         <div className="flex flex-1 items-center mb-2"><VscFeedback className="text-2xl"/><p className="ml-4">Reviews</p></div>
                     </Link>
                 </li>
