@@ -28,8 +28,7 @@ const postAmenity = (newAmenity) => {
 const putAmenity = (amenity_id, updatedAmenity) => {
     const URL_API = `api/v1/amenity/${amenity_id}`;
     const formData = new FormData();
-    if (updatedAmenity.image)
-        formData.append("image", updatedAmenity.image);
+    if (updatedAmenity.image) formData.append("image", updatedAmenity.image);
     if (updatedAmenity.amenity_name)
         formData.append("amenity_name", updatedAmenity.amenity_name);
     if (updatedAmenity.original_price)
@@ -111,7 +110,7 @@ const putWorkspaceType = (workspace_type_id, updatedWorkspaceType) => {
 
 const deleteWorkspaceType = (workspace_type_id) => {
     const URL_API = `/api/v1/workspace-type/delete/${workspace_type_id}`;
-    
+
     return axios.put(URL_API);
 };
 
@@ -222,6 +221,11 @@ const getCustomerById = (user_id) => {
 };
 
 const removeCustomer = (user_id) => {
+    const URL_API = `/api/v1/customer/remove/${user_id}`;
+    return axios.put(URL_API);
+};
+
+const putCustomer = (user_id) => {
     const URL_API = `/api/v1/customer/remove/${user_id}`;
     return axios.put(URL_API);
 };
@@ -465,6 +469,7 @@ export {
     getCustomer,
     getCustomerById,
     removeCustomer,
+    putCustomer,
     getBookingByBuildingId,
     getBuilding,
     getBuildingById,
