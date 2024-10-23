@@ -27,7 +27,21 @@ const postAmenity = (newAmenity) => {
 
 const putAmenity = (amenity_id, updatedAmenity) => {
     const URL_API = `api/v1/amenity/${amenity_id}`;
-    return axios.put(URL_API, updatedAmenity);
+    const formData = new FormData();
+    if (updatedAmenity.image)
+        formData.append("image", updatedAmenity.image);
+    if (updatedAmenity.amenity_name)
+        formData.append("amenity_name", updatedAmenity.amenity_name);
+    if (updatedAmenity.original_price)
+        formData.append("original_price", updatedAmenity.original_price);
+    if (updatedAmenity.rent_price)
+        formData.append("rent_price", updatedAmenity.rent_price);
+
+    return axios.put(URL_API, formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
 };
 
 const blockAmenity = (amenity_id) => {
@@ -77,7 +91,22 @@ const postWorkspaceType = (newWorkspaceType) => {
 
 const putWorkspaceType = (workspace_type_id, updatedWorkspaceType) => {
     const URL_API = `/api/v1/workspace-type/${workspace_type_id}`;
-    return axios.put(URL_API, updatedWorkspaceType);
+    const formData = new FormData();
+    if (updatedWorkspaceType.image)
+        formData.append("image", updatedWorkspaceType.image);
+    if (updatedWorkspaceType.workspace_type_name)
+        formData.append(
+            "workspace_type_name",
+            updatedWorkspaceType.workspace_type_name
+        );
+    if (updatedWorkspaceType.description)
+        formData.append("description", updatedWorkspaceType.description);
+
+    return axios.put(URL_API, formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
 };
 
 const deleteWorkspaceType = (workspace_type_id) => {

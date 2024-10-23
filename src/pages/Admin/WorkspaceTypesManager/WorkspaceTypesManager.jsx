@@ -89,6 +89,7 @@ const WorkspacesTypesManagerPage = () => {
 
     const handleOnClose = () => {
         setNewWorkspaceType({}); // Clear the form
+        setSelectedWorkspaceTypeDetails(null); // Clear the selected item
         setShowAddModal(false);
         setShowUpdateModal(false);
         setShowDeleteModal(false);
@@ -203,27 +204,50 @@ const WorkspacesTypesManagerPage = () => {
             };
 
             console.log("newWorkspaceType:", newWorkspaceType); // Log để kiểm tra giá trị
-            await putWorkspaceType(
+            const response = await putWorkspaceType(
                 updatedWorkspaceType.workspace_type_id,
                 updatedWorkspaceType
             );
-            setShowUpdateModal(false);
-            setIsChanged(!isChanged);
-            setSuccessMessage("Workspace type updated successfully!");
-            setError(null); // Reset lỗi
+
+            if (response && response.err === 0) {
+                setShowUpdateModal(false);
+                setIsChanged(!isChanged);
+                Swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "Workspace type updated successfully!",
+                });
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: response.message || "Update failed",
+                });
+            }
         } catch (err) {
             console.error("Failed to update workspace type:", err);
-            setError(err.response?.data?.message || "Update failed");
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Failed to update workspace type",
+            });
         }
     };
 
     const handleUpdateChange = (e) => {
-        const { name, type, value, checked } = e.target;
+        const { name, type, value, files, checked } = e.target;
+        console.log(files); // Log để kiểm tra giá trị
 
         setNewWorkspaceType((prev) => ({
             ...prev,
             [name]:
-                type === "checkbox" ? (checked ? "active" : "inactive") : value,
+                type === "checkbox"
+                    ? checked
+                        ? "active"
+                        : "inactive"
+                    : type === "file"
+                    ? e.target.files[0]
+                    : value,
         }));
     };
 
@@ -253,14 +277,6 @@ const WorkspacesTypesManagerPage = () => {
             type: "text",
             name: "description",
             value: `${newWorkspaceType.description}`,
-        },
-        {
-            label: "Status",
-            type: "checkbox",
-            name: "status",
-            checked: `${newWorkspaceType.status}` === "active",
-            onChange: handleUpdateChange,
-            checkboxLabels: { checked: "active", unchecked: "inactive" },
         },
     ];
 
@@ -292,11 +308,11 @@ const WorkspacesTypesManagerPage = () => {
                     Swal.fire({
                         icon: "success",
                         title:
-                            workspaceTypeToDelete.status === "active"
+                            workspaceTypeToDelete.status === "inactive"
                                 ? "Workspace Type active!"
                                 : "Workspace Type inacitve!",
                         text:
-                            workspaceTypeToDelete.status === "active"
+                            workspaceTypeToDelete.status === "inactive"
                                 ? "Workspace Type has been successfully active."
                                 : "Workspace Type has been successfully inacitve.",
                     });

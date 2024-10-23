@@ -254,30 +254,53 @@ const AmenitiesManagerPage = () => {
         }
 
         try {
-            await putAmenity(newAmenity.amenity_id, newAmenity);
-
-            // set to the updated amenity in the local state
-            setAmenity(
-                amenity.map((a) =>
-                    a.amenity_id === newAmenity.amenity_id ? newAmenity : a
-                )
+            const response = await putAmenity(
+                newAmenity.amenity_id,
+                newAmenity
             );
 
-            setIsChanged(!isChanged);
-            setShowUpdateModal(false);
-            setSuccessMessage("Amenity updated successfully!");
+            if (response && response.err === 0) {
+                // set to the updated amenity in the local state
+                setAmenity(
+                    amenity.map((a) =>
+                        a.amenity_id === newAmenity.amenity_id ? newAmenity : a
+                    )
+                );
+
+                setIsChanged(!isChanged);
+                setShowUpdateModal(false);
+                setSuccessMessage("Amenity updated successfully!");
+                Swal.fire({
+                    icon: "success",
+                    title: "Update Amenity!",
+                    text: response.message,
+                });
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: response.message,
+                });
+            }
         } catch (err) {
             console.error("Error updating amenity", err);
         }
     };
 
     const handleUpdateChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        console.log(e.target);
+        const { name, type, value, files, checked } = e.target;
+        console.log(files); // Log để kiểm tra giá trị
+
         setNewAmenity((prev) => ({
             ...prev,
             [name]:
-                type === "checkbox" ? (checked ? "active" : "inactive") : value,
+                type === "checkbox"
+                    ? checked
+                        ? "active"
+                        : "inactive"
+                    : type === "file"
+                    ? e.target.files[0]
+                    : value,
         }));
     };
 
