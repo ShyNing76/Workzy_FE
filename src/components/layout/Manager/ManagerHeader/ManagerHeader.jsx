@@ -29,6 +29,7 @@ const ManagerHeader = () => {
         <button onClick={handleLogout} className='btn'>Logout</button>
       </div>
     </div>
+    
   )
 }
 

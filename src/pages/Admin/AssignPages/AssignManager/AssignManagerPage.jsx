@@ -77,7 +77,10 @@ const AssignManagerPage = () => {
   };
 
   const isBuildingAssignedToManager = (buildingId) => {
-    return selectedManagerIds[buildingId];
+    return (
+      buildings.find((building) => building.building_id === buildingId)
+        .manager_id !== null
+    );
   };
   // Handle Assign Manager
   const handleAssignManagerToBuilding = async (buildingId) => {
@@ -94,6 +97,9 @@ const AssignManagerPage = () => {
           text: "Manager assigned to building successfully",
           icon: "success",
         });
+        // fetch lại data sau khi gán
+        await fetchManagerAndBuilding();
+        // reset selected manager id cho building đã gán
         setBuildings((prevBuildings) =>
           prevBuildings.map((building) =>
             building.building_id === buildingId
@@ -132,6 +138,9 @@ const AssignManagerPage = () => {
             text: "Unassigned the manager from the building successfully",
             icon: "success",
           });
+          // fetch lại data
+          await fetchManagerAndBuilding();
+          
           setBuildings((prevBuildings) =>
             prevBuildings.map((building) =>
               building.building_id === buildingId
@@ -218,7 +227,11 @@ const AssignManagerPage = () => {
                       <td>
                         <select
                           className="select select-bordered w-full max-w-xs"
-                          value={selectedManagerIds[building.building_id] || ""}
+                          value={
+                            selectedManagerIds[building.building_id] ||
+                            building.manager_id ||
+                            ""
+                          }
                           onChange={(e) =>
                             handleSelectedManagerId(
                               e.target.value,
@@ -238,29 +251,34 @@ const AssignManagerPage = () => {
                         </select>
                       </td>
                       <td>
-                        {isBuildingAssignedToManager(building.building_id) ? (
-                          <button
-                            className="btn btn-primary btn-sm"
-                            onClick={() =>
-                              handleAssignManagerToBuilding(
-                                building.building_id
-                              )
-                            }
-                          >
-                            Assign
-                          </button>
-                        ) : (
-                          <button
-                            className="btn btn-danger btn-sm"
-                            onClick={() =>
-                              handleUnassignManagerFromBuilding(
-                                building.building_id
-                              )
-                            }
-                          >
-                            Unassign
-                          </button>
-                        )}
+                        <button
+                          className="btn btn-primary btn-sm"
+                          onClick={() =>
+                            handleAssignManagerToBuilding(building.building_id)
+                          }
+                          disabled={
+                            !selectedManagerIds[building.building_id] &&
+                            !building.manager_id
+                          }
+                        >
+                          {isBuildingAssignedToManager(building.building_id)
+                            ? "Update"
+                            : "Assign"}
+                        </button>
+
+                        <button
+                          className="btn btn-danger btn-sm ml-2"
+                          onClick={() =>
+                            handleUnassignManagerFromBuilding(
+                              building.building_id
+                            )
+                          }
+                          disabled={
+                            !isBuildingAssignedToManager(building.building_id)
+                          }
+                        >
+                          Unassign
+                        </button>
                       </td>
                     </tr>
                   ))}
