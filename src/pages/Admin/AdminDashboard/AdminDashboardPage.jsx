@@ -100,93 +100,7 @@ const AdminDashboard = () => {
     return () => socket.disconnect();
   }, []);
 
-  const handleRavenueSubmit = (event) => {
-    event.preventDefault();
-    socket.emit("newCompletedBookingInMonth");
-    socket.on("totalPricesInMonth", (data) => {
-      setRavenue(data);
-    });
-  }
 
-  const handleBookingsSubmit = (event) => {
-    event.preventDefault();
-    socket.emit("newBooking");
-    socket.on("totalBooking", (data) => {
-      setBookings(data);
-    });
-  }
-
-  const handleVoucherSubmit = (event) => {
-    event.preventDefault();
-    socket.emit("newVoucher");
-    socket.on("totalVoucher", (data) => {
-      setVoucher(data);
-    });
-  }
-
-  const handleManagerSubmit = (event) => {
-    event.preventDefault();
-    socket.emit("newManager");
-    socket.on("totalManager", (data) => {
-      setManager(data);
-    });
-  }
-
-  const handleStaffSubmit = (event) => {
-    event.preventDefault();
-    socket.emit("newStaff");
-    socket.on("totalStaff", (data) => {
-      setStaff(data);
-    });
-  }
-
-  const handleCustomerSubmit = (event) => {
-    event.preventDefault();
-    socket.emit("newCustomer");
-    socket.on("totalCustomer", (data) => {
-      setCustomer(data);
-    });
-  }
-
-  const handleBuildingSubmit = (event) => {
-    event.preventDefault();
-    socket.emit("newBuilding");
-    socket.on("totalBuilding", (data) => {
-      setBuilding(data);
-    });
-  }
-
-  const handleAmenitySubmit = (event) => {
-    event.preventDefault();
-    socket.emit("newAmenities");
-    socket.on("totalAmenities", (data) => {
-      setAmenity(data);
-    });
-  }
-
-  const handleWorkspaceSubmit = (event) => {
-    event.preventDefault();
-    socket.emit("newWorkspace");
-    socket.on("totalWorkspace", (data) => {
-      setWorkspace(data);
-    });
-  }
-
-  const handleTop5CustomersSubmit = (event) => {
-    event.preventDefault();
-    socket.emit("newFiveCustomer");
-    socket.on("fiveCustomer", (data) => {
-      setTop5Customers(data);
-    });
-  }
-
-  const handleTop5BookingsSubmit = (event) => {
-    event.preventDefault();
-    socket.emit("newFiveBooking");
-    socket.on("fiveBooking", (data) => {
-      setTop5Bookings(data);
-    });
-  }
   return (
     <div className="max-w-screen *:box-border w-full h-full flex flex-col overflow-hidden">
       {/* Main Content */}
@@ -225,7 +139,7 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          <div className="card bg-base-100 shadow-xl">
+          <div className="card shadow-xl">
             <div className="card-body">
               <div className="flex flex-2">
                 <PiIdentificationBadge className="mt-1 size-5"/>
@@ -235,7 +149,7 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          <div className="card bg-base-100 shadow-xl">
+          <div className="card shadow-xl">
             <div className="card-body">
               <div className="flex flex-2">
                 <GoPerson className="mt-1 size-5"/>
@@ -245,7 +159,7 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          <div className="card bg-base-100 shadow-xl">
+          <div className="card shadow-xl">
             <div className="card-body">
               <div className="flex flex-2">
                 <GoPeople className="mt-1 size-5"/>
@@ -255,7 +169,7 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          <div className="card bg-base-100 shadow-xl">
+          <div className="card shadow-xl">
             <div className="card-body">
               <div className="flex flex-2">
                 <IoExtensionPuzzleOutline className="mt-1 size-5"/>
@@ -265,7 +179,7 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          <div className="card bg-base-100 shadow-xl">
+          <div className="card shadow-xl">
             <div className="card-body">
               <div className="flex flex-2">
                 <PiBuildingsLight className="mt-1 size-5"/>
@@ -275,7 +189,7 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          <div className="card bg-base-100 shadow-xl">
+          <div className="card shadow-xl">
             <div className="card-body">
               <div className="flex flex-2">
                 <RxDashboard className="mt-1 size-5"/>
@@ -341,7 +255,7 @@ const AdminDashboard = () => {
         <div className="mt-96">
           <h2 className="text-2xl font-bold mb-4">Bookings & Customers</h2>
           <div className="flex w-full">
-            <div className="rounded-box grid flex-grow">
+            <div className="rounded-box grid flex-grow place-items-stretch">
               <p className="text-xl font-semibold mb-4">Recent overview</p>
               <div className="bg-base-200 p-4 rounded-lg shadow-lg">
                 {top5Bookings.map((booking, index) => (
@@ -371,7 +285,7 @@ const AdminDashboard = () => {
 
             <div className="divider-horizontal"></div>
 
-            <div className="rounded-box grid flex-grow">
+            <div className="rounded-box grid h-20 flex-grow place-items-stretch">
               <p className="text-xl font-semibold mb-4">Top 5 VIP Customer</p>
               <div className="bg-base-200 p-4 rounded-lg shadow-lg">
                 <table className="table-auto w-full">
