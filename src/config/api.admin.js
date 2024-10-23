@@ -213,6 +213,7 @@ const assignStaffToBuilding = (staffId, buildingId) => {
 
   const assignManagerToBuilding = (building_id, manager_id) => {
     const URL_API = `/api/v1/building/${building_id}/manager`
+    console.log ("URL_API:", URL_API);
     return axios.put(URL_API, { manager_id })
   }
 
