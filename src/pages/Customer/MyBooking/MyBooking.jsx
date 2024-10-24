@@ -16,6 +16,7 @@ import {
 } from "../../../config/api";
 import Swal from "sweetalert2";
 import BookingReviewModal from "../../../components/layout/Customer/BookingReviewModal/BookingReviewModal";
+import Pagination from "../../../components/layout/Shared/Pagination/Pagination";
 
 const MyBooking = () => {
   const [selectedTab, setSelectedTab] = useState("All");
@@ -26,12 +27,16 @@ const MyBooking = () => {
   const [isOpenReviewModal, setIsOpenReviewModal] = useState(false);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
+  const [page, setPage] = useState(1);
+  const LIMIT_BOOKING = 5;
+  const [totalBooking, setTotalBooking] = useState(0);
 
   const fetchBookingData = async () => {
     try {
-      const resBooking = await getBookingOfCustomer();
+      const resBooking = await getBookingOfCustomer(LIMIT_BOOKING, page);
       if (resBooking && resBooking.data && resBooking.err === 0) {
-        return resBooking.data; // Trả về booking data nếu có
+        setTotalBooking(resBooking.data.count);
+        return resBooking.data.rows; // Trả về booking data nếu có
       } else {
         return []; // Trả về mảng rỗng nếu không có booking
       }
@@ -98,7 +103,7 @@ const MyBooking = () => {
 
     fetchAllBookingType();
     fetchBookingAndWorkspacesData();
-  }, [refreshData]); // Chạy khi component mount
+  }, [refreshData, page, setPage]); // Chạy khi component mount
 
   // Lọc bookings theo trạng thái của từng tab
   const filterBookings = () => {
@@ -500,6 +505,13 @@ const MyBooking = () => {
           </div>
         )}
       </div>
+      {Math.ceil(totalBooking / LIMIT_BOOKING) > 1 && (
+        <Pagination
+          page={page}
+          setPage={setPage}
+          totalPages={Math.ceil(totalBooking / LIMIT_BOOKING)}
+        />
+      )}
     </div>
   );
 };

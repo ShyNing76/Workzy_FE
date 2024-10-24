@@ -34,32 +34,6 @@ const SidebarCart = ({
     bookingIdRef.current = bookingId;
   }, [selectedAmenities, totalPrice, bookingId]);
 
-  // Prepare amenities data when `selectedAmenities` updates
-  // useEffect(() => {
-  //   const prepareAmenitiesData = () => {
-  //     console.log("Preparing amenities data...");
-  //     console.log("Selected amenities:", selectedAmenities);
-
-  //     if (!selectedAmenities || Object.keys(selectedAmenities).length === 0) {
-  //       console.warn("No amenities selected.");
-  //       setPreparedAmenities([]);
-  //       return;
-  //     }
-
-  //     const prepared = Object.values(selectedAmenities)
-  //       .filter((amenity) => amenity.amenity_id && amenity.quantity > 0)
-  //       .map((amenity) => ({
-  //         amenity_id: amenity.amenity_id,
-  //         quantity: amenity.quantity,
-  //       }));
-
-  //     console.log("Prepared amenities:", prepared);
-  //     setPreparedAmenities(prepared);
-  //   };
-
-  //   prepareAmenitiesData();
-  // }, [selectedAmenities]);
-
   // Log state updates for debugging
   useEffect(() => {
     console.log("selectedAmenities: ", selectedAmenities);
@@ -78,13 +52,6 @@ const SidebarCart = ({
           amenity_id: amenity.amenity_id,
           quantity: amenity.quantity,
         }));
-
-      console.log("------------------------------------");
-      console.log("Selected amenities:", amenitiesRef.current);
-      console.log("Prepared Amenities:", preparedAmenities);
-      console.log("Booking ID:", bookingIdRef.current);
-      console.log("Total Price:", totalPriceRef.current);
-      console.log("------------------------------------");
 
       // Use the ref values here
       if (preparedAmenities.length === 0 || totalPriceRef.current <= 0) {
@@ -170,7 +137,7 @@ const SidebarCart = ({
             Object.values(selectedAmenities).map((item) => (
               <div key={item.amenity_id} className="flex items-center mb-4">
                 <img
-                  src={amenitesImage}
+                  src={item.image || "https://placehold.co"}
                   alt={item.amenity_name}
                   className="w-20 h-20 rounded-lg object-cover"
                 />

@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { FaStar } from "react-icons/fa6";
 import userImage from "../../../../assets/user1.jpg";
+import Pagination from "../../Shared/Pagination/Pagination";
 
-const WorkspaceReview = ({ data }) => {
+const WorkspaceReview = ({ data, page, setPage, limit }) => {
   const [sortBy, setSortBy] = useState("newest");
   const reviews = data?.data || { count: 0, rows: [] };
-
-  useEffect(() => {
-    console.log("Review: ", reviews);
-  }, [reviews]);
 
   // Calculate average rating
   const averageRating =
@@ -140,14 +137,11 @@ const WorkspaceReview = ({ data }) => {
 
       {/* Pagination (if needed) */}
       {sortedReviews.length > 0 && (
-        <div className="mt-8 flex items-center justify-center gap-2">
-          <button className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50">
-            Previous
-          </button>
-          <button className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50">
-            Next
-          </button>
-        </div>
+        <Pagination
+          page={page}
+          setPage={setPage}
+          totalPages={Math.ceil(reviews.count / limit)}
+        />
       )}
     </div>
   );

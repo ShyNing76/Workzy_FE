@@ -8,11 +8,18 @@ import "./CustomDatePicker.scss";
 const CustomDatePicker = (props) => {
   const { selectedDate, setSelectedDate, today } = props;
 
+  const handleDateChange = (date) => {
+    // Đặt giờ, phút, giây và mili giây về 0 để tránh vấn đề về timezone
+    const newDate = new Date(date);
+    newDate.setHours(0, 0, 0, 0);
+    setSelectedDate(newDate);
+  };
+
   return (
     <div className="date-picker-container relative w-full max-w-xl">
       <DatePicker
         selected={selectedDate}
-        onChange={(date) => setSelectedDate(date)}
+        onChange={handleDateChange}
         minDate={today}
         dateFormat="dd-MM-yyyy"
         className="input input-bordered h-12 pl-4 pr-12 input-date-picker" // Điều chỉnh padding

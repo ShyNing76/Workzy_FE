@@ -27,7 +27,7 @@ const GoogleCallback = () => {
 
           if (userRes && userRes.data && userRes.err === 0) {
             const { role_id } = userRes.data;
-            localStorage.setItem("role_id", role_id);
+            localStorage.setItem("roleId", role_id);
             setRoleId(role_id);
 
             // Điều hướng người dùng dựa trên role_id

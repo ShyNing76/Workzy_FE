@@ -16,18 +16,20 @@ import "./BookingRoom.scss";
 
 const BookingRoom = (props) => {
   // Props room data
-  const { roomData, workSpaceTypeName } = props;
+  const {
+    roomData,
+    workSpaceTypeName,
+    today,
+    selectedDate,
+    setSelectedDate,
+    currentTab,
+    setCurrentTab,
+  } = props;
 
   // Auth context
   const { auth } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // Tab hiện tại
-  const [currentTab, setCurrentTab] = useState("Hourly");
-  // Lấy ngày hôm nay
-  const today = new Date();
-  // SelectedDate (Time)
-  const [selectedDate, setSelectedDate] = useState(today);
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
 
