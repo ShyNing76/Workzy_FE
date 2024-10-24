@@ -1,4 +1,65 @@
 import axios from "./axios.customize";
+//Admin Dashboard APIs____________________________________________________________
+const getTotalRavenue = () => {
+  const URL_API = "api/v1/booking/total-price-of-all-booking-in-month"
+  return axios.get(URL_API);
+}
+
+const getTotalBooking = () => {
+  const URL_API = "api/v1/booking/total"
+  return axios.get(URL_API)
+}
+
+const getTotalVoucher = () => {
+  const URL_API = "api/v1/voucher/total"
+  return axios.get(URL_API)
+}
+
+const getTotalUser = (manager, staff, customer) => {
+  const URL_API = "api/v1/user/total-user"
+  const data =  {
+    manager,
+    staff,
+    customer
+  }
+  return axios.get(URL_API, data)
+}
+
+const getTotalAmenity = () => {
+  const URL_API = "api/v1/amenity/total";
+  return axios.get(URL_API);
+}
+
+const getTotalBuilding = () => {
+  const URL_API = "api/v1/building/total"
+  return axios.get(URL_API);
+}
+
+const getTotalWorkspace = () => {
+  const URL_API = "api/v1/workspace/total"
+  return axios.get(URL_API);
+}
+
+const getRecentBooking = (workspace_name, workspace_type_name, booking_id, createAt, name) => {
+  const URL_API = "api/v1/booking/5recent"
+  const data = {
+    workspace_name,
+    workspace_type_name,
+    booking_id,
+    createAt,
+    name
+  }
+  return axios.get(URL_API, data);
+}
+
+const getTop5Customers = (name, point) => {
+  const URL_API = "api/v1/customer/top5customers";
+  const data = {
+    name,
+    point,
+  }
+  return axios.get(URL_API, data);
+}
 
 //Amenities Manager APIs_________________________________________________________
 const getAmenity = (amenity_id, amenity_name, image, original_price, depreciation_price, rent_price, status) =>  {
@@ -348,6 +409,16 @@ const deleteReview = (review_id) => {
   
 //=========================================================================================================================
   export {
+    getTotalRavenue,
+    getTotalBooking,
+    getTotalVoucher,
+    getTotalUser,
+    getTotalAmenity,
+    getTotalBuilding,
+    getTotalWorkspace,
+    getRecentBooking,
+    getTop5Customers,
+
     getAmenity,
     getAmenityById,
     postAmenity,

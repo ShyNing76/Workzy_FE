@@ -9,14 +9,22 @@ import { IoExtensionPuzzleOutline } from "react-icons/io5";
 import { LuCalendarCheck } from "react-icons/lu";
 import { RiCoupon3Line } from "react-icons/ri";
 import { IoIosArrowRoundForward } from "react-icons/io";
+import { RiCopperCoinLine } from "react-icons/ri";
 import React, { PureComponent } from 'react';
-import { format } from 'date-fns';
+import { format, set } from 'date-fns';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import io from "socket.io-client";
 import "./AdminDashboardPage.scss";
 import { useState, useEffect } from "react";
 
-
+import { getTotalRavenue } from "../../../config/api.admin";
+import { getTotalBooking } from "../../../config/api.admin";
+import { getTotalVoucher } from "../../../config/api.admin";
+import { getTotalUser } from "../../../config/api.admin";
+import { getTotalAmenity } from "../../../config/api.admin";
+import { getTotalBuilding } from "../../../config/api.admin";
+import { getTotalWorkspace } from "../../../config/api.admin";
+import { getRecentBooking } from "../../../config/api.admin";
+import { getTop5Customers } from "../../../config/api.admin";
 
 const data = [
   { name: '1', uv: 4000, pv: 2400, amt: 2400, },
@@ -49,7 +57,8 @@ const data2 = [
 ];
 
 const AdminDashboard = () => {
-  const socket = io('http://localhost:5000');
+  const [error, setError] = useState(null); // State lỗi
+  const [loading, setLoading] = useState(true); // State loading
   const [ravenue, setRavenue] = useState();
   const [booking, setBookings] = useState();
   const [voucher, setVoucher] = useState();
@@ -62,47 +71,121 @@ const AdminDashboard = () => {
   const [top5Customers, setTop5Customers] = useState([]);
   const [top5Bookings, setTop5Bookings] = useState([]);
 
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('vi-VN').format(value);
+  }
+
+  const fetchTotalRevenue = async () => {
+    try {
+      const response = await getTotalRavenue();
+      setRavenue(response.data); // Access the "data" field and update state
+    } catch (error) {
+      console.error('Error fetching total revenue:', error);
+    }
+  };
+
+  const fetchTotalBooking = async () => {
+    try {
+      const response = await getTotalBooking();
+      setBookings(response.data); // Access the "data" field and update state
+    } catch (error) {
+      console.error('Error fetching total revenue:', error);
+    }
+  };
+
+  const fetchTotalVoucher = async () => {
+    try {
+      const response = await getTotalVoucher();
+      setVoucher(response.data); // Access the "data" field and update state
+    } catch (error) {
+      console.error('Error fetching total revenue:', error);
+    }
+  }
+
+  const fetchTotalUser = async () => {
+    try {
+      const response = await getTotalUser();
+      setManager(response.data.manager); // Access the "data" field and update state
+      setStaff(response.data.staff); // Access the "data" field and update state
+      setCustomer(response.data.customer); // Access the "data" field and update state
+    } catch (error) {
+      console.error('Error fetching total revenue:', error);
+    }
+  }
+
+  const fetchTotalAmenity = async () => {
+    try {
+      const response = await getTotalAmenity();
+      setAmenity(response.data); // Access the "data" field and update state
+    } catch (error) {
+      console.error('Error fetching total revenue:', error)
+    }
+  }
+
+  const fetchTotalBuilding = async () => {
+    try {
+      const response = await getTotalBuilding();
+      setBuilding(response.data); // Access the "data" field and update state
+    } catch (error) {
+      console.error('Error fetching total revenue:', error)
+    }
+  }
+
+  const fetchTotalWorkspace = async () => {
+    try {
+      const response = await getTotalWorkspace();
+      setWorkspace(response.data); // Access the "data" field and update state
+    } catch (error) {
+      console.error('Error fetching total revenue:', error)
+    }
+  }
+
+  const fetchTop5Bookings = async () => {
+    try {
+      const response = await getRecentBooking();
+      if (response && response.data && Array.isArray(response.data)) {
+        setTop5Bookings(response.data);
+      } else {
+        setTop5Bookings([]); // Initialize as an empty array if data is not as expected
+      }
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchTop5Customers = async () => {
+    try {
+      const response = await getTop5Customers();
+      if (response && response.data && Array.isArray(response.data)) {
+        setTop5Customers(response.data);
+      } else {
+        setTop5Customers([]); // Initialize as an empty array if data is not as expected
+      }
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    socket.emit("newCompletedBookingInMonth");
-    socket.on("totalPricesInMonth", (data) => setRavenue(data));
-
-    socket.emit("newBooking");
-    socket.on("totalBooking", (data) => setBookings(data));
-
-    socket.emit("newVoucher");
-    socket.on("totalVoucher", (data) => setVoucher(data));
-
-    socket.emit("newManager");
-    socket.on("totalManager", (data) => setManager(data));
-
-    socket.emit("newStaff");
-    socket.on("totalStaff", (data) => setStaff(data));
-
-    socket.emit("newCustomer");
-    socket.on("totalCustomer", (data) => setCustomer(data));
-
-    socket.emit("newBuilding");
-    socket.on("totalBuilding", (data) => setBuilding(data));
-
-    socket.emit("newAmenities");
-    socket.on("totalAmenities", (data) => setAmenity(data));
-
-    socket.emit("newWorkspace");
-    socket.on("totalWorkspace", (data) => setWorkspace(data));
-
-    socket.emit("newFiveCustomer");
-    socket.on("fiveCustomer", (data) => setTop5Customers(data));
-
-    socket.emit("newFiveBooking");
-    socket.on("fiveBooking", (data) => setTop5Bookings(data));
-
-    // Cleanup socket connections on unmount
-    return () => socket.disconnect();
+    fetchTotalRevenue();
+    fetchTotalBooking();
+    fetchTotalVoucher();
+    fetchTotalUser();
+    fetchTotalAmenity();
+    fetchTotalBuilding();
+    fetchTotalWorkspace();
+    fetchTop5Bookings();
+    fetchTop5Customers();
   }, []);
 
 
   return (
     <div className="max-w-screen *:box-border w-full h-full flex flex-col overflow-hidden">
+      <h1 className="text-4xl font-black mt-5 ml-6">Welcome to WORKZY Admin</h1>
       {/* Main Content */}
       <main className="flex-1 p-6">
         <h2 className="text-2xl font-bold mb-4">General Overview</h2>
@@ -115,7 +198,7 @@ const AdminDashboard = () => {
                 <TfiStatsUp className="mt-1 size-5"/>
                 <div className="stat-title ml-2 text-xl">Total Revenue in Month</div>
               </div>
-              <div className="stat-value text-5xl">{ravenue}</div>
+              <div className="stat-value text-5xl">{formatCurrency(ravenue)}đ</div>
             </div>
           </div>
 
@@ -256,7 +339,7 @@ const AdminDashboard = () => {
           <h2 className="text-2xl font-bold mb-4">Bookings & Customers</h2>
           <div className="flex w-full">
             <div className="rounded-box grid flex-grow place-items-stretch">
-              <p className="text-xl font-semibold mb-4">Recent overview</p>
+              <p className="text-xl font-semibold mb-4">Recent Bookings</p>
               <div className="bg-base-200 p-4 rounded-lg shadow-lg">
                 {top5Bookings.map((booking, index) => (
                   <div key={index} className="border-b py-2 flex justify-between items-center">
@@ -291,7 +374,7 @@ const AdminDashboard = () => {
                 <table className="table-auto w-full">
                   <tbody>
                     {top5Customers.map((customer, index) => (
-                      <tr key={index} className="border-b">
+                      <tr key={index}>
                         <td
                           className="px-4 py-2 text-3xl font-bold"
                           style={{
@@ -301,7 +384,7 @@ const AdminDashboard = () => {
                           #{index + 1}
                         </td>
                         <td className="px-4 py-2 text-2xl font-semibold">{customer.User.name}</td>
-                        <td className="px-4 py-2 text-right text-xl font-medium">{customer.point} ZyCoin</td>
+                        <td className="px-4 py-2 text-right text-xl font-medium">{customer.point} ZyPoint</td>
                       </tr>
                     ))}
                   </tbody>

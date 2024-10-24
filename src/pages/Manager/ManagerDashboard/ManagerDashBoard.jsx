@@ -6,7 +6,8 @@ import { RxDashboard } from "react-icons/rx";
 import { PiWrench } from "react-icons/pi";
 import { LuCalendarCheck } from "react-icons/lu";
 import { PiEmpty } from "react-icons/pi";
-import { IoIosArrowRoundForward } from "react-icons/io";
+import { GoPerson } from "react-icons/go";
+import { IoIosArrowDown } from "react-icons/io";
 import React, { PureComponent } from 'react';
 import { format } from 'date-fns';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -71,6 +72,16 @@ const topWorkspaces = [
 const ManagerDashBoard = () => {
   return (
     <div className="max-w-screen *:box-border w-full h-full flex flex-col overflow-hidden">
+      <div className="flex flex-1">
+        <h1 className="text-4xl font-black mt-5 ml-6">Workzy Khu CNC Dashboard</h1>
+        <div className="dropdown mt-6 ml-2">
+          <div tabIndex={0} role="button" className="btn m-1 btn-sm"><IoIosArrowDown size-4/></div>
+          <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+            <li><a>Workzy Khu CNC</a></li>
+            <li><a>Workzy Nhà Văn hóa</a></li>
+          </ul>
+        </div>
+      </div>
       {/* Main Content */}
       <main className="flex-1 p-6">
         <h2 className="text-2xl font-bold mb-4">General Overview</h2>
@@ -100,7 +111,7 @@ const ManagerDashBoard = () => {
               <div className="card-body">
                 <div className="flex flex-2">
                   <GoPeople className="size-5"/>
-                  <div className="stat-title ml-2">Total Customer</div>
+                  <div className="stat-title ml-2">Total Customers</div>
                 </div>
                 <div className="stat-value text-5xl">120</div>
               </div>
@@ -109,10 +120,10 @@ const ManagerDashBoard = () => {
             <div className="card shadow-xl">
               <div className="card-body">
                 <div className="flex flex-2">
-                  <IoIosStarOutline className="size-5"/>
-                  <div className="stat-title ml-2">Average Rates</div>
+                  <GoPerson className="mt-1 size-5"/>
+                  <div className="stat-title ml-2">Total Staffs</div>
                 </div>
-                <div className="stat-value text-5xl">4.8</div>
+                <div className="stat-value text-5xl">1</div>
               </div>
             </div>
 
@@ -139,20 +150,20 @@ const ManagerDashBoard = () => {
             <div className="card shadow-xl">
               <div className="card-body">
                 <div className="flex flex-2">
-                  <PiWrench className="mt-1 size-5"/>
-                  <div className="stat-title ml-2">In Mantenance <br /> Workspaces</div>
+                  <PiEmpty className="mt-1 size-5"/>
+                  <div className="stat-title ml-2">Empty Workspaces</div>
                 </div>
-                <div className="stat-value text-5xl">1</div>
+                <div className="stat-value text-5xl">12</div>
               </div>
             </div>
 
             <div className="card shadow-xl">
               <div className="card-body">
                 <div className="flex flex-2">
-                  <PiEmpty className="mt-1 size-5"/>
-                  <div className="stat-title ml-2">Empty Workspaces</div>
+                  <IoIosStarOutline className="size-5"/>
+                  <div className="stat-title ml-2">Average Rates</div>
                 </div>
-                <div className="stat-value text-5xl">12</div>
+                <div className="stat-value text-5xl">4.8</div>
               </div>
             </div>
 
@@ -240,9 +251,9 @@ const ManagerDashBoard = () => {
               <table className="table-auto w-full">
                 <tbody>
                   {topWorkspaces.map((workspace, index) => (
-                    <tr key={index} className="border-b">
+                    <tr key={index}>
                       <td
-                        className="px-4 py-2 text-3xl font-bold"
+                        className="pl-1 py-1 text-3xl font-bold"
                           style={{
                             color: index === 0 ? '#d4af37' : index === 1 ? 'silver' : index === 2 ? '#cd7f32' : 'inherit',
                           }}
