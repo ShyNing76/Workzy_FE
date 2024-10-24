@@ -1,6 +1,46 @@
 import axios from "./axios.customize";
 
+// API for Manager Dashboard
 
+const getAllBuilding = () => {
+    const URL_API = "/api/v1/building"
+    return axios.get(URL_API)
+  }
+
+const getBuildingById = (building_id) => {
+    const URL_API = `/api/v1/building/${building_id}`
+    return axios.get(URL_API, building_id)
+}
+
+const getTotalRevenue = (building_id) => {
+    const URL_API = `api/v1/booking/total-price-of-all-booking-in-month?building_id=${building_id}`
+    return axios.get(URL_API, building_id);
+}
+
+const getTotalBooking = (building_id) => {
+    const URL_API = `api/v1/booking/total?building_id=${building_id}`
+    return axios.get(URL_API, building_id)
+}
+
+const getTotalWorkspace = (building_id) => {
+    const URL_API = `api/v1/workspace/total?building_id=${building_id}`
+    return axios.get(URL_API, building_id);
+}
+
+const getInUseWorkspace = (building_id) => {
+    const URL_API = `/api/v1/workspace/total-usage-workspace?building_id=${building_id}`
+    return axios.get(URL_API, building_id);
+}
+
+const getEmptyWorkspace = (building_id) => {
+    const URL_API = `api/v1/workspace/total-workspace-not-in-booking?building_id=${building_id}`
+    return axios.get(URL_API, building_id);
+}
+
+const getRecentBooking = (building_id) => {
+    const URL_API = `api/v1/booking/5recent?building_id=${building_id}`
+    return axios.get(URL_API, building_id);
+  }
 
 
  // api manager get all buildings
@@ -45,6 +85,15 @@ const deleteReview = (reviewId) => {
 
 
 export {
+    getAllBuilding,
+    getBuildingById,
+    getTotalRevenue,
+    getTotalBooking,
+    getTotalWorkspace,
+    getInUseWorkspace,
+    getEmptyWorkspace,
+    getRecentBooking,
+    
     getAllBuildings,
     getAllStaffs,
     assignStaffToBuilding,

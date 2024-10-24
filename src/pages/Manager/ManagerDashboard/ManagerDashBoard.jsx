@@ -13,6 +13,15 @@ import { format } from 'date-fns';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import io from "socket.io-client";
 import { useState, useEffect } from "react";
+import { useParams } from 'react-router-dom';
+
+import { getBuildingById } from "../../../config/apiManager.js";
+import { getTotalRevenue } from "../../../config/apiManager.js";
+import { getTotalBooking } from "../../../config/apiManager.js";
+import { getTotalWorkspace } from "../../../config/apiManager.js";
+import { getInUseWorkspace } from "../../../config/apiManager.js";
+import { getEmptyWorkspace } from "../../../config/apiManager.js";
+import { getRecentBooking } from "../../../config/apiManager.js";
 
 const data = [
   { name: '1', uv: 4000, pv: 2400, amt: 2400, },
@@ -44,56 +53,96 @@ const data2 = [
   { name: '12', uv: 3490, pv: 4300, amt: 2100, },
 ];
 
-const bookings = [
-  {
-    name: 'Le Van A',
-    room: 'Room no.01',
-    type: 'Double POD',
-    time: '12:45',
-    status: 'Booked',
-  },
-  {
-    name: 'Le Van A',
-    room: 'Room no.01',
-    type: 'Double POD',
-    time: '12:45',
-    status: 'Booked',
-  },
-];
-
-const topWorkspaces = [
-  { rating: 5.0, name: 'Double POD' },
-  { rating: 4.9, name: 'Double POD' },
-  { rating: 4.8, name: 'Double POD' },
-  { rating: 4.7, name: 'Double POD' },
-  { rating: 4.6, name: 'Double POD' },
-];
-
 const ManagerDashBoard = () => {
+  const [error, setError] = useState(null); // State lỗi
+  const [loading, setLoading] = useState(true); // State loading
+  const { building_id } = useParams(); // Get the building_id from route params
+  const [buildingName, setBuildingName] = useState('');
+  const [totalRevenue, setTotalRevenue] = useState(''); // Initialize with sample data
+  const [totalBooking, setTotalBooking] = useState(''); // Initialize with sample data
+  const [totalWorkspace, setTotalWorkspace] = useState(''); // Initialize with sample data
+  const [totalInUseWorkspace, setTotalInUseWorkspace] = useState(''); // Initialize with sample data
+  const [totalEmptyWorkspace, setTotalEmptyWorkspace] = useState(''); // Initialize with sample data
+  const [top5Bookings, setTop5Bookings] = useState([]); // Initialize with sample data
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('vi-VN').format(value);
+  }
+
+  useEffect(() => {
+    const fetchBuildingData = async () => {
+      try {
+        const buildingDetails = getBuildingById(building_id);
+        const totalRevenue = getTotalRevenue(building_id);
+        const totalBooking = getTotalBooking(building_id);
+        const totalWorkspace = getTotalWorkspace(building_id);
+        const inUseWorkspace = getInUseWorkspace(building_id);
+        const emptyWorkspace = getEmptyWorkspace(building_id);
+  
+        const responses = await Promise.all([
+          buildingDetails,
+          totalRevenue,
+          totalBooking,
+          totalWorkspace,
+          inUseWorkspace,
+          emptyWorkspace
+        ]);
+  
+        setBuildingName(responses[0].data.building_name);
+        setTotalRevenue(responses[1].data);
+        setTotalBooking(responses[2].data);
+        setTotalWorkspace(responses[3].data);
+        setTotalInUseWorkspace(responses[4].data);
+        setTotalEmptyWorkspace(responses[5].data);
+  
+      } catch (error) {
+        console.error("Error fetching building data", error);
+      }
+    };
+  
+    if (building_id) {
+      fetchBuildingData();
+    }
+  }, [building_id]);
+
+  useEffect(() => {
+    const fetchTop5Bookings = async () => {
+      try {
+        const response = await getRecentBooking(building_id);
+        if (response && response.data && Array.isArray(response.data)) {
+          setTop5Bookings(response.data);
+        } else {
+          setTop5Bookings([]); // Initialize as an empty array if data is not as expected
+        }
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (building_id) {
+      fetchTop5Bookings();
+    }
+  }, [building_id]);
+
   return (
     <div className="max-w-screen *:box-border w-full h-full flex flex-col overflow-hidden">
       <div className="flex flex-1">
-        <h1 className="text-4xl font-black mt-5 ml-6">Workzy Khu CNC Dashboard</h1>
-        <div className="dropdown mt-6 ml-2">
-          <div tabIndex={0} role="button" className="btn m-1 btn-sm"><IoIosArrowDown size-4/></div>
-          <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
-            <li><a>Workzy Khu CNC</a></li>
-            <li><a>Workzy Nhà Văn hóa</a></li>
-          </ul>
-        </div>
+        <h1 className="text-4xl font-black mt-5 ml-6">{buildingName} Dashboard</h1> {/* Display building name */}
       </div>
+
       {/* Main Content */}
       <main className="flex-1 p-6">
         <h2 className="text-2xl font-bold mb-4">General Overview</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* General Overview */}
             <div className="card shadow-xl">
               <div className="card-body">
-                <div className="flex flex-2">
+                <div className="flex items-center">
                   <TfiStatsUp className="size-5"/>
                   <div className="stat-title ml-2">Total Revenue in Month</div>
                 </div>
-                <div className="stat-value text-4xl">12000000</div>
+                <div className="stat-value text-4xl">{formatCurrency(totalRevenue)}đ</div>
               </div>
             </div>
 
@@ -103,27 +152,7 @@ const ManagerDashBoard = () => {
                   <LuCalendarCheck className="size-5"/>
                   <div className="stat-title ml-2">Total Bookings</div>
                 </div>
-                <div className="stat-value text-5xl">120</div>
-              </div>
-            </div>
-
-            <div className="card shadow-xl">
-              <div className="card-body">
-                <div className="flex flex-2">
-                  <GoPeople className="size-5"/>
-                  <div className="stat-title ml-2">Total Customers</div>
-                </div>
-                <div className="stat-value text-5xl">120</div>
-              </div>
-            </div>
-
-            <div className="card shadow-xl">
-              <div className="card-body">
-                <div className="flex flex-2">
-                  <GoPerson className="mt-1 size-5"/>
-                  <div className="stat-title ml-2">Total Staffs</div>
-                </div>
-                <div className="stat-value text-5xl">1</div>
+                <div className="stat-value text-4xl">{totalBooking}</div>
               </div>
             </div>
 
@@ -133,17 +162,18 @@ const ManagerDashBoard = () => {
                   <RxDashboard className="size-5"/>
                   <div className="stat-title ml-2">Total Workspaces</div>
                 </div>
-                <div className="stat-value text-5xl">120</div>
+                <div className="stat-value text-4xl">{totalWorkspace}</div>
               </div>
             </div>
-
-            <div className="card shadow-xl">
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+          <div className="card shadow-xl">
               <div className="card-body">
                 <div className="flex flex-2">
                   <RxDashboard className="size-5"/>
                   <div className="stat-title ml-2">In Use Workspaces</div>
                 </div>
-                <div className="stat-value text-5xl">12</div>
+                <div className="stat-value text-4xl">{totalInUseWorkspace}</div>
               </div>
             </div>
 
@@ -153,20 +183,9 @@ const ManagerDashBoard = () => {
                   <PiEmpty className="mt-1 size-5"/>
                   <div className="stat-title ml-2">Empty Workspaces</div>
                 </div>
-                <div className="stat-value text-5xl">12</div>
+                <div className="stat-value text-4xl">{totalEmptyWorkspace}</div>
               </div>
             </div>
-
-            <div className="card shadow-xl">
-              <div className="card-body">
-                <div className="flex flex-2">
-                  <IoIosStarOutline className="size-5"/>
-                  <div className="stat-title ml-2">Average Rates</div>
-                </div>
-                <div className="stat-value text-5xl">4.8</div>
-              </div>
-            </div>
-
           </div>
 
         {/* Revenue & Guest */}
@@ -227,48 +246,23 @@ const ManagerDashBoard = () => {
             <div className="rounded-box grid flex-grow place-items-stretch">
               <p className="text-xl font-semibold mb-4">Recent overview</p>
               <div className="bg-base-200 flex-grow p-4 rounded-lg shadow-lg">
-                {bookings.map((booking, index) => (
-                  <div key={index} className="border-b py-2 flex justify-between items-center">
+                {top5Bookings.map((booking, index) => (
+                  <div key={index} className="border-b py-2 mb-1 flex justify-between items-center">
                     <div>
-                      <p className="font-semibold">{booking.name}</p>
-                      <p>{booking.room}</p>
-                      <p className="text-sm">{booking.type}</p>
+                      <p className="font-semibold">{booking.Customer.User.name}</p>
+                      <p>{booking.Workspace.workspace_name}</p>
+                      <p className="text-sm">{booking.Workspace.WorkspaceType.workspace_type_name}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold">{booking.time}</p>
-                      <p>{booking.status}</p>
+                      <p className="font-semibold">{format(new Date(booking.createdAt), "dd/MM/yyyy HH:mm:ss")}</p>
+                      {booking.BookingStatuses.map((status, idx) => (
+                        <p key={idx}>{status.status}</p>
+                      ))}
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-
-          <div className="divider-horizontal"></div>
-            
-          <div className="rounded-box grid h-20">
-            <p className="text-xl font-semibold mb-4">Top 5 Workspaces by Customer’s review</p>
-            <div className="bg-base-200 p-4 rounded-lg shadow-lg place-content-stretch" style={{ minWidth: '550px' }}>
-              <table className="table-auto w-full">
-                <tbody>
-                  {topWorkspaces.map((workspace, index) => (
-                    <tr key={index}>
-                      <td
-                        className="pl-1 py-1 text-3xl font-bold"
-                          style={{
-                            color: index === 0 ? '#d4af37' : index === 1 ? 'silver' : index === 2 ? '#cd7f32' : 'inherit',
-                          }}
-                      >
-                        {workspace.rating.toFixed(1)}
-                      </td>
-                      <td className="px-4 py-2 text-2xl font-semibold text-left">
-                        {workspace.name}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
         </div>
       </div>
     </main>
