@@ -4,8 +4,8 @@ import axios from "./axios.customize";
 
 
  // api manager get all buildings
-const getAllBuildings = () => {
-    const URL_API = `/api/v1/building/`;
+const getBuildingsByManager = () => {
+    const URL_API = `/api/v1/manager/buildings/`;
     return axios.get(URL_API);
 }
 
@@ -43,14 +43,21 @@ const deleteReview = (reviewId) => {
     return axios.delete(URL_API)
 }
 
+const getAllWorkSpaces = (buildingId) => {
+    const URL_API = `/api/v1/workspace?building_id=${buildingId}`
+    return axios.get(URL_API)
+}
+
+
 
 export {
-    getAllBuildings,
+    getBuildingsByManager,
     getAllStaffs,
     assignStaffToBuilding,
     unassignStaffFromBuilding,
     activeStaff,
     inactiveStaff,
     getAllReview,
-    deleteReview
+    deleteReview,
+    getAllWorkSpaces
 }

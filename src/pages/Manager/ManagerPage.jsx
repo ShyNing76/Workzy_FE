@@ -47,7 +47,7 @@ const ManagerPage = () => {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
-      <div className="navbar bg-base-100 shadow-lg sticky top-0 z-50">
+      <div className="navbar bg-base-100 shadow-lg sticky top-0 z-50 ">
         <ManagerHeader />
       </div>
 

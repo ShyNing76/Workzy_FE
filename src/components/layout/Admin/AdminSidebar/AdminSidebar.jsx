@@ -87,15 +87,21 @@ const AdminSidebar = () => {
                 <h2 className="font-semibold ml-2 mb-2 mt-2 text-gray-500">WORKZY Assign</h2>
 
                 <li className="mb-1">
-                    <div className="flex flex-1 items-center mb-2"><PiBuildingsLight className="text-2xl"/><p className="ml-4">Assign Staff</p></div>
+                    <Link to="/admin/assignstaff" className= {`tab ${location.pathname === '/admin/assignstaff' ? 'active' : ''}`}>
+                        <div className="flex flex-1 items-center mb-2"><PiBuildingsLight className="text-2xl"/><p className="ml-4">Assign Staff</p></div>
+                    </Link>
                 </li>
 
                 <li className="mb-1">
-                    <div className="flex flex-1 items-center mb-2"><PiBuildingsLight className="text-2xl"/><p className="ml-4">Assign Manager</p></div>
+                    <Link to="/admin/assignmanager" className= {`tab ${location.pathname === '/admin/assignmanager' ? 'active' : ''}`}>
+                        <div className="flex flex-1 items-center mb-2"><PiBuildingsLight className="text-2xl"/><p className="ml-4">Assign Manager</p></div>
+                    </Link>
                 </li>
 
                 <li className="mb-1">
-                    <div className="flex flex-1 items-center mb-2"><PiBuildingsLight className="text-2xl"/><p className="ml-4">Assign Workspace</p></div>
+                    <Link to="/admin/assignworkspace" className={`tab ${location.pathname === '/admin/assignworkspace' ? 'active' : ''}`}>
+                        <div className="flex flex-1 items-center mb-2"><PiBuildingsLight className="text-2xl"/><p className="ml-4">Assign Workspace</p></div>
+                    </Link>
                 </li>
 
                 <h2 className="font-semibold ml-2 mb-2 mt-2 text-gray-500">WORKZY Bookings</h2>

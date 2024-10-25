@@ -53,6 +53,9 @@ import BookingDetail from "../pages/Customer/BookingDetail/BookingDetail.jsx";
 import BookingAmenities from "../pages/Customer/BookingAmenities/BookingAmenities.jsx";
 import Admin from "../pages/Admin/AdminMain/Admin.jsx";
 import Staff from "../pages/Staff/StaffMain/Staff.jsx";
+import AssignStaffPage from "../pages/Admin/AssignPages/AssignStaff/AssignStaffPage.jsx";
+import AssignManagerPage from "../pages/Admin/AssignPages/AssignManager/AssignManagerPage.jsx";
+import AssignWorkspacePage from "../pages/Admin/AssignPages/AssignWorkspace/AssignWorkspacePage.jsx";
 
 import AccessDenied from "../pages/Customer/AccessDenied/AccessDenied.jsx";
 import NotFound from "../pages/Customer/NotFound/NotFound.jsx";
@@ -261,6 +264,18 @@ export const router = createBrowserRouter([
         path: "vouchersmanager",
         element: <VouchersManagerPage />,
       },
+      {
+        path: "assignstaff",
+        element: <AssignStaffPage/>
+      },
+      {
+        path: "assignmanager",
+        element: <AssignManagerPage/>
+      },
+      {
+        path: "assignworkspace",
+        element: <AssignWorkspacePage/>
+      }
     ],
     // condition: (user) => user.isAdmin, // Add condition to check if user is admin before rendering the routes
   },
