@@ -1,65 +1,96 @@
-.building-room-container{
+.room-controls {
+    width: 100%; 
+    padding: 0 20px; 
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    height: 100vh;
-    overflow-y: auto;
+    gap: 20px;
 
-    .navbar {
-        width: 100%;
-        background-color: black;
-        padding: 10px 0;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        text-align: center;
+    .control-row {
         display: flex;
-        
-        ul {
-            list-style: none;
-            display: flex;
-            justify-content: center;
-    
-            li {
-                margin: 0 15px;
-                display: flex;
-                align-items: center;
-    
-                button {
-                    background: none;
-                    border: none;
-                    display: flex;
-                    align-items: center;  
-                    font-size: 18px;
-                    color: #333;
-                    cursor: pointer;
-    
-                    &:hover {
-                        color: #eaf0f7;
-                    }
-    
-                    svg {
-                        margin-right: 5px;  
-                    }
-                }
-            }
-        }
+        justify-content: space-between; 
+        gap: 20px; 
+        width: 100%;
     }
-    .sidebar {
-        background-color: black;
-        padding: 20px;
-        width: 200px;
-        height: 72%;
-        position: absolute;
-        left: 0;
-        top: 200px; 
+
+    .control {
+        flex: 1; 
         display: flex;
         flex-direction: column;
-        align-items: center;
-        text-align: center;
 
-        h2, h3 {
-            margin: 10px 0;
-            color: #333;
+        label {
+            color: black; 
+            font-weight: bold ;
+            margin-bottom: 5px;
         }
+
+        input[type="date"], input[type="month"], input[type="number"] {
+            border: 1px solid black;  /* Khung viền đen */
+            border-radius: 4px;  /* Góc bo tròn */
+            font-size: 16px;  /* Kích thước chữ */
+            background-color: white;  
+            padding-left: 10px;
+        }
+
+        select {
+            border: 1px solid black; 
+            border-radius: 4px; 
+            appearance: none; 
+            background: white; 
+            cursor: pointer; 
+            padding-left: 10px;
+        }
+
+        .form-select {
+            -webkit-appearance: none; 
+            -moz-appearance: none; 
+            appearance: none; 
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>') no-repeat right 0.75rem center; /* Thêm mũi tên bên phải */
+            background-size: 1rem; 
+            padding-right: 2.5rem;
+        }
+    }
+
+    .table-container {
+        width: 100%; 
+        margin-top: 20px;
+        overflow-x: auto; 
+    }
+    .status-labels {
+        display: flex;
+        margin-bottom: 20px; /* Khoảng cách giữa ô chú thích và bảng */
+
+        .status-label {
+            padding: 10px;
+            margin-right: 10px;
+            color: black ;
+            border-radius: 5px;
+            display: flex;
+          }
+
+          .circle {
+            width: 20px; /* Đường kính của ô tròn */
+            height: 20px;
+            border-radius: 50%; /* Tạo hình tròn */
+            margin-right: 8px; /* Khoảng cách giữa ô tròn và chữ */
+          }
+      }
+
+    .status-item {
+        display: flex;
+        align-items: center;
+    }
+
+    .status-color {
+        width: 20px; 
+        height: 20px; 
+        border-radius: 50%; 
+        margin-right: 5px; 
+    }
+
+    .status-label {
+        font-size: 14px;
+        color: black; 
+        
     }
 }

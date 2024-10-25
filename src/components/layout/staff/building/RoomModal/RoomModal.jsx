@@ -1,78 +1,37 @@
-import React, { useEffect, useState } from 'react';
-import { getWorkspaceByBuildingId, getStaffBuildingId } from '../../../../../config/api.staff.js'; 
+import React from 'react';
 import './RoomModal.scss';
 
-const Modal = ({ isOpen, onClose, room, bookingType }) => {
-    const [workspaceDetails, setWorkspaceDetails] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('vi-VN', { 
+        year: 'numeric', month: '2-digit', day: '2-digit', 
+        hour: '2-digit', minute: '2-digit', hour12: false 
+    }).replace(',', ''); 
+};
 
-    useEffect(() => {
-        const fetchWorkspaceDetails = async () => {
-            if (!isOpen || !room) return;
-            setLoading(true);
-            setError(null);
-            try {
-                const buildingResponse = await getStaffBuildingId();
-                if (buildingResponse && buildingResponse.err === 0) {
-                    const buildingId = buildingResponse.data.building_id;
-                    const workspaceResponse = await getWorkspaceByBuildingId(buildingId);
-                    if (workspaceResponse && workspaceResponse.err === 0) {
-                        const foundWorkspace = workspaceResponse.data.find(ws => ws.id === room.id);
-                        console.log('Found Workspace:', foundWorkspace); 
-                        setWorkspaceDetails(foundWorkspace);
-                    } else {
-                        setError('Error when fetching workspaces.');
-                    }
-                }
-            } catch (error) {
-                setError('Error while fetching building.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchWorkspaceDetails();
-    }, [isOpen, room]);
-
-    const getPrice = () => {
-        if (!workspaceDetails) return 'N/A';
-
-        switch (bookingType) {
-            case 'hourly':
-                return workspaceDetails.price_per_hour ? `${Number(workspaceDetails.price_per_hour).toLocaleString()} đ` : 'N/A';
-            case 'daily':
-                return workspaceDetails.price_per_day ? `${Number(workspaceDetails.price_per_day).toLocaleString()} đ` : 'N/A';
-            case 'monthly':
-                return workspaceDetails.price_per_month ? `${Number(workspaceDetails.price_per_month).toLocaleString()} đ` : 'N/A';
-            default:
-                return 'N/A';
-        }
-    };
-
-    if (!isOpen || !workspaceDetails) return null;
-
-    if (loading) {
-        return <div>Loading workspace...</div>;
-    }
-
-    if (error) {
-        return <div>{error}</div>;
-    }
-
+const Modal = ({ isOpen, onClose, workspaceType, bookings }) => {
+    if (!isOpen) return null;
     return (
         <div className="modal-overlay">
             <div className="modal-content">
                 <button className="close-button" onClick={onClose}>×</button>
                 <h2 className="modal-title">
-                    {workspaceDetails ? `${workspaceDetails.WorkspaceType?.workspace_type_name} - ${workspaceDetails.workspace_name}` : 'Thông tin không có sẵn'}
+                    {workspaceType || 'Workspace Details'}
                 </h2>
-                <div className="price">
-                    <h3>Price: {getPrice()}</h3> {/* Hiển thị giá */}
-                </div>
-                <div className="status">
-                    <h3>Status: </h3>
-                </div>
+                {bookings && bookings.length > 0 ? (
+                    <div className="bookings-info">
+                        {bookings.map((booking, index) => (
+                            <div key={index} className="booking-item">
+                                <h3>Customer: {booking.customerName}</h3>
+                                <p>Start Time: {formatDate(booking.startTime)}</p>
+                                <p>End Time: {formatDate(booking.endTime)}</p>
+                                <p>Status: {booking.status}</p>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div>No bookings available.</div>
+                )}
             </div>
         </div>
     );
