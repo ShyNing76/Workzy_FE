@@ -3,6 +3,8 @@ import { getStaff, getStaffById } from "../../../config/api.admin.js";
 import { postStaff } from "../../../config/api.admin.js";
 import { putStaff } from "../../../config/api.admin.js";
 import { deleteStaff } from "../../../config/api.admin.js";
+import { getManager } from "../../../config/api.admin.js";
+import { getCustomer } from "../../../config/api.admin.js";
 
 import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
 import AddModal from "../../../components/layout/Admin/Modals/AddModal.jsx";
@@ -13,6 +15,7 @@ import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal.j
 import AddButton from "../../../components/layout/Admin/Buttons/AddButton.jsx";
 import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.jsx";
 import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
+import BlockButton from "../../../components/layout/Admin/Buttons/BlockButton.jsx";
 
 import { useLocation } from "react-router-dom";
 import Swal from 'sweetalert2';
@@ -21,7 +24,8 @@ const StaffsManagerPage = () => {
   const location = useLocation();
 
   const [staff, setStaff] = useState(null);
-  // const [searchTerm, setSearchTerm] = useState("");
+  const [manager, setManager] = useState([]);
+  const [customer, setCustomer] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null); 
   const [showAddModal, setShowAddModal] = useState(false);
@@ -30,9 +34,12 @@ const StaffsManagerPage = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [staffToDelete, setStaffToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState('all');
   const [newStaff, setNewStaff] = useState({
     email: '',
     password: '',
+    confirmPassword: '',
     phone: '',
     name: '',
   });
@@ -47,12 +54,22 @@ const StaffsManagerPage = () => {
     const [day, month, year] = dateString.split('/');
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
   };
-  
 
-  // const [successModal, setSuccessModal] = useState({
-  //   show: false,
-  //   message: "",
-  // });
+  const formatDate = (dateString) => {
+    if (!dateString) return "None";
+    
+    const date = new Date(dateString);
+    
+    if (isNaN(date.getTime())) {
+      return "None";
+    }
+  
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); 
+    const year = date.getFullYear();
+  
+    return `${day}/${month}/${year}`;
+  };
 
   //Hiện data lên table
   const fetchStaff = async () => {
@@ -72,6 +89,24 @@ const StaffsManagerPage = () => {
 
   useEffect(() => {
     fetchStaff();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const managerRes = await getManager();
+      const customerRes = await getCustomer();
+      
+      setManager(managerRes.data.rows || []);
+      setCustomer(customerRes.data.rows || []);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -94,18 +129,73 @@ const StaffsManagerPage = () => {
   const handleRowClick = async (user_id) => {
     try {
       const res = await getStaffById(user_id);
-      if(res && res.data){
-        setSelectedStaffDetails(res.data);
+      if (res && res.data) {
+        // Format the date using formatDate before setting it in state
+        const staffDetails = {
+          ...res.data,
+          date_of_birth: formatDate(res.data.date_of_birth),
+        };
+  
+        setSelectedStaffDetails(staffDetails);
         setShowDetailsModal(true);
       }
-    }catch (err){
+    } catch (err) {
       console.error("Error fetching staff type details: ", err);
     }
-  }
+  };
 
   //Khu vực hàm dành cho add
    const handleAddStaff = async (e) => {
     e.preventDefault();
+
+    if (!newStaff.name || !newStaff.email || !newStaff.password || !newStaff.phone) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'All fields are required.',
+        position: 'top-end',
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+      return;
+    }
+  
+    // Check for email and phone number duplicates
+    const isEmailDuplicate = [...staff, ...manager, ...customer].some(
+      (person) => person.email === newStaff.email
+    );
+    if (isEmailDuplicate) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'This email is already in use.',
+        position: 'top-end',
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+      return;
+    }
+  
+    const isPhoneDuplicate = [...staff, ...manager, ...customer].some(
+      (person) => person.phone === newStaff.phone
+    );
+    if (isPhoneDuplicate) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'This phone number is already in use.',
+        position: 'top-end',
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+      return;
+    }
 
         // Validation logic with SweetAlert
         if (!newStaff.name) {
@@ -164,6 +254,51 @@ const StaffsManagerPage = () => {
           return;
         }
 
+        const emailDuplicate = staff && staff.some((item) => item.email === newStaff.email);
+        if (emailDuplicate) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'A staff member with this email already exists.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+      
+        const phoneDuplicate = staff && staff.some((item) => item.phone === newStaff.phone);
+        if (phoneDuplicate) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'A staff member with this phone number already exists.',
+            position: 'top-end',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+          return;
+        }
+
+          // Check if passwords match
+  if (newStaff.password !== newStaff.confirmPassword) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Password Error',
+      text: 'Passwords do not match.',
+      position: 'top-end',
+      toast: true,
+      timer: 3000,
+      timerProgressBar: true,
+      showConfirmButton: false,
+    });
+    return;
+  }
+
     try {
       // Ensure we send only the necessary fields
       const { email, password, phone, name } = newStaff;
@@ -181,7 +316,8 @@ const StaffsManagerPage = () => {
   const addStaffFields = [
     { label: "Name",  type: "text", name: "name", value: `${newStaff.name}` },
     { label: "Email", type: "text", name: "email", value: `${newStaff.email}`},
-    { label: "Password", type: "text", name: "password", value: `${newStaff.password}` },
+    { label: "Password", type: "password", name: "password", value: `${newStaff.password}` },
+    { label: "Confirm Password", type: "password", name: "confirmPassword", value: `${newStaff.confirmPassword}` },
     { label: "Phone", type: "text", name: "phone", value: `${newStaff.phone}`}
   ];
 
@@ -193,18 +329,67 @@ const StaffsManagerPage = () => {
     });
   };
 
-  //Khu vực hàm dành cho delete
-  const handleDeleteStaff = async () => {
-    try {
-      await deleteStaff(staffToDelete.user_id);
-      setSuccessMessage(`Staff ${staffToDelete.name} set to inactive successfully!`);
-      setShowDeleteModal(false);
-      fetchStaff(); // Refresh the staff list
-    } catch (err) {
-      console.error("Error deleting staff: ", err);
-      setError(err.response?.data?.message || 'Failed to delete staff');
+  const resetNewStaff = () => {
+    setNewStaff({
+      email: '',
+      password: '',
+      confirmPassword: '',
+      phone: '',
+      name: '',
+    });
+  };
+
+  //Khu vực hàm dành cho block/unblock
+  const handleStatusToggle = async (staff) => {
+    const newStatus = staff.status === "active" ? "inactive" : "active";
+    const action = newStatus === "active" ? "unblock" : "block";
+  
+    const result = await Swal.fire({
+      title: `Are you sure you want to ${action} this staff?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: `Yes`,
+      cancelButtonText: 'Cancel',
+    });
+  
+    if (result.isConfirmed) {
+      try {
+        await putStaff(staff.user_id, { ...staff, status: newStatus });
+        
+        setStaff((prevStaff) =>
+          prevStaff.map((s) =>
+            s.user_id === staff.user_id
+              ? { ...s, status: newStatus }
+              : s
+          )
+        );
+        
+        Swal.fire({
+          icon: 'success',
+          title: `Staff status has been set to ${newStatus} successfully!`,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } catch (error) {
+        console.error("Error toggling workspace type status:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `Failed to set staff status to ${newStatus}. Try again later.`,
+        });
+      }
     }
   };
+
+  const filteredStaff = Array.isArray(staff)
+  ? staff.filter((item) => {
+      const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
+      const matchesSearchTerm = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesStatus && matchesSearchTerm;
+    })
+  : [];
+
+
 
   // const handleInputChange = (e) => {
   //   const { name, value } = e.target;
@@ -283,16 +468,32 @@ const StaffsManagerPage = () => {
       <h1 className="text-4xl font-black mb-4">Manage Staffs</h1>
 
       <div className="grid grid-cols-2">
-        {/* <SearchBar
+      <SearchBar
           searchTerm={searchTerm}
-          handleSearchChange={handleSearchChange}
-          placeholder="Search by ID, name, or information"
-        /> */}
+          handleSearchChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search by Staff Name"
+        />
 
         {/* Add Button */}
         <div className="ml-2">
-          <AddButton onClick={() => setShowAddModal(true)} label="Add Staff" />
+          <AddButton onClick={() => {
+            resetNewStaff();
+            setShowAddModal(true)
+          } } label="Add Staff" />
         </div>
+      </div>
+
+      <div className="mb-4">
+        <select
+          id="statusFilter"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="select select-bordered select-sm max-w-xs"
+        >
+          <option value="all">All</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
       </div>
 
       {/* Table */}
@@ -310,23 +511,21 @@ const StaffsManagerPage = () => {
             </tr>
           </thead>
           <tbody>
-            {Array.isArray(staff) && staff.map((staff) => (
-                <tr key={staff.user_id} className="cursor-pointer" onClick={() => handleRowClick(staff.user_id)}>
+            {filteredStaff.map((staff) => (
+                <tr key={staff.user_id} className="hover:bg-gray-100 cursor-pointer" onClick={() => handleRowClick(staff.user_id)}>
                   <td>{staff.name}</td>
                   <td>{staff.email}</td>
                   <td>{staff.gender}</td>
-                  <td>{staff.date_of_birth}</td>
+                  <td>{formatDate(staff.date_of_birth)}</td>
                   <td>{staff.phone}</td>
                   <td>{staff.status}</td>
                   <td>
-
-                    {/* Delete Button */}
-                    <DeleteButton
+                    <BlockButton
                       onClick={(e) => {
                         e.stopPropagation();
-                        setStaffToDelete(staff);
-                        setShowDeleteModal(true);
+                        handleStatusToggle(staff);
                       }}
+                      status={staff.status}
                     />
                   </td>
                 </tr>
@@ -343,14 +542,6 @@ const StaffsManagerPage = () => {
         currentItem={newStaff}
         onInputChange={handleInputChange}
         fields={addStaffFields}
-      />
-
-      <DeleteModal
-        show={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onDelete={handleDeleteStaff}
-        itemToDelete={staffToDelete}
-        itemType="staff"
       />
 
       {/* <SuccessModal
