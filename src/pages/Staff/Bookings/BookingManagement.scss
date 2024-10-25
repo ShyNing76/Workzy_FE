@@ -2,9 +2,12 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    padding: 10px;
+    padding: 20px;
     flex: 1;
     margin-top: -10px;
+    overflow-y: auto; 
+    max-height: 80vh; 
+    overflow-y: auto; 
 
     .main-bookings-content {
         .input{
@@ -50,6 +53,10 @@
                     tr {
                         &:nth-child(even) {
                             background-color: #f2f2f2;
+                        }
+
+                        &:hover {
+                            background-color: #e1b0b0; /* Màu nền khi hover */
                         }
 
                         td {

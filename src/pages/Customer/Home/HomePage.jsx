@@ -364,7 +364,7 @@ const HomePage = () => {
         `}</style>
       </div>
 
-      <div className="container mx-auto">
+      <div className=" mx-auto">
         <Comment />
       </div>
 

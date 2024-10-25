@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import GallerySwiper from "../../../components/layout/Customer/GallerySwiper/GallerySwiper";
 import "./RoomDetail.scss";
 import Googlemap from "../../../components/layout/Customer/Googlemap/Googlemap";
@@ -15,6 +15,7 @@ import { TbHomeOff } from "react-icons/tb";
 import { getAmenityIcon } from "../../../components/context/iconGenerate";
 import SimilarRooms from "../../../components/layout/Customer/SimilarRoom/SimilarRooms";
 import WorkspaceReview from "../../../components/layout/Customer/WorkspaceReview/WorkspaceReview";
+import TimeBooking from "../../../components/layout/Customer/TimeBooking/TimeBooking";
 
 const RoomDetail = () => {
   const { roomid } = useParams();
@@ -23,6 +24,16 @@ const RoomDetail = () => {
   const [workSpaceAmenities, setWorkSpaceAmenities] = useState([]);
   const [roomReviews, setRoomReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const LIMIT_REVIEW = 5;
+
+  // Lấy ngày hôm nay
+  const today = new Date();
+  // SelectedDate (Time)
+  const [selectedDate, setSelectedDate] = useState(today);
+
+  // Tab hiện tại
+  const [currentTab, setCurrentTab] = useState("Hourly");
 
   // fetch room data
   useEffect(() => {
@@ -85,7 +96,11 @@ const RoomDetail = () => {
     const fetchReviews = async () => {
       if (roomData && roomData.workspace_name) {
         try {
-          const res = await getReviewByWorkspaceName(roomData.workspace_name);
+          const res = await getReviewByWorkspaceName(
+            roomData.workspace_name,
+            LIMIT_REVIEW,
+            page
+          );
           if (res && res.err === 0) {
             // Ensure the data is in the correct format
             setRoomReviews({
@@ -109,11 +124,7 @@ const RoomDetail = () => {
     fetchReviews();
     fetchWorkSpaceAmenities();
     fetchWorkSpaceTypeName();
-  }, [roomData]); // Trigger this effect when roomData changes
-
-  useEffect(() => {
-    console.log("Review(1->): ", roomReviews);
-  }, [roomReviews]);
+  }, [roomData, page, setPage]); // Trigger this effect when roomData changes
 
   return (
     <>
@@ -125,33 +136,12 @@ const RoomDetail = () => {
                 <GallerySwiper />
               </div>
 
-              <div className="time-booking-container">
-                <h2 className="text-2xl font-bold mb-4">Time Booking</h2>
-
-                {/* AM Time Row */}
-                <div className="time-row">
-                  <div className="am-label">AM</div>
-                  <div className="time-slot-grid">
-                    {Array.from({ length: 12 }, (_, i) => (
-                      <div key={i} className="time-slot">
-                        {`${(i + 1).toString().padStart(2, "0")}:00`}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* PM Time Row */}
-                <div className="time-row">
-                  <div className="pm-label">PM</div>
-                  <div className="time-slot-grid">
-                    {Array.from({ length: 12 }, (_, i) => (
-                      <div key={i} className="time-slot">
-                        {`${(i + 13).toString().padStart(2, "0")}:00`}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              {currentTab === "Hourly" && (
+                <TimeBooking
+                  workspaceId={roomData.workspace_id}
+                  selectedDate={selectedDate}
+                />
+              )}
 
               <div className="room-descriptions-container mt-4 mb-4">
                 <h2 className="room-descriptions-title text-2xl font-bold mb-4">
@@ -196,11 +186,21 @@ const RoomDetail = () => {
               <BookingRoom
                 roomData={roomData}
                 workSpaceTypeName={workSpaceTypeName}
+                today={today}
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
+                currentTab={currentTab}
+                setCurrentTab={setCurrentTab}
               />
             </div>
           </div>
           <hr />
-          <WorkspaceReview data={roomReviews} />
+          <WorkspaceReview
+            data={roomReviews}
+            page={page}
+            setPage={setPage}
+            limit={LIMIT_REVIEW}
+          />
           <hr />
           <SimilarRooms
             currentBuildingId={roomData.building_id}

@@ -65,9 +65,25 @@ const Staff = () => {
     return { buildingId, buildingName }; // Trả về cả buildingId và buildingName
   };
 
-  const handleLogoClick = () => {
-    navigate("/staff");
+  const handleLogoutStaff = () => {
+    localStorage.clear("access_token", "roleId");
+    setAuth({
+      isAuthenticated: false,
+    });
+    setRoleId(null);
+    navigate("/");
   };
+
+  const handleLogoClick = () => {
+    navigate("/");
+  };
+
+  useEffect(() => {
+    // Điều hướng về trang "/" nếu người dùng đã đăng xuất
+    if (!auth.isAuthenticated) {
+      navigate("/");
+    }
+  }, [auth.isAuthenticated, navigate]);
 
   return (
     <>
@@ -77,14 +93,25 @@ const Staff = () => {
         </div>
       ) : (
         <div className="main-container">
-          <header className="header">
+          <header className="header" style={{ display: "flex" }}>
             <div
               className="logo-container"
-              onClick={handleLogoClick}
+              onClick={() => handleLogoClick()}
               style={{ cursor: "pointer" }}
             >
               <div className="circle">WZ</div>
-              <h1>Workzy Staff at {buildingName}</h1>
+              <h1 style={{ marginRight: "680px" }}>
+                Workzy Staff at {buildingName}
+              </h1>
+              <button
+                onClick={() => handleLogoutStaff()}
+                className="btn"
+                style={{
+                  cursor: "pointer",
+                }}
+              >
+                Logout
+              </button>
             </div>
           </header>
           <div className="tabs">

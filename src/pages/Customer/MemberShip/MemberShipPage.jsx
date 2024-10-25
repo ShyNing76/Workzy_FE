@@ -1,12 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BsFillHexagonFill } from "react-icons/bs";
 import "./MemberShipPage.scss";
+import { getPointOfCustomer } from "../../../config/api";
 
 const MemberShipPage = () => {
-  const currentPoints = 3285;
-  const requiredPoints = 5000;
+  // Define the points required for each tier
+  const tierPoints = {
+    Bronze: 0, // starting tier
+    Silver: 5000, // points required to move from Bronze to Silver
+    Gold: 10000, // points required to move from Silver to Gold
+    Emerald: 20000, // points required to move from Gold to Emerald
+    Diamond: 40000, // points required to move from Emerald to Diamond
+  };
 
-  // State to manage the selected tier
+  const [currentPoints, setCurrentPoints] = useState(40000);
   const [selectedTier, setSelectedTier] = useState("Bronze");
   const [currentTier, setCurrentTier] = useState("Bronze");
 
@@ -49,6 +56,61 @@ const MemberShipPage = () => {
     setSelectedTier(tier);
   };
 
+  // Check for tier upgrades and reset progress
+  useEffect(() => {
+    const determineTier = () => {
+      if (currentPoints >= tierPoints.Diamond) {
+        setCurrentTier("Diamond");
+      } else if (currentPoints >= tierPoints.Emerald) {
+        setCurrentTier("Emerald");
+      } else if (currentPoints >= tierPoints.Gold) {
+        setCurrentTier("Gold");
+      } else if (currentPoints >= tierPoints.Silver) {
+        setCurrentTier("Silver");
+      } else {
+        setCurrentTier("Bronze");
+      }
+    };
+
+    determineTier();
+  }, [currentPoints]);
+
+  // Fetch points for the customer
+  useEffect(() => {
+    const fetchPointCustomer = async () => {
+      const res = await getPointOfCustomer();
+
+      if (res && res.data && res.err === 0) {
+        setCurrentPoints(res.data);
+      }
+    };
+
+    fetchPointCustomer();
+  }, []);
+
+  // Calculate progress for the current tier
+  const calculateProgress = () => {
+    if (currentTier === "Diamond") return 100; // Max progress for Diamond tier
+    const tierStartPoints = tierPoints[currentTier];
+    const nextTier =
+      Object.keys(tierPoints)[Object.keys(tierPoints).indexOf(currentTier) + 1];
+    const nextTierPoints = tierPoints[nextTier] || tierPoints.Diamond;
+
+    return (
+      ((currentPoints - tierStartPoints) / (nextTierPoints - tierStartPoints)) *
+      100
+    );
+  };
+
+  // Calculate points needed for the next tier
+  const pointsToNextTier = () => {
+    if (currentTier === "Diamond") return null; // No next tier for Diamond
+    const nextTier =
+      Object.keys(tierPoints)[Object.keys(tierPoints).indexOf(currentTier) + 1];
+    const nextTierPoints = tierPoints[nextTier] || tierPoints.Diamond;
+    return nextTierPoints - currentPoints;
+  };
+
   return (
     <div className="max-w-5xl container mx-auto my-20 p-8 bg-white rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold text-neutral mb-8 text-left">
@@ -86,22 +148,28 @@ const MemberShipPage = () => {
         </div>
 
         {/* Right Section */}
-        <div className="membership-status flex flex-col items-center justify-center space-y-4">
+        <div className="membership-status flex flex-col items-center justify-center space-y-4 w-1/2">
           <BsFillHexagonFill
             className={`text-7xl ${membershipTiers[currentTier].color}`}
           />
           <p className="text-2xl font-bold text-gray-800">
             {currentPoints} wyPoint
           </p>
-          <p className="text-sm text-gray-500">
-            You need to have {requiredPoints - currentPoints} wyPoint to upgrade
-          </p>
+          {currentTier !== "Diamond" ? (
+            <p className="text-sm text-gray-500">
+              You need {pointsToNextTier()} wyPoint to upgrade
+            </p>
+          ) : (
+            <p className="text-sm text-gray-500">
+              You have reached the top tier!
+            </p>
+          )}
 
           {/* Progress Bar */}
           <progress
             className="progress progress-warning w-56"
-            value={currentPoints}
-            max={requiredPoints}
+            value={calculateProgress()}
+            max="100"
           ></progress>
 
           {/* wyPoint History Link */}

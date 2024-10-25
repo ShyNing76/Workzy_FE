@@ -5,7 +5,11 @@ import ProgressBar from "../../../components/layout/Customer/Progress Bar/Progre
 import { IoChevronBackCircleOutline } from "react-icons/io5";
 import BookingTimeLine from "../../../components/layout/Customer/BookingTimeLine/BookingTimeLine";
 import BookingDetailCard from "../../../components/layout/Customer/BookingDetailCard/BookingDetailCard";
-import { getBookingById } from "../../../config/api";
+import {
+  getAmnenitiesBookingByBookingId,
+  getBookingById,
+} from "../../../config/api";
+import BookingAmenitiesCard from "../BookingAmenitiesCard/BookingAmenitiesCard";
 
 const BookingDetail = () => {
   const location = useLocation();
@@ -13,6 +17,7 @@ const BookingDetail = () => {
   const workspace = location.state?.workspace; // Access workspace data passed via navigate
   const type = location.state?.type; // Access type data passed via navigate
   const [bookingStatuses, setBookingStatuses] = useState([]);
+  const [amenitiesBooking, setAmenitiesBooking] = useState([]);
 
   const statusOrder = [
     "confirmed",
@@ -48,8 +53,26 @@ const BookingDetail = () => {
       }
     };
 
+    const fetchAmenitiesBooking = async () => {
+      try {
+        const res = await getAmnenitiesBookingByBookingId(booking.booking_id);
+        if (res && res.data && res.err === 0) {
+          setAmenitiesBooking(res.data);
+        } else {
+          setAmenitiesBooking([]);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
     fetchBookingStatus();
+    fetchAmenitiesBooking();
   }, []);
+
+  useEffect(() => {
+    console.log("amenities: ", amenitiesBooking);
+  }, [amenitiesBooking]);
 
   const getStatusBadgeClass = (status) => {
     switch (status) {
@@ -108,6 +131,9 @@ const BookingDetail = () => {
 
       <hr />
 
+      <BookingAmenitiesCard amenitiesBooking={amenitiesBooking} />
+
+      <hr />
       {booking.BookingStatuses[0].status !== "cancelled" ? (
         <PriceBreakDown booking={booking} />
       ) : (

@@ -13,7 +13,6 @@ const formatCurrency = (amount) => {
 // Modal component to display booking details
 const DetailModal = ({ booking, onClose }) => {
     if (!booking) return null; // If no booking data, render nothing
-    console.log(booking.amenities);
     return (
         <dialog className="modal" open>
             <div className="modal-box">
