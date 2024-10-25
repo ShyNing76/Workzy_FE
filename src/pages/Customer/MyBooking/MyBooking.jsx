@@ -29,14 +29,20 @@ const MyBooking = () => {
   const [comment, setComment] = useState("");
   const [page, setPage] = useState(1);
   const LIMIT_BOOKING = 5;
-  const [totalBooking, setTotalBooking] = useState(0);
+  const [totalBooking, setTotalBooking] = useState({});
 
   const fetchBookingData = async () => {
     try {
-      const resBooking = await getBookingOfCustomer(LIMIT_BOOKING, page);
+      const resBooking = await getBookingOfCustomer(
+        LIMIT_BOOKING,
+        page,
+        selectedTab
+      );
       if (resBooking && resBooking.data && resBooking.err === 0) {
-        setTotalBooking(resBooking.data.count);
-        return resBooking.data.rows; // Trả về booking data nếu có
+        let tabTotalBooking = resBooking.data.statusCount[selectedTab];
+
+        setTotalBooking(tabTotalBooking);
+        return resBooking.data.bookings; // Trả về booking data nếu có
       } else {
         return []; // Trả về mảng rỗng nếu không có booking
       }
@@ -103,39 +109,7 @@ const MyBooking = () => {
 
     fetchAllBookingType();
     fetchBookingAndWorkspacesData();
-  }, [refreshData, page, setPage]); // Chạy khi component mount
-
-  // Lọc bookings theo trạng thái của từng tab
-  const filterBookings = () => {
-    if (selectedTab === "All") return bookingData;
-    if (selectedTab === "Current") {
-      return bookingData.filter((booking) =>
-        [
-          "usage",
-          "check-out",
-          "check-in",
-          "check-amenities",
-          "damage-payment",
-        ].includes(booking.BookingStatuses[0].status)
-      );
-    }
-    if (selectedTab === "Upcoming") {
-      return bookingData.filter((booking) =>
-        ["paid", "confirmed"].includes(booking.BookingStatuses[0].status)
-      );
-    }
-    if (selectedTab === "Completed") {
-      return bookingData.filter(
-        (booking) => booking.BookingStatuses[0].status === "completed"
-      );
-    }
-    if (selectedTab === "Cancelled") {
-      return bookingData.filter(
-        (booking) => booking.BookingStatuses[0].status === "cancelled"
-      );
-    }
-    return [];
-  };
+  }, [refreshData, page, setPage, selectedTab]); // Chạy khi component mount
 
   // Cancel Booking function
   const handleCancelBooking = (e, bookingId) => {
@@ -376,8 +350,8 @@ const MyBooking = () => {
 
       <div className="container mx-auto p-4">
         {/* Hiển thị Booking Cards tương ứng */}
-        {filterBookings().length > 0 ? (
-          filterBookings().map((booking) => {
+        {bookingData && bookingData.length > 0 ? (
+          bookingData.map((booking) => {
             const workspace = workspaceData[booking.workspace_id];
 
             const type = bookingType.find(

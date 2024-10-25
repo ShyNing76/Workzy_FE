@@ -113,13 +113,13 @@ const putUpdateImage = (image) => {
 };
 
 const getWorkspaceByBuildingId = (buildingId, limit, page, queryString) => {
-  const URL_API = `api/v1/workspace/?building_id=${buildingId}&limit=${limit}&page=${page}&${queryString}status=active`;
+  const URL_API = `api/v1/workspace/?building_id=${buildingId}&limit=${limit}&page=${page}&${queryString}&status=active`;
 
   return axios.get(URL_API);
 };
 
 const getAllWorkspacesByBuildingId = (buildingId, queryString) => {
-  const URL_API = `api/v1/workspace/?building_id=${buildingId}&${queryString}status=active`; // No pagination in this call
+  const URL_API = `api/v1/workspace/?building_id=${buildingId}&${queryString}&status=active`; // No pagination in this call
   return axios.get(URL_API);
 };
 
@@ -179,8 +179,10 @@ const postApprovePaypalOrder = (orderId, bookingId) => {
   return axios.post(URL_API, data);
 };
 
-const getBookingOfCustomer = (limit, page) => {
-  const URL_API = `api/v1/booking/customer?limit=${limit}&page=${page}`;
+const getBookingOfCustomer = (limit, page, status) => {
+  const URL_API = `api/v1/booking/customer?&order[]=created_at&order[]=desc&limit=${limit}&page=${page}&status=${
+    status || ""
+  }`;
 
   return axios.get(URL_API);
 };
@@ -296,6 +298,17 @@ const getTimeBookingInRoomAndDate = (workspace_id, date) => {
   return axios.get(URL_API);
 };
 
+const getAllWishlistOfCustomer = () => {
+  const URL_API = `api/v1/wishList/mywishlist`;
+  return axios.get(URL_API);
+};
+
+const getAmnenitiesBookingByBookingId = (booking_id) => {
+  const URL_API = `api/v1/booking/get-amenities/${booking_id}`;
+
+  return axios.get(URL_API);
+};
+
 export {
   loginApi,
   registerApi,
@@ -332,4 +345,6 @@ export {
   getAllWorkspaceType,
   getPointOfCustomer,
   getTimeBookingInRoomAndDate,
+  getAllWishlistOfCustomer,
+  getAmnenitiesBookingByBookingId,
 };
