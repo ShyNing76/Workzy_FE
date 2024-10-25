@@ -54,24 +54,25 @@ const CheckAmenitiesModal = ({ bookingId, onClose, handleChangeStatus, handleSen
   
     const handleDone = async () => {
       try {
-        if (selectedAmenities.length === 0) {
-          await handleChangeStatus(bookingId, "completed");
-
-        } else {
-            console.log(selectedAmenities);
-            await handleSendBrokenAmenities(bookingId, selectedAmenities);
-        }
+          if (selectedAmenities.length === 0) {
+              await handleChangeStatus(bookingId, "completed");
+          } else {
+              console.log(selectedAmenities);
+              await handleSendBrokenAmenities(bookingId, selectedAmenities);
+          }
       } catch (err) {
-        console.error("Error handling Done:", err);
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "An error occurred while updating the status!",
-        });
+          console.error("Error handling Done:", err);
+          Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "An error occurred while updating the status!",
+          });
       } finally {
-        onClose();
+          onClose();
       }
-    };
+  };
+  
+    console.log("Loading State:", loading);
   
     const handleModalClick = (event) => {
       event.stopPropagation();
@@ -104,9 +105,6 @@ const CheckAmenitiesModal = ({ bookingId, onClose, handleChangeStatus, handleSen
           <div className="modal-action">
             <button type="button" onClick={handleDone}>
               Done
-            </button>
-            <button type="button" onClick={onClose}>
-              Close
             </button>
           </div>
         </div>

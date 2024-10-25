@@ -69,6 +69,14 @@ const Staff = () => {
     navigate("/staff");
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("auth");
+    localStorage.removeItem("roleId");
+    localStorage.removeItem("access_token");
+    setAuth({ isAuthenticated: false }); // Đặt lại trạng thái đăng nhập
+    navigate("/"); // Chuyển hướng về trang chủ
+  };
+
   return (
     <>
       {appLoading ? (
@@ -77,14 +85,23 @@ const Staff = () => {
         </div>
       ) : (
         <div className="main-container">
-          <header className="header">
+          <header className="header" style={{display: "flex"}}>
             <div
               className="logo-container"
               onClick={handleLogoClick}
               style={{ cursor: "pointer" }}
             >
               <div className="circle">WZ</div>
-              <h1>Workzy Staff at {buildingName}</h1>
+              <h1 style={{ marginRight: "680px" }}>Workzy Staff at {buildingName}</h1>
+            <button
+              onClick={handleLogout}
+              className="btn"
+              style={{
+                cursor: "pointer",
+              }}
+            >
+              Logout
+            </button>
             </div>
           </header>
           <div className="tabs">
@@ -115,7 +132,7 @@ const Staff = () => {
           </div>
 
           <main className="content">
-            <Outlet context={{ buildingId }} />
+            <Outlet context={{ buildingId }} /> 
           </main>
         </div>
       )}
