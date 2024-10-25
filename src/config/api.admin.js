@@ -228,21 +228,8 @@ const assignStaffToBuilding = (staffId, buildingId) => {
   }
 
   //Workspace Manager APIs_________________________________________________________
-const getWorkspace = (workspace_id, workspace_type_name, building_id, workspace_name, price_per_hour, price_per_day, price_per_month, area, capacity, description, status) => {
-  const URL_API = "/api/v1/workspace"
-  const data = {
-    workspace_id,
-    workspace_type_name,
-    building_id,
-    workspace_name,
-    price_per_hour,
-    price_per_day,
-    price_per_month,
-    area,
-    capacity,
-    description,
-    status,
-  }
+const getWorkspace = () => {
+  const URL_API = "/api/v1/workspace/"
   return axios.get(URL_API)
 }
 
@@ -265,6 +252,17 @@ const deleteWorkspace = (workspace_id) => {
   const URL_API = `/api/v1/workspace/delete/${workspace_id}`
   return axios.delete(URL_API)
 }
+const assignWorkspaceToBuilding = (building_id, workspace_ids) => {
+  const URL_API = `api/v1/workspace/assign/${building_id}`
+  return axios.put(URL_API, {workspace_ids}) 
+}
+
+const unassignWorkspaceFromBuilding = (building_id, workspace_ids) => {
+  const URL_API = `api/v1/workspace/unassign/${building_id}`
+  return axios.put(URL_API, {workspace_ids})
+}
+
+
 
 
   //Voucher Manager APIs___________________________________________________________
@@ -345,6 +343,8 @@ const deleteReview = (review_id) => {
     getWorkspaceById,
     postWorkspace,
     putWorkspace,
+    assignWorkspaceToBuilding,
+    unassignWorkspaceFromBuilding,
     deleteWorkspace,
 
     getManager,
