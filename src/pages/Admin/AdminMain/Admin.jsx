@@ -53,7 +53,7 @@ const Admin = () => {
           <div className="sidebar-container drawer lg:drawer-open">
             {/* Sidebar */}
             <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
-            <main className="drawer-content flex flex-col items-start w-full h-full p-4">
+            <main className="drawer-content items-start w-full h-full p-4">
               {/* Page content here */}
               <Outlet />
             </main>

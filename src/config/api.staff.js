@@ -18,7 +18,7 @@ const getBooking = (building_id) => {
 const getBookingWorkspace = (building_id, workspace_id) => {
   const URL_API = `/api/v1/booking/get/?building_id=${building_id}&workspace_id=${workspace_id}`;
   return axios.get(URL_API);
-}
+};
 
 
 const postBookingStatus = (booking_id, status) => {
@@ -39,11 +39,18 @@ const sendBrokenAmenities = (data) => {
   return axios.post(URL_API, data);  
 };
 
+const getBookingTypeById = (booking_type_id) => {
+  const URL_API = `/api/v1/staff/booking-type/${booking_type_id}`;
+  return axios.get(URL_API);
+};
+
 export {
   getStaffBuildingId,
   getWorkspaceByBuildingId,
   getBooking,
   postBookingStatus,
   getAmenitiesByBookingId,
-  sendBrokenAmenities, getBookingWorkspace
+  sendBrokenAmenities, 
+  getBookingWorkspace,
+  getBookingTypeById
 };

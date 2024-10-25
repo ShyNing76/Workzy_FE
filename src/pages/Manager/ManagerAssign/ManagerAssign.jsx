@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import {
-  getAllBuildings,
+  getBuildingsByManager,
   getAllStaffs,
   assignStaffToBuilding,
   unassignStaffFromBuilding
@@ -32,7 +32,7 @@ const ManagerAssign = () => {
       setIsLoading(true);
       try {
         const [buildingResponse, staffResponse] = await Promise.all([
-          getAllBuildings(),
+          getBuildingsByManager(),
           getAllStaffs(),
         ]);
         if (
@@ -88,11 +88,15 @@ const ManagerAssign = () => {
     : filteredBuildings;
 
     // check if staff is assigned to any building
-  const isStaffAssigned = (staffId) => {
-    return staff.some(
-      (staff) => staff.user_id === staffId && staff.Staff.building_id !== null // check if staff.user_id is the same as the staff id in the staff array and staff.building_id is not null this mean the staff is assigned to a building
-    );
-  };
+    const isStaffAssigned = (staffId, buildingId) => {
+      // Kiểm tra xem nhân viên có được phân công cho tòa nhà hiện tại không
+      const assignedStaff = staff.find( // find the staff in the staff array
+        (staffMember) => staffMember.user_id === staffId && staffMember.Staff.building_id === buildingId // check if the staff is assigned to the building
+      );
+      return assignedStaff !== undefined; // return != undefined if the staff is assigned to the building
+    };
+    
+    
  
   // check if the building is assigned to any staff
   const isBuildingAssigned = (buildingId) => {
@@ -105,31 +109,42 @@ const ManagerAssign = () => {
   // handle selected staff id
   const handleSelectedStaffId = (userId, buildingId) => {
     // Kiểm tra xem nhân viên đã được phân công chưa
-    if (isStaffAssigned(userId)) {
+    if (isStaffAssigned(userId, buildingId)) { // nếu nhân viên đã được phân công cho tòa nhà hiện tại
+      // xong sau đó chọn nhân viên mới thì selectedStaffIds sẽ cập nhật lại với staffId mới
+      setSelectedStaffIds((prevSelectedStaffIds) => ({
+        ...prevSelectedStaffIds,
+        [buildingId]: userId,
+      }));
+      return;
+    } else if (isStaffAssigned(userId)) { // nếu nhân viên đã được phân công cho tòa nhà khác thì hiển thị cảnh báo
       Swal.fire({
         title: "Warning",
         text: "This staff member is already assigned to another building.",
         icon: "warning",
       });
-    } else {
+    } else { // nếu nhân viên không được phân công cho tòa nhà nào thì khung select sẽ cập nhật lại với tên nhân viên mới
       setSelectedStaffIds((prevSelectedStaffIds) => ({
         ...prevSelectedStaffIds,
         [buildingId]: userId,
       }));
     }
   };
+  
 
   // handle assign staff to building
   const handleAssignStaffToBuilding = async (buildingId) => {
+    // lấy staffId từ selectedStaffIds, staffId là giá trị của khung select
+    // selectedStaffIds là object chứa staffId của nhân viên được phân công cho từng tòa nhà
+    // [buildingId] là key của object selectedStaffIds, buildingId là id của tòa nhà
     const newStaffId = selectedStaffIds[buildingId];
+    // nếu không có staffId thì không thực hiện gán
     if (!newStaffId) return;
   
     try {
       // Kiểm tra xem tòa nhà đã có nhân viên được gán chưa
-      const currentAssignedStaff = staff.find((staffMember) => staffMember.Staff.building_id === buildingId);
-      
+      const currentAssignedStaff = staff.find((staffMember) => staffMember.Staff.building_id === buildingId); // find the staff in the staff array
+      // nếu đã có nhân viên được gán, hiển thị xác nhận trước khi cập nhật
       if (currentAssignedStaff) {
-        // Nếu đã có nhân viên được gán, hiển thị xác nhận trước khi cập nhật
         const result = await Swal.fire({
           title: 'Confirm update',
           text: 'This building already has a staff assigned. Do you want to update the staff?',
@@ -143,7 +158,7 @@ const ManagerAssign = () => {
           return; // Người dùng không muốn cập nhật, thoát khỏi hàm
         }
       }
-  
+      // gán nhân viên mới cho tòa nhà
       const response = await assignStaffToBuilding(newStaffId, buildingId);
       if (response && response.err === 0) {
         Swal.fire({
@@ -153,6 +168,7 @@ const ManagerAssign = () => {
             : "Assigned the staff to the building.",
           icon: "success",
         });
+        // fetch lại data sau khi gán/cập nhật
         await fetchStaffAndBuilding();
       } else {
         throw new Error(response.message || "Có lỗi xảy ra khi gán/cập nhật nhân viên");
@@ -171,7 +187,7 @@ const ManagerAssign = () => {
   const handleUnassignStaffFromBuilding = async (buildingId) => { 
     try {
       // Tìm nhân viên được gán cho tòa nhà này
-      const assignedStaff = staff.find((staffMember) => staffMember.Staff.building_id === buildingId);
+      const assignedStaff = staff.find((staffMember) => staffMember.Staff.building_id === buildingId); // find the staff in the staff array
       // nếu không có nhân viên nào được gán cho tòa nhà này thì hiển thị thông báo
       if (!assignedStaff) {
         Swal.fire({
@@ -190,7 +206,7 @@ const ManagerAssign = () => {
         confirmButtonText: 'Yes, unassign',
         cancelButtonText: 'Cancel'
       });
-  
+      // nếu người dùng xác nhận hủy gán nhân viên
       if (result.isConfirmed) {
         const response = await unassignStaffFromBuilding(assignedStaff.user_id);
         if (response && response.err === 0) {
@@ -199,6 +215,7 @@ const ManagerAssign = () => {
             text: "Unassigned the staff from the building successfully",
             icon: "success",
           });
+          // fetch lại data sau khi hủy gán
           await fetchStaffAndBuilding();
         } else {
           throw new Error(response.message || "Error unassigning the staff from the building");
@@ -291,24 +308,25 @@ const ManagerAssign = () => {
                           staffMember => staffMember.Staff.building_id === building.building_id
                         )?.user_id || ""}
                         onChange={(e) =>
-                          
                           handleSelectedStaffId(
                             e.target.value,
                             building.building_id
                           )
-                          
                         }
                       >
                         <option value="">Select Staff</option>
-                        {staff.map((staffMember) => (
-                          
-                          <option
-                            key={staffMember.user_id}
-                            value={staffMember.user_id}
-                    
-                          >
-                            {staffMember.name}
-                          </option>
+                        {staff
+                          .filter(
+                            (staffMember) =>
+                              !staffMember.Staff.building_id || staffMember.Staff.building_id === building.building_id
+                          )
+                          .map((staffMember) => (
+                            <option
+                              key={staffMember.user_id}
+                              value={staffMember.user_id}
+                            >
+                              {staffMember.name} {/* Ẩn tên nếu đã được phân công */}
+                            </option>
                         ))}
                       </select>
                     </td>

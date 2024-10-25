@@ -1,10 +1,26 @@
-import { IoNotificationsOutline } from "react-icons/io5";
-import { FaRegBell } from "react-icons/fa";
-import { IoMenu } from "react-icons/io5";
-import { VscAccount } from "react-icons/vsc";
-import { IoLogOutOutline } from "react-icons/io5";
+import {
+  IoNotificationsOutline,
+  IoMenu,
+  IoLogOutOutline,
+} from "react-icons/io5";
+
+import { useContext } from "react";
+import { AuthContext } from "../../../context/auth.context";
+import { useNavigate } from "react-router-dom";
 
 const AdminHeader = () => {
+  const { auth, setAuth, setRoleId } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.clear("access_token", "roleId");
+    setAuth({
+      isAuthenticated: false,
+    });
+    setRoleId(null);
+    navigate("/");
+  };
+
   return (
     <div className="header-container navbar bg-base-200">
       <label
@@ -108,14 +124,14 @@ const AdminHeader = () => {
             </div>
             <div className="flex flex-col">
               <h1 className="ml-2 text-xl font-semibold">Admin</h1>
-              <a className="link ml-2 text-xs">View profile</a>
+              {/* <a className="link ml-2 text-xs">View profile</a> */}
             </div>
           </div>
           <li>
-            <a>
+            <div onClick={() => handleLogout()}>
               <IoLogOutOutline />
               Logout
-            </a>
+            </div>
           </li>
         </ul>
       </div>

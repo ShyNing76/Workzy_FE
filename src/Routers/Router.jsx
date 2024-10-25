@@ -15,6 +15,7 @@ import PrivateRoute from "./PrivateRoute.jsx";
 import ManagerPage from "../pages/Manager/ManagerPage.jsx";
 import ManagerAssign from "../pages/Manager/ManagerAssign/ManagerAssign.jsx";
 import ManagerDashBoard from "../pages/Manager/ManagerDashboard/ManagerDashBoard.jsx";
+import ChooseBuildingDashboard from "../pages/Manager/ManagerDashboard/ChooseBuildingDashboard.jsx";
 import Building from "../pages/Customer/Building/Building.jsx";
 import GoogleCallback from "../pages/Customer/GoogleCallBack/GoogleCallback.jsx";
 import SinglePOD from "../pages/Customer/SinglePOD/SinglePOD.jsx";
@@ -53,6 +54,9 @@ import BookingDetail from "../pages/Customer/BookingDetail/BookingDetail.jsx";
 import BookingAmenities from "../pages/Customer/BookingAmenities/BookingAmenities.jsx";
 import Admin from "../pages/Admin/AdminMain/Admin.jsx";
 import Staff from "../pages/Staff/StaffMain/Staff.jsx";
+import AssignStaffPage from "../pages/Admin/AssignPages/AssignStaff/AssignStaffPage.jsx";
+import AssignManagerPage from "../pages/Admin/AssignPages/AssignManager/AssignManagerPage.jsx";
+import AssignWorkspacePage from "../pages/Admin/AssignPages/AssignWorkspace/AssignWorkspacePage.jsx";
 
 import AccessDenied from "../pages/Customer/AccessDenied/AccessDenied.jsx";
 import NotFound from "../pages/Customer/NotFound/NotFound.jsx";
@@ -261,6 +265,18 @@ export const router = createBrowserRouter([
         path: "vouchersmanager",
         element: <VouchersManagerPage />,
       },
+      {
+        path: "assignstaff",
+        element: <AssignStaffPage />,
+      },
+      {
+        path: "assignmanager",
+        element: <AssignManagerPage />,
+      },
+      {
+        path: "assignworkspace",
+        element: <AssignWorkspacePage />,
+      },
     ],
     // condition: (user) => user.isAdmin, // Add condition to check if user is admin before rendering the routes
   },
@@ -328,6 +344,11 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "",
+        element: <ChooseBuildingDashboard />,
+      },
+
+      {
+        path: "manager-dashboard/:building_id",
         element: <ManagerDashBoard />,
       },
 
