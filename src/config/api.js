@@ -128,7 +128,8 @@ const postCreateBooking = (
   type,
   startTime,
   endTime,
-  totalPrice
+  totalPrice,
+  voucher_id
 ) => {
   const URL_API = "api/v1/booking/create";
   const data = {
@@ -137,6 +138,7 @@ const postCreateBooking = (
     start_time: startTime,
     end_time: endTime,
     total_price: totalPrice,
+    voucher_id: voucher_id,
   };
 
   return axios.post(URL_API, data);
@@ -309,6 +311,37 @@ const getAmnenitiesBookingByBookingId = (booking_id) => {
   return axios.get(URL_API);
 };
 
+const postCreatePaypalOrderBrokenAmenities = (bookingId) => {
+  const URL_API = "api/v1/booking/checkout/paypal/damage-amenities";
+  const data = {
+    booking_id: bookingId,
+  };
+
+  return axios.post(URL_API, data);
+};
+
+const postApprovePaypalOrderBrokenAmenities = (orderId, bookingId) => {
+  const URL_API = "api/v1/booking/checkout/paypal/damage-amenities/success";
+  const data = {
+    booking_id: bookingId,
+    order_id: orderId,
+  };
+
+  return axios.post(URL_API, data);
+};
+
+const getReviewByBookingId = (booking_id) => {
+  const URL_API = `api/v1/review/booking/${booking_id}`;
+
+  return axios.get(URL_API);
+};
+
+const getVoucherValid = (voucher_code) => {
+  const URL_API = `api/v1/voucher/valid/${voucher_code}`;
+
+  return axios.get(URL_API);
+};
+
 export {
   loginApi,
   registerApi,
@@ -347,4 +380,8 @@ export {
   getTimeBookingInRoomAndDate,
   getAllWishlistOfCustomer,
   getAmnenitiesBookingByBookingId,
+  postCreatePaypalOrderBrokenAmenities,
+  postApprovePaypalOrderBrokenAmenities,
+  getReviewByBookingId,
+  getVoucherValid,
 };

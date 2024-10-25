@@ -14,7 +14,7 @@ import {
   putUpdateImage,
 } from "../../../config/api";
 import { convertDateToYYYYMMDD } from "../../../components/context/dateFormat";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { useOutletContext } from "react-router-dom";
 import ModalUpdatePassword from "../../../components/layout/Customer/UserModal/UpdatePasswordModal/ModalUpdatePassword";
 import UpdatePhoneModal from "../../../components/layout/Customer/UserModal/UpdatePhoneModal/UpdatePhoneModal";
@@ -147,6 +147,7 @@ const Profile = (props) => {
 
   return (
     <>
+      <ToastContainer />
       <div className="max-w-5xl container mx-auto my-20 p-8 bg-white rounded-lg shadow-lg">
         <div className="flex">
           {/* Left Content */}
