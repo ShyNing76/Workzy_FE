@@ -15,6 +15,7 @@ import PrivateRoute from "./PrivateRoute.jsx";
 import ManagerPage from "../pages/Manager/ManagerPage.jsx";
 import ManagerAssign from "../pages/Manager/ManagerAssign/ManagerAssign.jsx";
 import ManagerDashBoard from "../pages/Manager/ManagerDashboard/ManagerDashBoard.jsx";
+import ChooseBuildingDashboard from "../pages/Manager/ManagerDashboard/ChooseBuildingDashboard.jsx";
 import Building from "../pages/Customer/Building/Building.jsx";
 import GoogleCallback from "../pages/Customer/GoogleCallBack/GoogleCallback.jsx";
 import SinglePOD from "../pages/Customer/SinglePOD/SinglePOD.jsx";
@@ -343,7 +344,12 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "",
-        element: <ManagerDashBoard />,
+        element: <ChooseBuildingDashboard />,
+      },
+
+      {
+        path: "manager-dashboard/:building_id",
+        element: <ManagerDashBoard />
       },
 
       {
