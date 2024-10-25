@@ -233,6 +233,11 @@ const getWorkspace = () => {
   return axios.get(URL_API)
 }
 
+const getWorkspaceByBuildingId = (building_id) => {
+  const URL_API = `/api/v1/workspace?building_id=${building_id}`
+  return axios.get(URL_API)
+}
+
 const getWorkspaceById = (workspace_id) => {
   const URL_API = `/api/v1/workspace/${workspace_id}`
   return axios.get(URL_API)
@@ -302,16 +307,9 @@ const deleteVoucher = (voucher_id) => {
 }
 
 //Review manager APIs___________________________________________________________
-const getReview = (review_id, booking_id, workspace_id, review_content, rating) => {
-  const URL_API = "/api/v1/review"
-  const data = {
-    review_id,
-    booking_id,
-    workspace_id,
-    review_content,
-    rating
-  }
-  return axios.get(URL_API, data)
+const getReview = () => {
+  const URL_API = "/api/v1/review/"
+  return axios.get(URL_API)
 }
 
 const getReviewById = (review_id) => {
@@ -340,6 +338,7 @@ const deleteReview = (review_id) => {
     deleteWorkspaceType,
 
     getWorkspace,
+    getWorkspaceByBuildingId,
     getWorkspaceById,
     postWorkspace,
     putWorkspace,

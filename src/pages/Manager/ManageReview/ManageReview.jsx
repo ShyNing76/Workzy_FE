@@ -6,6 +6,7 @@ import {
   getAllWorkSpaces,
   getBuildingsByManager,
 } from "../../../config/apiManager";
+import { LiaStarOfLifeSolid } from "react-icons/lia";
 
 const ManageReview = () => {
   const [buildings, setBuildings] = useState([]);
@@ -196,6 +197,17 @@ const ManageReview = () => {
                                   </td>
                                 </tr>
                               ))}
+                              {reviews.length === 0 && (
+                              <tr>
+                                <td colSpan="6" className="text-center justify-center p-3">
+                                  <div className="flex flex-col justify-center items-center">
+                                    <LiaStarOfLifeSolid className="text-4xl" style={{color: "#808080"}}/>
+                                    
+                                    <h4 className="text-lg font-medium" style={{color: "#808080"}}>There is no review for this workspace</h4>
+                                  </div>
+                                </td>
+                              </tr>
+                            )}  
                           </tbody>
                         </table>
                       </div>
