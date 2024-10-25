@@ -267,16 +267,16 @@ export const router = createBrowserRouter([
       },
       {
         path: "assignstaff",
-        element: <AssignStaffPage/>
+        element: <AssignStaffPage />,
       },
       {
         path: "assignmanager",
-        element: <AssignManagerPage/>
+        element: <AssignManagerPage />,
       },
       {
         path: "assignworkspace",
-        element: <AssignWorkspacePage/>
-      }
+        element: <AssignWorkspacePage />,
+      },
     ],
     // condition: (user) => user.isAdmin, // Add condition to check if user is admin before rendering the routes
   },
@@ -349,7 +349,7 @@ export const router = createBrowserRouter([
 
       {
         path: "manager-dashboard/:building_id",
-        element: <ManagerDashBoard />
+        element: <ManagerDashBoard />,
       },
 
       {
