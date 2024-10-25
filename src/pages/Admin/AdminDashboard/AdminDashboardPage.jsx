@@ -171,15 +171,21 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
-    fetchTotalRevenue();
-    fetchTotalBooking();
-    fetchTotalVoucher();
-    fetchTotalUser();
-    fetchTotalAmenity();
-    fetchTotalBuilding();
-    fetchTotalWorkspace();
-    fetchTop5Bookings();
-    fetchTop5Customers();
+    const fetchData = async () => {
+      await fetchTotalRevenue();
+      await fetchTotalBooking();
+      await fetchTotalVoucher();
+      await fetchTotalUser();
+      await fetchTotalAmenity();
+      await fetchTotalBuilding();
+      await fetchTotalWorkspace();
+      await fetchTop5Bookings();
+      await fetchTop5Customers();
+    };
+  
+    fetchData();
+    const intervalId = setInterval(fetchData, 30000);
+    return () => clearInterval(intervalId); // Cleanup interval on unmount
   }, []);
 
 
