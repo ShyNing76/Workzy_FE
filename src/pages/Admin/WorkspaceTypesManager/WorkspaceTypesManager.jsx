@@ -44,7 +44,7 @@ const WorkspacesTypesManagerPage = () => {
     });
 
     // pagination
-    const PAGE_SIZE = 8;
+    const PAGE_SIZE = 10;
     const [currentPage, setCurrentPage] = useState(1);
     const [workspaceTypeCount, setWorkspaceTypeCount] = useState(0);
     const [totalPages, setTotalPages] = useState(1);

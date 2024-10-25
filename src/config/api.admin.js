@@ -1,8 +1,9 @@
 import axios from "./axios.customize";
 
 //Amenities Manager APIs_________________________________________________________
-const getAmenity = (page, limit) => {
-    const URL_API = `/api/v1/amenity?page=${page}&limit=${limit}`;
+const getAmenity = (search, page, limit) => {
+    let URL_API = `/api/v1/amenity?page=${page}&limit=${limit}`;
+    if (search) URL_API += `&amenity_name=${search}`;
     return axios.get(URL_API);
 };
 

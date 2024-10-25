@@ -56,7 +56,11 @@ const AmenitiesManagerPage = () => {
         //Hiện data lên table
         const fetchAmenity = async () => {
             try {
-                const res = await getAmenity(currentPage, PAGE_SIZE);
+                const res = await getAmenity(
+                    searchTerm,
+                    currentPage,
+                    PAGE_SIZE
+                );
                 console.log("API response:", res);
                 if (res && res.data && Array.isArray(res.data.rows)) {
                     const sortAmenity = res.data.rows.sort((a, b) => {
@@ -405,15 +409,10 @@ const AmenitiesManagerPage = () => {
         setLoading(true);
         try {
             setCurrentPage(1);
-            const res = await getAmenity(currentPage, PAGE_SIZE);
+            const res = await getAmenity(searchTerm, currentPage, PAGE_SIZE);
             if (res && res.data && Array.isArray(res.data.rows)) {
-                const filterAmenities = res.data.rows.filter((amenity) =>
-                    amenity.amenity_name
-                        .toLowerCase()
-                        .includes(searchTerm.toLowerCase())
-                );
-                setAmenity(filterAmenities);
-                setAmenitiesCount(filterAmenities.length);
+                setAmenity(res.data.rows);
+                setAmenitiesCount(res.data.count);
             } else {
                 setAmenity([]);
             }
