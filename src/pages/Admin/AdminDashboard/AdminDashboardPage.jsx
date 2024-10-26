@@ -19,8 +19,9 @@ import {
 } from "recharts";
 import { format } from "date-fns";
 import {
+  getBookingDataIn6DaysAdmin,
   getRecentBooking,
-  getRevenueDataIn8Day,
+  getRevenueDataIn6DaysAdmin,
   getTop5Customers,
   getTotalAmenity,
   getTotalBooking,
@@ -54,37 +55,59 @@ const StatCard = ({ icon: Icon, title, value, trend }) => (
   </div>
 );
 
-const RevenueChart = ({ data }) => (
-  <div className="bg-white p-6 rounded-xl shadow-lg">
-    <h3 className="text-lg font-semibold mb-4">Revenue Overview</h3>
-    <div className="h-72">
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart
-          data={data}
-          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-        >
-          <defs>
-            <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.8} />
-              <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-          <XAxis dataKey="date" />
-          <YAxis />
-          <Tooltip />
-          <Area
-            type="monotone"
-            dataKey="total_price"
-            stroke="#f59e0b"
-            fillOpacity={1}
-            fill="url(#colorRevenue)"
-          />
-        </AreaChart>
-      </ResponsiveContainer>
+const RevenueChart = ({ data }) => {
+  const formatYAxis = (value) => {
+    if (value >= 1000000) {
+      return `${(value / 1000000).toFixed(1)}M`;
+    }
+    if (value >= 1000) {
+      return `${(value / 1000).toFixed(0)}K`;
+    }
+    return value;
+  };
+
+  const formatTooltipValue = (value) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-xl shadow-lg">
+      <h3 className="text-lg font-semibold mb-4">Revenue Overview</h3>
+      <div className="h-72">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart
+            data={data}
+            margin={{ top: 10, right: 30, left: 16, bottom: 0 }}
+          >
+            <defs>
+              <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+            <XAxis dataKey="date" tickMargin={8} />
+            <YAxis tickFormatter={formatYAxis} tickMargin={8} width={60} />
+            <Tooltip
+              formatter={(value) => [formatTooltipValue(value), "Revenue"]}
+            />
+            <Area
+              type="monotone"
+              dataKey="total_price"
+              stroke="#f59e0b"
+              fillOpacity={1}
+              fill="url(#colorRevenue)"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const BookingsChart = ({ data }) => (
   <div className="bg-white p-6 rounded-xl shadow-lg">
@@ -99,7 +122,7 @@ const BookingsChart = ({ data }) => (
           <XAxis dataKey="date" />
           <YAxis />
           <Tooltip />
-          <Bar dataKey="bookings" fill="#f59e0b" />
+          <Bar dataKey="total_booking" fill="#f59e0b" />
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -269,8 +292,8 @@ const AdminDashboard = () => {
           getTotalWorkspace(),
           getTop5Customers(),
           getRecentBooking(),
-          getRevenueDataIn8Day(),
-          // getBookingsDataThisMonth(), // You'll need to implement this API call
+          getRevenueDataIn6DaysAdmin(),
+          getBookingDataIn6DaysAdmin(), // You'll need to implement this API call
         ]);
 
         setStats({

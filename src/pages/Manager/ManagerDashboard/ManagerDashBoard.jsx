@@ -1,72 +1,258 @@
-import { Link, Outlet, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
 import { TfiStatsUp } from "react-icons/tfi";
-import { GoPeople } from "react-icons/go";
-import { IoIosStarOutline } from "react-icons/io";
-import { RxDashboard } from "react-icons/rx";
-import { PiWrench } from "react-icons/pi";
-import { LuCalendarCheck } from "react-icons/lu";
-import { PiEmpty } from "react-icons/pi";
 import { GoPerson } from "react-icons/go";
-import { IoIosArrowDown } from "react-icons/io";
-import React, { PureComponent } from 'react';
-import { format } from 'date-fns';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { useState, useEffect } from "react";
-import { useParams } from 'react-router-dom';
+import { RxDashboard } from "react-icons/rx";
+import { PiEmpty } from "react-icons/pi";
+import { LuCalendarCheck } from "react-icons/lu";
+import { IoIosArrowRoundForward } from "react-icons/io";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+} from "recharts";
+import { format } from "date-fns";
 
-import { getBuildingById } from "../../../config/apiManager.js";
-import { getTotalRevenue } from "../../../config/apiManager.js";
-import { getTotalBooking } from "../../../config/apiManager.js";
-import { getTotalWorkspace } from "../../../config/apiManager.js";
-import { getInUseWorkspace } from "../../../config/apiManager.js";
-import { getEmptyWorkspace } from "../../../config/apiManager.js";
-import { getRecentBooking } from "../../../config/apiManager.js";
+import {
+  getBuildingById,
+  getTotalRevenue,
+  getTotalBooking,
+  getTotalWorkspace,
+  getInUseWorkspace,
+  getEmptyWorkspace,
+  getRecentBooking,
+} from "../../../config/apiManager.js";
+import {
+  getBookingDataIn6Days,
+  getRevenueDataIn6Days,
+} from "../../../config/api.admin.js";
 
 const data = [
-  { name: '1', uv: 4000, pv: 2400, amt: 2400, },
-  { name: '2', uv: 3000, pv: 1398, amt: 2210, },
-  { name: '3', uv: 2000, pv: 9800, amt: 2290, },
-  { name: '4', uv: 2780, pv: 3908, amt: 2000, },
-  { name: '5', uv: 1890, pv: 4800, amt: 2181, },
-  { name: '6', uv: 2390, pv: 3800, amt: 2500, },
-  { name: '7', uv: 3490, pv: 4300, amt: 2100, },
-  { name: '8', uv: 3490, pv: 4300, amt: 2100, },
-  { name: '9', uv: 3490, pv: 4300, amt: 2100, },
-  { name: '10', uv: 3490, pv: 4300, amt: 2100, },
-  { name: '11', uv: 3490, pv: 4300, amt: 2100, },
-  { name: '12', uv: 3490, pv: 4300, amt: 2100, },
+  { name: "1", uv: 4000, pv: 2400, amt: 2400 },
+  { name: "2", uv: 3000, pv: 1398, amt: 2210 },
+  { name: "3", uv: 2000, pv: 9800, amt: 2290 },
+  { name: "4", uv: 2780, pv: 3908, amt: 2000 },
+  { name: "5", uv: 1890, pv: 4800, amt: 2181 },
+  { name: "6", uv: 2390, pv: 3800, amt: 2500 },
+  { name: "7", uv: 3490, pv: 4300, amt: 2100 },
+  { name: "8", uv: 3490, pv: 4300, amt: 2100 },
+  { name: "9", uv: 3490, pv: 4300, amt: 2100 },
+  { name: "10", uv: 3490, pv: 4300, amt: 2100 },
+  { name: "11", uv: 3490, pv: 4300, amt: 2100 },
+  { name: "12", uv: 3490, pv: 4300, amt: 2100 },
 ];
 
 const data2 = [
-  { name: '1', uv: 4000, pv: 2400, amt: 2400, },
-  { name: '2', uv: 3000, pv: 1398, amt: 2210, },
-  { name: '3', uv: 2000, pv: 9800, amt: 2290, },
-  { name: '4', uv: 2780, pv: 3908, amt: 2000, },
-  { name: '5', uv: 1890, pv: 4800, amt: 2181, },
-  { name: '6', uv: 2390, pv: 3800, amt: 2500, },
-  { name: '7', uv: 3490, pv: 4300, amt: 2100, },
-  { name: '8', uv: 3490, pv: 4300, amt: 2100, },
-  { name: '9', uv: 3490, pv: 4300, amt: 2100, },
-  { name: '10', uv: 3490, pv: 4300, amt: 2100, },
-  { name: '11', uv: 3490, pv: 4300, amt: 2100, },
-  { name: '12', uv: 3490, pv: 4300, amt: 2100, },
+  { name: "1", uv: 4000, pv: 2400, amt: 2400 },
+  { name: "2", uv: 3000, pv: 1398, amt: 2210 },
+  { name: "3", uv: 2000, pv: 9800, amt: 2290 },
+  { name: "4", uv: 2780, pv: 3908, amt: 2000 },
+  { name: "5", uv: 1890, pv: 4800, amt: 2181 },
+  { name: "6", uv: 2390, pv: 3800, amt: 2500 },
+  { name: "7", uv: 3490, pv: 4300, amt: 2100 },
+  { name: "8", uv: 3490, pv: 4300, amt: 2100 },
+  { name: "9", uv: 3490, pv: 4300, amt: 2100 },
+  { name: "10", uv: 3490, pv: 4300, amt: 2100 },
+  { name: "11", uv: 3490, pv: 4300, amt: 2100 },
+  { name: "12", uv: 3490, pv: 4300, amt: 2100 },
 ];
 
+// Reusable StatCard Component
+const StatCard = ({ icon: Icon, title, value }) => (
+  <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center space-x-3">
+        <div className="p-3 bg-orange-100 rounded-lg">
+          <Icon className="w-6 h-6 text-orange-600" />
+        </div>
+        <div>
+          <p className="text-sm text-gray-600">{title}</p>
+          <p className="text-2xl font-bold mt-1">{value}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Revenue Chart Component
+const RevenueChart = ({ data }) => {
+  const formatYAxis = (value) => {
+    if (value >= 1000000) {
+      return `${(value / 1000000).toFixed(1)}M`;
+    }
+    if (value >= 1000) {
+      return `${(value / 1000).toFixed(0)}K`;
+    }
+    return value;
+  };
+
+  const formatTooltipValue = (value) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-xl shadow-lg">
+      <h3 className="text-lg font-semibold mb-4">Revenue Overview</h3>
+      <div className="h-96">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart
+            data={data}
+            margin={{ top: 10, right: 30, left: 16, bottom: 0 }}
+          >
+            <defs>
+              <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+            <XAxis dataKey="date" tickMargin={8} />
+            <YAxis tickFormatter={formatYAxis} tickMargin={8} width={60} />
+            <Tooltip
+              formatter={(value) => [formatTooltipValue(value), "Revenue"]}
+            />
+            <Area
+              type="monotone"
+              dataKey="total_price"
+              stroke="#f59e0b"
+              fillOpacity={1}
+              fill="url(#colorRevenue)"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+};
+
+// Bookings Chart Component
+const BookingsChart = ({ data }) => (
+  <div className="bg-white p-6 rounded-xl shadow-lg">
+    <h3 className="text-lg font-semibold mb-4">Bookings Overview</h3>
+    <div className="h-96">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={data}
+          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+          <XAxis dataKey="date" />
+          <YAxis />
+          <Tooltip />
+          <Bar dataKey="total_booking" fill="#f59e0b" />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  </div>
+);
+
+// BookingsList Component
+const BookingsList = ({ bookings }) => (
+  <div className="bg-white p-6 rounded-xl shadow-lg">
+    <div className="flex justify-between items-center mb-6">
+      <h3 className="text-lg font-semibold">Recent Bookings</h3>
+      <Link
+        to="/bookings"
+        className="flex items-center text-orange-600 hover:text-orange-700"
+      >
+        View all
+        <IoIosArrowRoundForward className="w-5 h-5 ml-1" />
+      </Link>
+    </div>
+    <div className="space-y-4">
+      {bookings.map((booking, idx) => (
+        <div
+          key={idx}
+          className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+        >
+          <div className="flex items-center space-x-4">
+            <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+              <GoPerson className="w-6 h-6 text-orange-600" />
+            </div>
+            <div>
+              <p className="font-semibold">{booking.Customer.User.name}</p>
+              <p className="text-sm text-gray-600">
+                {booking.Workspace.workspace_name}
+              </p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-sm font-medium">
+              {format(new Date(booking.createdAt), "dd MMM yyyy")}
+            </p>
+            <p className="text-sm text-gray-600">
+              {booking.BookingStatuses[0]?.status}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+// Workspace Stats Component
+const WorkspaceStats = ({ totalWorkspace, inUseWorkspace, emptyWorkspace }) => (
+  <div className="bg-white p-6 rounded-xl shadow-lg">
+    <h3 className="text-lg font-semibold mb-4">Workspace Overview</h3>
+    <div className="grid grid-cols-3 gap-4">
+      <div className="flex items-center space-x-3">
+        <div className="p-2 bg-orange-100 rounded-lg">
+          <RxDashboard className="w-5 h-5 text-orange-600" />
+        </div>
+        <div>
+          <p className="text-sm text-gray-600">Total</p>
+          <p className="text-lg font-bold">{totalWorkspace}</p>
+        </div>
+      </div>
+      <div className="flex items-center space-x-3">
+        <div className="p-2 bg-orange-100 rounded-lg">
+          <RxDashboard className="w-5 h-5 text-orange-600" />
+        </div>
+        <div>
+          <p className="text-sm text-gray-600">In Use</p>
+          <p className="text-lg font-bold">{inUseWorkspace}</p>
+        </div>
+      </div>
+      <div className="flex items-center space-x-3">
+        <div className="p-2 bg-orange-100 rounded-lg">
+          <PiEmpty className="w-5 h-5 text-orange-600" />
+        </div>
+        <div>
+          <p className="text-sm text-gray-600">Empty</p>
+          <p className="text-lg font-bold">{emptyWorkspace}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 const ManagerDashBoard = () => {
-  const [error, setError] = useState(null); // State lỗi
-  const [loading, setLoading] = useState(true); // State loading
-  const { building_id } = useParams(); // Get the building_id from route params
-  const [buildingName, setBuildingName] = useState('');
-  const [totalRevenue, setTotalRevenue] = useState(''); // Initialize with sample data
-  const [totalBooking, setTotalBooking] = useState(''); // Initialize with sample data
-  const [totalWorkspace, setTotalWorkspace] = useState(''); // Initialize with sample data
-  const [totalInUseWorkspace, setTotalInUseWorkspace] = useState(''); // Initialize with sample data
-  const [totalEmptyWorkspace, setTotalEmptyWorkspace] = useState(''); // Initialize with sample data
-  const [top5Bookings, setTop5Bookings] = useState([]); // Initialize with sample data
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { building_id } = useParams();
+  const [buildingName, setBuildingName] = useState("");
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [totalBooking, setTotalBooking] = useState(0);
+  const [totalWorkspace, setTotalWorkspace] = useState(0);
+  const [totalInUseWorkspace, setTotalInUseWorkspace] = useState(0);
+  const [totalEmptyWorkspace, setTotalEmptyWorkspace] = useState(0);
+  const [recentBookings, setRecentBookings] = useState([]);
+  const [revenueDataInChart, setRevenueDataInChart] = useState([]);
+  const [bookingDataInChart, setBookingDataInChart] = useState([]);
 
   const formatCurrency = (value) => {
-    return new Intl.NumberFormat('vi-VN').format(value);
-  }
+    return new Intl.NumberFormat("vi-VN").format(value);
+  };
 
   useEffect(() => {
     const fetchBuildingData = async () => {
@@ -77,201 +263,116 @@ const ManagerDashBoard = () => {
         const totalWorkspace = getTotalWorkspace(building_id);
         const inUseWorkspace = getInUseWorkspace(building_id);
         const emptyWorkspace = getEmptyWorkspace(building_id);
-  
+        const revenueData = getRevenueDataIn6Days(building_id);
+        const bookingData = getBookingDataIn6Days(building_id);
+
         const responses = await Promise.all([
           buildingDetails,
           totalRevenue,
           totalBooking,
           totalWorkspace,
           inUseWorkspace,
-          emptyWorkspace
+          emptyWorkspace,
+          revenueData,
+          bookingData,
         ]);
-  
+
         setBuildingName(responses[0].data.building_name);
         setTotalRevenue(responses[1].data);
         setTotalBooking(responses[2].data);
         setTotalWorkspace(responses[3].data);
         setTotalInUseWorkspace(responses[4].data);
         setTotalEmptyWorkspace(responses[5].data);
-  
+        setRevenueDataInChart(responses[6].data);
+        setBookingDataInChart(responses[7].data);
       } catch (error) {
         console.error("Error fetching building data", error);
+        setError(error);
       }
     };
-  
+
     if (building_id) {
       fetchBuildingData();
       const intervalId = setInterval(fetchBuildingData, 60000);
-      return () => clearInterval(intervalId); // Cleanup interval on unmount
+      return () => clearInterval(intervalId);
     }
   }, [building_id]);
 
   useEffect(() => {
-    const fetchTop5Bookings = async () => {
+    const fetchRecentBookings = async () => {
       try {
         const response = await getRecentBooking(building_id);
-        if (response && response.data && Array.isArray(response.data)) {
-          setTop5Bookings(response.data);
-        } else {
-          setTop5Bookings([]); 
+        if (response && response.data) {
+          setRecentBookings(response.data);
         }
-      } catch (err) {
-        setError(err);
+      } catch (error) {
+        console.error("Error fetching recent bookings:", error);
+        setError(error);
       } finally {
         setLoading(false);
       }
     };
-  
+
     if (building_id) {
-      fetchTop5Bookings();
-      const intervalId = setInterval(fetchTop5Bookings, 60000);
-      return () => clearInterval(intervalId); 
+      fetchRecentBookings();
+      const intervalId = setInterval(fetchRecentBookings, 60000);
+      return () => clearInterval(intervalId);
     }
   }, [building_id]);
 
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
   return (
-    <div className="max-w-screen *:box-border w-full h-full flex flex-col overflow-hidden">
-      <div className="flex flex-1">
-        <h1 className="text-4xl font-black mt-5 ml-6">{buildingName} Dashboard</h1> {/* Display building name */}
+    <div className="min-h-screen bg-gray-50 p-8">
+      <header className="mb-8">
+        <h1 className="text-4xl font-bold text-gray-900">
+          {buildingName} Dashboard
+        </h1>
+        <p className="text-gray-600 mt-2">Here's what's happening today</p>
+      </header>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
+        <StatCard
+          icon={TfiStatsUp}
+          title="Total Revenue"
+          value={`${formatCurrency(totalRevenue)}đ`}
+        />
+        <StatCard
+          icon={LuCalendarCheck}
+          title="Total Bookings"
+          value={totalBooking}
+        />
+        <StatCard
+          icon={RxDashboard}
+          title="Total Workspaces"
+          value={totalWorkspace}
+        />
+        <WorkspaceStats
+          totalWorkspace={totalWorkspace}
+          inUseWorkspace={totalInUseWorkspace}
+          emptyWorkspace={totalEmptyWorkspace}
+        />
       </div>
 
-      {/* Main Content */}
-      <main className="flex-1 p-6">
-        <h2 className="text-2xl font-bold mb-4">General Overview</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* General Overview */}
-            <div className="card shadow-xl">
-              <div className="card-body">
-                <div className="flex items-center">
-                  <TfiStatsUp className="size-5"/>
-                  <div className="stat-title ml-2">Total Revenue in Month</div>
-                </div>
-                <div className="stat-value text-4xl">{formatCurrency(totalRevenue)}đ</div>
-              </div>
-            </div>
-
-            <div className="card shadow-xl">
-              <div className="card-body">
-                <div className="flex flex-2">
-                  <LuCalendarCheck className="size-5"/>
-                  <div className="stat-title ml-2">Total Bookings</div>
-                </div>
-                <div className="stat-value text-4xl">{totalBooking}</div>
-              </div>
-            </div>
-
-            <div className="card shadow-xl">
-              <div className="card-body">
-                <div className="flex flex-2">
-                  <RxDashboard className="size-5"/>
-                  <div className="stat-title ml-2">Total Workspaces</div>
-                </div>
-                <div className="stat-value text-4xl">{totalWorkspace}</div>
-              </div>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-          <div className="card shadow-xl">
-              <div className="card-body">
-                <div className="flex flex-2">
-                  <RxDashboard className="size-5"/>
-                  <div className="stat-title ml-2">In Use Workspaces</div>
-                </div>
-                <div className="stat-value text-4xl">{totalInUseWorkspace}</div>
-              </div>
-            </div>
-
-            <div className="card shadow-xl">
-              <div className="card-body">
-                <div className="flex flex-2">
-                  <PiEmpty className="mt-1 size-5"/>
-                  <div className="stat-title ml-2">Empty Workspaces</div>
-                </div>
-                <div className="stat-value text-4xl">{totalEmptyWorkspace}</div>
-              </div>
-            </div>
-          </div>
-
-        {/* Revenue & Guest */}
-        <div className="mt-6">
-          <h2 className="text-2xl font-bold mb-4">Revenue & Booking Analysis</h2>
-          <div className="flex w-full flex-col lg:flex-row">
-            <div className="rounded-box grid h-32 flex-grow">
-            <p className="text-xl font-semibold mb-4">Revenue</p>
-              <div style={{ width: '100%', height: 400 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart width={730} height={250} data={data}
-                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <Tooltip />
-                    <Area type="monotone" dataKey="uv" stroke="#8884d8" fillOpacity={1} fill="url(#colorUv)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-            
-            <div className="divider"></div>
-            
-            <div className="rounded-box grid h-32 flex-grow">
-              <p className="text-xl font-semibold mb-4">Guest Bookings</p>
-              <div style={{ width: '100%', height: 400 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart width={730} height={250} data={data2}
-                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
-                        <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <Tooltip />
-                    <Area type="monotone" dataKey="uv" stroke="#8884d8" fillOpacity={1} fill="url(#colorUv)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="lg:col-span-4">
+          <RevenueChart data={revenueDataInChart} />
         </div>
+        <div></div>
+      </div>
 
-        <div className="mt-96">
-          <h2 className="text-2xl font-bold mb-4">Bookings & Customers</h2>
-          <div className="flex w-full">
-            <div className="rounded-box grid flex-grow place-items-stretch">
-              <p className="text-xl font-semibold mb-4">Recent overview</p>
-              <div className="bg-base-200 flex-grow p-4 rounded-lg shadow-lg">
-                {top5Bookings.map((booking, index) => (
-                  <div key={index} className="border-b py-2 mb-1 flex justify-between items-center">
-                    <div>
-                      <p className="font-semibold">{booking.Customer.User.name}</p>
-                      <p>{booking.Workspace.workspace_name}</p>
-                      <p className="text-sm">{booking.Workspace.WorkspaceType.workspace_type_name}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold">{format(new Date(booking.createdAt), "dd/MM/yyyy HH:mm:ss")}</p>
-                      {booking.BookingStatuses.map((status, idx) => (
-                        <p key={idx}>{status.status}</p>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="lg:col-span-4">
+          <BookingsChart data={bookingDataInChart} />
         </div>
       </div>
-    </main>
+
+      <div>
+        <BookingsList bookings={recentBookings} />
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default ManagerDashBoard
+export default ManagerDashBoard;
