@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAllBuilding } from '../../../config/apiManager';
+import { getAllManagerBuilding } from '../../../config/apiManager';
 
 
 
@@ -13,7 +13,7 @@ const ChooseBuildingDashboard = () => {
 
     const fetchBuilding = async () => {
         try {
-          const res = await getAllBuilding();
+          const res = await getAllManagerBuilding();
           setBuilding(res.data || []);
         } catch (err) {
           setError(err);
@@ -30,22 +30,32 @@ const ChooseBuildingDashboard = () => {
         navigate(`manager-dashboard/${building_id}`); // Navigate with building_id
     };
 
-return (
-    <div className="container mx-auto p-4">
-        <h2 className="text-4xl font-black mt-5 ml-6">Choose Building</h2>
-        <div className="grid grid-cols-4 gap-4 mt-6">
-            {building.map((building) => (
-                <div key={building.building_id} className="card shadow-lg">
-                    <button 
-                        onClick={() => handleBuildingClick(building.building_id)} // Handle click
-                        className="card-body btn btn-neutral"
-                    >
+    return (
+        <div className="container mx-auto p-4">
+            <h2 className="text-4xl font-black mt-5 ml-6">Choose Building</h2>
+            <div className="grid grid-cols-3 gap-4 mt-6">
+                {building.map((building) => (
+                <div
+                    key={building.building_id}
+                    onClick={() => handleBuildingClick(building.building_id)} // Đưa sự kiện onClick lên thẻ <div>
+                    className="card card-compact bg-base-100 shadow-xl cursor-pointer transition-transform transform hover:scale-105"
+                >
+                    <figure>
+                        <img
+                            src={building.BuildingImages[0].image}
+                            alt={building.building_name}
+                        />
+                    </figure>
+                    <div className="card-body">
                         <h2 className="card-title text-center">{building.building_name}</h2>
-                    </button>
+                        <div className="card-actions justify-end">
+                            {/* Chỗ này không cần nút, nên có thể bỏ đi nếu không cần */}
+                        </div>
+                    </div>
                 </div>
-            ))}
+                ))}
+            </div>
         </div>
-    </div>
     );
 };
 

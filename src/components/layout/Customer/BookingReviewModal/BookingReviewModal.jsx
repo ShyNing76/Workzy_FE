@@ -2,7 +2,7 @@ import React from "react";
 
 const BookingReviewModal = (props) => {
   const {
-    booking,
+    bookingId,
     isOpenReviewModal,
     setIsOpenReviewModal,
     setRating,
@@ -26,7 +26,19 @@ const BookingReviewModal = (props) => {
           className="modal modal-open"
           style={{ backgroundColor: "#0000001a" }}
         >
+        <div
+          className="modal modal-open"
+          style={{ backgroundColor: "#0000001a" }}
+        >
           <div className="modal-box relative">
+            <form method="dialog" className="modal-backdrop">
+              <button
+                className="btn btn-sm btn-circle absolute right-2 top-2"
+                onClick={() => handleCloseModal()}
+              >
+                ✕
+              </button>
+            </form>
             <form method="dialog" className="modal-backdrop">
               <button
                 className="btn btn-sm btn-circle absolute right-2 top-2"
@@ -62,7 +74,7 @@ const BookingReviewModal = (props) => {
               <div className="modal-action">
                 <button
                   className="btn btn-accent"
-                  onClick={() => handleSubmitReview(booking.booking_id)}
+                  onClick={() => handleSubmitReview(bookingId)}
                 >
                   Done
                 </button>

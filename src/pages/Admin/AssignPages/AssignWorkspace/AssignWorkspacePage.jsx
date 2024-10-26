@@ -13,6 +13,7 @@ const AssignWorkspacePage = () => {
   const [selectedBuilding, setSelectedBuilding] = useState(null);
   const [selectedWorkspaces, setSelectedWorkspaces] = useState([]);
   const [assignState, setAssignState] = useState(true);
+  const [isLoaded, setIsLoaded] = useState();
   //fetch workspaces and buildings
   const fetchWorkspacesAndBuildings = async () => {
     try {
@@ -23,7 +24,6 @@ const AssignWorkspacePage = () => {
       if (workspaceResponse?.data && workspaceResponse.err === 0) {
         setWorkspaces(workspaceResponse.data);
         console.log("workspaces:", workspaceResponse.data);
-        
       }
       if (buildingResponse?.data && buildingResponse.err === 0) {
         setBuildings(buildingResponse.data);
@@ -94,6 +94,13 @@ const AssignWorkspacePage = () => {
             text: "Assign workspaces to building successfully",
             icon: "success",
           });
+          setWorkspaces((prevWorkspaces) =>
+            prevWorkspaces.map((workspace) =>
+              selectedWorkspaces.includes(workspace.workspace_id)
+                ? { ...workspace, Building: { building_id: selectedBuilding } }
+                : workspace
+            )
+          );
         }
       } catch (error) {
         Swal.fire({
@@ -115,6 +122,13 @@ const AssignWorkspacePage = () => {
             text: "Unassign workspaces from building successfully",
             icon: "success",
           });
+          setWorkspaces((prevWorkspaces) =>
+            prevWorkspaces.map((workspace) =>
+              selectedWorkspaces.includes(workspace.workspace_id)
+                ? { ...workspace, Building: null }
+                : workspace
+            )
+          );
         }
       } catch (error) {
         Swal.fire({
@@ -130,11 +144,16 @@ const AssignWorkspacePage = () => {
 
   // show workspacrs when change Assign/Unassign button
   const filteredWorkspaces = assignState
-  ? workspaces.filter((workspace) => !workspace.Building || workspace.Building.building_id === null) // chỉ lấy những workspace không có building_id
-  : workspaces.filter(
-      (workspace) => workspace.Building && workspace.Building.building_id === selectedBuilding
-    ); // chỉ lấy những workspace có building_id khớp với selectedBuilding
- // chỉ hiển thị các workspace có building_id là selectedBuilding
+    ? workspaces.filter(
+        (workspace) =>
+          !workspace.Building || workspace.Building.building_id === null
+      ) // chỉ lấy những workspace không có building_id
+    : workspaces.filter(
+        (workspace) =>
+          workspace.Building &&
+          workspace.Building.building_id === selectedBuilding
+      ); // chỉ lấy những workspace có building_id khớp với selectedBuilding
+  // chỉ hiển thị các workspace có building_id là selectedBuilding
 
   return (
     <div>
@@ -142,31 +161,30 @@ const AssignWorkspacePage = () => {
       <label htmlFor="building-select" className="label">
         <span className="label-text">Select Building:</span>
       </label>
-      
 
       <div className="btn-group my-4">
-      <select
-        id="building-select"
-        className="select select-bordered w-full max-w-xs"
-        onChange={handleBuildingChange}
-      >
-        <option value="">Select a Building</option>
-        {buildings.map((building) => (
-          <option key={building.building_id} value={building.building_id}>
-            {building.building_name}
-          </option>
+        <select
+          id="building-select"
+          className="select select-bordered w-full max-w-xs mr-4"
+          onChange={handleBuildingChange}
+        >
+          <option value="">Select a Building</option>
+          {buildings.map((building) => (
+            <option key={building.building_id} value={building.building_id}>
+              {building.building_name}
+            </option>
           ))}
         </select>
 
-       <button
+        <button
           onClick={() => setAssignState(true)}
-          className={`btn ${assignState ? "btn-primary" : "btn-gray"} mt-4`} // Thay đổi màu nút
+          className={`btn ${assignState ? "btn-primary" : "btn-gray"} mr-2`}
         >
           Assign
         </button>
         <button
           onClick={() => setAssignState(false)}
-          className={`btn ${!assignState ? "btn-secondary" : "btn-gray"} mt-4`} // Thay đổi màu nút
+          className={`btn ${!assignState ? "btn-secondary" : "btn-gray"}`}
         >
           Unassign
         </button>
@@ -178,6 +196,7 @@ const AssignWorkspacePage = () => {
             <tr>
               <th>Select</th>
               <th>Workspace Name</th>
+              <th>Workspace Type</th>
             </tr>
           </thead>
           <tbody>
@@ -196,14 +215,16 @@ const AssignWorkspacePage = () => {
                   />
                 </td>
                 <td>{workspace.workspace_name}</td>
+                <td>{workspace.WorkspaceType.workspace_type_name}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <button onClick={handleSubmit} className="btn btn-success mt-4">Submit</button>
-
+      <button onClick={handleSubmit} className="btn btn-success mt-4">
+        Submit
+      </button>
     </div>
   );
 };

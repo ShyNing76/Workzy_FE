@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./BookingCard.scss";
 import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "../../../context/priceFormat";
@@ -10,6 +10,8 @@ const BookingCard = (props) => {
     booking,
     workspace,
     type,
+    isReview,
+    dataReview,
     handleCancelBooking,
     handleCheckinBooking,
     handleCheckoutBooking,
@@ -20,7 +22,9 @@ const BookingCard = (props) => {
   const navigate = useNavigate(); // For navigating to detail page
 
   const handleCardClick = () => {
-    navigate(`${booking.booking_id}`, { state: { booking, workspace, type } });
+    navigate(`${booking.booking_id}`, {
+      state: { booking, workspace, type, dataReview },
+    });
   };
 
   const handleAddAmenitiesClick = (event) => {
@@ -171,14 +175,15 @@ const BookingCard = (props) => {
               Pay Broken Amenities
             </button>
           )}
-          {booking.BookingStatuses[0].status === "completed" && (
-            <button
-              className="btn btn-outline btn-accent"
-              onClick={(e) => handleOpenReviewModal(e)}
-            >
-              Rating
-            </button>
-          )}
+          {booking.BookingStatuses[0].status === "completed" &&
+            isReview === false && (
+              <button
+                className="btn btn-outline btn-accent"
+                onClick={(e) => handleOpenReviewModal(e, booking.booking_id)}
+              >
+                Rating
+              </button>
+            )}
         </div>
       </div>
     </div>

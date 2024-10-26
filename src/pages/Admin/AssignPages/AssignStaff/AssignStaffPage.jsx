@@ -316,7 +316,7 @@ const AssignStaffPage = () => {
                         disabled={
                           !selectedStaffIds[building.building_id] || isAssigned
                         }
-                        className="btn"
+                        className="btn btn-primary"
                       >
                         {isBuildingAssigned(building.building_id) ? "Update" : "Assign"}
                       </button>

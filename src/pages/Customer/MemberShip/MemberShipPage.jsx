@@ -13,7 +13,7 @@ const MemberShipPage = () => {
     Diamond: 40000, // points required to move from Emerald to Diamond
   };
 
-  const [currentPoints, setCurrentPoints] = useState(40000);
+  const [currentPoints, setCurrentPoints] = useState(0);
   const [selectedTier, setSelectedTier] = useState("Bronze");
   const [currentTier, setCurrentTier] = useState("Bronze");
 

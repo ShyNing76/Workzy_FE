@@ -266,6 +266,13 @@ const getCustomer = (
   return axios.get(URL_API, data);
 };
 
+const getAllBooking = () => {
+  const URL_API = `/api/v1/booking/get`;
+  return axios.get(URL_API);
+};
+
+//Buildings Manager APIs_________________________________________________________
+
 //Buildings Manager APIs_________________________________________________________
 const getBuilding = () => {
   const URL_API = "/api/v1/building/";
@@ -349,6 +356,11 @@ const getWorkspace = () => {
   return axios.get(URL_API);
 };
 
+const getWorkspaceByBuildingId = (building_id) => {
+  const URL_API = `/api/v1/workspace?building_id=${building_id}`;
+  return axios.get(URL_API);
+};
+
 const getWorkspaceById = (workspace_id) => {
   const URL_API = `/api/v1/workspace/${workspace_id}`;
   return axios.get(URL_API);
@@ -424,22 +436,9 @@ const deleteVoucher = (voucher_id) => {
 };
 
 //Review manager APIs___________________________________________________________
-const getReview = (
-  review_id,
-  booking_id,
-  workspace_id,
-  review_content,
-  rating
-) => {
-  const URL_API = "/api/v1/review";
-  const data = {
-    review_id,
-    booking_id,
-    workspace_id,
-    review_content,
-    rating,
-  };
-  return axios.get(URL_API, data);
+const getReview = () => {
+  const URL_API = "/api/v1/review/";
+  return axios.get(URL_API);
 };
 
 const getReviewById = (review_id) => {
@@ -450,6 +449,26 @@ const getReviewById = (review_id) => {
 const deleteReview = (review_id) => {
   const URL_API = `/api/v1/review/delete/${review_id}`;
   return axios.put(URL_API);
+};
+
+const getRevenueDataIn6Days = (building_id) => {
+  const URL_API = `api/v1/booking/revenue-in-6-days-ago?building_id=${building_id}`;
+  return axios.get(URL_API);
+};
+
+const getBookingDataIn6Days = (building_id) => {
+  const URL_API = `api/v1/booking/total-booking-in-6-days-ago?building_id=${building_id}`;
+  return axios.get(URL_API);
+};
+
+const getRevenueDataIn6DaysAdmin = () => {
+  const URL_API = `api/v1/booking/revenue-in-6-days-ago`;
+  return axios.get(URL_API);
+};
+
+const getBookingDataIn6DaysAdmin = () => {
+  const URL_API = `api/v1/booking/total-booking-in-6-days-ago`;
+  return axios.get(URL_API);
 };
 
 //=========================================================================================================================
@@ -512,4 +531,10 @@ export {
   getReview,
   getReviewById,
   deleteReview,
+  getRevenueDataIn6Days,
+  getWorkspaceByBuildingId,
+  getAllBooking,
+  getBookingDataIn6Days,
+  getRevenueDataIn6DaysAdmin,
+  getBookingDataIn6DaysAdmin,
 };

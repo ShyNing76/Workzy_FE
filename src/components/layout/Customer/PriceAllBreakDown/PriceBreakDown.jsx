@@ -9,12 +9,18 @@ const PriceBreakDown = (props) => {
       label: "Workspace Price (Include Tax and Discount): ",
       amount: booking.total_workspace_price,
     },
-    { label: "Amenities Price: ", amount: booking.total_amenities_price },
+    {
+      label: "Additional Amenities Price: ",
+      amount: booking.total_amenities_price,
+    },
     { label: "Broken Price: ", amount: booking.total_broken_price },
   ];
 
   return (
     <div className="card-body">
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-xl font-semibold">Final Invoices</h3>
+      </div>
       {items.map((item, index) => (
         <div className="flex justify-between py-1" key={index}>
           <span>{item.label}</span>

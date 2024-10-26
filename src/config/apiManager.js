@@ -2,10 +2,10 @@ import axios from "./axios.customize";
 
 // API for Manager Dashboard
 
-const getAllBuilding = () => {
-  const URL_API = "/api/v1/building";
-  return axios.get(URL_API);
-};
+const getAllManagerBuilding = () => {
+    const URL_API = "/api/v1/manager/buildings"
+    return axios.get(URL_API)
+}
 
 const getBuildingById = (building_id) => {
   const URL_API = `/api/v1/building/${building_id}`;
@@ -88,7 +88,7 @@ const getAllWorkSpaces = (buildingId) => {
 };
 
 export {
-  getAllBuilding,
+  getAllManagerBuilding,
   getBuildingById,
   getTotalRevenue,
   getTotalBooking,

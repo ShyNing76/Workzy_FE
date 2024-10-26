@@ -49,7 +49,8 @@ const Admin = () => {
         </div>
       ) : (
         <>
-          <AdminHeader />
+        <div className="sticky top-0 z-50"><AdminHeader /></div>
+          
           <div className="sidebar-container drawer lg:drawer-open">
             {/* Sidebar */}
             <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />

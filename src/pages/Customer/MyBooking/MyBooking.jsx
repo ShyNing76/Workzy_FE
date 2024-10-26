@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import {
   getAllBookingType,
   getBookingOfCustomer,
+  getReviewByBookingId,
   getWorkSpaceById,
   postBookingAddToCalendar,
   postBookingRefund,
@@ -30,6 +31,8 @@ const MyBooking = () => {
   const [page, setPage] = useState(1);
   const LIMIT_BOOKING = 5;
   const [totalBooking, setTotalBooking] = useState({});
+  const [reviewStatus, setReviewStatus] = useState([]);
+  const [bookingIdReview, setBookingIdReview] = useState("");
 
   const fetchBookingData = async () => {
     try {
@@ -242,11 +245,11 @@ const MyBooking = () => {
       confirmButtonColor: "green",
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, check-out it!",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        const res = putChangeStatus(bookingId, "check-out");
+        const res = await putChangeStatus(bookingId, "check-out");
 
-        if (res && res.err === 0) {
+        if (res.err === 0) {
           Swal.fire({
             position: "center",
             icon: "success",
@@ -287,9 +290,10 @@ const MyBooking = () => {
     }
   };
 
-  const handleOpenReviewModal = (e) => {
+  const handleOpenReviewModal = (e, bookingId) => {
     e.stopPropagation();
 
+    setBookingIdReview(bookingId);
     setIsOpenReviewModal(true);
   };
 
@@ -321,6 +325,32 @@ const MyBooking = () => {
     setComment("");
     setIsOpenReviewModal(false);
   };
+
+  useEffect(() => {
+    const fetchAllReviews = async () => {
+      try {
+        // Dùng Promise.all để gọi API cho tất cả bookingIds
+        const reviewResults = await Promise.all(
+          bookingData.map(async (booking) => {
+            const res = await getReviewByBookingId(booking.booking_id);
+            const hasReview = res && res.err === 0;
+            return {
+              bookingId: booking.booking_id,
+              isReview: hasReview,
+              reviewData: hasReview ? res.data : null,
+            };
+          })
+        );
+
+        // Cập nhật state một lần với toàn bộ kết quả
+        setReviewStatus(reviewResults);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchAllReviews();
+  }, [bookingData]);
 
   return (
     <div className="max-w-5xl container mx-auto my-20 p-8 bg-white rounded-lg shadow-lg">
@@ -356,6 +386,10 @@ const MyBooking = () => {
 
             const type = bookingType.find(
               (ty) => ty.booking_type_id === booking.booking_type_id
+            );
+
+            const reviewStatusEntry = reviewStatus.find(
+              (review) => review.bookingId === booking.booking_id
             );
 
             if (!workspace) {
@@ -450,23 +484,18 @@ const MyBooking = () => {
                     type={type}
                     workspace={workspace}
                     booking={booking}
+                    isReview={
+                      reviewStatusEntry ? reviewStatusEntry.isReview : false
+                    }
+                    dataReview={
+                      reviewStatusEntry ? reviewStatusEntry.reviewData : {}
+                    }
                     handleCancelBooking={handleCancelBooking}
                     handleCheckinBooking={handleCheckinBooking}
                     handleCheckoutBooking={handleCheckoutBooking}
                     handleOpenReviewModal={handleOpenReviewModal}
                     handleRefundBooking={handleRefundBooking}
                     handlAddToCalendar={handlAddToCalendar}
-                  />
-                </div>
-                <div key={`review-${booking.booking_id}`}>
-                  <BookingReviewModal
-                    booking={booking}
-                    isOpenReviewModal={isOpenReviewModal}
-                    setIsOpenReviewModal={setIsOpenReviewModal}
-                    setRating={setRating}
-                    setComment={setComment}
-                    comment={comment}
-                    handleSubmitReview={handleSubmitReview}
                   />
                 </div>
               </>
@@ -486,6 +515,15 @@ const MyBooking = () => {
           totalPages={Math.ceil(totalBooking / LIMIT_BOOKING)}
         />
       )}
+      <BookingReviewModal
+        bookingId={bookingIdReview}
+        isOpenReviewModal={isOpenReviewModal}
+        setIsOpenReviewModal={setIsOpenReviewModal}
+        setRating={setRating}
+        setComment={setComment}
+        comment={comment}
+        handleSubmitReview={handleSubmitReview}
+      />
     </div>
   );
 };
