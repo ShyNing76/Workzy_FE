@@ -184,7 +184,7 @@ const AdminDashboard = () => {
     };
   
     fetchData();
-    const intervalId = setInterval(fetchData, 30000);
+    const intervalId = setInterval(fetchData, 60000);
     return () => clearInterval(intervalId); // Cleanup interval on unmount
   }, []);
 
