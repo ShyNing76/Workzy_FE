@@ -170,6 +170,10 @@ const assignStaffToBuilding = (staffId, buildingId) => {
     const URL_API = `/api/v1/booking/get?building_id=${building_id}`
     return axios.get(URL_API)
   }
+  const getAllBooking = () => {
+    const URL_API = `/api/v1/booking/get`
+    return axios.get(URL_API)
+  }
 
   //Buildings Manager APIs_________________________________________________________
   const getBuilding = () => {
@@ -365,6 +369,7 @@ const deleteReview = (review_id) => {
     removeCustomer,
 
     getBookingByBuildingId,
+    getAllBooking,
 
     getBuilding,
     getBuildingById,

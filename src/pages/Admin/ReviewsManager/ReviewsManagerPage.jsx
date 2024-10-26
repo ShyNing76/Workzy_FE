@@ -197,7 +197,7 @@ const ReviewsManagerPage = () => {
                                   </td>
                                 </tr>
                               ))}
-                            {reviews.length === 0 && (
+                            {reviews.filter(review => review.Booking.Workspace.workspace_name === filteredWorkspace.workspace_name).length === 0 && (
                               <tr>
                                 <td colSpan="6" className="text-center justify-center p-3">
                                   <div className="flex flex-col justify-center items-center">
