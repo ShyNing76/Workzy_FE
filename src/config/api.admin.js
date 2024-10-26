@@ -452,6 +452,11 @@ const deleteReview = (review_id) => {
   return axios.put(URL_API);
 };
 
+const getRevenueDataIn8Day = () => {
+  const URL_API = `api/v1/booking/revenue-in-8-days-ago`;
+  return axios.get(URL_API);
+};
+
 //=========================================================================================================================
 export {
   getTotalRavenue,
@@ -512,4 +517,5 @@ export {
   getReview,
   getReviewById,
   deleteReview,
+  getRevenueDataIn8Day,
 };
