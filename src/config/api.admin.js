@@ -349,6 +349,11 @@ const getWorkspace = () => {
   return axios.get(URL_API);
 };
 
+const getWorkspaceByBuildingId = (building_id) => {
+  const URL_API = `/api/v1/workspace?building_id=${building_id}`;
+  return axios.get(URL_API);
+};
+
 const getWorkspaceById = (workspace_id) => {
   const URL_API = `/api/v1/workspace/${workspace_id}`;
   return axios.get(URL_API);
