@@ -101,7 +101,7 @@ const ManagerDashBoard = () => {
   
     if (building_id) {
       fetchBuildingData();
-      const intervalId = setInterval(fetchBuildingData, 30000);
+      const intervalId = setInterval(fetchBuildingData, 60000);
       return () => clearInterval(intervalId); // Cleanup interval on unmount
     }
   }, [building_id]);
@@ -124,7 +124,7 @@ const ManagerDashBoard = () => {
   
     if (building_id) {
       fetchTop5Bookings();
-      const intervalId = setInterval(fetchTop5Bookings, 30000);
+      const intervalId = setInterval(fetchTop5Bookings, 60000);
       return () => clearInterval(intervalId); 
     }
   }, [building_id]);
