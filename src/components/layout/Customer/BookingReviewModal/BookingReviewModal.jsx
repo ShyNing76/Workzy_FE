@@ -26,19 +26,7 @@ const BookingReviewModal = (props) => {
           className="modal modal-open"
           style={{ backgroundColor: "#0000001a" }}
         >
-        <div
-          className="modal modal-open"
-          style={{ backgroundColor: "#0000001a" }}
-        >
           <div className="modal-box relative">
-            <form method="dialog" className="modal-backdrop">
-              <button
-                className="btn btn-sm btn-circle absolute right-2 top-2"
-                onClick={() => handleCloseModal()}
-              >
-                ✕
-              </button>
-            </form>
             <form method="dialog" className="modal-backdrop">
               <button
                 className="btn btn-sm btn-circle absolute right-2 top-2"
