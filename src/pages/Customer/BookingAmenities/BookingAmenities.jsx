@@ -8,6 +8,7 @@ import { IoChevronBackCircleOutline } from "react-icons/io5";
 import { getAllAmenities } from "../../../config/api";
 import amenitesImage from "../../../assets/amenities.jpg";
 import { toast, ToastContainer } from "react-toastify";
+import Pagination from "../../../components/layout/Shared/Pagination/Pagination";
 
 const BookingAmenities = () => {
   const [availableAmenities, setAvailableAmenities] = useState([]);
@@ -17,6 +18,10 @@ const BookingAmenities = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [isCartVisible, setIsCartVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const [page, setPage] = useState(1);
+  const [totalAmenities, setTotalAmenities] = useState(0);
+  const LIMIT_AMENITIES = 8;
 
   // Function to handle adding an amenity
   const handleAddAmenity = (amenity) => {
@@ -80,18 +85,20 @@ const BookingAmenities = () => {
   useEffect(() => {
     const fetchAllAmenities = async () => {
       try {
-        const res = await getAllAmenities();
+        const res = await getAllAmenities(LIMIT_AMENITIES, page);
         if (res && res.data && res.err === 0) {
           setAvailableAmenities(res.data.rows);
+          setTotalAmenities(res.data.count);
         } else {
           setAvailableAmenities([]);
+          setTotalAmenities(0);
         }
       } catch (error) {
         console.error(error);
       }
     };
     fetchAllAmenities();
-  }, []);
+  }, [page, setPage]);
 
   return (
     <div className="relative max-w-5xl container mx-auto my-20 p-8 bg-white rounded-lg shadow-lg">
@@ -139,7 +146,7 @@ const BookingAmenities = () => {
             >
               <img
                 className="rounded-lg w-36 h-32"
-                src={amenitesImage}
+                src={amenity.image || "https://placehold.co/144x128"}
                 alt={amenity.amenity_name}
               />
               <h3 className="font-semibold text-lg mt-4">
@@ -182,6 +189,15 @@ const BookingAmenities = () => {
           <p>No amenities found</p>
         )}
       </div>
+      {Math.ceil(totalAmenities / LIMIT_AMENITIES) > 1 && (
+        <div className="mt-8">
+          <Pagination
+            page={page}
+            setPage={setPage}
+            totalPages={Math.ceil(totalAmenities / LIMIT_AMENITIES)}
+          />
+        </div>
+      )}
 
       {/* Overlay */}
       {isCartVisible && (

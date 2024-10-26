@@ -1,63 +1,69 @@
 import React from "react";
+import { FaPhoneAlt } from "react-icons/fa";
+import { FiMessageCircle, FiFileText } from "react-icons/fi";
+import { CiMail } from "react-icons/ci";
+import { IoIosHelpCircleOutline } from "react-icons/io";
+import SupportCard from "../../../components/layout/Customer/SupportCard/SupportCard";
 
 const SupportCenter = () => {
+  const supportOptions = [
+    {
+      icon: FiMessageCircle,
+      title: "Live Chat",
+      description: "Chat live with our support team",
+    },
+    {
+      icon: FaPhoneAlt,
+      title: "Phone Support",
+      description: "Call us from 24 hours every day",
+    },
+    {
+      icon: CiMail,
+      title: "Email",
+      description: "Email us and get a response within 24 hours",
+    },
+    {
+      icon: FiFileText,
+      title: "Instruction Manual",
+      description: "See detailed instructions and frequently asked questions",
+    },
+    {
+      icon: IoIosHelpCircleOutline,
+      title: "Help Center",
+      description: "Learn more about how to use the product",
+    },
+  ];
+
   return (
     <div className="max-w-5xl container mx-auto my-20 p-8 bg-white rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-neutral mb-8 text-left">
-        Support Center
-      </h2>
-      <div className="bg-base-100 h-96 rounded-lg flex justify-between items-center">
-        {/* Left Section */}
-        <div className="membership-info w-1/2">
-          {/* Smaller content and centered under h2 */}
-          {/* <div className="text-center">
-            <p className="text-3xl font-medium text-gray-800 leading-tight">
-              Special Offer Information
-              <br />
-              for{" "}
-              <span className="font-black">
-                {membershipTiers[selectedTier].name} Membership
-              </span>
-            </p>
-
-            <p className="my-10 text-xl text-gray-600 max-w-sm mx-auto">
-              {membershipTiers[selectedTier].benefits}
-            </p>
-          </div> */}
-
-          {/* Membership Tier Icons */}
-          {/* <div className="flex justify-center space-x-3 mt-6">
-            {Object.keys(membershipTiers).map((tier) => (
-              <BsFillHexagonFill
-                key={tier}
-                className={`text-6xl cursor-pointer transition-transform hover:scale-105 ${membershipTiers[tier].color} `}
-                onClick={() => handleTierClick(tier)}
-              />
-            ))}
-          </div> */}
+      <div className="text-center mb-12">
+        <h2 className="text-3xl font-bold mb-4">How can we help you?</h2>
+        <p className="text-gray-600 max-w-2xl mx-auto">
+          Find answers quickly or contact our support team
+        </p>
+      </div>
+      <div className="bg-base-100 rounded-lg flex justify-between items-center flex-col">
+        {/* Support Options Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {supportOptions.map((option, index) => (
+            <SupportCard
+              key={index}
+              icon={option.icon}
+              title={option.title}
+              description={option.description}
+            />
+          ))}
         </div>
 
-        {/* Right Section */}
-        <div className="membership-status flex flex-col items-center justify-center space-y-4">
-          {/* <BsFillHexagonFill
-            className={`text-7xl ${membershipTiers[currentTier].color}`}
-          />
-          <p className="text-2xl font-bold text-gray-800">
-            {currentPoints} wyPoint
+        {/* Contact Information */}
+        <div className="mt-16 text-center p-8 bg-orange-50 rounded-lg w-full">
+          <h3 className="text-xl font-semibold mb-4">Still need help?</h3>
+          <p className="text-gray-600 mb-4">
+            Our support team is always ready to help you.
           </p>
-          <p className="text-sm text-gray-500">
-            You need to have {requiredPoints - currentPoints} wyPoint to upgrade
-          </p> */}
-
-          {/* Progress Bar */}
-          {/* <progress
-            className="progress progress-warning w-56"
-            value={currentPoints}
-            max={requiredPoints}
-          ></progress> */}
-
-          {/* wyPoint History Link */}
-          {/* <button className=" mt-2 btn btn-neutral">wyPoint history</button> */}
+          <button className="bg-orange-600 text-white px-6 py-2 rounded-lg hover:bg-orange-700 transition-colors">
+            Contact now
+          </button>
         </div>
       </div>
     </div>

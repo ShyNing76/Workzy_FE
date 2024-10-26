@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./FilterBar.scss";
 import { useLocation, useNavigate } from "react-router-dom";
+import { getAllWorkspaceType } from "../../../../config/api";
 
 const FilterBar = (props) => {
   const { buildingId } = props;
@@ -13,6 +14,8 @@ const FilterBar = (props) => {
   const [officeSize, setOfficeSize] = useState(props.officeSize || "");
   const [workspaceType, setWorkspaceType] = useState(props.workSpaceType || "");
   const currentLocation = useLocation();
+
+  const [workspaceTypeData, setWorkspaceTypeData] = useState([]);
 
   // Navigate
   const navigate = useNavigate();
@@ -73,6 +76,18 @@ const FilterBar = (props) => {
       setWorkspaceType("");
     }
   }, [currentLocation]);
+
+  useEffect(() => {
+    const fetchWorkspaceType = async () => {
+      const res = await getAllWorkspaceType();
+
+      if (res && res.data && res.err === 0) {
+        setWorkspaceTypeData(res.data.rows);
+      }
+    };
+
+    fetchWorkspaceType();
+  }, []);
 
   return (
     <>
@@ -142,12 +157,17 @@ const FilterBar = (props) => {
               <option disabled value="">
                 Workspace type
               </option>
-              <option value="Single POD">Single POD</option>
-              <option value="Double POD">Double POD</option>
-              <option value="Quad POD">Quad POD</option>
-              <option value="Working Room">Working Room</option>
-              <option value="Meeting Room">Meeting Room</option>
-              <option value="Event Space">Event Space</option>
+              {workspaceTypeData &&
+                workspaceTypeData
+                  .filter((workspace) => workspace.status === "active")
+                  .map((workspace) => (
+                    <option
+                      key={workspace.workspace_type_id}
+                      value={workspace.workspace_type_name}
+                    >
+                      {workspace.workspace_type_name}
+                    </option>
+                  ))}
             </select>
           </div>
 

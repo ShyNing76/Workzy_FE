@@ -60,9 +60,7 @@ const BuildingWorkspaces = () => {
           const bookings = response?.data?.rows.map(booking => {
             const startTime = convertToVietnamTime(booking.start_time_date);
             const endTime = convertToVietnamTime(booking.end_time_date);
-            
-            console.log('Start Time (Vietnam):', startTime);
-            console.log('End Time (Vietnam):', endTime);
+
             // Không còn xử lý thêm ngày cho booking từ 00:00 đến 07:00
             return {
               startTime: new Date(startTime),
@@ -98,7 +96,6 @@ const BuildingWorkspaces = () => {
   const handleDateChange = (e) => {
     const dateValue = e.target.value;
     let date;
-    console.log(dateValue)
     if (selectedType === 'monthly') {
       const [year, month] = dateValue.split('-');
       date = new Date(year, month - 1);

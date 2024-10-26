@@ -1,5 +1,5 @@
 //Normal import
-import React from "react";
+import React, { useState } from "react";
 import "./HomePage.scss";
 import { Link } from "react-router-dom";
 //Component
@@ -59,16 +59,18 @@ import eventSpaceImage1 from "../../../assets/eventSpaceImage1.jpg";
 import eventSpaceImage2 from "../../../assets/eventSpaceImage2.jpg";
 import eventSpaceImage3 from "../../../assets/eventSpaceImage3.jpg";
 
-import { MdContactSupport } from "react-icons/md";
-import { TbTruckDelivery } from "react-icons/tb";
-import { AiFillPrinter } from "react-icons/ai";
-import { FaPhone } from "react-icons/fa6";
-import Accordion from "../../../components/layout/Customer/Accordion/Accordion";
 import Comment from "../../../components/layout/Customer/CommentSection/Comment";
 import { ToastContainer } from "react-toastify";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
+
+import { FaPhone, FaTruck } from "react-icons/fa";
+import { CiMail } from "react-icons/ci";
+import { FiMapPin } from "react-icons/fi";
 
 const HomePage = () => {
   // Define the slides for the Swiper
+  const [activeTab, setActiveTab] = useState(0);
+
   const tabs = [
     {
       name: "Single POD",
@@ -117,7 +119,6 @@ const HomePage = () => {
         { Icon: FaRegCalendarAlt, details: "Open 24/7" },
         { Icon: FaWifi, details: "Strong, stable Wi-Fi" },
         { Icon: BsCupHot, details: "Coffee and Tea" },
-        { Icon: MdConnectWithoutContact, details: "Community connection" },
         { Icon: FiPrinter, details: "Printer" },
         { Icon: MdGroups2, details: "2-4 People" },
         { Icon: BiBuildingHouse, details: "Professional Enviroment" },
@@ -133,14 +134,10 @@ const HomePage = () => {
         { image: workingRoomImage3 },
       ],
       serviceDetails: [
-        { Icon: FaRegCalendarAlt, details: "Open 24/7" },
         { Icon: FaWifi, details: "Strong, stable Wi-Fi" },
-        { Icon: BsCupHot, details: "Coffee and Tea" },
         { Icon: MdConnectWithoutContact, details: "Community connection" },
         { Icon: FiPrinter, details: "Printer" },
         { Icon: BsFillTelephoneFill, details: "Telephone for room" },
-        { Icon: BiBuildingHouse, details: "Professional Enviroment" },
-        { Icon: BiRename, details: "Incorporate a business name" },
         { Icon: SlScreenDesktop, details: "Screen" },
         { Icon: FaChalkboard, details: "White board" },
       ],
@@ -155,12 +152,8 @@ const HomePage = () => {
         { image: meetingRoomImage3 },
       ],
       serviceDetails: [
-        { Icon: FaRegCalendarAlt, details: "Open 24/7" },
         { Icon: FaWifi, details: "Strong, stable Wi-Fi" },
-        { Icon: BsCupHot, details: "Coffee and Tea" },
         { Icon: MdGroups2, details: "6-15 people" },
-        { Icon: FiPrinter, details: "Printer" },
-        { Icon: BsFillTelephoneFill, details: "Telephone for room" },
         { Icon: MdOutlineSecurity, details: "Security" },
         { Icon: PiProjectorScreenDuotone, details: "Projector" },
         { Icon: SlScreenDesktop, details: "Screen" },
@@ -181,62 +174,63 @@ const HomePage = () => {
         { Icon: FaWifi, details: "Strong, stable Wi-Fi" },
         { Icon: BsCupHot, details: "Coffee and Tea" },
         { Icon: MdGroups2, details: "50-150 people" },
-        { Icon: MdOutlineSecurity, details: "Security" },
         { Icon: PiProjectorScreenDuotone, details: "Projector" },
         { Icon: SlScreenDesktop, details: "Screen" },
-        { Icon: FaChalkboard, details: "White board" },
       ],
       subTitle: "Versatile and Inviting venue",
     },
   ];
 
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <ToastContainer />
-      {/* Filter Section */}
-      <div>
+
+      {/* Hero Section with Filter */}
+      <div className="relative">
         <Filter />
       </div>
 
       {/* Service Cards Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 justify-items-center mx-20">
-        <ServiceCard
-          title="Our solution"
-          description="Browse our full range of products and services"
-          Icon={AiOutlineSolution}
-          link="/about"
-        />
-        <ServiceCard
-          title="Talk to us"
-          description="Get advice from one of our experts"
-          Icon={MdPhoneInTalk}
-          link="/contact"
-        />
-        <ServiceCard
-          title="Book workspace"
-          description="Book rooms and offices"
-          Icon={ImOffice}
-          link="/services"
-        />
-        <ServiceCard
-          title="Set up office"
-          description="Start building a real presence today"
-          Icon={TbSettingsUp}
-          link="/location"
-        />
-        <ServiceCard
-          title="Become a VIP"
-          description="Concessionary for VIP member"
-          Icon={RiVipCrown2Fill}
-          // link = "VIP Tutorial page"
-        />
-        <ServiceCard
-          title="Explore our web"
-          description="View our web to find your workspace"
-          Icon={RiPhoneFindLine}
-          link="/about"
-        />
-      </div>
+      <section className="bg-orange-50 py-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 justify-items-center mx-20">
+          <ServiceCard
+            title="Our solution"
+            description="Browse our full range of products and services"
+            Icon={AiOutlineSolution}
+            link="/services"
+          />
+          <ServiceCard
+            title="Talk to us"
+            description="Get advice from one of our experts"
+            Icon={MdPhoneInTalk}
+            link="/contact"
+          />
+          <ServiceCard
+            title="Book workspace"
+            description="Book rooms and offices"
+            Icon={ImOffice}
+            link="/location"
+          />
+          <ServiceCard
+            title="Set up office"
+            description="Start building a real presence today"
+            Icon={TbSettingsUp}
+            link="/location"
+          />
+          <ServiceCard
+            title="Become a VIP"
+            description="Concessionary for VIP member"
+            Icon={RiVipCrown2Fill}
+            link="/contact"
+          />
+          <ServiceCard
+            title="Explore our web"
+            description="View our web to find your workspace"
+            Icon={RiPhoneFindLine}
+            link="/about"
+          />
+        </div>
+      </section>
 
       {/* Hero Section */}
       <div>
@@ -262,99 +256,191 @@ const HomePage = () => {
       </div>
 
       {/*How it work */}
-      <div className="about-testimonials">
-        <div className="title-about-cart">
-          <span style={{ padding: "100px" }}>How it work</span>
+      <section className=" bg-orange-50 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
+            How It Works
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: TbHexagonNumber1,
+                title: "Search",
+                description: "Find available workspaces in your area",
+              },
+              {
+                icon: TbHexagonNumber2,
+                title: "Book",
+                description: "Reserve your preferred space and time",
+              },
+              {
+                icon: TbHexagonNumber3,
+                title: "Work",
+                description: "Enjoy your quiet and professional workspace",
+              },
+
+              // ... other steps
+            ].map((step, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-xl p-8 text-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+              >
+                <step.icon className="w-16 h-16 mx-auto text-orange-500" />
+                <h3 className="mt-4 text-xl font-semibold text-gray-900">
+                  {step.title}
+                </h3>
+                <p className="mt-2 text-gray-600">{step.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="about-card">
-          <Card
-            icon={TbHexagonNumber1}
-            title="Search"
-            description="Find available workspaces in your area"
-          />
-          <Card
-            icon={TbHexagonNumber2}
-            title="Book"
-            description="Reserve your preferred space and time"
-          />
-          <Card
-            icon={TbHexagonNumber3}
-            title="Work"
-            description="Enjoy your quiet and professional workspace"
-          />
-        </div>
-      </div>
+      </section>
 
       {/*Discover workzy services*/}
-      <div className="tittle-service-tab">
-        Discover Services of <span style={{ color: "#f39c12" }}>Workzy</span>
-      </div>
-      <div role="tablist" className="service-tabs tabs tabs-bordered">
-        {tabs.map((room, index) => (
-          <React.Fragment key={index}>
-            <input
-              type="radio"
-              name="my_tabs_2"
-              role="tab"
-              className="tab service-tab "
-              aria-label={`${room.name}`}
-              defaultChecked={index === 0} // Tab đầu tiên được chọn mặc định
-            />
-            <div role="tabpanel" className="tab-content p-10">
+      <div className="w-full max-w-6xl mx-auto my-10">
+        <div className="text-center mb-8">
+          <h2 className="text-5xl font-bold text-center mb-12 text-gray-900">
+            Discover Services of <span className="text-orange-400">Workzy</span>
+          </h2>
+        </div>
+
+        {/* Tab buttons */}
+        <div className="flex gap-2 border-b border-base-300 justify-center">
+          {tabs.map((tab, index) => (
+            <button
+              key={index}
+              onClick={() => setActiveTab(index)}
+              className={`px-6 py-3 text-lg font-medium transition-colors duration-200
+              ${
+                activeTab === index
+                  ? "border-b-2 border-orange-400 text-orange-400"
+                  : "text-gray-600 hover:text-orange-400"
+              }`}
+            >
+              {tab.name}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab content with transitions */}
+        <TransitionGroup className="relative">
+          <CSSTransition
+            key={activeTab}
+            timeout={300}
+            classNames={{
+              enter: "opacity-0 translate-x-4",
+              enterActive:
+                "opacity-100 translate-x-0 transition-all duration-300",
+              exit: "opacity-0 -translate-x-4 absolute top-0 left-0 right-0 transition-all duration-300",
+            }}
+          >
+            <div className="p-6">
               <OfficeNavbar
-                title={room.name}
-                swiperSlides={room.swiperSlides}
-                serviceDetails={room.serviceDetails}
-                subTitle={room.subTitle}
+                title={tabs[activeTab].name}
+                swiperSlides={tabs[activeTab].swiperSlides}
+                serviceDetails={tabs[activeTab].serviceDetails}
+                subTitle={tabs[activeTab].subTitle}
               />
             </div>
-          </React.Fragment>
-        ))}
+          </CSSTransition>
+        </TransitionGroup>
+
+        <style jsx>{`
+          .opacity-0 {
+            opacity: 0;
+          }
+          .opacity-100 {
+            opacity: 1;
+          }
+          .translate-x-4 {
+            transform: translateX(1rem);
+          }
+          .translate-x-0 {
+            transform: translateX(0);
+          }
+          .-translate-x-4 {
+            transform: translateX(-1rem);
+          }
+        `}</style>
       </div>
 
-      {/* Hero Section 2 */}
-      {/* <div>
-        <Hero
-          title="Work Seamlessly Wherever Your Business Takes You"
-          details={
-            <>
-
-              With over 4,000 office locations worldwide, we offer meeting rooms
-              and coworking spaces in every town, city, and major transport hub.
-              <br />
-              <br />
-              Whether you're working solo, growing a startup, or leading one of
-              the world’s most successful corporations, you can work close to
-              your clients, colleagues, or family through our network.
-
-            </>
-          }
-          image={imageHero2}
-          showButton = {true}
-        />
-      </div> */}
-      <h2 className="text-4xl font-bold mb-6 ml-36">What Our Users Say</h2>
-
-      <div className="container mx-auto pt-5">
+      <div className=" mx-auto">
         <Comment />
       </div>
 
-      {/* Google Map and Contact Section */}
-      <div className="container-map-contact flex flex-col md:flex-row items-center justify-between gap-8 py-8">
-        <div className="w-full md:w-full">
-          <Googlemap src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.0709101923308!2d106.77992101092796!3d10.88221128922828!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3174d89aad780e49%3A0x54542761d4c22175!2zS8O9IHTDumMgeMOhIEtodSBCIC0gxJDhuqFpIGjhu41jIFF14buRYyBnaWEgVFAuSENN!5e0!3m2!1svi!2s!4v1726835740160!5m2!1svi!2s" />
+      {/* Contact and Map Section */}
+      <section className="py-24 bg-gradient-to-br">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            {/* Map Container */}
+            <div className="w-full h-[450px] rounded-2xl overflow-hidden shadow-xl bg-white p-2">
+              <div className="w-full h-full rounded-xl overflow-hidden">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.0709101923308!2d106.77992101092796!3d10.88221128922828!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3174d89aad780e49%3A0x54542761d4c22175!2zS8O9IHTDumMgeMOhIEtodSBCIC0gxJDhuqFpIGjhu41jIFF14buRYyBnaWEgVFAuSENN!5e0!3m2!1svi!2s!4v1726835740160!5m2!1svi!2s"
+                  className="w-full h-full"
+                  loading="lazy"
+                  title="Location map"
+                />
+              </div>
+            </div>
+
+            {/* Contact Info */}
+            <div className="space-y-8">
+              <div className="text-center lg:text-left">
+                <h2 className="text-4xl font-bold text-gray-800 mb-4">
+                  Get in Touch
+                </h2>
+                <p className="text-gray-600 mb-8">
+                  We're here to help and answer any questions you might have.
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                <div className="flex items-center gap-4 p-4 bg-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300">
+                  <div className="p-3 bg-orange-100 rounded-lg">
+                    <FaPhone className="w-6 h-6 text-orange-500" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Hotline</p>
+                    <p className="font-medium text-gray-800">1900 1234</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 p-4 bg-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300">
+                  <div className="p-3 bg-orange-100 rounded-lg">
+                    <CiMail className="w-6 h-6 text-orange-500" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Email</p>
+                    <p className="font-medium text-gray-800">
+                      contact_workzy@gmail.com
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 p-4 bg-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300">
+                  <div className="p-3 bg-orange-100 rounded-lg">
+                    <FaTruck className="w-6 h-6 text-orange-500" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Expert Support</p>
+                    <p className="font-medium text-gray-800">0792 652 763</p>
+                  </div>
+                </div>
+              </div>
+
+              <Link
+                to={`contact`}
+                className="w-full lg:w-auto mt-8 px-8 py-4 btn-neutral btn text-white rounded-xl font-medium hover:bg-neutral-600 transition-colors duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+              >
+                <FiMapPin className="w-5 h-5" />
+                <span>Contact Us</span>
+              </Link>
+            </div>
+          </div>
         </div>
-        <div className="container-contact w-full md:w-1/2 text-center py-8">
-          <h2 className="text-2xl font-bold mb-4">Get in touch</h2>
-          <p className="mb-2">Hot Line: 1900 1234</p>
-          <p className="mb-2">Email: contact_workzy@gmail.com</p>
-          <p>Call expert: 0792 695 143</p>
-          <Link to="/contact" className="btn">
-            Contact us
-          </Link>
-        </div>
-      </div>
-    </>
+      </section>
+    </div>
   );
 };
 

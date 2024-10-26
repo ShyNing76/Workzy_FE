@@ -23,11 +23,15 @@ const Sidebar = (props) => {
 
   useEffect(() => {
     const fetchUserInfo = async () => {
-      const res = await getUserAuthen();
+      try {
+        const res = await getUserAuthen();
 
-      if (res && res.data && res.err === 0) {
-        setName(res?.data?.name);
-        setAvatar(res?.data?.image);
+        if (res && res.data && res.err === 0) {
+          setName(res?.data?.name);
+          setAvatar(res?.data?.image);
+        }
+      } catch (error) {
+        console.error(error);
       }
     };
 
@@ -48,7 +52,7 @@ const Sidebar = (props) => {
           </label>
           {outlet}
         </div>
-        <div className="drawer-side z-20 h-auto">
+        <div className="drawer-side fixed top-0 left-0 z-20 h-screen bg-base-200">
           <label
             htmlFor="my-drawer-2"
             aria-label="close sidebar"

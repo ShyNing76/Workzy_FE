@@ -10,11 +10,13 @@ import {
   getWorkSpaceById,
   postBookingAddToCalendar,
   postBookingRefund,
+  postCreateReview,
   putCancelBooking,
   putChangeStatus,
 } from "../../../config/api";
 import Swal from "sweetalert2";
 import BookingReviewModal from "../../../components/layout/Customer/BookingReviewModal/BookingReviewModal";
+import Pagination from "../../../components/layout/Shared/Pagination/Pagination";
 
 const MyBooking = () => {
   const [selectedTab, setSelectedTab] = useState("All");
@@ -25,12 +27,22 @@ const MyBooking = () => {
   const [isOpenReviewModal, setIsOpenReviewModal] = useState(false);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
+  const [page, setPage] = useState(1);
+  const LIMIT_BOOKING = 5;
+  const [totalBooking, setTotalBooking] = useState({});
 
   const fetchBookingData = async () => {
     try {
-      const resBooking = await getBookingOfCustomer();
+      const resBooking = await getBookingOfCustomer(
+        LIMIT_BOOKING,
+        page,
+        selectedTab
+      );
       if (resBooking && resBooking.data && resBooking.err === 0) {
-        return resBooking.data; // Trả về booking data nếu có
+        let tabTotalBooking = resBooking.data.statusCount[selectedTab];
+
+        setTotalBooking(tabTotalBooking);
+        return resBooking.data.bookings; // Trả về booking data nếu có
       } else {
         return []; // Trả về mảng rỗng nếu không có booking
       }
@@ -97,39 +109,7 @@ const MyBooking = () => {
 
     fetchAllBookingType();
     fetchBookingAndWorkspacesData();
-  }, [refreshData]); // Chạy khi component mount
-
-  // Lọc bookings theo trạng thái của từng tab
-  const filterBookings = () => {
-    if (selectedTab === "All") return bookingData;
-    if (selectedTab === "Current") {
-      return bookingData.filter((booking) =>
-        [
-          "in-process",
-          "check-out",
-          "check-in",
-          "check-amenities",
-          "damage-payment",
-        ].includes(booking.BookingStatuses[0].status)
-      );
-    }
-    if (selectedTab === "Upcoming") {
-      return bookingData.filter((booking) =>
-        ["paid", "confirmed"].includes(booking.BookingStatuses[0].status)
-      );
-    }
-    if (selectedTab === "Completed") {
-      return bookingData.filter(
-        (booking) => booking.BookingStatuses[0].status === "completed"
-      );
-    }
-    if (selectedTab === "Cancelled") {
-      return bookingData.filter(
-        (booking) => booking.BookingStatuses[0].status === "cancelled"
-      );
-    }
-    return [];
-  };
+  }, [refreshData, page, setPage, selectedTab]); // Chạy khi component mount
 
   // Cancel Booking function
   const handleCancelBooking = (e, bookingId) => {
@@ -264,7 +244,7 @@ const MyBooking = () => {
       confirmButtonText: "Yes, check-out it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        putChangeStatus(bookingId, "check-out");
+        const res = putChangeStatus(bookingId, "check-out");
 
         if (res && res.err === 0) {
           Swal.fire({
@@ -313,10 +293,28 @@ const MyBooking = () => {
     setIsOpenReviewModal(true);
   };
 
-  const handleSubmitReview = () => {
-    // Xử lý gửi đánh giá, ví dụ gọi API
-    console.log("Rating:", rating);
-    console.log("Comment:", comment);
+  const handleSubmitReview = async (bookingId) => {
+    const res = await postCreateReview(bookingId, rating, comment);
+
+    if (res && res.err === 0) {
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Review Workspace Successful",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+      setRefreshData((prev) => !prev);
+    } else {
+      Swal.fire({
+        position: "center",
+        icon: "error",
+        title: res.message,
+        text: "Fail to Review Workspace",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    }
 
     // Đóng modal sau khi gửi đánh giá
     setRating(5);
@@ -352,8 +350,8 @@ const MyBooking = () => {
 
       <div className="container mx-auto p-4">
         {/* Hiển thị Booking Cards tương ứng */}
-        {filterBookings().length > 0 ? (
-          filterBookings().map((booking) => {
+        {bookingData && bookingData.length > 0 ? (
+          bookingData.map((booking) => {
             const workspace = workspaceData[booking.workspace_id];
 
             const type = bookingType.find(
@@ -392,7 +390,7 @@ const MyBooking = () => {
                     <br />
                     <div
                       className={`card-actions ${
-                        booking.BookingStatuses[0].status === "in-process" ||
+                        booking.BookingStatuses[0].status === "usage" ||
                         booking.BookingStatuses[0].status === "confirmed"
                           ? "justify-between"
                           : "justify-end"
@@ -418,7 +416,7 @@ const MyBooking = () => {
                           </button>
                         </>
                       )}
-                      {booking.BookingStatuses[0].status === "in-process" && (
+                      {booking.BookingStatuses[0].status === "usage" && (
                         <>
                           <button className="btn btn-outline btn-info skeleton">
                             Checkout
@@ -481,6 +479,13 @@ const MyBooking = () => {
           </div>
         )}
       </div>
+      {Math.ceil(totalBooking / LIMIT_BOOKING) > 1 && (
+        <Pagination
+          page={page}
+          setPage={setPage}
+          totalPages={Math.ceil(totalBooking / LIMIT_BOOKING)}
+        />
+      )}
     </div>
   );
 };

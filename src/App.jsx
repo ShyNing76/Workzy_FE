@@ -45,19 +45,13 @@ function App() {
 
   return (
     <>
-      {appLoading ? (
-        <div className="flex justify-center items-center h-screen">
-          <span className="loading loading-spinner loading-lg"></span>
+      <div className="flex flex-col min-h-screen">
+        <Navbar refresh={refresh} />
+        <div className="flex-grow">
+          <Outlet context={{ refresh, setRefresh }} />
         </div>
-      ) : (
-        <div className="flex flex-col min-h-screen">
-          <Navbar refresh={refresh} />
-          <div className="flex-grow">
-            <Outlet context={{ refresh, setRefresh }} />
-          </div>
-          <Footer />
-        </div>
-      )}
+        <Footer />
+      </div>
     </>
   );
 }

@@ -179,8 +179,10 @@ const postApprovePaypalOrder = (orderId, bookingId) => {
   return axios.post(URL_API, data);
 };
 
-const getBookingOfCustomer = () => {
-  const URL_API = `api/v1/booking/customer`;
+const getBookingOfCustomer = (limit, page, status) => {
+  const URL_API = `api/v1/booking/customer?&order[]=created_at&order[]=desc&limit=${limit}&page=${page}&status=${
+    status || ""
+  }`;
 
   return axios.get(URL_API);
 };
@@ -212,8 +214,8 @@ const putChangeStatus = (bookingId, status) => {
   return axios.put(URL_API, data);
 };
 
-const getAllAmenities = () => {
-  const URL_API = `api/v1/amenity`;
+const getAllAmenities = (limit, page) => {
+  const URL_API = `api/v1/amenity?limit=${limit}&page=${page}`;
 
   return axios.get(URL_API);
 };
@@ -230,10 +232,6 @@ const postCreatePaypalOrderAmenities = (
     booking_id,
     total_amenities_price,
   };
-
-  console.log("booking id:", booking_id);
-  console.log("addAmenities:", addAmenities);
-  console.log("Total Price:", total_amenities_price);
 
   return axios.post(URL_API, data);
 };
@@ -262,6 +260,53 @@ const postBookingRefund = (bookingId) => {
   const URL_API = `api/v1/booking/refund/${bookingId}`;
 
   return axios.post(URL_API);
+};
+
+const getAllWorkspacesByWorkspaceTypeName = (WorkspaceTypeName) => {
+  const URL_API = `api/v1/workspace/?workspace_type_name=${WorkspaceTypeName}&status=active`; // No pagination in this call
+  return axios.get(URL_API);
+};
+
+const getReviewByWorkspaceName = (WorkspaceName, limit, page) => {
+  const URL_API = `api/v1/review/?workspace_name=${WorkspaceName}&limit=${limit}&page=${page}`;
+  return axios.get(URL_API);
+};
+
+const postCreateReview = (booking_id, rating, review_content) => {
+  const URL_API = `api/v1/review`;
+  const data = {
+    booking_id,
+    rating,
+    review_content,
+  };
+
+  return axios.post(URL_API, data);
+};
+
+const getAllWorkspaceType = () => {
+  const URL_API = `api/v1/workspace-type`;
+  return axios.get(URL_API);
+};
+
+const getPointOfCustomer = () => {
+  const URL_API = `api/v1/customer/point`;
+  return axios.get(URL_API);
+};
+
+const getTimeBookingInRoomAndDate = (workspace_id, date) => {
+  const URL_API = `/api/v1/booking/time-booking/${workspace_id}/?date=${date}`;
+  return axios.get(URL_API);
+};
+
+const getAllWishlistOfCustomer = () => {
+  const URL_API = `api/v1/wishList/mywishlist`;
+  return axios.get(URL_API);
+};
+
+const getAmnenitiesBookingByBookingId = (booking_id) => {
+  const URL_API = `api/v1/booking/get-amenities/${booking_id}`;
+
+  return axios.get(URL_API);
 };
 
 export {
@@ -294,4 +339,12 @@ export {
   postApprovePaypalOrderAmenities,
   postBookingAddToCalendar,
   postBookingRefund,
+  getAllWorkspacesByWorkspaceTypeName,
+  getReviewByWorkspaceName,
+  postCreateReview,
+  getAllWorkspaceType,
+  getPointOfCustomer,
+  getTimeBookingInRoomAndDate,
+  getAllWishlistOfCustomer,
+  getAmnenitiesBookingByBookingId,
 };

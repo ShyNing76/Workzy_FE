@@ -1,18 +1,23 @@
 import React from "react";
 import { GoTrash } from "react-icons/go";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
-const DeleteButton = ({ onClick, label = "Delete" }) => {
+const DeleteButton = ({ onClick, label = "Block" }) => {
     return (
-        <button className="btn btn-error btn-sm" onClick={onClick}>
-            <GoTrash className="text-white"/>
+        <button
+            className={`btn btn-sm w-20 ${
+                label === "Block" ? "btn-error" : "btn-success"
+            } `}
+            onClick={onClick}
+        >
+            {label}
         </button>
     );
 };
 
 DeleteButton.propTypes = {
     onClick: PropTypes.func.isRequired,
-    label: PropTypes.string
+    label: PropTypes.string,
 };
 
 export default DeleteButton;

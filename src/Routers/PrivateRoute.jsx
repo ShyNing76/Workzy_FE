@@ -8,12 +8,15 @@ const PrivateRoute = (props) => {
   //   auth from auth Context (use context)
   const { roleId, auth } = useContext(AuthContext);
 
-  console.log("authen: ", auth?.isAuthenticated);
-  console.log("roldId", roleId);
+  console.log("auth out: ", auth?.isAuthenticated);
 
   //   Check auth from user has login or not
   if (!auth?.isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    console.log("auth in: ", auth?.isAuthenticated);
+
+    console.log("logout retric");
+
+    return <Navigate to="/restricted" replace />;
   }
 
   // if role id equals with requireRole ID => Render children
@@ -27,8 +30,10 @@ const PrivateRoute = (props) => {
     return children;
   }
 
+  console.log("logout not ");
+
   // If role doesn't match, redirect the user to the login page or another appropriate page
-  return <Navigate to="/login" replace />;
+  return <Navigate to="/restricted" replace />;
 };
 
 export default PrivateRoute;
