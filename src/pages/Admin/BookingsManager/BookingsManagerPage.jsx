@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   getAllBooking,
-  getBuilding,
-  getWorkspace,
 } from "../../../config/api.admin";
 import { FiFilter } from "react-icons/fi";
 const BookingsManagerPage = () => {

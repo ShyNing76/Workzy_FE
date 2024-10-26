@@ -323,7 +323,7 @@ const getReviewById = (review_id) => {
 
 const deleteReview = (review_id) => {
   const URL_API = `/api/v1/review/delete/${review_id}`
-  return axios.put(URL_API)
+  return axios.delete(URL_API)
 }
 
   
