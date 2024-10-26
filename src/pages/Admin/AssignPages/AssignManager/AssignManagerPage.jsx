@@ -140,7 +140,7 @@ const AssignManagerPage = () => {
           });
           // fetch lại data
           await fetchManagerAndBuilding();
-          
+
           setBuildings((prevBuildings) =>
             prevBuildings.map((building) =>
               building.building_id === buildingId
@@ -204,7 +204,13 @@ const AssignManagerPage = () => {
 
       <div className="mt-5">
         {isLoading ? (
-          <div className="loading-spinner">Loading...</div>
+          <div className="flex justify-center items-center h-64">
+            <tr>
+              <td colSpan="4">
+                <span className="loading loading-spinner loading-lg"></span>
+              </td>
+            </tr>
+          </div>
         ) : (
           <div className="assign-manager-table-container">
             <div className="overflow-x-auto">
@@ -252,7 +258,7 @@ const AssignManagerPage = () => {
                       </td>
                       <td>
                         <button
-                          className="btn btn-primary btn-sm"
+                          className="btn btn-primary"
                           onClick={() =>
                             handleAssignManagerToBuilding(building.building_id)
                           }
@@ -267,7 +273,7 @@ const AssignManagerPage = () => {
                         </button>
 
                         <button
-                          className="btn btn-danger btn-sm ml-2"
+                          className="btn btn-error ml-5"
                           onClick={() =>
                             handleUnassignManagerFromBuilding(
                               building.building_id

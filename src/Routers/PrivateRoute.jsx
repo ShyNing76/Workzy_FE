@@ -8,14 +8,8 @@ const PrivateRoute = (props) => {
   //   auth from auth Context (use context)
   const { roleId, auth } = useContext(AuthContext);
 
-  console.log("auth out: ", auth?.isAuthenticated);
-
   //   Check auth from user has login or not
   if (!auth?.isAuthenticated) {
-    console.log("auth in: ", auth?.isAuthenticated);
-
-    console.log("logout retric");
-
     return <Navigate to="/restricted" replace />;
   }
 

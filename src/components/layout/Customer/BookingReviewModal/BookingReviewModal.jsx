@@ -2,7 +2,7 @@ import React from "react";
 
 const BookingReviewModal = (props) => {
   const {
-    booking,
+    bookingId,
     isOpenReviewModal,
     setIsOpenReviewModal,
     setRating,
@@ -62,7 +62,7 @@ const BookingReviewModal = (props) => {
               <div className="modal-action">
                 <button
                   className="btn btn-accent"
-                  onClick={() => handleSubmitReview(booking.booking_id)}
+                  onClick={() => handleSubmitReview(bookingId)}
                 >
                   Done
                 </button>

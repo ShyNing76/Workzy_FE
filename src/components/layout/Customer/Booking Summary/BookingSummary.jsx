@@ -40,7 +40,7 @@ const BookingSummary = (props) => {
   // Calculate the total price
   useEffect(() => {
     // Calculate the subtotal first
-    const newSubtotal = amountPrice - discount;
+    const newSubtotal = amountPrice - amountPrice * discount;
 
     // Then calculate the tax based on the subtotal
     const newTax = newSubtotal * 0.1; // Assuming tax is 10%
@@ -60,7 +60,7 @@ const BookingSummary = (props) => {
         </div>
         <div className="flex justify-between mb-2">
           <span>Discount:</span>
-          <span>{formatCurrency(discount)}</span>
+          <span>- {formatCurrency(amountPrice * discount)}</span>
         </div>
         <div className="flex justify-between mb-2">
           <span>Subtotal:</span>

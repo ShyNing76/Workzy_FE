@@ -1,233 +1,274 @@
-import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-
-import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
-import AddModal from "../../../components/layout/Admin/Modals/AddModal.jsx";
-import DeleteModal from "../../../components/layout/Admin/Modals/DeleteModal.jsx";
-import UpdateModal from "../../../components/layout/Admin/Modals/UpdateModal.jsx";
-import AddButton from "../../../components/layout/Admin/Buttons/AddButton.jsx";
-import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.jsx";
-import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
-import SuccessAlert from "../../../components/layout/Admin/SuccessAlert/SuccessAlert.jsx";
-import { getBookingByBuildingId } from "../../../config/api.admin.js";
-import { getBuilding } from "../../../config/api.admin.js" // Assuming similar structure to getBooking
-
+import React, { useEffect, useState } from "react";
+import {
+  getAllBooking,
+} from "../../../config/api.admin";
+import { FiFilter } from "react-icons/fi";
+import { format } from "date-fns";
 const BookingsManagerPage = () => {
-  const location = useLocation();
+  const [bookings, setBookings] = useState([]);
+  const [filterLocation, setFilterLocation] = useState("");
+  const [filterBookingType, setFilterBookingType] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
 
-  const [booking, setBooking] = useState(null);
-  const [loading, setLoading] = useState(true); // State loading
-  const [error, setError] = useState(null); // State lỗi
-  const [building, setBuilding] = useState([]);
-  const [selectedBuildingId, setSelectedBuildingId] = useState('');
-
-  // const [searchTerm, setSearchTerm] = useState("");
-  // const [showAddModal, setShowAddModal] = useState(false);
-  // const [showUpdateModal, setShowUpdateModal] = useState(false);
-  // const [showDeleteModal, setShowDeleteModal] = useState(false);
-  // const [bookingToDelete, setBookingToDelete] = useState(null);
-  // const [successMessage, setSuccessMessage] = useState("");
-  const [newBooking, setNewBooking] = useState({
-    booking_id: '',
-    workspace_id: '',
-    start_time: '',
-    end_time: '',
-    total_price: ''
-  });
-
-  const [responseData, setResponseData] = useState(null);
-
-    //Hiện data lên table
-    
-    useEffect(() => {
-      const fetchBooking = async () => {
-        if (!selectedBuildingId) {
-          setBooking([]); // Clear bookings if no building is selected
-          return;
+  // Fetch bookings data
+  useEffect(() => {
+    const fetchDataBookings = async () => {
+      setIsLoading(true);
+      try {
+        const response = await getAllBooking();
+        if (response) {
+          setBookings(response.data.rows);
+          console.log("bookings", bookings);
         }
-    
-        setLoading(true); // Start loading state while fetching
-        try {
-          
-          const res = await getBookingByBuildingId(selectedBuildingId);
-          console.log('Fetching bookings for building:', selectedBuildingId)
-          
-          if (res && res.data && res.data.err === 0) { // Validate structure and success
-            const rows = res.data.rows;
-            setBooking(res.data.rows);
-            console.log('Abs')
-          } else {
-            console.error('Unexpected data format or error from API:', res);
-            setBooking([]); // Initialize with empty array if data is not as expected
-          }
-        } catch (err) {
-          console.error('Error fetching bookings:', err);
-          setError(err);
-          setBooking([]); // Optionally reset bookings on error
-        } finally {
-          setLoading(false); // End loading state
-        }
-      };
-    
-      fetchBooking();
-    }, [selectedBuildingId]);
-
-useEffect(() => {
-  const fetchBuildings = async () => {
-    try {
-      const res = await getBuilding();
-      if (res && res.data) {
-        setBuilding(res.data.rows || res.data); // Adjust based on your response structure
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err) {
-      console.error('Failed to fetch buildings:', err);
-    }
+    };
+    fetchDataBookings();
+  }, []);
+
+  // Hold the location value
+  const handleFilterLocation = (event) => {
+    setFilterLocation(event.target.value);
   };
 
-  fetchBuildings();
-}, []);
+  // Hold the booking type value
+  const handleFilterBookingType = (event) => {
+    setFilterBookingType(event.target.value);
+  };
 
-  // const handleInputChange = (e) => {
+  // Filter bookings by location and booking type
+  const filteredBookings = bookings.filter(
+    (booking) =>
+      (filterLocation
+        ? booking.Workspace.Building &&
+          booking.Workspace.Building.location === filterLocation
+        : true) &&
+      (filterBookingType
+        ? booking.BookingType.type === filterBookingType
+        : true)
+  );
+  // Open modal truyền vào 1 booking để hiển thị chi tiết booking đó
+  const handleOpenModal = (selectedBooking) => {
+    // param: selectedBooking là booking được chọn để hiển thị chi tiết
+    setSelectedBooking(selectedBooking); // set selectedBooking là booking được chọn
+    setOpenModal(true); // set openModal là true để hiển thị modal
+  };
 
-  // };
-
-  // const generateBookingId = () => {
-  //   const lastId =
-  //     bookings.length > 0 ? bookings[bookings.length - 1].id : "BK00";
-  //   const newId = `BK${parseInt(lastId.substring(2)) + 1}`;
-  //   return newId;
-  // };
-
-  // const handleSearchChange = (e) => {
-  //   setSearchTerm(e.target.value);
-  // };
-
-  // const closeSuccessMessage = () => {
-  //   setSuccessMessage("");
-  // };
-
-  // const filteredBookings = bookings.filter((booking) => {
-  //     return(
-  //       booking.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //       booking.customerID.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //       booking.workspaceID.toLowerCase().includes(searchTerm.toLowerCase())
-  //     )
-  //   }
-  // );
+  // Đóng modal
+  const handleCloseModal = () => {
+    // đóng modal
+    setSelectedBooking(null); // set selectedBooking là null
+    setOpenModal(false); // set openModal là false để đóng modal
+  };
 
   return (
-    <div className="container mx-auto px-4 sm:px-8">
-      <h1 className="text-4xl font-black mb-4">Manage Bookings</h1>
+    <div>
+      <div className="p-4 space-y-6">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-2">
+            <h1 className="text-3xl font-bold">View Bookings</h1>
+            <div className="badge badge-neutral">
+              {filteredBookings.length} bookings
+            </div>
+          </div>
 
-      <div className="grid grid-cols-2">
-        <SearchBar
-          // searchTerm={searchTerm}
-          // handleSearchChange={handleSearchChange}
-          // placeholder="Search by ID, name, or status"
-        />
-
-        {/* Add Button */}
-        <div className="ml-2">
-          {/* <AddButton
-            onClick={() => setShowAddModal(true)}
-            label="Add Booking"
-          /> */}
+          {/* Stats Cards */}
+          <div className="stats shadow">
+            <div className="stat place-items-center">
+              <div className="stat-title">Total Bookings</div>
+              <div className="stat-value text-primary">{bookings.length}</div>
+            </div>
+            <div className="stat place-items-center">
+              <div className="stat-title">In using</div>
+              <div className="stat-value text-success">
+                {
+                  bookings.filter(
+                    (b) => b.BookingStatuses[0]?.status === "usage"
+                  ).length
+                }
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-        <div>
-          {/* <SuccessAlert
-            message={successMessage}
-            onClose={closeSuccessMessage}
-          /> */}
+        {/* Filters Card */}
+        <div className="card bg-base-100">
+          <div className="card-body">
+            <h2 className="card-title">
+              <FiFilter />
+              Filters
+            </h2>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <select
+                className="select select-bordered w-full max-w-xs"
+                value={filterLocation}
+                onChange={(e) => setFilterLocation(e.target.value)}
+              >
+                <option value="">All Locations</option>
+                <option value="HCM">Ho Chi Minh City</option>
+                <option value="Hanoi">Hanoi</option>
+              </select>
+
+              <select
+                className="select select-bordered w-full max-w-xs"
+                value={filterBookingType}
+                onChange={(e) => setFilterBookingType(e.target.value)}
+              >
+                <option value="">All Booking Types</option>
+                <option value="Hourly">Hourly</option>
+                <option value="Daily">Daily</option>
+                <option value="Monthly">Monthly</option>
+              </select>
+            </div>
+          </div>
         </div>
-        
-        <select
-  className="select select-bordered select-sm w-full max-w-xs"
-  value={selectedBuildingId}
-  onChange={(e) => setSelectedBuildingId(e.target.value)}
->
-  <option value="">All Buildings</option>
-  {building.map((building) => (
-    <option key={building.building_id} value={building.building_id}>
-      {building.building_name}
-    </option>
-  ))}
-</select>
 
-        <div className="overflow-x-auto flex flex-1">
-          <table className="table table-zebra w-full">
-            <thead>
-              <tr>
-                <th>Booking ID</th>
-                <th>Workspace ID</th>
-                <th>Total Price</th>
-                <th>Start Time</th>
-                <th>End Time</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Array.isArray(booking) && booking.map((booking) => (
-                  <tr key={booking.id}>
+        {/* Bookings Table */}
+        {!isLoading ? (
+          <div className="overflow-x-auto">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Index</th>
+                  <th>Booking ID</th>
+                  <th>Building Name</th>
+                  <th>Workspace Name</th>
+                  <th>Booking Type</th>
+                  <th>Start Time</th>
+                  <th>End Time</th>
+                  <th>Status</th>
+                  <th>Total Price</th>
+                  <th>View Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredBookings.map((booking, index) => (
+                  <tr key={booking.booking_id}>
+                    <td>{index + 1}</td>
                     <td>{booking.booking_id}</td>
-                    <td>{booking.workspace_id}</td>
+                    <td>{booking.Workspace.Building.building_name}</td>
+                    <td>{booking.Workspace.workspace_name}</td>
+                    <td>{booking.BookingType.type}</td>
+                    <td>
+                      {format(
+                        new Date(booking.start_time_date),
+                        "dd/MM/yyyy HH:mm"
+                      )}
+                    </td>
+                    <td>
+                      {format(
+                        new Date(booking.end_time_date),
+                        "dd/MM/yyyy HH:mm"
+                      )}
+                    </td>
+                    <td>
+                      {booking.BookingStatuses.length > 0 ? (
+                        <div
+                          className={`badge text-sm mx-1 my-1 rounded-lg shadow-md ${
+                            booking.BookingStatuses[0].status === "usage"
+                              ? "badge-accent"
+                              : booking.BookingStatuses[0].status === "paid"
+                              ? "badge-warning"
+                              : booking.BookingStatuses[0].status ===
+                                "cancelled"
+                              ? "badge-error"
+                              : booking.BookingStatuses[0].status ===
+                                "check-amenities"
+                              ? "badge-primary"
+                              : booking.BookingStatuses[0].status ===
+                                "completed"
+                              ? "badge-info"
+                              : "badge-neutral"
+                          }`}
+                        >
+                          {booking.BookingStatuses[0].status}
+                        </div>
+                      ) : (
+                        <div className="badge badge-neutral text-lg mx-1 my-1 rounded-lg shadow-md">
+                          N/A
+                        </div>
+                      )}
+                    </td>
                     <td>{booking.total_price}</td>
-                    <td>{booking.start_time}</td>
-                    <td>{booking.end_time}</td>
-                    <td className="flex space-x-2">
-                      {/* Update Button */}
-                      {/* <UpdateButton
-                        onClick={() => {
-                          setCurrentBooking({ 
-                            ...booking, 
-                            oldId: booking.id 
-                          });
-                          setShowUpdateModal(true);
-                        }}
-                      /> */}
-
-                      {/* Delete Button */}
-                      {/* <DeleteButton
-                        onClick={() => {
-                          setBookingToDelete(booking);
-                          setShowDeleteModal(true);
-                        }}
-                      /> */}
+                    <td>
+                      <button
+                        className="btn btn-sm hover:bg-green-500"
+                        onClick={() => handleOpenModal(booking)}
+                      >
+                        Details
+                      </button>
                     </td>
                   </tr>
                 ))}
-              
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <table>
+            <tbody>
+              <tr>
+                <td colSpan="9">
+                  <div className="flex justify-center items-center h-64">
+                    <span className="loading loading-spinner loading-lg"></span>
+                  </div>
+                </td>
+              </tr>
             </tbody>
           </table>
-        </div>
+        )}
 
-        {/* Add, Update, Delete, Success Modals */}
-        {/* <AddModal
-          show={showAddModal}
-          onClose={() => setShowAddModal(false)}
-          onSubmit={handleAddBookingSubmit}
-          currentItem={currentBooking}
-          onInputChange={handleInputChange}
-          fields={addBookingFields}
-        /> */}
-
-        {/* <UpdateModal
-          show={showUpdateModal}
-          onClose={() => setShowUpdateModal(false)}
-          onSubmit={handleUpdateBookingSubmit}
-          currentItem={currentBooking}
-          onInputChange={handleInputChange}
-          fields={updateBookingFields}
-        />
-
-        <DeleteModal
-          show={showDeleteModal}
-          onClose={() => setShowDeleteModal(false)}
-          onDelete={handleDeleteBooking}
-          itemToDelete={bookingToDelete}
-          itemType="booking"
-        /> */}
+        {/* Modal */}
+        {/*nếu openModal là true và selectedBooking khác null thì hiển thị modal*/}
+        {openModal && selectedBooking && (
+          <dialog id="my_modal_3" className="modal open" open>
+            <div className="modal-box">
+              <form method="dialog">
+                <button
+                  className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                  onClick={handleCloseModal}
+                >
+                  ✕
+                </button>
+              </form>
+              <h3 className="font-bold text-lg">Booking Details</h3>
+              <p className="py-4">Booking ID: {selectedBooking.booking_id}</p>
+              <p className="py-4">
+                Building Name:{" "}
+                {selectedBooking.Workspace.Building.building_name}
+              </p>
+              <p className="py-4">
+                Workspace Name: {selectedBooking.Workspace.workspace_name}
+              </p>
+              <p className="py-4">
+                Booking Type: {selectedBooking.BookingType.type}
+              </p>
+              <p className="py-4">
+                Start Time:{" "}
+                {format(
+                  new Date(selectedBooking.start_time_date),
+                  "dd/MM/yyyy HH:mm"
+                )}
+              </p>
+              <p className="py-4">
+                {format(
+                  new Date(selectedBooking.end_time_date),
+                  "dd/MM/yyyy HH:mm"
+                )}{" "}
+              </p>
+              <p className="py-4">
+                Status: {selectedBooking.BookingStatuses[0]?.status || "N/A"}
+              </p>
+              <p className="py-4">Total Price: {selectedBooking.total_price}</p>
+            </div>
+          </dialog>
+        )}
+      </div>
     </div>
   );
 };

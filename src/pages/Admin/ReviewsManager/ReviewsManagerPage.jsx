@@ -1,166 +1,266 @@
-import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-
-import { getReview } from "../../../config/api.admin.js";
-import { getReviewById } from "../../../config/api.admin.js";
-import { deleteReview } from "../../../config/api.admin.js";
-
-import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
-import AddModal from "../../../components/layout/Admin/Modals/AddModal.jsx";
-import DeleteModal from "../../../components/layout/Admin/Modals/DeleteModal.jsx";
-import UpdateModal from "../../../components/layout/Admin/Modals/UpdateModal.jsx";
-import AddButton from "../../../components/layout/Admin/Buttons/AddButton.jsx";
-import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.jsx";
-import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
-import SuccessAlert from "../../../components/layout/Admin/SuccessAlert/SuccessAlert.jsx";
-import { set } from "date-fns";
+import React, { useEffect, useState } from "react";
+import { format } from "date-fns";
+import {
+  deleteReview,
+  getBuilding,
+  getReview,
+  getWorkspaceByBuildingId,
+} from "../../../config/api.admin";
+import { LiaStarOfLifeSolid } from "react-icons/lia";
+import { FaBuilding, FaChevronDown } from "react-icons/fa";
+import { MdWorkspaces } from "react-icons/md";
+import { AiFillStar } from "react-icons/ai";
+import { BiTime } from "react-icons/bi";
+import { FaUserCircle } from "react-icons/fa";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import Swal from "sweetalert2";
 
 const ReviewsManagerPage = () => {
-  const location = useLocation();
+  const [buildings, setBuildings] = useState([]);
+  const [workSpaces, setWorkSpaces] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  const [review, setReview] = useState(null);
-  const [loading, setLoading] = useState(true); // State loading
-  const [error, setError] = useState(null); // State lỗi
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [reviewToDelete, setReviewToDelete] = useState(null);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [newReview, setNewReview] = useState({
-    booking_id: '',
-    rating: '',
-    review_content: '',
-  })
-
-  const [responseData, setResponseData] = useState(null);
-
-  const fetchReview = async () => {
-    try {
-      const res = await getReview();
-      console.log("API response:", res); // Inspect API response
-      if (res && res.data && Array.isArray(res.data.rows)) {
-        setReview(res.data.rows);
-      } else {
-        setReview([]); // Initialize as an empty array if data is not as expected
+  useEffect(() => {
+    const fetchAllBuildings = async () => {
+      setIsLoading(true);
+      try {
+        const responseBuildings = await getBuilding();
+        if (
+          responseBuildings &&
+          responseBuildings.data &&
+          responseBuildings.err === 0
+        ) {
+          setBuildings(responseBuildings.data);
+        }
+      } catch (error) {
+        console.error("Error fetching buildings:", error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
+    };
+    fetchAllBuildings();
+  }, []);
+
+  useEffect(() => {
+    const fetchAllWorkSpaces = async (buildingId) => {
+      try {
+        const responseWorkSpaces = await getWorkspaceByBuildingId(buildingId);
+        if (
+          responseWorkSpaces &&
+          responseWorkSpaces.data &&
+          responseWorkSpaces.err === 0
+        ) {
+          setWorkSpaces((prevWorkSpaces) => [
+            ...prevWorkSpaces,
+            { buildingId, workSpaces: responseWorkSpaces.data },
+          ]);
+        }
+      } catch (error) {
+        console.error("Error fetching workspaces:", error);
+      }
+    };
+
+    buildings.forEach((building) => {
+      fetchAllWorkSpaces(building.building_id);
+    });
+  }, [buildings]);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      setIsLoading(true);
+      try {
+        const responseReviews = await getReview();
+        if (
+          responseReviews &&
+          responseReviews.data &&
+          responseReviews.err === 0
+        ) {
+          setReviews(responseReviews.data.rows);
+        }
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    if (!isLoaded) {
+      fetchReviews();
+      setIsLoaded(true);
+    }
+  }, [isLoaded]);
+
+  const handleDeleteReview = async (reviewId) => {
+    try {
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+      });
+
+      if (result.isConfirmed) {
+        const responseDeleteReview = await deleteReview(reviewId);
+        if (responseDeleteReview && responseDeleteReview.err === 0) {
+          Swal.fire({
+            title: "Delete review successfully",
+            icon: "success",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          setReviews(reviews.filter((review) => review.review_id !== reviewId));
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting review:", error);
+      Swal.fire({
+        title: "Error",
+        text: "Failed to delete review",
+        icon: "error",
+      });
     }
   };
 
-  useEffect(() => {
-    fetchReview();
-  }, []);
-
-  // const [searchTerm, setSearchTerm] = useState("");
-
-  const handleDeleteReview = async () => {
-    if (!reviewToDelete) return;
-
-    try {
-      // Call the deleteReview API with the selected review ID
-      const response = await deleteReview(reviewToDelete.review_id);
-  
-      if (response && response.success) {
-        // If the deletion is successful, update the reviews list
-        setReview((prevReviews) =>
-          prevReviews.filter((r) => r.review_id !== reviewToDelete.review_id)
-        );
-  
-        // Show a success message
-        setSuccessMessage("Review deleted successfully.");
-      } else {
-        setError("Failed to delete the review.");
-      }
-    } catch (err) {
-      setError("An error occurred while deleting the review.");
-    } finally {
-      // Close the delete modal
-      setShowDeleteModal(false);
-      // Clear the review to delete
-      setReviewToDelete(null)
-    };
-  }
-
-    // const handleSearchChange = (e) => setSearchTerm(e.target.value);
-
-    // const closeSuccessMessage = () => setSuccessMessage("");
-
-    // const filteredReviews = reviews.filter((review) => {
-    //   return(
-    //     review.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    //     review.bookingId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    //     review.reviewContent.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    //     review.rating.toString().includes(searchTerm)
-    //   )
-    // });
-    
-
+  const renderStarRating = (rating) => {
+    return [...Array(5)].map((_, index) => (
+      <AiFillStar
+        key={index}
+        className={`inline ${
+          index < rating ? "text-yellow-400" : "text-gray-300"
+        }`}
+      />
+    ));
+  };
 
   return (
-    <div className="container mx-auto px-4 sm:px-8">
-      <h1 className="text-4xl font-black mb-4">Manage Reviews</h1>
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-6 flex items-center">
+        <MdWorkspaces className="mr-2" />
+        Manage Reviews
+      </h2>
+      {isLoading ? (
+        <div className="flex justify-center items-center h-64">
+          <span className="loading loading-spinner loading-lg"></span>
+        </div>
+      ) : (
+        buildings.map((building) => (
+          <div key={building.building_id} className="collapse bg-base-200 mb-4 rounded-lg shadow-md">
+            <input type="checkbox" className="peer" />
+            <div className="collapse-title text-xl font-medium flex items-center justify-between p-4">
+              <div className="flex items-center">
+                <FaBuilding className="mr-2" />
+                {building.building_name}
+              </div>
+              <FaChevronDown className="transform peer-checked:rotate-180 transition-transform" />
+            </div>
 
-      <div className="grid grid-cols-2">
-          <SearchBar
-            // searchTerm={searchTerm}
-            // handleSearchChange={handleSearchChange}
-            // placeholder="Search payments"
-          />
-  
-          {/* Add Button */}
-          <div className="ml-2">
-            {/* <AddButton onClick={setShowAddModal} label="Add Payment info" /> */}
-          </div>
-      </div>
-  
-      <div>
-        {/* <SuccessAlert message={successMessage} onClose={closeSuccessMessage} /> */}
-      </div>
-
-      <div className="overflow-x-auto flex flex-1">
-        <table className="table table-zebra w-full">
-          <thead>
-            <tr>
-              <th>Booking ID</th>
-              <th>Content</th>
-              <th>Rating</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Array.isArray(review) && review.map((review) => (
-                <tr key={review.review_id}>
-                  <td>{review.booking_id}</td>
-                  <td>{review.review_content}</td>
-                  <td>{review.rating}</td>
-                  <td className="flex space-x-2">
-
-                    {/* Delete Button */}
-                    <DeleteButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setReviewToDelete(review);
-                        setShowDeleteModal(true);
-                      }}
-                    />
-                  </td>
-                </tr>
+            <div className="collapse-content bg-white">
+              {(
+                workSpaces.find((ws) => ws?.buildingId === building.building_id)
+                  ?.workSpaces || []
+              ).map((filteredWorkspace) => (
+                <div
+                  key={filteredWorkspace.workspace_id}
+                  className="collapse mb-2 border rounded-lg mt-2"
+                >
+                  <input type="checkbox" className="peer" />
+                  <div className="collapse-title text-lg font-medium flex items-center justify-between p-4">
+                    <div className="flex items-center">
+                      <MdWorkspaces className="mr-2" />
+                      {filteredWorkspace.workspace_name}
+                    </div>
+                    <FaChevronDown className="transform peer-checked:rotate-180 transition-transform" />
+                  </div>
+                  <div className="collapse-content">
+                    <div className="overflow-x-auto">
+                      <table className="table w-full">
+                        <thead>
+                          <tr className="bg-gray-100">
+                            <th className="w-1/12">No.</th>
+                            <th className="w-3/12">Comment</th>
+                            <th className="w-2/12">Rating</th>
+                            <th className="w-2/12">Customer</th>
+                            <th className="w-2/12">Date</th>
+                            <th className="w-1/12">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {reviews
+                            .filter(
+                              (review) =>
+                                review.Booking.Workspace.workspace_name ===
+                                filteredWorkspace.workspace_name
+                            )
+                            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                            .map((review, index) => (
+                              <tr
+                                key={review.review_id}
+                                className="border-b hover:bg-gray-50"
+                              >
+                                <td className="text-center">{index + 1}</td>
+                                <td className="whitespace-normal break-words">
+                                  {review.review_content}
+                                </td>
+                                <td>
+                                  <div className="flex items-center">
+                                    {renderStarRating(review.rating)}
+                                  </div>
+                                </td>
+                                <td>
+                                  <div className="flex items-center">
+                                    <FaUserCircle className="mr-2" />
+                                    {review.Booking.Customer.User.name}
+                                  </div>
+                                </td>
+                                <td>
+                                  <div className="flex items-center">
+                                    <BiTime className="mr-2" />
+                                    {format(new Date(review.createdAt), 'dd MMM yyyy HH:mm')}
+                                  </div>
+                                </td>
+                                <td>
+                                  <button
+                                    className="btn btn-error btn-sm"
+                                    onClick={() => handleDeleteReview(review.review_id)}
+                                    disabled={isLoading}
+                                  >
+                                    <RiDeleteBin6Line />
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          {reviews.filter(
+                            (review) =>
+                              review.Booking.Workspace.workspace_name ===
+                              filteredWorkspace.workspace_name
+                          ).length === 0 && (
+                            <tr>
+                              <td colSpan="6" className="text-center p-8">
+                                <div className="flex flex-col items-center gap-2">
+                                  <LiaStarOfLifeSolid
+                                    className="text-4xl text-gray-400"
+                                  />
+                                  <h4 className="text-lg font-medium text-gray-400">
+                                    No reviews available for this workspace
+                                  </h4>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
               ))}
-          </tbody>
-        </table>
-      </div>
-
-      <DeleteModal
-        show={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onDelete={handleDeleteReview}
-        itemToDelete={reviewToDelete}
-        itemType="review"
-      />
-
+            </div>
+          </div>
+        ))
+      )}
     </div>
   );
 };

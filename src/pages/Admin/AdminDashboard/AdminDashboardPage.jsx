@@ -1,401 +1,382 @@
-import { Link, Outlet, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { TfiStatsUp } from "react-icons/tfi";
-import { GoPeople } from "react-icons/go";
-import { RxDashboard } from "react-icons/rx";
-import { PiIdentificationBadge } from "react-icons/pi";
-import { GoPerson } from "react-icons/go";
-import { PiBuildingsLight } from "react-icons/pi";
-import { IoExtensionPuzzleOutline } from "react-icons/io5";
-import { LuCalendarCheck } from "react-icons/lu";
-import { RiCoupon3Line } from "react-icons/ri";
+import { GoPeople, GoPerson } from "react-icons/go";
+import { PiIdentificationBadge, PiBuildingsLight } from "react-icons/pi";
 import { IoIosArrowRoundForward } from "react-icons/io";
-import { RiCopperCoinLine } from "react-icons/ri";
-import React, { PureComponent } from 'react';
-import { format, set } from 'date-fns';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import "./AdminDashboardPage.scss";
-import { useState, useEffect } from "react";
+import { LuCalendarCheck } from "react-icons/lu";
+import { RiCoupon3Line, RiCopperCoinLine } from "react-icons/ri";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+} from "recharts";
+import { format } from "date-fns";
+import {
+  getBookingDataIn6DaysAdmin,
+  getRecentBooking,
+  getRevenueDataIn6DaysAdmin,
+  getTop5Customers,
+  getTotalAmenity,
+  getTotalBooking,
+  getTotalBuilding,
+  getTotalRavenue,
+  getTotalUser,
+  getTotalVoucher,
+  getTotalWorkspace,
+} from "../../../config/api.admin";
 
-import { getTotalRavenue } from "../../../config/api.admin";
-import { getTotalBooking } from "../../../config/api.admin";
-import { getTotalVoucher } from "../../../config/api.admin";
-import { getTotalUser } from "../../../config/api.admin";
-import { getTotalAmenity } from "../../../config/api.admin";
-import { getTotalBuilding } from "../../../config/api.admin";
-import { getTotalWorkspace } from "../../../config/api.admin";
-import { getRecentBooking } from "../../../config/api.admin";
-import { getTop5Customers } from "../../../config/api.admin";
+const StatCard = ({ icon: Icon, title, value, trend }) => (
+  <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center space-x-3">
+        <div className="p-3 bg-orange-100 rounded-lg">
+          <Icon className="w-6 h-6 text-orange-600" />
+        </div>
+        <div>
+          <p className="text-sm text-gray-600">{title}</p>
+          <p className="text-2xl font-bold mt-1">{value}</p>
+        </div>
+      </div>
+      {trend && (
+        <div
+          className={`text-sm ${trend > 0 ? "text-green-500" : "text-red-500"}`}
+        >
+          {trend > 0 ? "↑" : "↓"} {Math.abs(trend)}%
+        </div>
+      )}
+    </div>
+  </div>
+);
 
-const data = [
-  { name: '1', uv: 4000, pv: 2400, amt: 2400, },
-  { name: '2', uv: 3000, pv: 1398, amt: 2210, },
-  { name: '3', uv: 2000, pv: 9800, amt: 2290, },
-  { name: '4', uv: 2780, pv: 3908, amt: 2000, },
-  { name: '5', uv: 1890, pv: 4800, amt: 2181, },
-  { name: '6', uv: 2390, pv: 3800, amt: 2500, },
-  { name: '7', uv: 3490, pv: 4300, amt: 2100, },
-  { name: '8', uv: 3490, pv: 4300, amt: 2100, },
-  { name: '9', uv: 3490, pv: 4300, amt: 2100, },
-  { name: '10', uv: 3490, pv: 4300, amt: 2100, },
-  { name: '11', uv: 3490, pv: 4300, amt: 2100, },
-  { name: '12', uv: 3490, pv: 4300, amt: 2100, },
-];
-
-const data2 = [
-  { name: '1', uv: 4000, pv: 2400, amt: 2400, },
-  { name: '2', uv: 3000, pv: 1398, amt: 2210, },
-  { name: '3', uv: 2000, pv: 9800, amt: 2290, },
-  { name: '4', uv: 2780, pv: 3908, amt: 2000, },
-  { name: '5', uv: 1890, pv: 4800, amt: 2181, },
-  { name: '6', uv: 2390, pv: 3800, amt: 2500, },
-  { name: '7', uv: 3490, pv: 4300, amt: 2100, },
-  { name: '8', uv: 3490, pv: 4300, amt: 2100, },
-  { name: '9', uv: 3490, pv: 4300, amt: 2100, },
-  { name: '10', uv: 3490, pv: 4300, amt: 2100, },
-  { name: '11', uv: 3490, pv: 4300, amt: 2100, },
-  { name: '12', uv: 3490, pv: 4300, amt: 2100, },
-];
-
-const AdminDashboard = () => {
-  const [error, setError] = useState(null); // State lỗi
-  const [loading, setLoading] = useState(true); // State loading
-  const [ravenue, setRavenue] = useState();
-  const [booking, setBookings] = useState();
-  const [voucher, setVoucher] = useState();
-  const [manager, setManager] = useState();
-  const [staff, setStaff] = useState();
-  const [customer, setCustomer] = useState();
-  const [building, setBuilding] = useState();
-  const [amenity, setAmenity] = useState();
-  const [workspace, setWorkspace] = useState();
-  const [top5Customers, setTop5Customers] = useState([]);
-  const [top5Bookings, setTop5Bookings] = useState([]);
-
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat('vi-VN').format(value);
-  }
-
-  const fetchTotalRevenue = async () => {
-    try {
-      const response = await getTotalRavenue();
-      setRavenue(response.data); // Access the "data" field and update state
-    } catch (error) {
-      console.error('Error fetching total revenue:', error);
+const RevenueChart = ({ data }) => {
+  const formatYAxis = (value) => {
+    if (value >= 1000000) {
+      return `${(value / 1000000).toFixed(1)}M`;
     }
+    if (value >= 1000) {
+      return `${(value / 1000).toFixed(0)}K`;
+    }
+    return value;
   };
 
-  const fetchTotalBooking = async () => {
-    try {
-      const response = await getTotalBooking();
-      setBookings(response.data); // Access the "data" field and update state
-    } catch (error) {
-      console.error('Error fetching total revenue:', error);
-    }
+  const formatTooltipValue = (value) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      maximumFractionDigits: 0,
+    }).format(value);
   };
-
-  const fetchTotalVoucher = async () => {
-    try {
-      const response = await getTotalVoucher();
-      setVoucher(response.data); // Access the "data" field and update state
-    } catch (error) {
-      console.error('Error fetching total revenue:', error);
-    }
-  }
-
-  const fetchTotalUser = async () => {
-    try {
-      const response = await getTotalUser();
-      setManager(response.data.manager); // Access the "data" field and update state
-      setStaff(response.data.staff); // Access the "data" field and update state
-      setCustomer(response.data.customer); // Access the "data" field and update state
-    } catch (error) {
-      console.error('Error fetching total revenue:', error);
-    }
-  }
-
-  const fetchTotalAmenity = async () => {
-    try {
-      const response = await getTotalAmenity();
-      setAmenity(response.data); // Access the "data" field and update state
-    } catch (error) {
-      console.error('Error fetching total revenue:', error)
-    }
-  }
-
-  const fetchTotalBuilding = async () => {
-    try {
-      const response = await getTotalBuilding();
-      setBuilding(response.data); // Access the "data" field and update state
-    } catch (error) {
-      console.error('Error fetching total revenue:', error)
-    }
-  }
-
-  const fetchTotalWorkspace = async () => {
-    try {
-      const response = await getTotalWorkspace();
-      setWorkspace(response.data); // Access the "data" field and update state
-    } catch (error) {
-      console.error('Error fetching total revenue:', error)
-    }
-  }
-
-  const fetchTop5Bookings = async () => {
-    try {
-      const response = await getRecentBooking();
-      if (response && response.data && Array.isArray(response.data)) {
-        setTop5Bookings(response.data);
-      } else {
-        setTop5Bookings([]); // Initialize as an empty array if data is not as expected
-      }
-    } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchTop5Customers = async () => {
-    try {
-      const response = await getTop5Customers();
-      if (response && response.data && Array.isArray(response.data)) {
-        setTop5Customers(response.data);
-      } else {
-        setTop5Customers([]); // Initialize as an empty array if data is not as expected
-      }
-    } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchTotalRevenue();
-    fetchTotalBooking();
-    fetchTotalVoucher();
-    fetchTotalUser();
-    fetchTotalAmenity();
-    fetchTotalBuilding();
-    fetchTotalWorkspace();
-    fetchTop5Bookings();
-    fetchTop5Customers();
-  }, []);
-
 
   return (
-    <div className="max-w-screen *:box-border w-full h-full flex flex-col overflow-hidden">
-      <h1 className="text-4xl font-black mt-5 ml-6">Welcome to WORKZY Admin</h1>
-      {/* Main Content */}
-      <main className="flex-1 p-6">
-        <h2 className="text-2xl font-bold mb-4">General Overview</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* General Overview */}
-          <div className="card shadow-xl">
-            <div className="card-body">
-              <div className="flex flex-2">
-                <TfiStatsUp className="mt-1 size-5"/>
-                <div className="stat-title ml-2 text-xl">Total Revenue in Month</div>
-              </div>
-              <div className="stat-value text-5xl">{formatCurrency(ravenue)}đ</div>
-            </div>
-          </div>
-
-          <div className="card shadow-xl">
-            <div className="card-body">
-              <div className="flex flex-2">
-                <LuCalendarCheck className="mt-1 size-5"/>
-                <div className="stat-title ml-2 text-xl">Total Bookings</div>
-              </div>
-              <div className="stat-value text-5xl">{booking}</div>
-            </div>
-          </div>
-
-          <div className="card shadow-xl">
-            <div className="card-body">
-              <div className="flex flex-2">
-                <RiCoupon3Line className="mt-1 size-5"/>
-                <div className="stat-title ml-2 text-xl">Total Vouchers</div>
-              </div>
-              <div className="stat-value text-5xl">{voucher}</div>
-            </div>
-          </div>
-
-          <div className="card shadow-xl">
-            <div className="card-body">
-              <div className="flex flex-2">
-                <PiIdentificationBadge className="mt-1 size-5"/>
-                <div className="stat-title ml-2 text-xl">Total Managers</div>
-              </div>
-              <div className="stat-value text-5xl">{manager}</div>
-            </div>
-          </div>
-
-          <div className="card shadow-xl">
-            <div className="card-body">
-              <div className="flex flex-2">
-                <GoPerson className="mt-1 size-5"/>
-                <div className="stat-title ml-2 text-xl">Total Staffs</div>
-              </div>
-              <div className="stat-value text-5xl">{staff}</div>
-            </div>
-          </div>
-
-          <div className="card shadow-xl">
-            <div className="card-body">
-              <div className="flex flex-2">
-                <GoPeople className="mt-1 size-5"/>
-                <div className="stat-title ml-2 text-xl">Total Customers</div>
-              </div>
-              <div className="stat-value text-5xl">{customer}</div>
-            </div>
-          </div>
-
-          <div className="card shadow-xl">
-            <div className="card-body">
-              <div className="flex flex-2">
-                <IoExtensionPuzzleOutline className="mt-1 size-5"/>
-                <div className="stat-title ml-2 text-xl">Total Amenities</div>
-              </div>
-              <div className="stat-value text-5xl">{amenity}</div>
-            </div>
-          </div>
-
-          <div className="card shadow-xl">
-            <div className="card-body">
-              <div className="flex flex-2">
-                <PiBuildingsLight className="mt-1 size-5"/>
-                <div className="stat-title ml-2 text-xl">Total Buildings</div>
-              </div>
-              <div className="stat-value text-5xl">{building}</div>
-            </div>
-          </div>
-
-          <div className="card shadow-xl">
-            <div className="card-body">
-              <div className="flex flex-2">
-                <RxDashboard className="mt-1 size-5"/>
-                <div className="stat-title ml-2 text-xl">Total Workspaces</div>
-              </div>
-              <div className="stat-value text-5xl">{workspace}</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Revenue & Guest */}
-        <div className="mt-6">
-          <h2 className="text-2xl font-bold mb-4">Revenue & Booking Analysis</h2>
-          <div className="flex w-full flex-col lg:flex-row">
-            <div className="rounded-box grid h-32 flex-grow">
-            <p className="text-xl font-semibold mb-4">Revenue</p>
-              <div style={{ width: '100%', height: 400 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart width={730} height={250} data={data}
-                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <Tooltip />
-                    <Area type="monotone" dataKey="uv" stroke="#8884d8" fillOpacity={1} fill="url(#colorUv)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-            
-            <div className="divider"></div>
-            
-            <div className="rounded-box grid h-32 flex-grow">
-              <p className="text-xl font-semibold mb-4">Guest Bookings</p>
-              <div style={{ width: '100%', height: 400 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart width={730} height={250} data={data2}
-                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
-                        <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <Tooltip />
-                    <Area type="monotone" dataKey="uv" stroke="#8884d8" fillOpacity={1} fill="url(#colorUv)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-96">
-          <h2 className="text-2xl font-bold mb-4">Bookings & Customers</h2>
-          <div className="flex w-full">
-            <div className="rounded-box grid flex-grow place-items-stretch">
-              <p className="text-xl font-semibold mb-4">Recent Bookings</p>
-              <div className="bg-base-200 p-4 rounded-lg shadow-lg">
-                {top5Bookings.map((booking, index) => (
-                  <div key={index} className="border-b py-2 flex justify-between items-center">
-                    <div>
-                      <p className="font-semibold">{booking.Customer.User.name}</p>
-                      <p>{booking.Workspace.workspace_name}</p>
-                      <p className="text-sm">{booking.Workspace.WorkspaceType.workspace_type_name}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold">{format(new Date(booking.createdAt), "dd/MM/yyyy HH:mm:ss")}</p>
-                      {booking.BookingStatuses.map((status, idx) => (
-                        <p key={idx}>{status.status}</p>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-                <div className="mt-7 text-right">
-                  <Link to="/admin/bookingsmanager" className= {`tab ${location.pathname === '/admin/bookingsmanager' ? 'active' : ''}`}>
-                    <button className="btn btn-neutral btn-sm">
-                      See more<IoIosArrowRoundForward className="size-5" />
-                    </button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            <div className="divider-horizontal"></div>
-
-            <div className="rounded-box grid h-20 flex-grow place-items-stretch">
-              <p className="text-xl font-semibold mb-4">Top 5 VIP Customer</p>
-              <div className="bg-base-200 p-4 rounded-lg shadow-lg">
-                <table className="table-auto w-full">
-                  <tbody>
-                    {top5Customers.map((customer, index) => (
-                      <tr key={index}>
-                        <td
-                          className="px-4 py-2 text-3xl font-bold"
-                          style={{
-                            color: index === 0 ? '#d4af37' : index === 1 ? 'silver' : index === 2 ? '#cd7f32' : 'inherit',
-                          }}
-                        >
-                          #{index + 1}
-                        </td>
-                        <td className="px-4 py-2 text-2xl font-semibold">{customer.User.name}</td>
-                        <td className="px-4 py-2 text-right text-xl font-medium">{customer.point} ZyPoint</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
+    <div className="bg-white p-6 rounded-xl shadow-lg">
+      <h3 className="text-lg font-semibold mb-4">Revenue Overview</h3>
+      <div className="h-72">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart
+            data={data}
+            margin={{ top: 10, right: 30, left: 16, bottom: 0 }}
+          >
+            <defs>
+              <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+            <XAxis dataKey="date" tickMargin={8} />
+            <YAxis tickFormatter={formatYAxis} tickMargin={8} width={60} />
+            <Tooltip
+              formatter={(value) => [formatTooltipValue(value), "Revenue"]}
+            />
+            <Area
+              type="monotone"
+              dataKey="total_price"
+              stroke="#f59e0b"
+              fillOpacity={1}
+              fill="url(#colorRevenue)"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
-}
+};
+
+const BookingsChart = ({ data }) => (
+  <div className="bg-white p-6 rounded-xl shadow-lg">
+    <h3 className="text-lg font-semibold mb-4">Bookings This Month</h3>
+    <div className="h-72">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={data}
+          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+          <XAxis dataKey="date" />
+          <YAxis />
+          <Tooltip />
+          <Bar dataKey="total_booking" fill="#f59e0b" />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  </div>
+);
+
+const BookingsList = ({ bookings }) => (
+  <div className="bg-white p-6 rounded-xl shadow-lg">
+    <div className="flex justify-between items-center mb-6">
+      <h3 className="text-lg font-semibold">Recent Bookings</h3>
+      <Link
+        to="/admin/bookingsmanager"
+        className="flex items-center text-orange-600 hover:text-orange-700"
+      >
+        View all
+        <IoIosArrowRoundForward className="w-5 h-5 ml-1" />
+      </Link>
+    </div>
+    <div className="space-y-4">
+      {bookings.map((booking, idx) => (
+        <div
+          key={idx}
+          className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+        >
+          <div className="flex items-center space-x-4">
+            <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+              <GoPerson className="w-6 h-6 text-orange-600" />
+            </div>
+            <div>
+              <p className="font-semibold">{booking.Customer.User.name}</p>
+              <p className="text-sm text-gray-600">
+                {booking.Workspace.workspace_name}
+              </p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-sm font-medium">
+              {format(new Date(booking.createdAt), "dd MMM yyyy")}
+            </p>
+            <p className="text-sm text-gray-600">
+              {booking.BookingStatuses[0]?.status}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const TopCustomers = ({ customers }) => (
+  <div className="bg-white p-6 rounded-xl shadow-lg">
+    <h3 className="text-lg font-semibold mb-6">Top Customers</h3>
+    <div className="space-y-4">
+      {customers.map((customer, idx) => (
+        <div key={idx} className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center
+              ${
+                idx === 0
+                  ? "bg-yellow-100 text-yellow-600"
+                  : idx === 1
+                  ? "bg-gray-100 text-gray-600"
+                  : idx === 2
+                  ? "bg-orange-100 text-orange-600"
+                  : "bg-gray-50 text-gray-500"
+              }`}
+            >
+              #{idx + 1}
+            </div>
+            <p className="font-medium">{customer.User.name}</p>
+          </div>
+          <div className="flex items-center text-gray-600">
+            <RiCopperCoinLine className="w-5 h-5 mr-1" />
+            <span>{customer.point}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const StatsOverview = ({ stats }) => (
+  <div className="bg-white p-6 rounded-xl shadow-lg">
+    <h3 className="text-lg font-semibold mb-4">System Overview</h3>
+    <div className="grid grid-cols-2 gap-4">
+      <div className="flex items-center space-x-3">
+        <div className="p-2 bg-orange-100 rounded-lg">
+          <PiIdentificationBadge className="w-5 h-5 text-orange-600" />
+        </div>
+        <div>
+          <p className="text-sm text-gray-600">Managers</p>
+          <p className="text-lg font-bold">{stats.managers}</p>
+        </div>
+      </div>
+      <div className="flex items-center space-x-3">
+        <div className="p-2 bg-orange-100 rounded-lg">
+          <GoPerson className="w-5 h-5 text-orange-600" />
+        </div>
+        <div>
+          <p className="text-sm text-gray-600">Staff</p>
+          <p className="text-lg font-bold">{stats.staff}</p>
+        </div>
+      </div>
+      <div className="flex items-center space-x-3">
+        <div className="p-2 bg-orange-100 rounded-lg">
+          <GoPeople className="w-5 h-5 text-orange-600" />
+        </div>
+        <div>
+          <p className="text-sm text-gray-600">Customers</p>
+          <p className="text-lg font-bold">{stats.customers}</p>
+        </div>
+      </div>
+      <div className="flex items-center space-x-3">
+        <div className="p-2 bg-orange-100 rounded-lg">
+          <PiBuildingsLight className="w-5 h-5 text-orange-600" />
+        </div>
+        <div>
+          <p className="text-sm text-gray-600">Buildings</p>
+          <p className="text-lg font-bold">{stats.buildings}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const AdminDashboard = () => {
+  const [stats, setStats] = useState({
+    revenue: 0,
+    bookings: 0,
+    vouchers: 0,
+    managers: 0,
+    staff: 0,
+    customers: 0,
+    amenities: 0,
+    buildings: 0,
+    workspaces: 0,
+  });
+  const [revenueData, setRevenueData] = useState([]);
+  const [bookingsData, setBookingsData] = useState([]);
+  const [topCustomers, setTopCustomers] = useState([]);
+  const [recentBookings, setRecentBookings] = useState([]);
+
+  useEffect(() => {
+    // Fetch data using your existing API calls
+    const fetchData = async () => {
+      try {
+        const [
+          revenueRes,
+          bookingsRes,
+          vouchersRes,
+          usersRes,
+          amenitiesRes,
+          buildingsRes,
+          workspacesRes,
+          top5CustomersRes,
+          recentBookingsRes,
+          revenueDataRes,
+          bookingsDataRes,
+        ] = await Promise.all([
+          getTotalRavenue(),
+          getTotalBooking(),
+          getTotalVoucher(),
+          getTotalUser(),
+          getTotalAmenity(),
+          getTotalBuilding(),
+          getTotalWorkspace(),
+          getTop5Customers(),
+          getRecentBooking(),
+          getRevenueDataIn6DaysAdmin(),
+          getBookingDataIn6DaysAdmin(), // You'll need to implement this API call
+        ]);
+
+        setStats({
+          revenue: revenueRes.data,
+          bookings: bookingsRes.data,
+          vouchers: vouchersRes.data,
+          managers: usersRes.data.manager,
+          staff: usersRes.data.staff,
+          customers: usersRes.data.customer,
+          amenities: amenitiesRes.data,
+          buildings: buildingsRes.data,
+          workspaces: workspacesRes.data,
+        });
+
+        setTopCustomers(top5CustomersRes.data || []);
+        setRecentBookings(recentBookingsRes.data || []);
+        setRevenueData(revenueDataRes.data || []);
+        setBookingsData(bookingsDataRes.data || []);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat("vi-VN").format(value);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-8">
+      <header className="mb-8">
+        <h1 className="text-4xl font-bold text-gray-900">
+          Welcome to WORKZY Admin
+        </h1>
+        <p className="text-gray-600 mt-2">Here's what's happening today</p>
+      </header>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <StatCard
+          icon={TfiStatsUp}
+          title="Total Revenue"
+          value={`${formatCurrency(stats.revenue)}đ`}
+          trend={12}
+        />
+        <StatCard
+          icon={LuCalendarCheck}
+          title="Total Bookings"
+          value={stats.bookings}
+          trend={8}
+        />
+        <StatCard
+          icon={RiCoupon3Line}
+          title="Active Vouchers"
+          value={stats.vouchers}
+          trend={-3}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="lg:col-span-2">
+          <RevenueChart data={revenueData} />
+        </div>
+        <div>
+          <TopCustomers customers={topCustomers} />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="lg:col-span-2">
+          <BookingsChart data={bookingsData} />
+        </div>
+        <div>
+          <StatsOverview stats={stats} />
+        </div>
+      </div>
+
+      <div>
+        <BookingsList bookings={recentBookings} />
+      </div>
+    </div>
+  );
+};
 
 export default AdminDashboard;

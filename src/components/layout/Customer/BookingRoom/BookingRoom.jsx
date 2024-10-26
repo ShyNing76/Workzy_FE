@@ -13,6 +13,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { AuthContext } from "../../../context/auth.context";
 import { useNavigate } from "react-router-dom";
 import "./BookingRoom.scss";
+import DiscountCodeForm from "../DiscountCode/DiscountCodeForm ";
 
 const BookingRoom = (props) => {
   // Props room data
@@ -47,11 +48,16 @@ const BookingRoom = (props) => {
   const [endDateTime, setEndDateTime] = useState(null);
 
   // Price and discount
+  const [messageDiscount, setMessageDiscount] = useState({
+    type: "",
+    content: "",
+  });
   const [discountCode, setDiscountCode] = useState("");
   const [subtotal, setSubtotal] = useState(0);
   const [tax, setTax] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [total, setTotal] = useState(0);
+  const [voucherId, setVoucherId] = useState("");
 
   // Amount Text and Price in booking
   const [amountText, setAmountText] = useState("");
@@ -89,6 +95,12 @@ const BookingRoom = (props) => {
       setNumOfHours(0);
       setNumOfDays(0);
       setNumOfMonths(0);
+      setMessageDiscount({
+        type: "",
+        content: "",
+      });
+      setDiscount(0);
+      setVoucherId("");
     }
   }, [currentTab]);
 
@@ -191,7 +203,8 @@ const BookingRoom = (props) => {
         currentTab,
         formatDateTime(startDateTime),
         formatDateTime(endDateTime),
-        total
+        total,
+        voucherId
       );
 
       if (res && res.err === 0) {
@@ -206,6 +219,7 @@ const BookingRoom = (props) => {
             amountText,
             subtotal,
             discount,
+            discountCode,
             tax,
             total,
           },
@@ -302,13 +316,16 @@ const BookingRoom = (props) => {
             </div>
 
             {/* Discount Code Input */}
-            <input
-              type="text"
-              placeholder="Discount code"
-              value={discountCode}
-              onChange={(e) => setDiscountCode(e.target.value)}
-              className="input input-bordered w-full max-w-xl mb-3"
-            />
+            {auth.isAuthenticated && (
+              <DiscountCodeForm
+                discountCode={discountCode}
+                setDiscountCode={setDiscountCode}
+                setDiscount={setDiscount}
+                message={messageDiscount}
+                setMessage={setMessageDiscount}
+                setVoucherId={setVoucherId}
+              />
+            )}
 
             {/* Booking Summary */}
 
@@ -370,13 +387,16 @@ const BookingRoom = (props) => {
             />
           </div>
 
-          <input
-            type="text"
-            placeholder="Discount code"
-            value={discountCode}
-            onChange={(e) => setDiscountCode(e.target.value)}
-            className="input input-bordered w-full max-w-xl mb-3"
-          />
+          {auth.isAuthenticated && (
+            <DiscountCodeForm
+              discountCode={discountCode}
+              setDiscountCode={setDiscountCode}
+              setDiscount={setDiscount}
+              message={messageDiscount}
+              setMessage={setMessageDiscount}
+              setVoucherId={setVoucherId}
+            />
+          )}
 
           <BookingSummary
             handleOpenCloseModal={handleOpenCloseModal}
@@ -438,13 +458,16 @@ const BookingRoom = (props) => {
             />
           </div>
 
-          <input
-            type="text"
-            placeholder="Discount code"
-            value={discountCode}
-            onChange={(e) => setDiscountCode(e.target.value)}
-            className="input input-bordered w-full max-w-xl mb-3"
-          />
+          {auth.isAuthenticated && (
+            <DiscountCodeForm
+              discountCode={discountCode}
+              setDiscountCode={setDiscountCode}
+              setDiscount={setDiscount}
+              message={messageDiscount}
+              setMessage={setMessageDiscount}
+              setVoucherId={setVoucherId}
+            />
+          )}
 
           <BookingSummary
             handleOpenCloseModal={handleOpenCloseModal}

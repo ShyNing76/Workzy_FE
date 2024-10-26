@@ -10,14 +10,20 @@ import {
   getBookingById,
 } from "../../../config/api";
 import BookingAmenitiesCard from "../BookingAmenitiesCard/BookingAmenitiesCard";
+import PriceBrokenAmenities from "../../../components/layout/Customer/PriceBrokenAmenities/PriceBrokenAmenities";
+import PaymentBrokenButton from "../../../components/layout/Customer/PaymentBrokenButton/PaymentBrokenButton";
+import ReviewBox from "../../../components/layout/Customer/ReviewBox/ReviewBox";
 
 const BookingDetail = () => {
   const location = useLocation();
   const booking = location.state?.booking; // Access booking data passed via navigate
   const workspace = location.state?.workspace; // Access workspace data passed via navigate
   const type = location.state?.type; // Access type data passed via navigate
+  const dataReview = location.state?.dataReview; // Access type data passed via navigate
+
   const [bookingStatuses, setBookingStatuses] = useState([]);
   const [amenitiesBooking, setAmenitiesBooking] = useState([]);
+  const [amenitiesBroken, setAmenitiesBroken] = useState([]);
 
   const statusOrder = [
     "confirmed",
@@ -45,6 +51,19 @@ const BookingDetail = () => {
         const res = await getBookingById(booking.booking_id);
         if (res && res.data && res.err === 0) {
           setBookingStatuses(res.data.BookingStatuses);
+          const amenitiesArray = res?.data?.report_damage_ameninites
+            .split("|")
+            .map((item) => {
+              const [amenities, quantity, amount] = item
+                .split(":")
+                .map((str) => str.trim());
+              return {
+                amenities,
+                quantity: parseInt(quantity, 10),
+                amount: +amount,
+              };
+            });
+          setAmenitiesBroken(amenitiesArray);
         } else {
           setBookingStatuses([]);
         }
@@ -69,10 +88,6 @@ const BookingDetail = () => {
     fetchBookingStatus();
     fetchAmenitiesBooking();
   }, []);
-
-  useEffect(() => {
-    console.log("amenities: ", amenitiesBooking);
-  }, [amenitiesBooking]);
 
   const getStatusBadgeClass = (status) => {
     switch (status) {
@@ -130,12 +145,47 @@ const BookingDetail = () => {
       />
 
       <hr />
+      <ReviewBox review={dataReview} />
 
-      <BookingAmenitiesCard amenitiesBooking={amenitiesBooking} />
+      {booking.BookingStatuses[0].status !== "completed" && (
+        <>
+          <hr />
 
-      <hr />
+          <BookingAmenitiesCard amenitiesBooking={amenitiesBooking} />
+        </>
+      )}
+
+      {booking.report_damage_ameninites !== null && (
+        <>
+          <hr />
+
+          <div className="flex items-center my-4">
+            <div
+              className={`${
+                booking.BookingStatuses[0].status !== "damaged-payment"
+                  ? "w-full"
+                  : "w-1/2"
+              }`}
+            >
+              <PriceBrokenAmenities
+                booking={booking}
+                amenitiesBroken={amenitiesBroken}
+              />
+            </div>
+            {booking.BookingStatuses[0].status === "damaged-payment" && (
+              <div className="w-1/2 p-2 border-l-2">
+                <PaymentBrokenButton booking={booking} />
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
       {booking.BookingStatuses[0].status !== "cancelled" ? (
-        <PriceBreakDown booking={booking} />
+        <>
+          <hr />
+          <PriceBreakDown booking={booking} />
+        </>
       ) : (
         <></>
       )}

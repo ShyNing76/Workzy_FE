@@ -5,16 +5,25 @@ import {
   assignWorkspaceToBuilding,
   unassignWorkspaceFromBuilding,
 } from "../../../../config/api.admin";
+import {
+  HiOutlineOfficeBuilding,
+  HiOutlineCheck,
+  HiOutlineX,
+  HiOutlineRefresh,
+} from "react-icons/hi";
+import { BsBuilding, BsArrowLeftRight, BsCheckSquare } from "react-icons/bs";
 import Swal from "sweetalert2";
-import Pagination from "../../../../components/layout/Shared/Pagination/Pagination";
+
 const AssignWorkspacePage = () => {
   const [workspaces, setWorkspaces] = useState([]);
   const [buildings, setBuildings] = useState([]);
   const [selectedBuilding, setSelectedBuilding] = useState(null);
   const [selectedWorkspaces, setSelectedWorkspaces] = useState([]);
   const [assignState, setAssignState] = useState(true);
-  //fetch workspaces and buildings
+  const [isLoading, setIsLoading] = useState(true);
+
   const fetchWorkspacesAndBuildings = async () => {
+    setIsLoading(true);
     try {
       const [workspaceResponse, buildingResponse] = await Promise.all([
         getWorkspace(),
@@ -22,15 +31,18 @@ const AssignWorkspacePage = () => {
       ]);
       if (workspaceResponse?.data && workspaceResponse.err === 0) {
         setWorkspaces(workspaceResponse.data);
-        console.log("workspaces:", workspaceResponse.data);
-        
       }
       if (buildingResponse?.data && buildingResponse.err === 0) {
         setBuildings(buildingResponse.data);
-        console.log("buildings:", buildingResponse.data);
       }
     } catch (error) {
-      console.log("Error fetching workspaces and buildings:", error);
+      Swal.fire({
+        title: "Error",
+        text: "Failed to fetch data",
+        icon: "error",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -38,172 +50,243 @@ const AssignWorkspacePage = () => {
     fetchWorkspacesAndBuildings();
   }, []);
 
-  // handle building change
   const handleBuildingChange = (e) => {
     setSelectedBuilding(e.target.value);
+    setSelectedWorkspaces([]); // Reset selections when building changes
   };
 
-  // handle selected workspaces
-  // cập nhật trạng thái của workspace khi click vào checkbox
   const handleWorkspaceSelect = (workspace_id) => {
-    // setSelectedWorkspaces cập nhật trạng thái của workspace khi click vào checkbox
-    setSelectedWorkspaces((prevSelectedWorkspace) => {
-      //prevSelectedWorkspace là mảng các workspace_id đã được chọn
-      // nếu prevSelectedWorkspace đã có workspace_id
-      if (prevSelectedWorkspace.includes(workspace_id)) {
-        // workspace đã đc chọn
-        return prevSelectedWorkspace.filter((id) => id !== workspace_id); // loại bỏ workspace_id đó ra khỏi mảng
-      } else {
-        // nếu workspace_id không có trong mảng
-        return [...prevSelectedWorkspace, workspace_id]; // thêm workspace_id vào mảng
-      }
-    });
+    setSelectedWorkspaces((prev) =>
+      prev.includes(workspace_id)
+        ? prev.filter((id) => id !== workspace_id)
+        : [...prev, workspace_id]
+    );
   };
 
-  // handle assign/unassign workspaces to building by submit button
   const handleSubmit = async () => {
-    console.log("Submit button clicked");
-    console.log("Selected building:", selectedBuilding);
-    console.log("Selected workspaces:", selectedWorkspaces);
     if (!selectedBuilding) {
       Swal.fire({
         title: "Warning",
-        text: "Please select a building.",
+        text: "Please select a building",
         icon: "warning",
       });
-      return; // Ngừng hàm nếu không có building được chọn
+      return;
     }
     if (selectedWorkspaces.length === 0) {
       Swal.fire({
         title: "Warning",
-        text: "Please select at least one workspace.",
+        text: "Please select at least one workspace",
         icon: "warning",
       });
-      return; // Ngừng hàm nếu không có workspace được chọn
+      return;
     }
-    if (assignState) {
-      try {
-        const responseAssign = await assignWorkspaceToBuilding(
-          selectedBuilding,
-          selectedWorkspaces
-        );
-        console.log("responseAssign:", responseAssign);
-        if (responseAssign?.err === 0) {
-          Swal.fire({
-            title: "Success",
-            text: "Assign workspaces to building successfully",
-            icon: "success",
-          });
-        }
-      } catch (error) {
+
+    try {
+      const response = assignState
+        ? await assignWorkspaceToBuilding(selectedBuilding, selectedWorkspaces)
+        : await unassignWorkspaceFromBuilding(
+            selectedBuilding,
+            selectedWorkspaces
+          );
+
+      if (response?.err === 0) {
         Swal.fire({
-          title: "Error",
-          text: "Assign workspaces to building failed",
-          icon: "error",
+          title: "Success",
+          text: `${assignState ? "Assigned" : "Unassigned"} workspaces ${
+            assignState ? "to" : "from"
+          } building successfully`,
+          icon: "success",
         });
-      }
-    } else {
-      try {
-        const responseUnassign = await unassignWorkspaceFromBuilding(
-          selectedBuilding,
-          selectedWorkspaces
+
+        setWorkspaces((prevWorkspaces) =>
+          prevWorkspaces.map((workspace) =>
+            selectedWorkspaces.includes(workspace.workspace_id)
+              ? {
+                  ...workspace,
+                  Building: assignState
+                    ? { building_id: selectedBuilding }
+                    : null,
+                }
+              : workspace
+          )
         );
-        console.log("responseUnassign:", responseUnassign);
-        if (responseUnassign?.err === 0) {
-          Swal.fire({
-            title: "Success",
-            text: "Unassign workspaces from building successfully",
-            icon: "success",
-          });
-        }
-      } catch (error) {
-        Swal.fire({
-          title: "Error",
-          text: "Unassign workspaces from building failed",
-          icon: "error",
-        });
+        setSelectedWorkspaces([]);
       }
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: `Failed to ${assignState ? "assign" : "unassign"} workspaces`,
+        icon: "error",
+      });
     }
-    // reset selected workspaces after submit
-    setSelectedWorkspaces([]);
   };
 
-  // show workspacrs when change Assign/Unassign button
   const filteredWorkspaces = assignState
-  ? workspaces.filter((workspace) => !workspace.Building || workspace.Building.building_id === null) // chỉ lấy những workspace không có building_id
-  : workspaces.filter(
-      (workspace) => workspace.Building && workspace.Building.building_id === selectedBuilding
-    ); // chỉ lấy những workspace có building_id khớp với selectedBuilding
- // chỉ hiển thị các workspace có building_id là selectedBuilding
+    ? workspaces.filter(
+        (workspace) =>
+          !workspace.Building || workspace.Building.building_id === null
+      )
+    : workspaces.filter(
+        (workspace) => workspace.Building?.building_id === selectedBuilding
+      );
 
   return (
-    <div>
-      <h1>Assign workspaces to building</h1>
-      <label htmlFor="building-select" className="label">
-        <span className="label-text">Select Building:</span>
-      </label>
-      
+    <div className="container mx-auto p-6 max-w-6xl">
+      <div className="bg-base-100 shadow-lg rounded-lg p-6">
+        <div className="flex items-center gap-2 mb-6">
+          <BsBuilding className="text-2xl text-primary" />
+          <h1 className="text-2xl font-bold">Workspace Assignment Manager</h1>
+        </div>
 
-      <div className="btn-group my-4">
-      <select
-        id="building-select"
-        className="select select-bordered w-full max-w-xs"
-        onChange={handleBuildingChange}
-      >
-        <option value="">Select a Building</option>
-        {buildings.map((building) => (
-          <option key={building.building_id} value={building.building_id}>
-            {building.building_name}
-          </option>
-          ))}
-        </select>
+        <div className="card bg-base-200 p-4 mb-6">
+          <div className="flex flex-col md:flex-row md:items-center gap-4">
+            <div className="form-control flex-1">
+              <label className="label">
+                <span className="label-text flex items-center gap-2">
+                  <HiOutlineOfficeBuilding className="text-lg" />
+                  Select Building
+                </span>
+              </label>
+              <select
+                className="select select-bordered w-full"
+                onChange={handleBuildingChange}
+                value={selectedBuilding || ""}
+              >
+                <option value="">Choose a building...</option>
+                {buildings.map((building) => (
+                  <option
+                    key={building.building_id}
+                    value={building.building_id}
+                  >
+                    {building.building_name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-       <button
-          onClick={() => setAssignState(true)}
-          className={`btn ${assignState ? "btn-primary" : "btn-gray"} mt-4`} // Thay đổi màu nút
-        >
-          Assign
-        </button>
-        <button
-          onClick={() => setAssignState(false)}
-          className={`btn ${!assignState ? "btn-secondary" : "btn-gray"} mt-4`} // Thay đổi màu nút
-        >
-          Unassign
-        </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setAssignState(true)}
+                className={`btn ${
+                  assignState ? "btn-primary" : "btn-ghost"
+                } gap-2`}
+              >
+                <HiOutlineCheck className={assignState ? "text-white" : ""} />
+                Assign
+              </button>
+              <button
+                onClick={() => setAssignState(false)}
+                className={`btn ${
+                  !assignState ? "btn-secondary" : "btn-ghost"
+                } gap-2`}
+              >
+                <HiOutlineX />
+                Unassign
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {isLoading ? (
+          <div className="flex justify-center items-center p-8">
+            <span className="loading loading-spinner loading-lg text-primary"></span>
+          </div>
+        ) : (
+          <div className="overflow-x-auto bg-base-100 rounded-lg">
+            <table className="table w-full">
+              <thead>
+                <tr className="bg-base-200">
+                  <th className="w-16">
+                    <label>
+                      <input
+                        type="checkbox"
+                        className="checkbox"
+                        checked={
+                          filteredWorkspaces.length > 0 &&
+                          selectedWorkspaces.length ===
+                            filteredWorkspaces.length
+                        }
+                        onChange={() => {
+                          if (
+                            selectedWorkspaces.length ===
+                            filteredWorkspaces.length
+                          ) {
+                            setSelectedWorkspaces([]);
+                          } else {
+                            setSelectedWorkspaces(
+                              filteredWorkspaces.map((w) => w.workspace_id)
+                            );
+                          }
+                        }}
+                      />
+                    </label>
+                  </th>
+                  <th>Workspace Name</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredWorkspaces.map((workspace) => (
+                  <tr key={workspace.workspace_id} className="hover">
+                    <td>
+                      <label>
+                        <input
+                          type="checkbox"
+                          className="checkbox"
+                          checked={selectedWorkspaces.includes(
+                            workspace.workspace_id
+                          )}
+                          onChange={() =>
+                            handleWorkspaceSelect(workspace.workspace_id)
+                          }
+                        />
+                      </label>
+                    </td>
+                    <td className="font-medium">{workspace.workspace_name}</td>
+                    <td>
+                      <div className="flex items-center gap-2">
+                        
+                        {workspace.WorkspaceType.workspace_type_name}
+                      </div>
+                    </td>
+                    <td>
+                      <span
+                        className={`badge ${
+                          workspace.Building ? "badge-success" : "badge-warning"
+                        } gap-1`}
+                      >
+                        {workspace.Building ? (
+                          <>
+                            <BsCheckSquare />
+                            Assigned
+                          </>
+                        ) : (
+                          <>
+                            <BsArrowLeftRight />
+                            Unassigned
+                          </>
+                        )}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        <div className="flex justify-end mt-6">
+          <button
+            onClick={handleSubmit}
+            className="btn btn-primary gap-2"
+            disabled={selectedWorkspaces.length === 0}
+          >
+            <BsCheckSquare />
+            Submit Changes
+          </button>
+        </div>
       </div>
-
-      <div className="overflow-x-auto">
-        <table className="table table-zebra w-full">
-          <thead>
-            <tr>
-              <th>Select</th>
-              <th>Workspace Name</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredWorkspaces.map((workspace) => (
-              <tr key={workspace.workspace_id}>
-                <td>
-                  <input
-                    type="checkbox"
-                    className="checkbox"
-                    checked={selectedWorkspaces.includes(
-                      workspace.workspace_id
-                    )}
-                    onChange={() =>
-                      handleWorkspaceSelect(workspace.workspace_id)
-                    }
-                  />
-                </td>
-                <td>{workspace.workspace_name}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <button onClick={handleSubmit} className="btn btn-success mt-4">Submit</button>
-
     </div>
   );
 };
