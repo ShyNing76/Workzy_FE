@@ -1,20 +1,18 @@
 import React, { useContext, useEffect } from "react";
 import "./ManagerPage.scss";
 import ManagerHeader from "../../components/layout/Manager/ManagerHeader/ManagerHeader";
-import { MdOutlineManageAccounts } from "react-icons/md";
-import { MdOutlineRateReview } from "react-icons/md";
-import { Link, Outlet } from "react-router-dom";
-import { MdOutlineAssignmentInd } from "react-icons/md";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { FaChartBar } from "react-icons/fa";
+import { MdOutlineManageAccounts, MdOutlineAssignmentInd } from "react-icons/md";
 import { AuthContext } from "../../components/context/auth.context";
+import { VscFeedback } from "react-icons/vsc";
 
 const ManagerPage = () => {
-  const { auth, setAuth, appLoading, setAppLoading, setRoleId, roleId } =
-    useContext(AuthContext);
+  const location = useLocation();
+  const { auth, setAuth, setAppLoading, setRoleId } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchAccount = async () => {
-      // Kiểm tra nếu đã có auth trong localStorage thì không cần fetch lại
       if (!auth.isAuthenticated) {
         setAppLoading(true);
         try {
@@ -32,7 +30,6 @@ const ManagerPage = () => {
           }
         } catch (error) {
           console.error("Error fetching user data:", error);
-          // Xóa localStorage khi có lỗi
           localStorage.removeItem("auth");
           localStorage.removeItem("roleId");
         } finally {
@@ -47,23 +44,21 @@ const ManagerPage = () => {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
-      <div className="navbar bg-base-100 shadow-lg sticky top-0 z-50 ">
+      <div className="navbar bg-base-200 shadow-lg sticky top-0 z-50">
         <ManagerHeader />
       </div>
 
       {/* Drawer Container */}
       <div className="drawer lg:drawer-open">
-        {/* Drawer Toggle Input */}
         <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
 
-        {/* Drawer Content (Main Page Content) */}
-        <div className="drawer-content flex-col justify-center ">
+        {/* Main Content */}
+        <div className="drawer-content flex-col justify-center">
           <div className="mx-auto w-full p-4">
-            {/* Main content displayed here */}
             <Outlet />
           </div>
 
-          {/* Drawer Button for Small Screens */}
+          {/* Mobile Drawer Toggle */}
           <label
             htmlFor="my-drawer-2"
             className="btn drawer-button lg:hidden absolute top-0 left-4"
@@ -85,47 +80,79 @@ const ManagerPage = () => {
           </label>
         </div>
 
-        {/* Drawer Sidebar (Sidebar Content) */}
-        <div className="drawer-side z-10 sidebar-manager">
-          {/* Drawer Overlay */}
+        {/* Sidebar */}
+        <div className="drawer-side">
           <label htmlFor="my-drawer-2" className="drawer-overlay"></label>
-
-          {/* Sidebar Menu */}
-          <ul
-            className="menu bg-base-200 text-base-content min-h-full w-80 p-4"
-            style={{ paddingTop: "4rem" }}
-          >
-            <li className="menu-item-manager">
-              <Link to="/manager" className="flex items-center space-x-2">
-                <FaChartBar />
-                <span>Dashboard</span>
+          
+          <ul className="menu bg-base-200 text-base-content min-h-full w-60 p-3">
+            {/* Manager Dashboard Section */}
+            <h2 className="font-semibold ml-2 mb-2 text-gray-500">
+              Manager Dashboard
+            </h2>
+            
+            <li className="mb-1">
+              <Link
+                to="/manager"
+                className={`tab h-11 ${
+                  location.pathname === "/manager" ? "active" : ""
+                }`}
+              >
+                <div className="flex flex-1 items-center mb-2">
+                  <FaChartBar className="text-2xl" />
+                  <p className="ml-4">Dashboard</p>
+                </div>
               </Link>
             </li>
-            <li className="menu-item-manager">
+
+            {/* Staff Management Section */}
+            <h2 className="font-semibold ml-2 mb-2 mt-2 text-gray-500">
+              Staff Management
+            </h2>
+
+            <li className="mb-1">
               <Link
                 to="/manager/manager-assign"
-                className="flex items-center space-x-2"
+                className={`tab h-11 ${
+                  location.pathname === "/manager/manager-assign" ? "active" : ""
+                }`}
               >
-                <MdOutlineAssignmentInd />
-                <span>Assign Staff</span>
+                <div className="flex flex-1 items-center mb-2">
+                  <MdOutlineAssignmentInd className="text-2xl" />
+                  <p className="ml-4">Assign Staff</p>
+                </div>
               </Link>
             </li>
-            <li className="menu-item-manager">
+
+            <li className="mb-1">
               <Link
                 to="/manager/manager-manage-staff"
-                className="flex items-center space-x-2"
+                className={`tab h-11 ${
+                  location.pathname === "/manager/manager-manage-staff" ? "active" : ""
+                }`}
               >
-                <MdOutlineManageAccounts />
-                <span>Manage Staff</span>
+                <div className="flex flex-1 items-center mb-2">
+                  <MdOutlineManageAccounts className="text-2xl" />
+                  <p className="ml-4">Manage Staff</p>
+                </div>
               </Link>
             </li>
-            <li className="menu-item-manager">
+
+            {/* Reviews Section */}
+            <h2 className="font-semibold ml-2 mb-2 mt-2 text-gray-500">
+              Reviews Management
+            </h2>
+
+            <li className="mb-1">
               <Link
                 to="/manager/manager-manage-review"
-                className="flex items-center space-x-2"
+                className={`tab h-11 ${
+                  location.pathname === "/manager/manager-manage-review" ? "active" : ""
+                }`}
               >
-                <MdOutlineRateReview />
-                <span>Manage Review</span>
+                <div className="flex flex-1 items-center mb-2">
+                  <VscFeedback className="text-2xl" />
+                  <p className="ml-4">Manage Review</p>
+                </div>
               </Link>
             </li>
           </ul>

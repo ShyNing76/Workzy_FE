@@ -15,6 +15,7 @@ const AssignStaffPage = () => {
     const [searchTerm, setSearchTerm] = useState("");
     // Loading state
     const [isLoading, setIsLoading] = useState(false);
+    const [viewMode, setViewMode] = useState('grid');
 
     // Call API to fetch staff and building
     const fetchStaffAndBuilding = async () => {
@@ -211,17 +212,35 @@ const AssignStaffPage = () => {
 
 
   return (
-    <div className="assign-staff-container">
-      <h1 className="text-2xl font-bold top-10">Assign Staff to Buildings</h1>
+    <div className="p-6 ">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Building Management</h1>
+        
+        {/* View Toggle */}
+        <div className="join">
+          <button 
+            className={`join-item btn ${viewMode === 'grid' ? 'btn-active' : ''}`}
+            onClick={() => setViewMode('grid')}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>
+          </button>
+          <button 
+            className={`join-item btn ${viewMode === 'table' ? 'btn-active' : ''}`}
+            onClick={() => setViewMode('table')}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
 
-      <div className="flex justify-between items-center">
-        {/* Filter section */}
-        <div
-          className="manager-filter-section-container flex-1 w-64"
-          style={{ marginTop: "20px", marginBottom: "20px" }}
-        >
+      {/* Filters & Search */}
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="flex-1">
           <select
-            id="location-filter"
             value={filterLocation}
             onChange={handleFilterChange}
             className="select select-bordered w-full max-w-xs"
@@ -231,122 +250,205 @@ const AssignStaffPage = () => {
             <option value="Hanoi">Hanoi</option>
           </select>
         </div>
-
-        {/* Search Section */}
-        <div className="manager-assign-staff-search flex-1 w-32">
-          <label className="input input-bordered flex items-center gap-2">
-            <input
-              type="text"
-              className="grow"
-              placeholder="Search"
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 16 16"
-              fill="currentColor"
-              className="h-4 w-4 opacity-70"
-            >
-              <path
-                fillRule="evenodd"
-                d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-                clipRule="evenodd"
+        <div className="flex-1">
+          <div className="form-control">
+            <div className="input-group">
+              <input
+                type="text"
+                placeholder="Search buildings..."
+                className="input input-bordered w-full"
+                value={searchTerm}
+                onChange={handleSearchChange}
               />
-            </svg>
-          </label>
+              
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Building table */}
-      <div className="overflow-x-auto">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Index</th>
-              <th>Building Name</th>
-              <th>Location</th>
-              <th>Staff Assigned</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {!isLoading ? (
-              searchBuildings.map((building, index) => {
-                const isAssigned = isStaffAssigned(building.building_id); // check if the building is assigned to any staff
-                return (
-                  <tr key={building.building_id}>
-                    <td>{index + 1}</td>
-                    <td>{building.building_name}</td>
-                    <td>{building.location}</td>
-                    <td>
+      {isLoading ? (
+        <div className="flex justify-center items-center h-64">
+          <span className="loading loading-spinner loading-lg"></span>
+        </div>
+      ) : viewMode === 'grid' ? (
+        // Grid View
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {searchBuildings.map((building) => (
+            <div key={building.building_id} className="card bg-base-100 shadow-xl">
+              {/* Building Image */}
+              <figure className="px-6 pt-6">
+                <img
+                  src={building.image_url}
+                  alt={building.building_name}
+                  className="rounded-xl h-48 w-full object-cover"
+                />
+              </figure>
+              
+              <div className="card-body">
+                <h2 className="card-title">
+                  {building.building_name}
+                  <div className="badge badge-secondary">{building.location}</div>
+                </h2>
+                
+                {/* Staff Assignment Section */}
+                <div className="mt-4">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="avatar placeholder">
+                      {staff.find(s => s.Staff.building_id === building.building_id)?.avatar_url ? (
+                        <div className="w-12 h-12 rounded-full">
+                          <img 
+                            src={staff.find(s => s.Staff.building_id === building.building_id)?.avatar_url}
+                            alt="Staff avatar"
+                          />
+                        </div>
+                      ) : (
+                        <div className="bg-neutral text-neutral-content rounded-full w-12 h-12">
+                          <span className="text-xl">
+                            {staff.find(s => s.Staff.building_id === building.building_id)?.name?.charAt(0) || '?'} {/* Display the first letter of the staff name or '?' if the staff name is empty */}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <select
+                      className="select select-bordered flex-1"
+                      value={selectedStaffIds[building.building_id] || staff.find(
+                        staffMember => staffMember.Staff.building_id === building.building_id
+                      )?.user_id || ""}
+                      onChange={(e) => handleSelectedStaffId(e.target.value, building.building_id)}
+                    >
+                      <option value="">Select Staff</option>
+                      {staff
+                        .filter(staffMember => !staffMember.Staff.building_id || 
+                          staffMember.Staff.building_id === building.building_id)
+                        .map((staffMember) => (
+                          <option key={staffMember.user_id} value={staffMember.user_id}>
+                            {staffMember.name}
+                          </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="card-actions justify-end">
+                    <button
+                      onClick={() => handleAssignStaffToBuilding(building.building_id)}
+                      disabled={!selectedStaffIds[building.building_id] && 
+                        !staff.some(s => s.Staff.building_id === building.building_id)}
+                      className="btn btn-primary"
+                    >
+                      {isBuildingAssigned(building.building_id) ? "Update" : "Assign"}
+                    </button>
+                    
+                    <button
+                      onClick={() => handleUnassignStaffFromBuilding(building.building_id)}
+                      disabled={!isBuildingAssigned(building.building_id)}
+                      className="btn btn-error"
+                    >
+                      Unassign
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        // Table View
+        <div className="overflow-x-auto">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Building</th>
+                <th>Location</th>
+                <th>Current Staff</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {searchBuildings.map((building) => (
+                <tr key={building.building_id}>
+                  <td>
+                    <div className="flex items-center gap-3">
+                      <div className="avatar">
+                        <div className="w-12 h-12 mask mask-squircle">
+                          <img
+                            src={building.image_url}
+                            alt={building.building_name}
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-bold">{building.building_name}</div>
+                        <div className="text-sm opacity-50">ID: {building.building_id}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="badge badge-ghost">{building.location}</div>
+                  </td>
+                  <td>
+                    <div className="flex items-center gap-4">
+                      <div className="avatar placeholder">
+                        {staff.find(s => s.Staff.building_id === building.building_id)?.avatar_url ? (
+                          <div className="w-10 h-10 rounded-full">
+                            <img 
+                              src={staff.find(s => s.Staff.building_id === building.building_id)?.avatar_url}
+                              alt="Staff avatar"
+                            />
+                          </div>
+                        ) : (
+                          <div className="bg-neutral text-neutral-content rounded-full w-10 h-10">
+                            <span>
+                              {staff.find(s => s.Staff.building_id === building.building_id)?.name?.charAt(0) || '?'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                       <select
                         className="select select-bordered w-full max-w-xs"
                         value={selectedStaffIds[building.building_id] || staff.find(
                           staffMember => staffMember.Staff.building_id === building.building_id
                         )?.user_id || ""}
-                        onChange={(e) =>
-                          handleSelectedStaffId(
-                            e.target.value,
-                            building.building_id
-                          )
-                        }
+                        onChange={(e) => handleSelectedStaffId(e.target.value, building.building_id)}
                       >
                         <option value="">Select Staff</option>
                         {staff
-                          .filter(
-                            (staffMember) =>
-                              !staffMember.Staff.building_id || staffMember.Staff.building_id === building.building_id
-                          )
+                          .filter(staffMember => !staffMember.Staff.building_id || 
+                            staffMember.Staff.building_id === building.building_id)
                           .map((staffMember) => (
-                            <option
-                              key={staffMember.user_id}
-                              value={staffMember.user_id}
-                            >
-                              {staffMember.name} {/* Ẩn tên nếu đã được phân công */}
+                            <option key={staffMember.user_id} value={staffMember.user_id}>
+                              {staffMember.name}
                             </option>
-                        ))}
+                          ))}
                       </select>
-                    </td>
-                    <td>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="flex gap-2">
                       <button
-                        onClick={() =>
-                          handleAssignStaffToBuilding(building.building_id)
-                        }
-                        disabled={
-                          !selectedStaffIds[building.building_id] || isAssigned
-                        }
-                        className="btn btn-primary"
+                        onClick={() => handleAssignStaffToBuilding(building.building_id)}
+                        disabled={!selectedStaffIds[building.building_id] && 
+                          !staff.some(s => s.Staff.building_id === building.building_id)}
+                        className="btn btn-sm btn-primary"
                       >
                         {isBuildingAssigned(building.building_id) ? "Update" : "Assign"}
                       </button>
-
+                      
                       <button
                         onClick={() => handleUnassignStaffFromBuilding(building.building_id)}
-                        disabled = {!isBuildingAssigned(building.building_id)}
-                        className="btn btn-error ml-5"
-                        
+                        disabled={!isBuildingAssigned(building.building_id)}
+                        className="btn btn-sm btn-error"
                       >
                         Unassign
                       </button>
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td colSpan="4">
-                  <div className="flex justify-center items-center h-64">
-                    <span className="loading loading-spinner loading-lg"></span>
-                  </div>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-        
-      </div>
-      
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   )
 }
