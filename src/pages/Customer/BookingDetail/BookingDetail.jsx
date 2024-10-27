@@ -89,6 +89,10 @@ const BookingDetail = () => {
     fetchAmenitiesBooking();
   }, []);
 
+  useEffect(() => {
+    console.log("amenities: ", amenitiesBooking);
+  }, [amenitiesBooking]);
+
   const getStatusBadgeClass = (status) => {
     switch (status) {
       case "usage":

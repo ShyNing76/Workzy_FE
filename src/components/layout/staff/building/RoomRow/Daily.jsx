@@ -2,6 +2,17 @@ import React, { useState } from 'react';
 import './RoomSchedule.scss';
 import RoomModal from '../../building/RoomModal/RoomModal';
 
+const convertToVietnamTime = (dateTime) => {
+    const date = new Date(dateTime);
+    const options = { timeZone: 'Asia/Ho_Chi_Minh' };
+    const vietnamTime = date.toLocaleString('en-US', options);
+    
+    // In ra console ngày đã chuyển đổi
+    console.log('Ngày đã chuyển đổi:', vietnamTime);
+    
+    return vietnamTime;
+};
+
 const Daily = ({ selectedDate, workspaces }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState(null);
@@ -10,37 +21,43 @@ const Daily = ({ selectedDate, workspaces }) => {
     const dateObj = new Date(selectedDate);
     const daysInMonth = [...Array(new Date(dateObj.getFullYear(), dateObj.getMonth() + 1, 0).getDate()).keys()].map(i => i + 1);
 
-    
     const checkIfBooked = (bookings, day) => {
         if (!Array.isArray(bookings) || bookings.length === 0) return [];
-    
+
         const startOfDay = new Date(dateObj.getFullYear(), dateObj.getMonth(), day);
         const endOfDay = new Date(dateObj.getFullYear(), dateObj.getMonth(), day + 1);
-    
+
         return bookings.filter(booking => {
             const startTime = new Date(booking.startTime);
             const endTime = new Date(booking.endTime);
-            
+
             // Kiểm tra nếu booking kéo dài ít nhất 24 giờ và nằm trong khoảng thời gian ngày cụ thể
             return (endTime - startTime >= 24 * 60 * 60 * 1000) && (startTime < endOfDay && endTime >= startOfDay);
         });
-    };    
+    };
+
+    const isEndOfBookingInPreviousDay = (bookings, day) => {
+        return bookings.some(booking => {
+            const endTime = new Date(booking.endTime);
+            return endTime.getDate() === day && endTime.getHours() === 23 && endTime.getMinutes() === 59;
+        });
+    };
 
     const getCellStyle = (bookings, day) => {
         const bookedSlots = checkIfBooked(bookings, day);
-        
+
         // Nếu không có booking, trả về style mặc định
         if (bookedSlots.length === 0) {
             return { backgroundColor: 'white', padding: 0, border: '1px solid #ddd', position: 'relative' };
         }
-        
+
         // Nếu có booking, kiểm tra xem nó có bắt đầu từ ngày này không
         const startTime = new Date(bookedSlots[0].startTime);
         const endTime = new Date(bookedSlots[0].endTime);
-    
+
         const isStartOfBooking = day === startTime.getDate() && startTime.getHours() === 0;
-        const isEndOfBooking = day === endTime.getDate();
-    
+        const isEndOfBooking = day === endTime.getDate() || isEndOfBookingInPreviousDay(bookings, day);
+
         return {
             padding: 0,
             border: '1px solid #ddd',
@@ -48,7 +65,6 @@ const Daily = ({ selectedDate, workspaces }) => {
             borderRadius: `${isStartOfBooking ? '15px 0 0 15px' : ''}${isEndOfBooking ? '0 15px 15px 0' : ''}`,
         };
     };
-    
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -66,7 +82,7 @@ const Daily = ({ selectedDate, workspaces }) => {
                 return 'transparent'; // Không có màu
         }
     };
-    
+
     return (
         <div className='room-schedule'>
             <table>

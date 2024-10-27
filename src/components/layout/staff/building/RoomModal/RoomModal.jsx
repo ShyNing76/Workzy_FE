@@ -1,12 +1,13 @@
 import React from 'react';
 import './RoomModal.scss';
 
-const formatDate = (dateString) => {
+const convertToVietnamTime = (dateString) => {
     const date = new Date(dateString);
+    const options = { timeZone: 'Asia/Ho_Chi_Minh' };
     return date.toLocaleString('vi-VN', { 
         year: 'numeric', month: '2-digit', day: '2-digit', 
         hour: '2-digit', minute: '2-digit', hour12: false 
-    }).replace(',', ''); 
+    }).replace(',', '');
 };
 
 const Modal = ({ isOpen, onClose, workspaceType, bookings }) => {
@@ -23,8 +24,8 @@ const Modal = ({ isOpen, onClose, workspaceType, bookings }) => {
                         {bookings.map((booking, index) => (
                             <div key={index} className="booking-item">
                                 <h3>Customer: {booking.customerName}</h3>
-                                <p>Start Time: {formatDate(booking.startTime)}</p>
-                                <p>End Time: {formatDate(booking.endTime)}</p>
+                                <p>Start Time: {convertToVietnamTime(booking.startTime)}</p>
+                                <p>End Time: {convertToVietnamTime(booking.endTime)}</p>
                                 <p>Status: {booking.status}</p>
                             </div>
                         ))}

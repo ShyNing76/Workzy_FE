@@ -7,15 +7,19 @@ const Hourly = ({ selectedDate, workspaces}) => {
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [bookingsForModal, setBookingsForModal] = useState([]);
     const hours = Array.from({ length: 24 }, (_, i) => i);
+    
     const handleCellClick = (workspace, hour) => {
-        // Lấy bookings cho workspace và giờ đã chọn
         const bookings = workspace.bookings.filter(booking => {
             const bookingStart = new Date(booking.startTime);
             const bookingEnd = new Date(booking.endTime);
+            const selectedDateString = new Date(selectedDate).toLocaleDateString('en-GB');
+            
+            // Chỉ kiểm tra giờ trong cùng ngày đã chọn và không bỏ qua các khoảng thời gian từ 00:00 đến trước 7:00
             return (
+                bookingStart.toLocaleDateString('en-GB') <= selectedDateString &&
+                bookingEnd.toLocaleDateString('en-GB') >= selectedDateString &&
                 bookingStart.getHours() <= hour &&
-                bookingEnd.getHours() >= hour &&
-                bookingStart.toISOString().split('T')[0] === selectedDate
+                bookingEnd.getHours() >= hour
             );
         });
     
@@ -24,13 +28,14 @@ const Hourly = ({ selectedDate, workspaces}) => {
         setModalOpen(true); // Mở modal
     };
     
+    
     // Lấy danh sách khoảng thời gian booking
     const getBookingRanges = (bookings, date) => {
         if (!Array.isArray(bookings)) return [];
     
         return bookings.reduce((acc, { startTime, endTime, status }) => {
             if (status === 'cancelled') return acc; // Bỏ qua booking có trạng thái cancelled
-            
+    
             const start = new Date(startTime);
             const end = new Date(endTime);
             const currentDate = new Date(date);
@@ -43,8 +48,12 @@ const Hourly = ({ selectedDate, workspaces}) => {
             // Chỉ lấy booking trong ngày đã chọn và không tô ô ngày trước đó
             if (startDateString <= currentDateString && endDateString >= currentDateString) {
                 const startHour = startDateString === currentDateString ? start.getHours() : 0;
-                // endHour cần trừ 1 vì ô đại diện cho giờ bắt đầu của mỗi slot
-                const endHour = endDateString === currentDateString ? end.getHours() - 1 : 23;
+                let endHour = endDateString === currentDateString ? end.getHours() - 1 : 23;
+    
+                // Nếu giờ kết thúc là 23:59, tô luôn ô giờ thứ 23
+                if (end.getHours() === 23 && end.getMinutes() === 59) {
+                    endHour = 23;
+                }
     
                 acc.push({
                     startHour,
@@ -54,7 +63,7 @@ const Hourly = ({ selectedDate, workspaces}) => {
             }
             return acc;
         }, []);
-    };    
+    };
     
     
     // Style ô dựa vào trạng thái booking
