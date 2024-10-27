@@ -7,7 +7,7 @@
   overflow: hidden;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -20,8 +20,10 @@
     filter: brightness(40%);
   }
 
-  
-  .overlay-text, .header, .tabs, .content {
+  .overlay-text,
+  .header,
+  .tabs,
+  .content {
     position: relative;
     z-index: 1;
   }
@@ -41,8 +43,6 @@
 
   .header {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
     padding: 10px 20px;
     background-color: rgba(248, 249, 250, 0.014);
     border-bottom: 1px solid black;
