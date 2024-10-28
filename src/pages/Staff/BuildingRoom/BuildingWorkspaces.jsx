@@ -61,16 +61,9 @@ const BuildingWorkspaces = () => {
             const startTime = convertToVietnamTime(booking.start_time_date);
             const endTime = convertToVietnamTime(booking.end_time_date);
 
-            // Kiểm tra thời gian để xử lý các booking từ 00:00 đến 07:00
-            const vietnamStartTime = new Date(startTime);
-            const startHour = vietnamStartTime.getHours();
-            if (startHour >= 0 && startHour < 7) {
-              // Booking trong khoảng từ 00:00 đến 07:00 vẫn giữ nguyên hiển thị cho đúng ngày
-              vietnamStartTime.setDate(vietnamStartTime.getDate() + 1);
-            }
-
+            // Không còn xử lý thêm ngày cho booking từ 00:00 đến 07:00
             return {
-              startTime: vietnamStartTime,
+              startTime: new Date(startTime),
               endTime: new Date(endTime),
               status: booking.BookingStatuses[0]?.status,
               customerName: booking.Customer?.User?.name,
@@ -103,7 +96,6 @@ const BuildingWorkspaces = () => {
   const handleDateChange = (e) => {
     const dateValue = e.target.value;
     let date;
-    console.log(dateValue)
     if (selectedType === 'monthly') {
       const [year, month] = dateValue.split('-');
       date = new Date(year, month - 1);

@@ -354,7 +354,7 @@ const MyBooking = () => {
 
   return (
     <div className="max-w-5xl container mx-auto my-20 p-8 bg-white rounded-lg shadow-lg">
-      <div className="flex justify-between">
+      <div className="flex justify-between ">
         <h2 className="text-2xl font-bold text-neutral mb-8 text-left">
           My Booking
         </h2>

@@ -56,13 +56,13 @@ import Admin from "../pages/Admin/AdminMain/Admin.jsx";
 import Staff from "../pages/Staff/StaffMain/Staff.jsx";
 import AssignStaffPage from "../pages/Admin/AssignPages/AssignStaff/AssignStaffPage.jsx";
 import AssignManagerPage from "../pages/Admin/AssignPages/AssignManager/AssignManagerPage.jsx";
-import AssignWorkspacePage from "../pages/Admin/AssignPages/AssignWorkspace/AssignWorkspacePage.jsx";
 
 import AccessDenied from "../pages/Customer/AccessDenied/AccessDenied.jsx";
 import NotFound from "../pages/Customer/NotFound/NotFound.jsx";
 
 import AnimatedRoutes from "../Routers/AnimatedRoute.jsx";
 import ScrollToTop from "../components/context/ScrollToTop.jsx";
+import MyWishlist from "../pages/Customer/MyWishlist/MyWishlist.jsx";
 
 // Role id store in local Storage after login and register
 
@@ -187,6 +187,10 @@ export const router = createBrowserRouter([
                 element: <BookingAmenities />,
               },
               {
+                path: "wishlist",
+                element: <MyWishlist />,
+              },
+              {
                 path: "membership",
                 element: <MemberShipPage />,
               },
@@ -273,10 +277,7 @@ export const router = createBrowserRouter([
         path: "assignmanager",
         element: <AssignManagerPage />,
       },
-      {
-        path: "assignworkspace",
-        element: <AssignWorkspacePage />,
-      },
+      
     ],
     // condition: (user) => user.isAdmin, // Add condition to check if user is admin before rendering the routes
   },

@@ -25,11 +25,11 @@ const DetailModal = ({ booking, onClose }) => {
                     <li className="flex justify-between mb-2">
                         <span>2. Amenities</span>
                     </li>
-                    <div className="overflow-x-auto mt-2 mb-4">
+                    <div className="overflow-x-auto mt-2 mb-2">
                         <table className="table table-xs">
                             <thead>
                                 <tr>
-                                    <th style={{ width: '140px'}}>Amenity Name</th>
+                                    <th style={{ width: '150px'}}>Amenity Name</th>
                                     <th style={{ width: '130px'}}>Price</th>
                                     <th style={{ width: '130px'}}>Quantity</th>
                                     <th>Total Price</th>
@@ -51,19 +51,21 @@ const DetailModal = ({ booking, onClose }) => {
                                             No amenities added
                                         </td>
                                     </tr>
+                                    
                                 )}
                             </tbody>
                         </table>
+                        <h1>_____________________________________________________________________</h1>
+                        <li className="flex justify-between mb-1" style={{fontSize: '12px'}}>
+                            <span>Total Amenities Price</span>
+                            <span>{booking.total_amenities_price}</span>
+                        </li>
                     </div>
-                    <li className="flex justify-between mb-2">
+                    <li className="flex justify-between mb-1">
                         <span>3. Broken Price</span>
                         <span>{booking.total_broken_price}</span>
                     </li>
-
-                    {/* Separator */}
                     <p>_______________________________________________________________________</p>
-
-                    {/* Total Price */}
                     <li className="flex justify-between mb-2">
                         <span>Total Price</span>
                         <span>{booking.total_price}</span>

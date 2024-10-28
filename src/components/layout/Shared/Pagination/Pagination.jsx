@@ -2,6 +2,16 @@ import React from "react";
 
 const Pagination = (props) => {
   const { page, totalPages, setPage } = props;
+  const maxVisiblePages = 5; // Số lượng nút trang tối đa hiển thị cùng lúc
+
+  // Xác định phạm vi trang xung quanh trang hiện tại
+  const startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2));
+  const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+  // Nếu phạm vi vượt quá giới hạn cuối, điều chỉnh lại startPage
+  const adjustedStartPage = Math.max(1, endPage - maxVisiblePages + 1);
+  const pageCount =
+    endPage >= adjustedStartPage ? endPage - adjustedStartPage + 1 : 0; // Đảm bảo độ dài không âm
 
   return (
     <div>
@@ -14,21 +24,49 @@ const Pagination = (props) => {
           Prev
         </button>
 
-        {[...Array(totalPages)].map(
-          (
-            _,
-            index // Dynamically generate the correct number of pages
-          ) => (
+        {/* Trang đầu tiên */}
+        {adjustedStartPage > 1 && (
+          <>
             <button
-              key={index + 1}
-              className={`join-item btn ${
-                page === index + 1 ? "btn-active" : ""
-              }`}
-              onClick={() => setPage(index + 1)} // Go to specific page
+              className={`join-item btn ${page === 1 ? "btn-active" : ""}`}
+              onClick={() => setPage(1)}
             >
-              {index + 1}
+              1
             </button>
-          )
+            {adjustedStartPage > 2 && <span className="join-item">...</span>}
+          </>
+        )}
+
+        {/* Các trang trong phạm vi */}
+        {pageCount > 0 &&
+          [...Array(pageCount)].map((_, index) => {
+            const pageNumber = adjustedStartPage + index;
+            return (
+              <button
+                key={pageNumber}
+                className={`join-item btn ${
+                  page === pageNumber ? "btn-active" : ""
+                }`}
+                onClick={() => setPage(pageNumber)}
+              >
+                {pageNumber}
+              </button>
+            );
+          })}
+
+        {/* Trang cuối */}
+        {endPage < totalPages && (
+          <>
+            {endPage < totalPages - 1 && <span className="join-item">...</span>}
+            <button
+              className={`join-item btn ${
+                page === totalPages ? "btn-active" : ""
+              }`}
+              onClick={() => setPage(totalPages)}
+            >
+              {totalPages}
+            </button>
+          </>
         )}
 
         <button

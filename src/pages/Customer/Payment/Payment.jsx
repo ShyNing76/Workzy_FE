@@ -133,7 +133,7 @@ const PaymentPage = () => {
                 </div>
                 <div className="flex justify-between">
                   <span>Discount:</span>
-                  <span>{formatCurrency(discount)}</span>
+                  <span>- {formatCurrency(discount)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Subtotal:</span>

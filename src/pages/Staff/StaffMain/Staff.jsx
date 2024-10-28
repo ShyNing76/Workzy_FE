@@ -75,7 +75,7 @@ const Staff = () => {
   };
 
   const handleLogoClick = () => {
-    navigate("/");
+    navigate("/staff");
   };
 
   useEffect(() => {
@@ -93,14 +93,17 @@ const Staff = () => {
         </div>
       ) : (
         <div className="main-container">
-          <header className="header" style={{ display: "flex" }}>
+          <header className="header items-center">
             <div
               className="logo-container"
               onClick={() => handleLogoClick()}
               style={{ cursor: "pointer" }}
             >
               <div className="circle">WZ</div>
-              <h1 style={{ marginRight: "680px" }}>
+            </div>
+
+            <div className="flex justify-between w-full">
+              <h1 className="font-bold text-4xl">
                 Workzy Staff at {buildingName}
               </h1>
               <button

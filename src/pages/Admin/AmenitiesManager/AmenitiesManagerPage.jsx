@@ -93,9 +93,9 @@ const AmenitiesManagerPage = () => {
     }
   };
 
-  //Khu vực hàm dành cho add
-  const handleAddAmenity = async (e) => {
-    e.preventDefault();
+    //Khu vực hàm dành cho add
+    const handleAddAmenity = async (e) => {
+        e.preventDefault();
 
     if (!newAmenity.amenity_name) {
       Swal.fire({
