@@ -63,6 +63,7 @@ import NotFound from "../pages/Customer/NotFound/NotFound.jsx";
 
 import AnimatedRoutes from "../Routers/AnimatedRoute.jsx";
 import ScrollToTop from "../components/context/ScrollToTop.jsx";
+import MyWishlist from "../pages/Customer/MyWishlist/MyWishlist.jsx";
 
 // Role id store in local Storage after login and register
 
@@ -185,6 +186,10 @@ export const router = createBrowserRouter([
               {
                 path: "booking/amenities/:bookingId",
                 element: <BookingAmenities />,
+              },
+              {
+                path: "wishlist",
+                element: <MyWishlist />,
               },
               {
                 path: "membership",

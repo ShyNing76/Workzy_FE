@@ -11,6 +11,7 @@ import {
 import { TbCalendarCheck } from "react-icons/tb";
 
 import { GoSidebarCollapse } from "react-icons/go";
+import { TbJewishStar } from "react-icons/tb";
 
 import { Link } from "react-router-dom";
 import defaultProfile from "../../../../assets/default-profile.jpg";
@@ -82,6 +83,12 @@ const Sidebar = (props) => {
               <Link to="/user/booking">
                 <TbCalendarCheck className="icon" />
                 My Booking
+              </Link>
+            </li>
+            <li className="menu-item">
+              <Link to="/user/wishlist">
+                <TbJewishStar className="icon" />
+                My Wishlist
               </Link>
             </li>
             <li className="menu-item">

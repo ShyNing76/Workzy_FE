@@ -149,15 +149,13 @@ const BookingDetail = () => {
       />
 
       <hr />
-      <ReviewBox review={dataReview} />
-
-      {booking.BookingStatuses[0].status !== "completed" && (
-        <>
-          <hr />
-
-          <BookingAmenitiesCard amenitiesBooking={amenitiesBooking} />
-        </>
+      {dataReview && booking.BookingStatuses[0].status === "completed" && (
+        <ReviewBox review={dataReview} />
       )}
+
+      <hr />
+
+      <BookingAmenitiesCard amenitiesBooking={amenitiesBooking} />
 
       {booking.report_damage_ameninites !== null && (
         <>
