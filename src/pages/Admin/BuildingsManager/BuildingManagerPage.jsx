@@ -1,5 +1,6 @@
 import { useLocation } from "react-router-dom";
 import React, { useEffect, useState } from "react";
+import Swal from 'sweetalert2';
 
 import { getBuilding, getManager, postBuilding, putBuilding, assignManagerToBuilding, removeManagerFromBuilding, deleteBuilding } from "../../../config/api.admin";
 import AddModal from "../../../components/layout/Admin/Modals/AddModal";
@@ -10,6 +11,7 @@ import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.
 import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
 import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
 import BlockButton from "../../../components/layout/Admin/Buttons/BlockButton.jsx";
+import { postNewBuilding } from "../../../config/api.admin";
 
 const BuildingManagerPage = () => {
   const location = useLocation();
@@ -29,7 +31,7 @@ const BuildingManagerPage = () => {
     location: '',
     address: '',
     rating: 0,
-    images: [],
+    image: [],
     description: '',
     status: 'active',
     google_address: ''
@@ -39,7 +41,7 @@ const BuildingManagerPage = () => {
     location: '',
     address: '',
     rating: 0,
-    images: [],
+    image: [],
     description: '',
     status: 'active',
     google_address: ''
@@ -87,37 +89,43 @@ const BuildingManagerPage = () => {
   // Xử lý thêm building
   const handleAddBuilding = async (e) => {
     e.preventDefault();
+  
     const formData = new FormData();
-
     for (let key in newBuilding) {
-      if (key === 'images' && newBuilding.images.length > 0) {
-        Array.from(newBuilding.images).forEach(file => formData.append('images', file));
+      if (key === 'image') {
+        Array.from(newBuilding.image).forEach(file => formData.append('images', file));
       } else {
         formData.append(key, newBuilding[key]);
       }
     }
-
+  
     try {
-      const Building = await postBuilding(formData);
-      if (Building && Building.data) {
-        fetchBuilding();
+      const response = await postNewBuilding(formData);
+      // Handle successful addition
+      if (response && response.err === 0){
         setShowAddModal(false);
-        setSuccessMessage('Building added successfully!');
-        setNewBuilding({
-          building_name: '',
-          location: '',
-          address: '',
-          rating: 0,
-          images: [],
-          description: '',
-          status: 'active',
-          google_address: ''
+        fetchBuilding(); // Refresh the building list
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: response.message,
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: response.message,
         });
       }
     } catch (err) {
-      console.error('Failed to add building:', err);
-    }
-  };
+        console.error('Failed to add building:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'An unexpected error occurred while adding the building.',
+        });
+      }
+    };
 
   const addBuildingFields = [
     { name: "building_name", label: "Building Name", type: "text", value: `${newBuilding.building_name}` },
@@ -126,7 +134,7 @@ const BuildingManagerPage = () => {
     { name: "rating", label: "Rating", type: "number", value: `${newBuilding.rating}` },
     { name: 'google_address', label: 'Google Address', type: 'text', value: `${newBuilding.google_address}` },
     { name: "description", label: "Description", type: "text", value: `${newBuilding.description}` },
-    { name: 'images', label: 'Images', type: 'file', multiple: true }
+    { name: 'image', label: 'Images', type: 'file', multiple: true }
   ];
 
   
@@ -150,8 +158,8 @@ const BuildingManagerPage = () => {
     const formData = new FormData();
 
     for (let key in updateBuilding) {
-      if (key === 'images' && updateBuilding.images.length > 0) {
-        Array.from(updateBuilding.images).forEach(file => formData.append('images', file));
+      if (key === 'image' && updateBuilding.image.length > 0) {
+        Array.from(updateBuilding.image).forEach(file => formData.append('image', file));
       } else {
         formData.append(key, updateBuilding[key]);
       }
@@ -188,17 +196,19 @@ const BuildingManagerPage = () => {
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === 'images') {
-      setNewBuilding({ ...newBuilding, images: files });
+    console.log("value: " + value);
+    if (name === 'image') {
+      setNewBuilding({ ...newBuilding, image: Array.from(value) });
     } else {
       setNewBuilding({ ...newBuilding, [name]: value });
     }
+    
   };
 
   const handleUpdateChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === 'images') {
-      setUpdateBuilding({ ...updateBuilding, images: files });
+    if (name === 'image') {
+      setUpdateBuilding({ ...updateBuilding, image: files });
     } else {
       setUpdateBuilding({ ...updateBuilding, [name]: value });
     }
@@ -211,7 +221,7 @@ const BuildingManagerPage = () => {
     { name: "rating", label: "Rating", type: "number", value: `${updateBuilding.rating}` },
     { name: 'google_address', label: 'Google Address', type: 'text', value: `${updateBuilding.google_address}` },
     { name: "description", label: "Description", type: "text", value: `${updateBuilding.description}` },
-    { name: 'images', label: 'Images', type: 'file', multiple: true }
+    { name: 'image', label: 'Images', type: 'file', multiple: true }
   ];
 
   const filteredBuilding = Array.isArray(building)
