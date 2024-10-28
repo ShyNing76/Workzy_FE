@@ -49,7 +49,7 @@ const Admin = () => {
         </div>
       ) : (
         <>
-        <div className="sticky top-0 z-50"><AdminHeader /></div>
+        <div className="sticky top-0 z-50 shadow-lg"><AdminHeader /></div>
           
           <div className="sidebar-container drawer lg:drawer-open">
             {/* Sidebar */}

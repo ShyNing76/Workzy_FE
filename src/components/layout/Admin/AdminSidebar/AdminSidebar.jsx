@@ -32,9 +32,11 @@ const AdminSidebar = () => {
         ></label>
         <ul className="menu bg-base-200 text-base-content min-h-full w-60 p-3">
           {/* Sidebar content here --------------------------------------------------------------------*/}
-
+         
+         
+          {/* WORKZY Dashboard */}
           <h2 className="font-semibold ml-2 mb-2 text-gray-500">
-            WORKZY Manager
+            WORKZY Dashboard
           </h2>
 
           <li className="mb-1">
@@ -50,6 +52,12 @@ const AdminSidebar = () => {
               </div>
             </Link>
           </li>
+
+          <h2 className="font-semibold ml-2 mb-2 mt-2 text-gray-500">
+            WORKZY Management
+          </h2>
+
+          {/* WORKZY Management */}
 
           <li className="mb-1">
             <Link
@@ -81,8 +89,38 @@ const AdminSidebar = () => {
             </Link>
           </li>
 
-          <h2 className="font-semibold te ml-2 mb-2 mt-2 text-gray-500">
-            WORKZY Accounts
+          <li className="mb-1">
+            <Link
+              to="/admin/buildingmanager"
+              className={`tab h-11 ${
+                location.pathname === "/admin/buildingmanager" ? "active" : ""
+              }`}
+            >
+              <div className="flex flex-1 items-center mb-2">
+                <PiBuildingsLight className="text-2xl" />
+                <p className="ml-4">Building List</p>
+              </div>
+            </Link>
+          </li>
+
+          <li className="mb-1">
+            <Link
+              to="/admin/workspacesmanager"
+              className={`tab h-11 ${
+                location.pathname === "/admin/workspacesmanager" ? "active" : ""
+              }`}
+            >
+              <div className="flex flex-1 items-center mb-2">
+                <RxDashboard className="text-2xl" />
+                <p className="ml-4">Workspace List</p>
+              </div>
+            </Link>
+          </li>
+
+
+          {/* WORKZY Users */}
+          <h2 className="font-semibold ml-2 mb-2 mt-2 text-gray-500">
+            WORKZY Users
           </h2>
 
           <li className="mb-1">
@@ -127,40 +165,10 @@ const AdminSidebar = () => {
             </Link>
           </li>
 
-          <h2 className="font-semibold ml-2 mb-2 mt-2 text-gray-500">
-            WORKZY Branches
-          </h2>
-
-          <li className="mb-1">
-            <Link
-              to="/admin/buildingmanager"
-              className={`tab h-11 ${
-                location.pathname === "/admin/buildingmanager" ? "active" : ""
-              }`}
-            >
-              <div className="flex flex-1 items-center mb-2">
-                <PiBuildingsLight className="text-2xl" />
-                <p className="ml-4">Building List</p>
-              </div>
-            </Link>
-          </li>
-
-          <li className="mb-1">
-            <Link
-              to="/admin/workspacesmanager"
-              className={`tab h-11 ${
-                location.pathname === "/admin/workspacesmanager" ? "active" : ""
-              }`}
-            >
-              <div className="flex flex-1 items-center mb-2">
-                <RxDashboard className="text-2xl" />
-                <p className="ml-4">Workspace List</p>
-              </div>
-            </Link>
-          </li>
+          
 
           <h2 className="font-semibold ml-2 mb-2 mt-2 text-gray-500">
-            WORKZY Assign
+            WORKZY Assignments
           </h2>
 
           <li className="mb-1">
@@ -191,22 +199,10 @@ const AdminSidebar = () => {
             </Link>
           </li>
 
-          <li className="mb-1">
-            <Link
-              to="/admin/assignworkspace"
-              className={`tab h-11 ${
-                location.pathname === "/admin/assignworkspace" ? "active" : ""
-              }`}
-            >
-              <div className="flex flex-1 items-center mb-2">
-                <PiBuildingsLight className="text-2xl" />
-                <p className="ml-4">Assign Workspace</p>
-              </div>
-            </Link>
-          </li>
+         
 
           <h2 className="font-semibold ml-2 mb-2 mt-2 text-gray-500">
-            WORKZY Bookings
+            WORKZY Bookings and Reviews
           </h2>
 
           <li className="mb-1">
