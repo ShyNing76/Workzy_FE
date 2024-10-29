@@ -1,35 +1,41 @@
-import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { useState } from 'react';
+import React, { useEffect } from "react";
+import PropTypes from "prop-types";
+import { useState } from "react";
 import { FiPlus } from "react-icons/fi";
 import { RxCross2 } from "react-icons/rx";
 import { FiSave, FiUpload } from "react-icons/fi";
 import { RiDeleteBinLine } from "react-icons/ri";
 
-const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields }) => {
+const AddModal = ({
+  show,
+  onClose,
+  onSubmit,
+  currentItem,
+  onInputChange,
+  fields,
+}) => {
   const [errorMissing, setErrorMissing] = useState([]);
   const [previewImages, setPreviewImages] = useState([]);
-  
-  
+
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (e.target === document.querySelector('.modal')) {
+      if (e.target === document.querySelector(".modal")) {
         onClose();
       }
     };
 
     const handleEscape = (e) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         onClose();
       }
     };
 
-    setErrorMissing([]);  
-    window.addEventListener('click', handleClickOutside);
-    window.addEventListener('keydown', handleEscape);
+    setErrorMissing([]);
+    window.addEventListener("click", handleClickOutside);
+    window.addEventListener("keydown", handleEscape);
     return () => {
-      window.removeEventListener('click', handleClickOutside);
-      window.removeEventListener('keydown', handleEscape);
+      window.removeEventListener("click", handleClickOutside);
+      window.removeEventListener("keydown", handleEscape);
     };
   }, [onClose]);
 
@@ -51,8 +57,6 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
     });
   };
 
-
-
   const removeImage = (index) => {
     const newPreviews = previewImages.filter((_, i) => i !== index);
     setPreviewImages(newPreviews);
@@ -67,13 +71,13 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
       },
     });
   };
-  
+
   const handleOnClick = (e) => {
     e.preventDefault();
     let missing = [];
-  
+
     fields.forEach((field) => {
-      if (field.type === 'file') {
+      if (field.type === "file") {
         // Specifically handle file fields
         if (!currentItem[field.name] || currentItem[field.name].length === 0) {
           missing.push(field.label);
@@ -83,7 +87,7 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
         missing.push(field.label);
       }
     });
-  
+
     if (missing.length > 0) {
       setErrorMissing(missing);
       return;
@@ -98,11 +102,11 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
     setErrorMissing([]);
     setPreviewImages([]);
     onClose();
-  }
+  };
 
   const isFieldMissing = (fieldLabel) => {
     return errorMissing && errorMissing.includes(fieldLabel);
-  }
+  };
 
   return (
     <div className="modal modal-open">
@@ -120,17 +124,17 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
                 )}
 
                 {/* Render inputs based on field type */}
-                {field.type === 'text' && (
+                {field.type === "text" && (
                   <input
                     type="text"
                     name={field.name}
-                    value={currentItem[field.name] || ''}
+                    value={currentItem[field.name] || ""}
                     onChange={onInputChange}
                     className="input input-bordered"
                     required
                   />
                 )}
-                {field.type === 'number' && (
+                {field.type === "number" && (
                   <input
                     type="number"
                     name={field.name}
@@ -140,33 +144,33 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
                     required
                   />
                 )}
-                {field.type === 'datetime' && (
+                {field.type === "datetime" && (
                   <input
                     type="datetime-local"
                     name={field.name}
-                    value={currentItem[field.name] || ''}
+                    value={currentItem[field.name] || ""}
                     onChange={onInputChange}
                     className="input input-bordered"
                     required
                   />
                 )}
-                {field.type === 'date' && (
+                {field.type === "date" && (
                   <input
                     type="date"
                     name={field.name}
-                    value={currentItem[field.name] || ''}
+                    value={currentItem[field.name] || ""}
                     onChange={onInputChange}
                     className="input input-bordered"
                     required
                   />
                 )}
-                {field.type === 'select' && (
+                {field.type === "select" && (
                   <select
                     name={field.name}
-                    value={currentItem[field.name] || ''}
+                    value={currentItem[field.name] || ""}
                     onChange={onInputChange}
                     className={
-                      field.className || 'select select-bordered w-full'
+                      field.className || "select select-bordered w-full"
                     }
                     required
                   >
@@ -177,14 +181,14 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
                     ))}
                   </select>
                 )}
-                {field.type === 'checkbox' && (
+                {field.type === "checkbox" && (
                   <label className="cursor-pointer">
                     <input
                       type="checkbox"
                       name={field.name}
                       checked={currentItem[field.name] || false}
                       onChange={onInputChange}
-                      className={field.className || 'checkbox'}
+                      className={field.className || "checkbox"}
                     />
                     <span className="label-text">
                       {currentItem[field.name]
@@ -193,7 +197,7 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
                     </span>
                   </label>
                 )}
-                {field.type === 'file' && (
+                {field.type === "file" && (
                   <div className="space-y-2">
                     <div className="flex items-center justify-center w-full">
                       <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-base-200">
@@ -202,7 +206,7 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
                           <p className="text-sm">
                             <span className="font-semibold">
                               Click to upload
-                            </span>{' '}
+                            </span>{" "}
                             or drag and drop
                           </p>
                         </div>
@@ -222,14 +226,14 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
                       (currentItem.image && currentItem.image.length > 0)) && (
                       <div className="grid grid-cols-3 gap-4 mt-4">
                         {[
-                          ...(previewImages || [])
+                          ...(previewImages || []),
                           // ...(Array.isArray(currentItem.image)
                           //   ? currentItem.image
                           //   : []),
                         ].map((img, index) => (
                           <div key={index} className="relative group">
                             <img
-                              src={typeof img === 'string' ? img : img}
+                              src={typeof img === "string" ? img : img}
                               alt={`Preview ${index + 1}`}
                               className="w-full h-24 object-cover rounded-lg"
                             />
@@ -258,12 +262,11 @@ const AddModal = ({ show, onClose, onSubmit, currentItem, onInputChange, fields 
               onClick={handleOnClose}
             >
               <RxCross2 /> Cancel
-            </button> 
+            </button>
             <button
               type="submit"
               className="btn btn-sm mr-2"
               onClick={handleOnClick}
-
             >
               <FiPlus /> Add
             </button>
@@ -288,7 +291,8 @@ AddModal.propTypes = {
       options: PropTypes.arrayOf(
         PropTypes.shape({
           label: PropTypes.string.isRequired,
-          value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+          value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+            .isRequired,
         })
       ),
       checkboxLabels: PropTypes.shape({

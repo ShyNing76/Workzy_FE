@@ -63,7 +63,7 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
         <div className="modal-box max-w-6xl w-11/12 p-0 bg-base-100">
           {/* Header */}
           <div className="flex justify-between items-center p-4 border-b border-base-300">
-            <h2 className="text-2xl font-bold">Chi tiết</h2>
+            <h2 className="text-2xl font-bold">Details</h2>
             <button
               onClick={onClose}
               className="btn btn-ghost btn-circle btn-sm hover:bg-base-200"
@@ -144,7 +144,7 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
           {/* Footer */}
           <div className="modal-action px-6 py-4 border-t border-base-300">
             <button className="btn btn-primary" onClick={onClose}>
-              Đóng
+              Close
             </button>
           </div>
         </div>
