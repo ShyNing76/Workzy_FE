@@ -13,40 +13,40 @@ const UpdateModal = ({
   fields,
 }) => {
   const [previewImages, setPreviewImages] = useState([]);
+  const [imageFiles, setImageFiles] = useState([]);
   const [removedImages, setRemovedImages] = useState([]);
 
   useEffect(() => {
     if (currentItem?.images) {
+      // Existing Firebase images
       setPreviewImages(currentItem.images);
+      setImageFiles([]);
     } else if (currentItem?.BuildingImages) {
       const firebaseImages = currentItem.BuildingImages.map((img) => img.image);
       setPreviewImages(firebaseImages);
+      setImageFiles([]);
     }
-    setRemovedImages([]); // Reset removed images when modal opens
+    setRemovedImages([]);
   }, [currentItem]);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    const previews = files.map((file) => URL.createObjectURL(file));
 
-    setPreviewImages((prevPreviews) => {
-      const newPreviews = [...prevPreviews, ...previews];
+    // Create preview URLs for display
+    const newPreviewUrls = files.map((file) => URL.createObjectURL(file));
 
-      onInputChange({
-        target: {
-          name: "images",
-          value: newPreviews,
-        },
-      });
+    // Update preview images
+    setPreviewImages((prevPreviews) => [...prevPreviews, ...newPreviewUrls]);
 
-      return newPreviews;
-    });
+    // Store actual files
+    setImageFiles((prevFiles) => [...prevFiles, ...files]);
 
+    // Update parent component with new files
     onInputChange({
       target: {
         name: "images",
         type: "file",
-        files: files,
+        files: [...imageFiles, ...files],
       },
     });
   };
@@ -54,23 +54,15 @@ const UpdateModal = ({
   const removeImage = (indexToRemove) => {
     const removedImage = previewImages[indexToRemove];
 
+    // Remove from preview images
     setPreviewImages((prevPreviews) => {
       const newPreviews = prevPreviews.filter(
         (_, index) => index !== indexToRemove
       );
-
-      // Update parent's images state
-      onInputChange({
-        target: {
-          name: "images",
-          value: newPreviews,
-        },
-      });
-
       return newPreviews;
     });
 
-    // If it's a Firebase URL, add to removedImages
+    // If it's a Firebase URL
     if (typeof removedImage === "string" && removedImage.includes("firebase")) {
       setRemovedImages((prevRemoved) => {
         const newRemovedImages = [...prevRemoved, removedImage];
@@ -85,8 +77,41 @@ const UpdateModal = ({
 
         return newRemovedImages;
       });
+    } else {
+      // Remove from imageFiles if it's a new file
+      setImageFiles((prevFiles) => {
+        const newFiles = prevFiles.filter(
+          (_, index) => index !== indexToRemove
+        );
+
+        // Update parent component
+        onInputChange({
+          target: {
+            name: "images",
+            type: "file",
+            files: newFiles,
+          },
+        });
+
+        return newFiles;
+      });
+    }
+
+    // Cleanup preview URL
+    if (typeof removedImage === "string" && removedImage.startsWith("blob:")) {
+      URL.revokeObjectURL(removedImage);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      previewImages.forEach((url) => {
+        if (typeof url === "string" && url.startsWith("blob:")) {
+          URL.revokeObjectURL(url);
+        }
+      });
+    };
+  }, []);
 
   if (!show) return null;
 
@@ -187,7 +212,7 @@ const UpdateModal = ({
                         </div>
                         <input
                           type="file"
-                          name="images" // Đổi thành images thay vì image
+                          name="images"
                           onChange={handleImageChange}
                           className="hidden"
                           multiple={field.multiple}
@@ -197,17 +222,12 @@ const UpdateModal = ({
                     </div>
 
                     {/* Image Preview Grid */}
-                    {/* Hiển thị Grid hình ảnh */}
                     {previewImages.length > 0 && (
                       <div className="grid grid-cols-3 gap-4 mt-4">
                         {previewImages.map((img, index) => (
                           <div key={index} className="relative group">
                             <img
-                              src={
-                                typeof img === "string"
-                                  ? img
-                                  : URL.createObjectURL(img)
-                              }
+                              src={img}
                               alt={`Preview ${index + 1}`}
                               className="w-full h-24 object-cover rounded-lg"
                             />
