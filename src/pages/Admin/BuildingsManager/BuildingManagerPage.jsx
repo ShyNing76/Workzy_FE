@@ -19,6 +19,7 @@ import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.
 import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
 import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
 import BlockButton from "../../../components/layout/Admin/Buttons/BlockButton.jsx";
+import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal.jsx";
 
 const BuildingManagerPage = () => {
   const location = useLocation();
@@ -83,49 +84,27 @@ const BuildingManagerPage = () => {
     fetchManagers();
   }, []);
 
-  const handleRowClick = async (building_id) => {
-    try {
-      const buildingRes = await getBuildingById(building_id);
+  const handleRowClick = async (building) => {
+    let managerName = "N/A";
 
-      if (buildingRes && buildingRes.data) {
-        const buildingData = buildingRes.data;
-        let managerName = "N/A";
-
-        if (buildingData.manager_id) {
-          // Fetch manager details by ID
-          try {
-            const managerRes = await getManagerById(buildingData.manager_id);
-            if (managerRes && managerRes.data) {
-              managerName = managerRes.data.name || "N/A";
-            }
-          } catch (err) {
-            console.error("Error fetching manager details by ID", err);
-          }
-        }
-
-        const buildingDetails = {
-          ...buildingData,
-          manager_name: managerName,
-          image: buildingData.BuildingImages[0]?.image || null,
-        };
-
-        setSelectedBuildingDetails(buildingDetails);
-        setShowDetailsModal(true);
-      }
-    } catch (err) {
-      console.error("Error fetching building details", err);
+    if (building.Manager) {
+      // Fetch manager details by ID
+      managerName;
     }
+
+    const buildingDetails = {
+      ...building,
+      manager_name: building?.Manager?.User?.name || "None",
+      image: building.BuildingImages[0]?.image || null,
+    };
+
+    setSelectedBuildingDetails(buildingDetails);
+    setShowDetailsModal(true);
   };
 
   const handleCloseModal = () => {
     setSelectedBuildingDetails(null);
     setShowDetailsModal(false);
-  };
-
-  // Utility function to get manager name by ID
-  const getManagerNameById = (managerId) => {
-    const manager = managers.find((manager) => manager.user_id === managerId);
-    return manager ? manager.name : "N/A";
   };
 
   // Extract unique locations from the buildings
@@ -267,29 +246,6 @@ const BuildingManagerPage = () => {
       }
     } catch (err) {
       console.error("Error updating building:", err);
-    }
-  };
-
-  // Xử lý xóa building
-  const handleDeleteBuilding = async () => {
-    if (!buildingToDelete) return;
-
-    try {
-      await deleteBuilding(buildingToDelete.building_id);
-      fetchBuilding();
-      setShowDeleteModal(false);
-      setSuccessMessage("Building deleted successfully!");
-    } catch (err) {
-      console.error("Failed to delete building:", err);
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === "images") {
-      setNewBuilding({ ...newBuilding, images: files });
-    } else {
-      setNewBuilding({ ...newBuilding, [name]: value });
     }
   };
 
@@ -437,10 +393,12 @@ const BuildingManagerPage = () => {
               <tr
                 key={building.building_id}
                 className="hover:bg-gray-100 cursor-pointer"
-                onClick={() => handleRowClick(building.building_id)}
+                onClick={() => handleRowClick(building)}
               >
                 <td>{building.building_name}</td>
-                <td>{getManagerNameById(building.manager_id)}</td>
+                <td>
+                  {building.Manager ? building.Manager?.User?.name : "None"}
+                </td>
                 <td>{building.location}</td>
                 <td>{building.address}</td>
                 <td>{building.status}</td>

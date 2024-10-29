@@ -86,7 +86,7 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
                     <img
                       src={currentItem.image}
                       alt="Preview"
-                      className="w-full h-[500px] object-cover transform transition-transform duration-300 hover:scale-105"
+                      className="w-full h-[400px] object-cover transform transition-transform duration-300 hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-black/0 hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
                       <div className="bg-white/90 p-3 rounded-full transform hover:scale-110 transition-transform">
