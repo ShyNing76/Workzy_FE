@@ -19,12 +19,12 @@ const UpdateModal = ({
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     const previews = files.map((file) => URL.createObjectURL(file));
-    setPreviewImages(previews);
+    setPreviewImages((prevPreviews) => [...prevPreviews, ...previews]);
 
     onInputChange({
       target: {
         name: e.target.name,
-        value: files,
+        value: [...(currentItem.image || []), ...files],
       },
     });
   };
@@ -156,9 +156,6 @@ const UpdateModal = ({
                       <div className="grid grid-cols-3 gap-4 mt-4">
                         {[
                           ...(previewImages || []),
-                          ...(Array.isArray(currentItem.image)
-                            ? currentItem.image
-                            : []),
                         ].map((img, index) => (
                           <div key={index} className="relative group">
                             <img

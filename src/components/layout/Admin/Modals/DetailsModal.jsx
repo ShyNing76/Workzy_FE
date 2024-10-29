@@ -106,7 +106,9 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
                         key !== "Staff" &&
                         key !== "google_token" &&
                         key !== "User" &&
-                        key !== "image"
+                        key !== "image" &&
+                        key !== "manager_id" &&
+                        key !== "BuildingImages"
                     )
                     .map(([key, value]) => (
                       <div
