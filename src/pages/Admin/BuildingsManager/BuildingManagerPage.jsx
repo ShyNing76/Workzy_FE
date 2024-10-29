@@ -53,8 +53,8 @@ const BuildingManagerPage = () => {
     description: "",
     status: "active",
     google_address: "",
+    remove_images: [],
   });
-  const [managers, setManagers] = useState([]);
 
   // Fetch building và managers
   const fetchBuilding = async () => {
@@ -68,18 +68,8 @@ const BuildingManagerPage = () => {
     }
   };
 
-  const fetchManagers = async () => {
-    try {
-      const res = await getManager();
-      setManagers(res.data || []);
-    } catch (err) {
-      console.error("Failed to fetch managers:", err);
-    }
-  };
-
   useEffect(() => {
     fetchBuilding();
-    fetchManagers();
   }, []);
 
   const handleRowClick = async (building) => {
@@ -230,21 +220,31 @@ const BuildingManagerPage = () => {
     formData.append("rating", parseInt(updateBuilding.rating) || 0);
     formData.append("status", updateBuilding.status || "");
 
-    // Handle existing images from BuildingImages
+    // Handle images
     if (updateBuilding.images && updateBuilding.images.length > 0) {
-      updateBuilding.images.forEach((image, index) => {
-        // Nếu là URL (ảnh cũ từ Firebase)
-        if (typeof image === "string") {
-          formData.append(`images`, image);
-        }
-        // Nếu là File object (ảnh mới upload)
-        else if (image instanceof File) {
-          formData.append(`images`, image);
+      updateBuilding.images.forEach((image) => {
+        if (image instanceof File) {
+          formData.append("images", image);
+        } else if (
+          typeof image === "string" &&
+          !updateBuilding.remove_images.includes(image)
+        ) {
+          formData.append("images", image);
         }
       });
     }
 
-    // Log để kiểm tra
+    // Add removed images to formData
+    if (
+      updateBuilding.remove_images &&
+      updateBuilding.remove_images.length > 0
+    ) {
+      updateBuilding.remove_images.forEach((image) => {
+        formData.append("remove_images", image);
+      });
+    }
+
+    // Log formData contents for debugging
     for (let [key, value] of formData.entries()) {
       console.log(`${key}:`, value);
     }
@@ -275,9 +275,22 @@ const BuildingManagerPage = () => {
 
     setUpdateBuilding((prev) => {
       if (type === "file") {
+        const newFiles = Array.from(files);
         return {
           ...prev,
-          images: [...(prev.images || []), ...Array.from(files)],
+          images: [...(prev.images || []), ...newFiles],
+        };
+      } else if (name === "images") {
+        // Nhận danh sách ảnh mới từ modal
+        return {
+          ...prev,
+          images: value,
+        };
+      } else if (name === "remove_images") {
+        // Nhận danh sách ảnh đã xóa từ modal
+        return {
+          ...prev,
+          remove_images: value,
         };
       }
       return {

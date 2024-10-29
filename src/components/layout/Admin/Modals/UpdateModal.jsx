@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { RxCross2 } from "react-icons/rx";
 import { FiSave, FiUpload } from "react-icons/fi";
@@ -13,6 +13,7 @@ const UpdateModal = ({
   fields,
 }) => {
   const [previewImages, setPreviewImages] = useState([]);
+  const [removedImages, setRemovedImages] = useState([]);
 
   useEffect(() => {
     if (currentItem?.images) {
@@ -21,40 +22,70 @@ const UpdateModal = ({
       const firebaseImages = currentItem.BuildingImages.map((img) => img.image);
       setPreviewImages(firebaseImages);
     }
+    setRemovedImages([]); // Reset removed images when modal opens
   }, [currentItem]);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     const previews = files.map((file) => URL.createObjectURL(file));
 
-    // Cập nhật xem trước hình ảnh
-    setPreviewImages((prevPreviews) => [...prevPreviews, ...previews]);
+    setPreviewImages((prevPreviews) => {
+      const newPreviews = [...prevPreviews, ...previews];
 
-    // Cập nhật state cho currentItem.image
-    const updatedImages = [...(currentItem.image || []), ...files];
+      onInputChange({
+        target: {
+          name: "images",
+          value: newPreviews,
+        },
+      });
+
+      return newPreviews;
+    });
 
     onInputChange({
       target: {
-        name: e.target.name,
-        value: updatedImages,
+        name: "images",
+        type: "file",
+        files: files,
       },
     });
   };
 
-  const removeImage = (index) => {
-    // Xóa hình ảnh trong danh sách xem trước
-    const newPreviews = previewImages.filter((_, i) => i !== index);
-    setPreviewImages(newPreviews);
+  const removeImage = (indexToRemove) => {
+    const removedImage = previewImages[indexToRemove];
 
-    // Xóa hình ảnh trong currentItem.image
-    const newFiles = (currentItem.image || []).filter((_, i) => i !== index);
+    setPreviewImages((prevPreviews) => {
+      const newPreviews = prevPreviews.filter(
+        (_, index) => index !== indexToRemove
+      );
 
-    onInputChange({
-      target: {
-        name: "image",
-        value: newFiles,
-      },
+      // Update parent's images state
+      onInputChange({
+        target: {
+          name: "images",
+          value: newPreviews,
+        },
+      });
+
+      return newPreviews;
     });
+
+    // If it's a Firebase URL, add to removedImages
+    if (typeof removedImage === "string" && removedImage.includes("firebase")) {
+      setRemovedImages((prevRemoved) => {
+        const newRemovedImages = [...prevRemoved, removedImage];
+
+        // Update parent's remove_images state
+        onInputChange({
+          target: {
+            name: "remove_images",
+            value: newRemovedImages,
+          },
+        });
+
+        return newRemovedImages;
+      });
+    }
   };
 
   if (!show) return null;
