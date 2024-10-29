@@ -272,12 +272,15 @@ const getAllBooking = () => {
 };
 
 //Buildings Manager APIs_________________________________________________________
-
-//Buildings Manager APIs_________________________________________________________
 const getBuilding = () => {
   const URL_API = "/api/v1/building/";
   return axios.get(URL_API);
 };
+
+const postNewBuilding = (newBuilding) => {
+  const URL_API = "/api/v1/building/"
+  return axios.post(URL_API, newBuilding)
+}
 
 const getCustomerById = (user_id) => {
   const URL_API = `/api/v1/customer/${user_id}`;
@@ -537,4 +540,5 @@ export {
   getBookingDataIn6Days,
   getRevenueDataIn6DaysAdmin,
   getBookingDataIn6DaysAdmin,
+  postNewBuilding,
 };
