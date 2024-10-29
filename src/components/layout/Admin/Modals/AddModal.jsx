@@ -16,7 +16,6 @@ const AddModal = ({
 }) => {
   const [errorMissing, setErrorMissing] = useState([]);
   const [previewImages, setPreviewImages] = useState([]);
-
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (e.target === document.querySelector(".modal")) {
@@ -43,11 +42,8 @@ const AddModal = ({
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    console.log(files);
     const previews = files.map((file) => URL.createObjectURL(file));
-    console.log(previews);
     setPreviewImages((prevPreviews) => [...prevPreviews, ...previews]);
-    console.log(previews);
 
     onInputChange({
       target: {

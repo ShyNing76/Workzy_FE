@@ -8,10 +8,9 @@ const BlockButton = ({ onClick, status }) => {
 
     return (
         <button
-            className={`btn btn-sm ${isActive ? 'btn-error' : 'btn-success'} text-white` }
+            className={`btn btn-sm w-20 ${isActive ? 'btn-error' : 'btn-success'} text-white` }
             onClick={onClick}
         >
-            {isActive ? <CgBlock className="text-white size-5"/> : <CgUnblock className="text-white size-4"/>}
             {isActive ? 'Block' : 'Unblock'}
         </button>
     );

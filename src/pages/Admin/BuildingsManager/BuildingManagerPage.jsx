@@ -1,8 +1,16 @@
 import { useLocation } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
-import { getBuilding, getManager, postBuilding, putBuilding, assignManagerToBuilding, removeManagerFromBuilding, deleteBuilding } from "../../../config/api.admin";
+import {
+  getBuilding,
+  getBuildingById,
+  postNewBuilding,
+  getManager,
+  changeBuildingStatus,
+  putBuilding,
+  getManagerById,
+} from "../../../config/api.admin";
 import AddModal from "../../../components/layout/Admin/Modals/AddModal";
 import DeleteModal from "../../../components/layout/Admin/Modals/DeleteModal.jsx";
 import UpdateModal from "../../../components/layout/Admin/Modals/UpdateModal";
@@ -11,7 +19,6 @@ import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.
 import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
 import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
 import BlockButton from "../../../components/layout/Admin/Buttons/BlockButton.jsx";
-import { postNewBuilding } from "../../../config/api.admin";
 
 const BuildingManagerPage = () => {
   const location = useLocation();
@@ -22,29 +29,31 @@ const BuildingManagerPage = () => {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [buildingToDelete, setBuildingToDelete] = useState(null);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [successMessage, setSuccessMessage] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [locationFilter, setLocationFilter] = useState("all");
+  const [selectedBuildingDetails, setSelectedBuildingDetails] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [newBuilding, setNewBuilding] = useState({
-    building_name: '',
-    location: '',
-    address: '',
+    building_name: "",
+    location: "",
+    address: "",
     rating: 0,
-    image: [],
-    description: '',
-    status: 'active',
-    google_address: ''
+    images: [],
+    description: "",
+    status: "active",
+    google_address: "",
   });
   const [updateBuilding, setUpdateBuilding] = useState({
-    building_name: '',
-    location: '',
-    address: '',
+    building_name: "",
+    location: "",
+    address: "",
     rating: 0,
-    image: [],
-    description: '',
-    status: 'active',
-    google_address: ''
+    images: [],
+    description: "",
+    status: "active",
+    google_address: "",
   });
   const [managers, setManagers] = useState([]);
 
@@ -74,81 +83,153 @@ const BuildingManagerPage = () => {
     fetchManagers();
   }, []);
 
-    // Utility function to get manager name by ID
-    const getManagerNameById = (managerId) => {
-      const manager = managers.find(manager => manager.user_id === managerId);
-      return manager ? manager.name : 'N/A';
-    };
+  const handleRowClick = async (building_id) => {
+    try {
+      const buildingRes = await getBuildingById(building_id);
+
+      if (buildingRes && buildingRes.data) {
+        const buildingData = buildingRes.data;
+        let managerName = "N/A";
+
+        if (buildingData.manager_id) {
+          // Fetch manager details by ID
+          try {
+            const managerRes = await getManagerById(buildingData.manager_id);
+            if (managerRes && managerRes.data) {
+              managerName = managerRes.data.name || "N/A";
+            }
+          } catch (err) {
+            console.error("Error fetching manager details by ID", err);
+          }
+        }
+
+        const buildingDetails = {
+          ...buildingData,
+          manager_name: managerName,
+          image: buildingData.BuildingImages[0]?.image || null,
+        };
+
+        setSelectedBuildingDetails(buildingDetails);
+        setShowDetailsModal(true);
+      }
+    } catch (err) {
+      console.error("Error fetching building details", err);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setSelectedBuildingDetails(null);
+    setShowDetailsModal(false);
+  };
+
+  // Utility function to get manager name by ID
+  const getManagerNameById = (managerId) => {
+    const manager = managers.find((manager) => manager.user_id === managerId);
+    return manager ? manager.name : "N/A";
+  };
 
   // Extract unique locations from the buildings
   const getUniqueLocations = () => {
     if (!building) return [];
-    return ["all", ...new Set(building.map(b => b.location))];
+    return ["all", ...new Set(building.map((b) => b.location))];
   };
 
   // Xử lý thêm building
   const handleAddBuilding = async (e) => {
     e.preventDefault();
-  
+
     const formData = new FormData();
     for (let key in newBuilding) {
-      if (key === 'image') {
-        Array.from(newBuilding.image).forEach(file => formData.append('images', file));
+      if (key === "image") {
+        Array.from(newBuilding.image).forEach((file) =>
+          formData.append("images", file)
+        );
       } else {
         formData.append(key, newBuilding[key]);
       }
     }
-  
+
     try {
       const response = await postNewBuilding(formData);
       // Handle successful addition
-      if (response && response.err === 0){
+      if (response && response.err === 0) {
         setShowAddModal(false);
         fetchBuilding(); // Refresh the building list
         Swal.fire({
-          icon: 'success',
-          title: 'Success',
+          icon: "success",
+          title: "Success",
           text: response.message,
         });
       } else {
         Swal.fire({
-          icon: 'error',
-          title: 'Error',
+          icon: "error",
+          title: "Error",
           text: response.message,
         });
       }
     } catch (err) {
-        console.error('Failed to add building:', err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'An unexpected error occurred while adding the building.',
-        });
-      }
-    };
+      console.error("Failed to add building:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "An unexpected error occurred while adding the building.",
+      });
+    }
+  };
 
   const addBuildingFields = [
-    { name: "building_name", label: "Building Name", type: "text", value: `${newBuilding.building_name}` },
-    { name: "location", label: "Location", type: "text", value: `${newBuilding.location}` },
-    { name: "address", label: "Address", type: "text", value: `${newBuilding.address}` },
-    { name: "rating", label: "Rating", type: "number", value: `${newBuilding.rating}` },
-    { name: 'google_address', label: 'Google Address', type: 'text', value: `${newBuilding.google_address}` },
-    { name: "description", label: "Description", type: "text", value: `${newBuilding.description}` },
-    { name: 'image', label: 'Images', type: 'file', multiple: true }
+    {
+      name: "building_name",
+      label: "Building Name",
+      type: "text",
+      value: `${newBuilding.building_name}`,
+    },
+    {
+      name: "location",
+      label: "Location",
+      type: "text",
+      value: `${newBuilding.location}`,
+    },
+    {
+      name: "address",
+      label: "Address",
+      type: "text",
+      value: `${newBuilding.address}`,
+    },
+    {
+      name: "google_address",
+      label: "Google Address",
+      type: "text",
+      value: `${newBuilding.google_address}`,
+    },
+    {
+      name: "description",
+      label: "Description",
+      type: "text",
+      value: `${newBuilding.description}`,
+    },
+    { name: "image", label: "Images", type: "file", multiple: true },
   ];
 
-  
+  const handleInputChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "image") {
+      setNewBuilding({ ...newBuilding, image: Array.from(value) });
+    } else {
+      setNewBuilding({ ...newBuilding, [name]: value });
+    }
+  };
 
   const resetNewBuilding = () => {
     setNewBuilding({
-      building_name: '',
-      location: '',
-      address: '',
-      rating: 0,
-      google_address: '',
-      description: '',
+      building_name: "",
+      location: "",
+      address: "",
+      rating: 5,
+      google_address: "",
+      description: "",
       image: null,
-      status: 'active'
+      status: "active",
     });
   };
 
@@ -158,23 +239,32 @@ const BuildingManagerPage = () => {
     const formData = new FormData();
 
     for (let key in updateBuilding) {
-      if (key === 'image' && updateBuilding.image.length > 0) {
-        Array.from(updateBuilding.image).forEach(file => formData.append('image', file));
+      if (key === "images" && updateBuilding.images.length > 0) {
+        Array.from(updateBuilding.images).forEach((file) =>
+          formData.append("images", file)
+        );
       } else {
         formData.append(key, updateBuilding[key]);
       }
     }
 
     try {
-      await putBuilding(updateBuilding.building_id, formData);
-      if (updateBuilding.manager_id) {
-        await assignManagerToBuilding(updateBuilding.building_id, updateBuilding.manager_id);
+      const response = await putBuilding(updateBuilding.building_id, formData);
+      if (response && response.err === 0) {
+        setShowUpdateModal(false);
+        fetchBuilding();
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: response.message,
+        });
       } else {
-        await removeManagerFromBuilding(updateBuilding.building_id);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: response.message,
+        });
       }
-      fetchBuilding();
-      setShowUpdateModal(false);
-      setSuccessMessage('Building updated successfully!');
     } catch (err) {
       console.error("Error updating building:", err);
     }
@@ -188,75 +278,138 @@ const BuildingManagerPage = () => {
       await deleteBuilding(buildingToDelete.building_id);
       fetchBuilding();
       setShowDeleteModal(false);
-      setSuccessMessage('Building deleted successfully!');
+      setSuccessMessage("Building deleted successfully!");
     } catch (err) {
-      console.error('Failed to delete building:', err);
+      console.error("Failed to delete building:", err);
     }
   };
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
-    console.log("value: " + value);
-    if (name === 'image') {
-      setNewBuilding({ ...newBuilding, image: Array.from(value) });
+    if (name === "images") {
+      setNewBuilding({ ...newBuilding, images: files });
     } else {
       setNewBuilding({ ...newBuilding, [name]: value });
     }
-    
   };
 
   const handleUpdateChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === 'image') {
-      setUpdateBuilding({ ...updateBuilding, image: files });
+    if (name === "images") {
+      setUpdateBuilding({ ...updateBuilding, images: files });
     } else {
       setUpdateBuilding({ ...updateBuilding, [name]: value });
     }
   };
 
-
   const updateBuildingFields = [
-    { name: "location", label: "Location", type: "text", value: `${updateBuilding.location}` },
-    { name: "address", label: "Address", type: "text", value: `${updateBuilding.address}` },
-    { name: "rating", label: "Rating", type: "number", value: `${updateBuilding.rating}` },
-    { name: 'google_address', label: 'Google Address', type: 'text', value: `${updateBuilding.google_address}` },
-    { name: "description", label: "Description", type: "text", value: `${updateBuilding.description}` },
-    { name: 'image', label: 'Images', type: 'file', multiple: true }
+    {
+      name: "building_name",
+      label: "Building Name",
+      type: "text",
+      value: `${updateBuilding.building_name}`,
+    },
+    {
+      name: "location",
+      label: "Location",
+      type: "text",
+      value: `${updateBuilding.location}`,
+    },
+    {
+      name: "address",
+      label: "Address",
+      type: "text",
+      value: `${updateBuilding.address}`,
+    },
+    {
+      name: "google_address",
+      label: "Google Address",
+      type: "text",
+      value: `${updateBuilding.google_address}`,
+    },
+    {
+      name: "description",
+      label: "Description",
+      type: "text",
+      value: `${updateBuilding.description}`,
+    },
+    { name: "image", label: "Images", type: "file", multiple: true },
   ];
 
+  // Xử lý status building
+
+  const handleChangeStatus = async (building) => {
+    const newStatus = building.status === "active" ? "inactive" : "active";
+
+    try {
+      const response = await changeBuildingStatus(
+        building.building_id,
+        newStatus
+      );
+      if (response && response.err === 0) {
+        fetchBuilding();
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: `Building status changed to ${newStatus}.`,
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: response.message || "Failed to change status.",
+        });
+      }
+    } catch (err) {
+      console.error("Failed to change building status:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "An unexpected error occurred while changing the building status.",
+      });
+    }
+  };
+
   const filteredBuilding = Array.isArray(building)
-  ? building.filter((item) => {
-      const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
-      const matchesSearchTerm = item.building_name.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchesStatus && matchesSearchTerm;
-    })
-  : [];
+    ? building.filter((item) => {
+        const matchesStatus =
+          statusFilter === "all" || item.status === statusFilter;
+        const matchesSearchTerm = item.building_name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+        const matchesLocation =
+          locationFilter === "all" || item.location === locationFilter;
+        return matchesStatus && matchesSearchTerm && matchesLocation;
+      })
+    : [];
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-4xl font-black mb-4">Building List</h1>
 
-      <div className="grid grid-cols-2">
-        <div className="ml-2">
-        <SearchBar
-          searchTerm={searchTerm}
-          handleSearchChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search by Building Name"
-        />
-          
-          <AddButton onClick={() => {
-            resetNewBuilding();
-            setShowAddModal(true)
-          }} 
-            label="Add Building" />
+      <div className="flex justify-between items-center my-4">
+        <div className="flex-grow mr-4">
+          <SearchBar
+            searchTerm={searchTerm}
+            handleSearchChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search by Building Name"
+          />
         </div>
+        <AddButton
+          onClick={() => {
+            resetNewBuilding();
+            setShowAddModal(true);
+          }}
+          label="Add Building"
+        />
       </div>
 
-      <div className="flex justify-end mr-2">
+      <div className="flex mr-2">
+        <div className="form-control w-full max-w-xs">
           <select
+            className="select select-bordered select-sm w-full max-w-xs"
             value={locationFilter}
             onChange={(e) => setLocationFilter(e.target.value)}
-            className="px-4 py-2 border rounded-md"
           >
             {getUniqueLocations().map((location, index) => (
               <option key={index} value={location}>
@@ -265,6 +418,7 @@ const BuildingManagerPage = () => {
             ))}
           </select>
         </div>
+      </div>
 
       <div className="overflow-x-auto flex flex-1">
         <table className="table w-full">
@@ -280,32 +434,35 @@ const BuildingManagerPage = () => {
           </thead>
           <tbody>
             {filteredBuilding.map((building) => (
-                <tr key={building.building_id}>
-                  <td>{building.building_name}</td>
-                  <td>{getManagerNameById(building.manager_id)}</td>
-                  <td>{building.location}</td>
-                  <td>{building.address}</td>
-                  <td>{building.status}</td>
+              <tr
+                key={building.building_id}
+                className="hover:bg-gray-100 cursor-pointer"
+                onClick={() => handleRowClick(building.building_id)}
+              >
+                <td>{building.building_name}</td>
+                <td>{getManagerNameById(building.manager_id)}</td>
+                <td>{building.location}</td>
+                <td>{building.address}</td>
+                <td>{building.status}</td>
 
-                  <td className="flex space-x-2">
-                    <UpdateButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setUpdateBuilding(building);
-                        setShowUpdateModal(true);
-                      }}
-                    />
-
-                    <DeleteButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setBuildingToDelete(building);
-                        setShowDeleteModal(true);
-                      }}
-                    />
-                  </td>
-                </tr>
-              ))}
+                <td className="flex space-x-2">
+                  <UpdateButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setUpdateBuilding(building);
+                      setShowUpdateModal(true);
+                    }}
+                  />
+                  <BlockButton
+                    status={building.status}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleChangeStatus(building);
+                    }}
+                  />
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -330,12 +487,10 @@ const BuildingManagerPage = () => {
         successMessage={successMessage}
       />
 
-      <DeleteModal
-        show={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onSubmit={handleDeleteBuilding}
-        itemToDelete={buildingToDelete}
-        successMessage={successMessage}
+      <DetailsModal
+        show={showDetailsModal}
+        onClose={handleCloseModal}
+        currentItem={selectedBuildingDetails}
       />
     </div>
   );
