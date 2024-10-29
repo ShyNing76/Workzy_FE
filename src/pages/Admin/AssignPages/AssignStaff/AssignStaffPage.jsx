@@ -95,7 +95,7 @@ const AssignStaffPage = () => {
                 ...prevSelectedStaffIds,
                 [buildingId]: userId,
             }));
-        } else if (isBuildingAssigned(buildingId)) { // nếu tòa nhà đã được phân công cho nhân viên khác
+        } else if (isStaffAssigned(userId) ) { // nếu tòa nhà đã được phân công cho nhân viên khác
             Swal.fire({ // hiển thị cảnh báo
                 title: "Warning",
                 text: "This staff member is already assigned to another building.",
@@ -333,7 +333,7 @@ const AssignStaffPage = () => {
                     <button
                       onClick={() => handleAssignStaffToBuilding(building.building_id)}
                       disabled={!selectedStaffIds[building.building_id] && 
-                        !staff.some(s => s.Staff.building_id === building.building_id)}
+                        !staff.some(s => s.Staff.building_id === building.building_id) }
                       className="btn btn-primary"
                     >
                       {isBuildingAssigned(building.building_id) ? "Update" : "Assign"}
