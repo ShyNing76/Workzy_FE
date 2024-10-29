@@ -148,7 +148,7 @@ const Hourly = ({ selectedDate, workspaces}) => {
                     <tr>
                         <th style={{ width: '120px' }}>Workspaces</th>
                         {hours.map(hour => (
-                            <th key={hour}>{hour}:00</th>
+                            <th key={hour} style={{ fontSize: '0.90rem', textAlign: 'center' }}>{hour}:00</th>
                         ))}
                     </tr>
                 </thead>

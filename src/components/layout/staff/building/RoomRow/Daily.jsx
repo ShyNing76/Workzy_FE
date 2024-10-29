@@ -2,17 +2,6 @@ import React, { useState } from 'react';
 import './RoomSchedule.scss';
 import RoomModal from '../../building/RoomModal/RoomModal';
 
-const convertToVietnamTime = (dateTime) => {
-    const date = new Date(dateTime);
-    const options = { timeZone: 'Asia/Ho_Chi_Minh' };
-    const vietnamTime = date.toLocaleString('en-US', options);
-    
-    // In ra console ngày đã chuyển đổi
-    console.log('Ngày đã chuyển đổi:', vietnamTime);
-    
-    return vietnamTime;
-};
-
 const Daily = ({ selectedDate, workspaces }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState(null);
@@ -90,7 +79,7 @@ const Daily = ({ selectedDate, workspaces }) => {
                     <tr>
                         <th style={{ width: '120px' }}>Workspaces</th>
                         {daysInMonth.map(day => (
-                            <th key={day}>{day}</th>
+                            <th key={day} style={{ fontSize: '0.90rem', textAlign: 'center' }}>{day}</th>
                         ))}
                     </tr>
                 </thead>

@@ -3,11 +3,15 @@ import './RoomModal.scss';
 
 const convertToVietnamTime = (dateString) => {
     const date = new Date(dateString);
-    const options = { timeZone: 'Asia/Ho_Chi_Minh' };
     return date.toLocaleString('vi-VN', { 
         year: 'numeric', month: '2-digit', day: '2-digit', 
         hour: '2-digit', minute: '2-digit', hour12: false 
     }).replace(',', '');
+};
+
+const capitalizeFirstLetter = (string) => {
+    if (!string) return ''; // Trả về chuỗi rỗng nếu không có chuỗi
+    return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
 const Modal = ({ isOpen, onClose, workspaceType, bookings }) => {
@@ -26,7 +30,7 @@ const Modal = ({ isOpen, onClose, workspaceType, bookings }) => {
                                 <h3>Customer: {booking.customerName}</h3>
                                 <p>Start Time: {convertToVietnamTime(booking.startTime)}</p>
                                 <p>End Time: {convertToVietnamTime(booking.endTime)}</p>
-                                <p>Status: {booking.status}</p>
+                                <p>Status: {capitalizeFirstLetter(booking.status)}</p>
                             </div>
                         ))}
                     </div>

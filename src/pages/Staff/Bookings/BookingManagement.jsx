@@ -214,7 +214,7 @@
                 <td>
                     <div className="buttons" style={{ display: 'flex', gap: '30px' }}>
                         <button
-                            className="btn btn-sm btn-outline"
+                            className="btn btn-sm btn-active"
                             onClick={() => { 
                                 setSelectedBooking(booking); 
                                 setShowDetailModal(true); 
@@ -224,21 +224,21 @@
                         </button>
                         {booking.status === "check-in" && (
                             <button 
-                                className="btn btn-sm btn-outline btn-accent"
+                                className="btn btn-sm btn-accent btn-accent"
                                 onClick={() => handleChangeStatus(booking.booking_id, "usage")}>
                                 Confirm Check-In
                             </button>
                         )}
                         {booking.status === "paid" && (
                             <button 
-                                className="btn btn-sm btn-outline btn-accent"
+                                className="btn btn-sm btn-accent btn-accent"
                                 onClick={() => handleChangeStatus(booking.booking_id, "usage")}>
                                 Check-In
                             </button>
                         )}
                         {booking.status === "check-out" && (
                             <button 
-                                className="btn btn-sm btn-outline btn-accent"
+                                className="btn btn-sm btn-accent btn-accent"
                                 onClick={() => handleChangeStatus(booking.booking_id, "check-amenities")}>
                                 Check Amenities 
                             </button>
@@ -259,14 +259,14 @@
                         <table className="table table-xs table-pin-rows table-pin-cols">
                             <thead>
                                 <tr style={{fontSize: '16px'}}>
-                                    <th style={{ width: '80px'}}>Index</th>
+                                    <th style={{ width: '50px'}}>Index</th>
                                     <th style={{ width: '160px'}}>Customer Name</th>
-                                    <th style={{ width: '170px'}}>Workspace Name</th>
-                                    <th style={{ width: '160px'}}>Start Time</th>
-                                    <th style={{ width: '160px'}}>End Time</th>
+                                    <th style={{ width: '160px'}}>Workspace Name</th>
+                                    <th style={{ width: '150px'}}>Start Time</th>
+                                    <th style={{ width: '150px'}}>End Time</th>
                                     <th style={{ width: '130px'}}>Booking Type</th>
                                     <th style={{ width: '140px'}}>Total Price</th>
-                                    <th style={{ width: '140px'}}>Status</th>
+                                    <th style={{ width: '160px'}}>Status</th>
                                     <th style={{ width: '250px'}}>Actions</th>
                                 </tr>
                             </thead>

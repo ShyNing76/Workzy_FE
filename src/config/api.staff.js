@@ -44,6 +44,11 @@ const getBookingTypeById = (booking_type_id) => {
   return axios.get(URL_API);
 };
 
+const getWishlist = () => {
+  const URL_API = "/api/v1/wishList/";
+  return axios.get(URL_API);
+}
+
 export {
   getStaffBuildingId,
   getWorkspaceByBuildingId,
@@ -52,5 +57,6 @@ export {
   getAmenitiesByBookingId,
   sendBrokenAmenities, 
   getBookingWorkspace,
-  getBookingTypeById
+  getBookingTypeById,
+  getWishlist,
 };

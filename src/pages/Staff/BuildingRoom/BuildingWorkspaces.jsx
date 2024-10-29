@@ -138,7 +138,7 @@ const BuildingWorkspaces = () => {
       case 'daily':
         return <Daily selectedDate={currentDate} selectedStatus={selectedStatus} selectedType={selectedType} workspaces={filteredWorkspaces} onWorkspaceClick={handleWorkspaceClick} />;
       case 'monthly':
-        return <Monthly selectedStatus={selectedStatus} workspaces={filteredWorkspaces} onWorkspaceClick={handleWorkspaceClick} />;
+        return <Monthly selectedDate={currentDate} selectedStatus={selectedStatus} workspaces={filteredWorkspaces} onWorkspaceClick={handleWorkspaceClick} />;
       default:
         return null;
     }
@@ -156,7 +156,13 @@ const BuildingWorkspaces = () => {
       <div className="status-labels">
         {statusLabels.map((label, index) => (
           <div key={index} className="status-label">
-            <div className="circle" style={{ backgroundColor: label.color }}></div>
+            <div
+              className="circle"
+              style={{
+                backgroundColor: label.color,
+                border: label.status === 'Available' ? '1px solid black' : 'none',
+              }}
+            ></div>
             <span>{label.status}</span>
           </div>
         ))}

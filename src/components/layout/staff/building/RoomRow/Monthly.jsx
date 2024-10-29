@@ -89,7 +89,7 @@ const Monthly = ({ selectedStatus, workspaces = [] }) => {
                     <tr>
                         <th style={{ width: '120px' }}>Workspaces</th>
                         {months.map((month, index) => (
-                            <th key={index}>{month}</th>
+                            <th key={index} style={{ fontSize: '0.90rem', textAlign: 'center' }}>{month}</th>
                         ))}
                     </tr>
                 </thead>

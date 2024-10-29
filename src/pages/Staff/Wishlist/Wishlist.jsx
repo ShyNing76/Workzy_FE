@@ -1,101 +1,73 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import './Wishlist.scss';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Đảm bảo import useNavigate
+import { getWishlist } from '../../../config/api.staff'; // Đảm bảo đường dẫn đúng
+import './Wishlist.scss'; // Nhập file SCSS
 
 const Wishlist = () => {
-    const [bookings, setBookings] = useState([]);
-    const [error, setError] = useState(null);
-    const [successMessage, setSuccessMessage] = useState(null);
+  const [wishlists, setWishlists] = useState([]);
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchBookings = async () => {
-            try {
-                const response = await axios.get('/api/v1/bookings');
-                if (Array.isArray(response.data)) {
-                    setBookings(response.data);
-                } else {
-                    console.error("Data is not an array", response.data);
-                    setBookings([]);
-                }
-            } catch (err) {
-                console.error("Error fetching bookings", err);
-                setBookings([]);
-            }
-        };
-
-        fetchBookings();
-    }, []);
-
-    const handleSendNotification = async (customerID, workspaceName) => {
-        try {
-            const response = await axios.post('/api/v1/wishList/', {
-                workspace_ids: [workspaceName],
-                customer_id: customerID
-            }, {
-                headers: {
-                    'Authorization': 'your_token_here'
-                }
-            });
-            setSuccessMessage(`Notification sent for ${workspaceName}`);
-        } catch (error) {
-            setError("Error sending notification");
-        }
+  useEffect(() => {
+    const fetchWishlistData = async () => {
+      try {
+        const response = await getWishlist();
+        setWishlists(response.data);
+      } catch (error) {
+        console.error("Error fetching wishlist data:", error);
+      }
     };
 
-    return (
-        <div className="wishlist">
-            {error && <div className="error">{error}</div>}
-            {successMessage && <div className="success">{successMessage}</div>}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Customer ID</th>
-                        <th>Customer Name</th>
-                        <th>Workspace Type</th>
-                        <th>Workspace Name</th>
-                        <th>Description</th>
-                        <th>Booking Type</th> 
-                        <th>Start Time</th>
-                        <th>End time</th>
-                        <th>Price</th>
-                        <th>Amenities</th>
-                        <th>Creation Date</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {bookings.map((customer) => (
-                        customer.workspaces.map((workspace, index) => (
-                            <tr key={`${customer.customerID}-${index}`}>
-                                {index === 0 && (
-                                    <>
-                                        <td rowSpan={customer.workspaces.length}>{customer.customerID}</td>
-                                        <td rowSpan={customer.workspaces.length}>{customer.customerName}</td>
-                                    </>
-                                )}
-                                <td>{workspace.workspaceType}</td>
-                                <td>{workspace.workspaceName}</td>
-                                <td>{workspace.description.split("\n").map((line, i) => (
-                                    <div key={i}>{line}</div>
-                                ))}</td>
-                                <td>{workspace.bookingType}</td>
-                                <td>{workspace.price}</td>
-                                <td>{workspace.amenities}</td>
-                                <td>{workspace.creationDate}</td>
-                                <td>{workspace.status}</td>
-                                <td>
-                                    <button onClick={() => handleSendNotification(customer.customerID, workspace.workspaceName)}>
-                                        Send Notification
-                                    </button>
-                                </td>
-                            </tr>
-                        ))
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    );
+    fetchWishlistData();
+  }, []);
+
+  const uniqueWorkspaces = {};
+
+  const handleViewClick = (workspaceId) => {
+    // Lấy danh sách tên khách hàng theo workspaceId
+    const customerNames = wishlists
+      .filter(item => item.Workspaces.workspace_id === workspaceId)
+      .map(item => item.Customers.User.name);
+
+    // Chuyển hướng tới trang ViewWishlist và truyền danh sách tên khách hàng qua state
+    navigate('view-wishlist', { state: { customerNames } }); // Chỉ cần đường dẫn tương đối
+  };
+
+  return (
+    <div className="wishlist-container">
+      {wishlists.map(wishlist => {
+        const workspaceId = wishlist.Workspaces.workspace_id;
+
+        if (uniqueWorkspaces[workspaceId]) {
+          return null;
+        }
+
+        uniqueWorkspaces[workspaceId] = true;
+
+        return (
+          <div className="wishlist-card" key={workspaceId}>
+            <figure className="image-frame">
+              <img
+                src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
+                alt={wishlist.Workspaces.workspace_name}
+                className="horizontal-image"
+              />
+            </figure>
+            <div className="card-body">
+              <h2 className="card-title">{wishlist.Workspaces.workspace_name}</h2>
+              <div className="card-actions justify-end">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => handleViewClick(workspaceId)}
+                >
+                  View
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
 };
 
 export default Wishlist;

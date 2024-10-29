@@ -1,20 +1,23 @@
 import React, { useContext } from "react";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { AuthContext } from "../../../components/context/auth.context";
 import { getUserAuthen } from "../../../config/api";
 import { getStaffBuildingId } from "../../../config/api.staff";
+import { FaRegHeart } from "react-icons/fa";
+import { BsBuildings } from "react-icons/bs";
+import { PiCalendarCheckBold } from "react-icons/pi";
 
 const Staff = () => {
   const { auth, setAuth, appLoading, setAppLoading, setRoleId, roleId } =
     useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
   const [buildingName, setBuildingName] = useState("");
   const [buildingId, setBuildingId] = useState("");
 
   useEffect(() => {
     const fetchAccount = async () => {
-      // Kiểm tra nếu đã có auth trong localStorage thì không cần fetch lại
       if (!auth.isAuthenticated) {
         setAppLoading(true);
         try {
@@ -32,7 +35,6 @@ const Staff = () => {
           }
         } catch (error) {
           console.error("Error fetching user data:", error);
-          // Xóa localStorage khi có lỗi
           localStorage.removeItem("auth");
           localStorage.removeItem("roleId");
         } finally {
@@ -61,8 +63,8 @@ const Staff = () => {
   const fetchBuildingId = async () => {
     const BuildingIdRes = await getStaffBuildingId();
     const buildingId = BuildingIdRes.data.building_id;
-    const buildingName = BuildingIdRes.data.building_name; // Lấy buildingName
-    return { buildingId, buildingName }; // Trả về cả buildingId và buildingName
+    const buildingName = BuildingIdRes.data.building_name;
+    return { buildingId, buildingName };
   };
 
   const handleLogoutStaff = () => {
@@ -79,7 +81,6 @@ const Staff = () => {
   };
 
   useEffect(() => {
-    // Điều hướng về trang "/" nếu người dùng đã đăng xuất
     if (!auth.isAuthenticated) {
       navigate("/");
     }
@@ -100,7 +101,7 @@ const Staff = () => {
               style={{ cursor: "pointer" }}
             >
               <div className="circle">WZ</div>
-              <h1 style={{ marginRight: "680px" }}>
+              <h1>
                 Workzy Staff at {buildingName}
               </h1>
               <button
@@ -113,37 +114,51 @@ const Staff = () => {
                 Logout
               </button>
             </div>
+            <label htmlFor="my-drawer-2" className="btn btn-primary lg:hidden">
+              Open drawer
+            </label>
           </header>
-          <div className="tabs">
-            <Link
-              to="/staff/buildingroom"
-              className={`tab ${
-                location.pathname === "/staff/buildingroom" ? "active" : ""
-              }`}
-            >
-              Building's Workspaces
-            </Link>
-            <Link
-              to="/staff/bookings"
-              className={`tab ${
-                location.pathname === "/staff/bookings" ? "active" : ""
-              }`}
-            >
-              Bookings Management
-            </Link>
-            <Link
-              to="/staff/wishlist"
-              className={`tab ${
-                location.pathname === "/staff/wishlist" ? "active" : ""
-              }`}
-            >
-              Wishlist
-            </Link>
-          </div>
 
-          <main className="content">
-            <Outlet context={{ buildingId }} />
-          </main>
+          <div className="drawer lg:drawer-open">
+            <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
+            <div className="drawer-content flex flex-col items-center justify-center">
+              <main className="content">
+                <Outlet context={{ buildingId }} />
+              </main>
+            </div>
+            <div className="drawer-side">
+              <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay"></label>
+              <ul className="menu bg-base-200 text-base-content min-h-full w-50 p-4">
+                <li>
+                  <Link
+                    to="/staff/buildingroom"
+                    className={`menu-item ${location.pathname === "/staff/buildingroom" ? "active" : ""}`}
+                  >
+                    <BsBuildings className="mr-2 text-xl h-[calc(6vh-1rem)]" /> 
+                    Building's Workspaces
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/staff/bookings"
+                    className={`menu-item ${location.pathname === "/staff/bookings" ? "active" : ""}`}
+                  >
+                    <PiCalendarCheckBold className="mr-2 text-xl h-[calc(6vh-1rem)]" />
+                    Bookings Management
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/staff/wishlist"
+                    className={`menu-item ${location.pathname === "/staff/wishlist" ? "active" : ""}`}
+                  >
+                    <FaRegHeart className="mr-2 text-xl h-[calc(6vh-1rem)]" /> 
+                    Wishlist
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       )}
     </>
