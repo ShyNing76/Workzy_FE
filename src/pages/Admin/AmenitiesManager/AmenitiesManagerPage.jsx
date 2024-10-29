@@ -93,9 +93,9 @@ const AmenitiesManagerPage = () => {
     }
   };
 
-    //Khu vực hàm dành cho add
-    const handleAddAmenity = async (e) => {
-        e.preventDefault();
+  //Khu vực hàm dành cho add
+  const handleAddAmenity = async (e) => {
+    e.preventDefault();
 
     if (!newAmenity.amenity_name) {
       Swal.fire({
@@ -475,7 +475,7 @@ const AmenitiesManagerPage = () => {
                   <td className="flex space-x-2 w-48">
                     {/* Details Button */}
                     <button
-                      className="btn btn-accent btn-sm w-20"
+                      className="btn btn-info btn-sm w-20"
                       onClick={() => handleRowClick(amenity.amenity_id)}
                     >
                       Details

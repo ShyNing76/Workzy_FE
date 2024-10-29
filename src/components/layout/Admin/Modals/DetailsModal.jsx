@@ -60,7 +60,7 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
       <ImagePreviewModal imageSrc={currentItem?.image} />
 
       <div className="modal modal-open">
-        <div className="modal-box max-w-4xl w-11/12 p-0 bg-base-100">
+        <div className="modal-box max-w-6xl w-11/12 p-0 bg-base-100">
           {/* Header */}
           <div className="flex justify-between items-center p-4 border-b border-base-300">
             <h2 className="text-2xl font-bold">Chi tiết</h2>
@@ -72,31 +72,41 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
             </button>
           </div>
 
-          {/* Content Area */}
-          <div className="p-6 space-y-6">
-            {/* Image Preview Card */}
-            {hasImage && (
-              <div className="card bg-base-200 shadow-lg overflow-hidden">
-                <figure
-                  className="relative group cursor-pointer"
-                  onClick={openImagePreview}
-                >
-                  <img
-                    src={currentItem.image}
-                    alt="Preview"
-                    className="w-full h-[300px] object-cover transform transition-transform duration-300 hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-black/0 hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
-                    <div className="bg-white/90 p-3 rounded-full transform hover:scale-110 transition-transform">
-                      <BsZoomIn className="w-6 h-6" />
+          {/* Split Layout Container */}
+          <div className="flex flex-col md:flex-row h-[calc(100vh-300px)]">
+            {/* Left Side - Details */}
+
+            <div className="md:w-1/2 h-full p-6 flex items-center justify-center bg-base-200">
+              {hasImage ? (
+                <div className="w-full">
+                  <div
+                    className="relative group cursor-pointer rounded-lg overflow-hidden bg-white shadow-lg"
+                    onClick={openImagePreview}
+                  >
+                    <img
+                      src={currentItem.image}
+                      alt="Preview"
+                      className="w-full h-[500px] object-cover transform transition-transform duration-300 hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-black/0 hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
+                      <div className="bg-white/90 p-3 rounded-full transform hover:scale-110 transition-transform">
+                        <BsZoomIn className="w-6 h-6" />
+                      </div>
                     </div>
                   </div>
-                </figure>
-              </div>
-            )}
+                  <p className="text-center mt-4 text-base-content/70">
+                    Click to view full size
+                  </p>
+                </div>
+              ) : (
+                <div className="text-base-content/50 text-center">
+                  No image available
+                </div>
+              )}
+            </div>
 
-            {/* Details List with Custom Scrollbar */}
-            <div className="overflow-y-auto max-h-[400px] pr-2 scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-100">
+            {/* Right Side - Image Preview */}
+            <div className="md:w-1/2 p-6 border-r border-base-300 overflow-y-auto scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-100">
               <div className="divide-y divide-base-200">
                 {currentItem &&
                   Object.entries(currentItem)
@@ -111,12 +121,12 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
                     .map(([key, value]) => (
                       <div
                         key={key}
-                        className="grid grid-cols-2 gap-4 py-3 px-4 hover:bg-base-200/50 rounded-lg transition-colors duration-200"
+                        className="py-3 px-4 hover:bg-base-200/50 rounded-lg transition-colors duration-200"
                       >
-                        <span className="font-medium text-base-content">
+                        <div className="font-medium text-base-content mb-1">
                           {formatKey(key)}
-                        </span>
-                        <span className="text-base-content/80 text-right break-words">
+                        </div>
+                        <div className="text-base-content/80 break-words">
                           {value === null
                             ? "N/A"
                             : typeof value === "object"
@@ -124,7 +134,7 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
                             : Array.isArray(value)
                             ? value.join(", ")
                             : value}
-                        </span>
+                        </div>
                       </div>
                     ))}
               </div>

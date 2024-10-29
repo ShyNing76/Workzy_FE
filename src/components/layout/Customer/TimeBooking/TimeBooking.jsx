@@ -137,8 +137,8 @@ const TimeBooking = (props) => {
   }
 
   return (
-    <>
-      <h2 className="text-2xl font-bold mb-4 mt-4 text-gray-800">
+    <div className="time-booking">
+      <h2 className=" text-2xl font-bold mb-4 mt-4 text-gray-800">
         Available Time Slots ({format(selectedDate, "dd-MM-yyyy")})
       </h2>
       <div className="w-full p-4 ">
@@ -206,7 +206,7 @@ const TimeBooking = (props) => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

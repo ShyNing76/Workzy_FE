@@ -6,7 +6,6 @@ import { AuthContext } from "../../../context/auth.context";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoLogOutOutline } from "react-icons/io5";
-import logoWorkzy from "../../../../../public/WORKZY_LOGO_BGR.png";
 
 const ManagerHeader = () => {
   const { auth, setAuth, setRoleId } = useContext(AuthContext);
@@ -26,7 +25,11 @@ const ManagerHeader = () => {
       <div className="workzy-manager-header-content">
         <Link to="/manager" className="title-manager-header">
           <div className="flex items-center">
-            <img src={logoWorkzy} alt="logo" className="w-20 h-20" />
+            <img
+              src="../../../../../public/WORKZY_LOGO_BGR.png"
+              alt="logo"
+              className="w-20 h-20"
+            />
             <span> WORKZY MANAGER</span>
           </div>
         </Link>
