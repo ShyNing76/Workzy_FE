@@ -156,9 +156,9 @@ const UpdateModal = ({
                       <div className="grid grid-cols-3 gap-4 mt-4">
                         {[
                           ...(previewImages || []),
-                          ...(Array.isArray(currentItem.image)
-                            ? currentItem.image
-                            : []),
+                          // ...(Array.isArray(currentItem.image)
+                          //   ? currentItem.image
+                          //   : []),
                         ].map((img, index) => (
                           <div key={index} className="relative group">
                             <img

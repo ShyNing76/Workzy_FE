@@ -282,6 +282,11 @@ const postNewBuilding = (newBuilding) => {
   return axios.post(URL_API, newBuilding)
 }
 
+const changeBuildingStatus = (building_id, newStatus) => {
+  const URL_API = `/api/v1/building/${building_id}/status`;
+  return axios.put(URL_API, { status: newStatus });
+};
+
 const getCustomerById = (user_id) => {
   const URL_API = `/api/v1/customer/${user_id}`;
   return axios.get(URL_API);
@@ -541,4 +546,5 @@ export {
   getRevenueDataIn6DaysAdmin,
   getBookingDataIn6DaysAdmin,
   postNewBuilding,
+  changeBuildingStatus,
 };
