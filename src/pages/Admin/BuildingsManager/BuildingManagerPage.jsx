@@ -28,8 +28,6 @@ const BuildingManagerPage = () => {
   const [error, setError] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [buildingToDelete, setBuildingToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
@@ -40,8 +38,8 @@ const BuildingManagerPage = () => {
     building_name: "",
     location: "",
     address: "",
-    rating: 0,
-    images: [],
+    rating: 5,
+    image: [],
     description: "",
     status: "active",
     google_address: "",
@@ -50,7 +48,7 @@ const BuildingManagerPage = () => {
     building_name: "",
     location: "",
     address: "",
-    rating: 0,
+    rating: 5,
     images: [],
     description: "",
     status: "active",
@@ -85,17 +83,11 @@ const BuildingManagerPage = () => {
   }, []);
 
   const handleRowClick = async (building) => {
-    let managerName = "N/A";
-
-    if (building.Manager) {
-      // Fetch manager details by ID
-      managerName;
-    }
-
     const buildingDetails = {
       ...building,
       manager_name: building?.Manager?.User?.name || "None",
-      image: building.BuildingImages[0]?.image || null,
+      location: getDisplayLocation(building.location),
+      image: building.BuildingImages || null,
     };
 
     setSelectedBuildingDetails(buildingDetails);
@@ -105,6 +97,14 @@ const BuildingManagerPage = () => {
   const handleCloseModal = () => {
     setSelectedBuildingDetails(null);
     setShowDetailsModal(false);
+  };
+
+  const getDisplayLocation = (location) => {
+    const locationMappings = {
+      HCM: "Hồ Chí Minh",
+      Hanoi: "Hà Nội",
+    };
+    return locationMappings[location] || location;
   };
 
   // Extract unique locations from the buildings
@@ -166,7 +166,11 @@ const BuildingManagerPage = () => {
     {
       name: "location",
       label: "Location",
-      type: "text",
+      type: "select",
+      options: [
+        { value: "HCM", label: "Hồ Chí Minh" },
+        { value: "Hanoi", label: "Hà Nội" },
+      ],
       value: `${newBuilding.location}`,
     },
     {
@@ -207,7 +211,7 @@ const BuildingManagerPage = () => {
       rating: 5,
       google_address: "",
       description: "",
-      image: null,
+      images: [],
       status: "active",
     });
   };
@@ -217,14 +221,32 @@ const BuildingManagerPage = () => {
     e.preventDefault();
     const formData = new FormData();
 
-    for (let key in updateBuilding) {
-      if (key === "images" && updateBuilding.images.length > 0) {
-        Array.from(updateBuilding.images).forEach((file) =>
-          formData.append("images", file)
-        );
-      } else {
-        formData.append(key, updateBuilding[key]);
-      }
+    // Add basic fields
+    formData.append("building_name", updateBuilding.building_name || "");
+    formData.append("location", updateBuilding.location || "");
+    formData.append("address", updateBuilding.address || "");
+    formData.append("google_address", updateBuilding.google_address || "");
+    formData.append("description", updateBuilding.description || "");
+    formData.append("rating", parseInt(updateBuilding.rating) || 0);
+    formData.append("status", updateBuilding.status || "");
+
+    // Handle existing images from BuildingImages
+    if (updateBuilding.images && updateBuilding.images.length > 0) {
+      updateBuilding.images.forEach((image, index) => {
+        // Nếu là URL (ảnh cũ từ Firebase)
+        if (typeof image === "string") {
+          formData.append(`images`, image);
+        }
+        // Nếu là File object (ảnh mới upload)
+        else if (image instanceof File) {
+          formData.append(`images`, image);
+        }
+      });
+    }
+
+    // Log để kiểm tra
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
     }
 
     try {
@@ -237,25 +259,32 @@ const BuildingManagerPage = () => {
           title: "Success",
           text: response.message,
         });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: response.message,
-        });
       }
     } catch (err) {
-      console.error("Error updating building:", err);
+      console.error("Failed to update building:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "An unexpected error occurred while updating the building.",
+      });
     }
   };
 
   const handleUpdateChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === "images") {
-      setUpdateBuilding({ ...updateBuilding, images: files });
-    } else {
-      setUpdateBuilding({ ...updateBuilding, [name]: value });
-    }
+    const { name, type, files, value } = e.target;
+
+    setUpdateBuilding((prev) => {
+      if (type === "file") {
+        return {
+          ...prev,
+          images: [...(prev.images || []), ...Array.from(files)],
+        };
+      }
+      return {
+        ...prev,
+        [name]: value,
+      };
+    });
   };
 
   const updateBuildingFields = [
@@ -268,8 +297,12 @@ const BuildingManagerPage = () => {
     {
       name: "location",
       label: "Location",
-      type: "text",
-      value: `${updateBuilding.location}`,
+      type: "select",
+      options: [
+        { value: "HCM", label: "Hồ Chí Minh" },
+        { value: "Hanoi", label: "Hà Nội" },
+      ],
+      value: `${newBuilding.location}`,
     },
     {
       name: "address",
@@ -289,7 +322,12 @@ const BuildingManagerPage = () => {
       type: "text",
       value: `${updateBuilding.description}`,
     },
-    { name: "image", label: "Images", type: "file", multiple: true },
+    {
+      name: "images", // Đổi thành images thay vì image
+      label: "Images",
+      type: "file",
+      multiple: true,
+    },
   ];
 
   // Xử lý status building
@@ -369,7 +407,9 @@ const BuildingManagerPage = () => {
           >
             {getUniqueLocations().map((location, index) => (
               <option key={index} value={location}>
-                {location === "all" ? "All Locations" : location}
+                {location === "all"
+                  ? "All Locations"
+                  : getDisplayLocation(location)}
               </option>
             ))}
           </select>
@@ -390,24 +430,29 @@ const BuildingManagerPage = () => {
           </thead>
           <tbody>
             {filteredBuilding.map((building) => (
-              <tr
-                key={building.building_id}
-                className="hover:bg-gray-100 cursor-pointer"
-                onClick={() => handleRowClick(building)}
-              >
+              <tr key={building.building_id} className="hover:bg-gray-100 ">
                 <td>{building.building_name}</td>
-                <td>
-                  {building.Manager ? building.Manager?.User?.name : "None"}
-                </td>
-                <td>{building.location}</td>
+                <td>{building?.Manager?.User?.name || "None"}</td>
+                <td>{getDisplayLocation(building.location)}</td>
                 <td>{building.address}</td>
                 <td>{building.status}</td>
 
                 <td className="flex space-x-2">
+                  <button
+                    className="btn btn-info btn-sm w-20"
+                    onClick={() => handleRowClick(building)}
+                  >
+                    Details
+                  </button>
                   <UpdateButton
                     onClick={(e) => {
                       e.stopPropagation();
-                      setUpdateBuilding(building);
+                      // Restructure the building object
+                      const restructuredBuilding = {
+                        ...building,
+                        images: building.BuildingImages.map((img) => img.image),
+                      };
+                      setUpdateBuilding(restructuredBuilding);
                       setShowUpdateModal(true);
                     }}
                   />

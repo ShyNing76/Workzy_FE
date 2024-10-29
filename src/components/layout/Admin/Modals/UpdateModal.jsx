@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { RxCross2 } from "react-icons/rx";
 import { FiSave, FiUpload } from "react-icons/fi";
@@ -14,28 +14,41 @@ const UpdateModal = ({
 }) => {
   const [previewImages, setPreviewImages] = useState([]);
 
-  if (!show) return null;
+  useEffect(() => {
+    if (currentItem?.images) {
+      setPreviewImages(currentItem.images);
+    } else if (currentItem?.BuildingImages) {
+      const firebaseImages = currentItem.BuildingImages.map((img) => img.image);
+      setPreviewImages(firebaseImages);
+    }
+  }, [currentItem]);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     const previews = files.map((file) => URL.createObjectURL(file));
+
+    // Cập nhật xem trước hình ảnh
     setPreviewImages((prevPreviews) => [...prevPreviews, ...previews]);
+
+    // Cập nhật state cho currentItem.image
+    const updatedImages = [...(currentItem.image || []), ...files];
 
     onInputChange({
       target: {
         name: e.target.name,
-        value: [...(currentItem.image || []), ...files],
+        value: updatedImages,
       },
     });
   };
 
   const removeImage = (index) => {
+    // Xóa hình ảnh trong danh sách xem trước
     const newPreviews = previewImages.filter((_, i) => i !== index);
     setPreviewImages(newPreviews);
 
-    const newFiles = Array.from(currentItem.image || []).filter(
-      (_, i) => i !== index
-    );
+    // Xóa hình ảnh trong currentItem.image
+    const newFiles = (currentItem.image || []).filter((_, i) => i !== index);
+
     onInputChange({
       target: {
         name: "image",
@@ -43,6 +56,8 @@ const UpdateModal = ({
       },
     });
   };
+
+  if (!show) return null;
 
   return (
     <div className="modal modal-open">
@@ -141,7 +156,7 @@ const UpdateModal = ({
                         </div>
                         <input
                           type="file"
-                          name={field.name}
+                          name="images" // Đổi thành images thay vì image
                           onChange={handleImageChange}
                           className="hidden"
                           multiple={field.multiple}
@@ -151,15 +166,17 @@ const UpdateModal = ({
                     </div>
 
                     {/* Image Preview Grid */}
-                    {(previewImages.length > 0 ||
-                      (currentItem.image && currentItem.image.length > 0)) && (
+                    {/* Hiển thị Grid hình ảnh */}
+                    {previewImages.length > 0 && (
                       <div className="grid grid-cols-3 gap-4 mt-4">
-                        {[
-                          ...(previewImages || []),
-                        ].map((img, index) => (
+                        {previewImages.map((img, index) => (
                           <div key={index} className="relative group">
                             <img
-                              src={typeof img === "string" ? img : img}
+                              src={
+                                typeof img === "string"
+                                  ? img
+                                  : URL.createObjectURL(img)
+                              }
                               alt={`Preview ${index + 1}`}
                               className="w-full h-24 object-cover rounded-lg"
                             />

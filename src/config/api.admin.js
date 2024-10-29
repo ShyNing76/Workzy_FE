@@ -282,6 +282,11 @@ const postNewBuilding = (newBuilding) => {
   return axios.post(URL_API, newBuilding);
 };
 
+const changeBuildingStatus = (building_id, newStatus) => {
+  const URL_API = `/api/v1/building/${building_id}/status`;
+  return axios.put(URL_API, { status: newStatus });
+};
+
 const getCustomerById = (user_id) => {
   const URL_API = `/api/v1/customer/${user_id}`;
   return axios.get(URL_API);
@@ -356,11 +361,6 @@ const assignManagerToBuilding = (building_id, manager_id) => {
 const removeManagerFromBuilding = (building_id) => {
   const URL_API = `/api/v1/building/${building_id}/manager/remove`;
   return axios.put(URL_API);
-};
-
-const changeBuildingStatus = (building_id, newStatus) => {
-  const URL_API = `/api/v1/building/${building_id}/status`;
-  return axios.put(URL_API, { status: newStatus });
 };
 
 const deleteBuilding = (building_id) => {
