@@ -182,7 +182,7 @@ const AmenitiesManagerPage = () => {
       name: "image",
       label: "Images",
       type: "file",
-      multiple: true,
+      multiple: false,
       value: `${newAmenity.image}`,
     },
   ];
@@ -282,20 +282,11 @@ const AmenitiesManagerPage = () => {
   };
 
   const handleUpdateChange = (event) => {
-    const { name, value, files } = event.target;
-
-    if (name === "image") {
-      // Nếu là input file, cập nhật với mảng các tệp
-      setNewAmenity((prev) => ({
-        ...prev,
-        image: files ? Array.from(files) : [],
-      }));
-    } else {
-      setNewAmenity((prev) => ({
+    const { name, value } = event.target;
+    setNewAmenity((prev) => ({
         ...prev,
         [name]: value,
-      }));
-    }
+    }));
   };
 
   const handleUpdateClick = (amenity) => {
@@ -326,7 +317,7 @@ const AmenitiesManagerPage = () => {
       name: "image",
       label: "Images",
       type: "file",
-      multiple: true,
+      multiple: false,
       value: `${newAmenity.image}`,
     },
   ];

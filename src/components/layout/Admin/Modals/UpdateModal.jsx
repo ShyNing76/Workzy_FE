@@ -25,6 +25,11 @@ const UpdateModal = ({
       const firebaseImages = currentItem.BuildingImages.map((img) => img.image);
       setPreviewImages(firebaseImages);
       setImageFiles([]);
+    } else if (currentItem?.image) {
+      // Existing Firebase image
+      const previewImage = typeof currentItem.image === "string" ? currentItem.image : URL.createObjectURL(currentItem.image);
+      setPreviewImages([previewImage]);
+      setImageFiles([]);
     }
     setRemovedImages([]);
   }, [currentItem]);
@@ -34,21 +39,40 @@ const UpdateModal = ({
 
     // Create preview URLs for display
     const newPreviewUrls = files.map((file) => URL.createObjectURL(file));
+    if (e.target.multiple) {
+        // Update preview images
+        setPreviewImages((prevPreviews) => [
+            ...prevPreviews,
+            ...newPreviewUrls,
+        ]);
 
-    // Update preview images
-    setPreviewImages((prevPreviews) => [...prevPreviews, ...newPreviewUrls]);
+        // Store actual files
+        setImageFiles((prevFiles) => [...prevFiles, ...files]);
 
-    // Store actual files
-    setImageFiles((prevFiles) => [...prevFiles, ...files]);
+        // Update parent component with new files
+        onInputChange({
+            target: {
+                name: "images",
+                type: "file",
+                files: [...imageFiles, ...files],
+            },
+        });
+    } else {
+      // Update preview images
+        setPreviewImages([newPreviewUrls]);
+      
+        // Store actual files
+        setImageFiles(files);
 
-    // Update parent component with new files
-    onInputChange({
-      target: {
-        name: "images",
-        type: "file",
-        files: [...imageFiles, ...files],
-      },
-    });
+        // Update parent component with new files
+        onInputChange({
+            target: {
+                name: "image",
+                type: "file",
+                value: files[0],
+          },
+        });
+    }    
   };
 
   const removeImage = (indexToRemove) => {
