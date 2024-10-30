@@ -8,7 +8,19 @@ import {
   putWorkspace,
 } from "../../../config/api.admin";
 import Swal from "sweetalert2";
-import { FiX, FiDollarSign, FiUsers, FiSquare, FiImage, FiHome, FiGrid, FiFileText, FiSearch, FiPlus } from 'react-icons/fi';
+import {
+  FiX,
+  FiDollarSign,
+  FiUsers,
+  FiSquare,
+  FiImage,
+  FiHome,
+  FiGrid,
+  FiFileText,
+  FiSearch,
+  FiPlus,
+  FiEye,
+} from "react-icons/fi";
 
 const WorkspacesManagerPage = () => {
   const [workspaces, setWorkspaces] = useState([]);
@@ -17,7 +29,7 @@ const WorkspacesManagerPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
-//-----------------------------------------------------------------//
+  //-----------------------------------------------------------------//
   // ADD
   const [openModalAdd, setOpenModalAdd] = useState(false);
   const [newWorkspace, setNewWorkspace] = useState({
@@ -25,20 +37,25 @@ const WorkspacesManagerPage = () => {
     building_id: "",
     images: [],
     workspace_type_id: "",
-    workspace_price: 0,
+    workspace_price_hour: 0,
+    workspace_price_day: 0,
+    workspace_price_month: 0,
     capacity: 0,
     area: 0,
     description: "",
     status: "active",
   });
-//-----------------------------------------------------------------//
-  const [openModalUpdate, setOpenModalUpdate] = useState(false)
-  const [updateWorkspace, setUpdateWorkspace] = useState ({
+  //-----------------------------------------------------------------//
+  // UPDATE
+  const [openModalUpdate, setOpenModalUpdate] = useState(false);
+  const [updateWorkspace, setUpdateWorkspace] = useState({
     workspace_name: "",
     building_id: "",
     images: [],
     workspace_type_id: "",
-    workspace_price: 0,
+    workspace_price_hour: 0,
+    workspace_price_day: 0,
+    workspace_price_month: 0,
     capacity: 0,
     area: 0,
     description: "",
@@ -46,24 +63,37 @@ const WorkspacesManagerPage = () => {
   });
 
   //----------------------------------------------------------//
+  // VIEW
+  const [openModalView, setOpenModalView] = useState(false);
+  const [viewWorkspace, setViewWorkspace] = useState(null);
 
+  const handleOpenModalView = (workspace) => {
+    setOpenModalView(true);
+    setViewWorkspace(workspace);
+  };
 
-  
-    const fetchWorkspaces = async () => {
-      setIsLoading(true);
-      try {
-        const res = await getWorkspace();
-        if (res && res.data) {
-          setWorkspaces(res.data);
-        }
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setIsLoading(false);
+  const handleCloseModalView = () => {
+    setOpenModalView(false);
+    setViewWorkspace(null);
+  };
+  //-------------------------------------------------------------//
+
+  const fetchWorkspaces = async () => {
+    setIsLoading(true);
+    try {
+      const res = await getWorkspace();
+      if (res && res.data) {
+        setWorkspaces(res.data);
+        console.log(res.data);
       }
-    };
-    useEffect(() => {
-      fetchWorkspaces();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchWorkspaces();
   }, []);
 
   useEffect(() => {
@@ -72,6 +102,7 @@ const WorkspacesManagerPage = () => {
         const res = await getBuilding();
         if (res && res.data) {
           setBuildings(res.data);
+          console.log("building", res.data);
         }
       } catch (error) {
         console.log(error);
@@ -86,12 +117,13 @@ const WorkspacesManagerPage = () => {
         const res = await getAllWorkspaceType();
         if (res && res.data) {
           setWorkspacesType(res.data.rows);
+          console.log("workspace type", res.data.rows);
         }
       } catch (error) {
         console.log(error);
       }
     };
-    
+
     fetchWorkspaceType();
   }, []);
 
@@ -125,16 +157,21 @@ const WorkspacesManagerPage = () => {
               ws.workspace_id === workspaceId
                 ? {
                     ...ws,
-                    status: currentStatus === "inactive" ? "active" : "inactive",
+                    status:
+                      currentStatus === "inactive" ? "active" : "inactive",
                   }
                 : ws
             )
           );
           Swal.fire({
-            title: currentStatus === "inactive" ? "Workspace Unblocked!" : "Workspace Blocked!",
-            text: currentStatus === "inactive"
-              ? "Workspace has been successfully unblocked."
-              : "Workspace has been successfully blocked.",
+            title:
+              currentStatus === "inactive"
+                ? "Workspace Unblocked!"
+                : "Workspace Blocked!",
+            text:
+              currentStatus === "inactive"
+                ? "Workspace has been successfully unblocked."
+                : "Workspace has been successfully blocked.",
             icon: "success",
           });
           setIsLoaded(false);
@@ -149,8 +186,8 @@ const WorkspacesManagerPage = () => {
       });
     }
   };
-// -------------------------------------------------
-// ADD 
+  // -------------------------------------------------
+  // ADD
   const handleOpenModalAdd = () => {
     setOpenModalAdd(true);
   };
@@ -162,7 +199,9 @@ const WorkspacesManagerPage = () => {
       building_id: "",
       images: [],
       workspace_type_id: "",
-      workspace_price: 0,
+      workspace_price_hour: 0,
+      workspace_price_day: 0,
+      workspace_price_month: 0,
       capacity: 0,
       area: 0,
       description: "",
@@ -185,7 +224,15 @@ const WorkspacesManagerPage = () => {
       formData.append("workspace_name", newWorkspace.workspace_name);
       formData.append("building_id", newWorkspace.building_id);
       formData.append("workspace_type_id", newWorkspace.workspace_type_id);
-      formData.append("workspace_price", newWorkspace.workspace_price);
+      formData.append(
+        "workspace_price_hour",
+        newWorkspace.workspace_price_hour
+      );
+      formData.append("workspace_price_day", newWorkspace.workspace_price_day);
+      formData.append(
+        "workspace_price_month",
+        newWorkspace.workspace_price_month
+      );
       formData.append("capacity", newWorkspace.capacity);
       formData.append("area", newWorkspace.area);
       formData.append("description", newWorkspace.description);
@@ -199,15 +246,21 @@ const WorkspacesManagerPage = () => {
       if (res && res.err === 0) {
         // Đóng modal trước
         handleCloseModalAdd();
-        
+
         // Fetch lại dữ liệu mới
         await fetchWorkspaces();
-        
+
         // Hiển thị thông báo thành công
         Swal.fire({
           title: "Success",
           text: "Workspace added successfully",
           icon: "success",
+        });
+      } else {
+        Swal.fire({
+          title: "Error",
+          text: "Failed to add workspace",
+          icon: "error",
         });
       }
     } catch (error) {
@@ -219,83 +272,95 @@ const WorkspacesManagerPage = () => {
       });
     }
   };
-//----------------------------------------------------------------------------
-// UPDATE
-const handleOpenModalUpdate = (workspace) => {
-  setUpdateWorkspace({
-    ...workspace,
-    building_id: workspace.building_id || "",
-    images: workspace.images || [],
-  });
-  setOpenModalUpdate(true);
-}
+  //----------------------------------------------------------------------------
+  // UPDATE
+  const handleOpenModalUpdate = (workspace) => {
+    setUpdateWorkspace({
+      ...workspace,
+      building_id: workspace.building_id || "",
+      images: workspace.images || [],
+    });
+    setOpenModalUpdate(true);
+  };
 
-const handleCloseModalUpdate = () => {
-  setOpenModalUpdate(false);
-}
+  const handleCloseModalUpdate = () => {
+    setOpenModalUpdate(false);
+  };
 
-const handleUpdateChange = (e) => {
-  setUpdateWorkspace({ ...updateWorkspace, [e.target.name]: e.target.value });
-};
+  const handleUpdateChange = (e) => {
+    setUpdateWorkspace({ ...updateWorkspace, [e.target.name]: e.target.value });
+  };
 
-const handleUpdateFileChange = (e) => {
-  const files = Array.from(e.target.files);
-  setUpdateWorkspace({ ...updateWorkspace, images: files });
-};
+  const handleUpdateFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    setUpdateWorkspace({ ...updateWorkspace, images: files });
+  };
 
-const handleUpdateWorkspace = async () => {
-  try {
-    const formData = new FormData();
-    formData.append("workspace_name", updateWorkspace.workspace_name);
-    formData.append("building_id", updateWorkspace.building_id);
-    formData.append("workspace_type_id", updateWorkspace.workspace_type_id);
-    formData.append("workspace_price", updateWorkspace.workspace_price);
-    formData.append("capacity", updateWorkspace.capacity);
-    formData.append("area", updateWorkspace.area);
-    formData.append("description", updateWorkspace.description);
-    formData.append("status", updateWorkspace.status);
+  const handleUpdateWorkspace = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("workspace_name", updateWorkspace.workspace_name);
+      formData.append("building_id", updateWorkspace.building_id);
+      formData.append("workspace_type_id", updateWorkspace.workspace_type_id);
+      formData.append(
+        "workspace_price_hour",
+        updateWorkspace.workspace_price_hour
+      );
+      formData.append(
+        "workspace_price_day",
+        updateWorkspace.workspace_price_day
+      );
+      formData.append(
+        "workspace_price_month",
+        updateWorkspace.workspace_price_month
+      );
+      formData.append("capacity", updateWorkspace.capacity);
+      formData.append("area", updateWorkspace.area);
+      formData.append("description", updateWorkspace.description);
+      formData.append("status", updateWorkspace.status);
 
-    if (Array.isArray(updateWorkspace.images)) {
-      updateWorkspace.images.forEach((file) => formData.append("images", file));
-    }
+      if (Array.isArray(updateWorkspace.images)) {
+        updateWorkspace.images.forEach((file) =>
+          formData.append("images", file)
+        );
+      }
 
-    
-    const res = await putWorkspace(updateWorkspace.workspace_id, formData);
-    if (res && res.err === 0) {
-      // Đóng modal trước
-      handleCloseModalUpdate();
-      
-      // Fetch lại dữ liệu mới
-      await fetchWorkspaces();
-      
-      // Hiển thị thông báo thành công
+      const res = await putWorkspace(updateWorkspace.workspace_id, formData);
+      if (res && res.err === 0) {
+        // Đóng modal trước
+        handleCloseModalUpdate();
+
+        // Fetch lại dữ liệu mới
+        await fetchWorkspaces();
+
+        // Hiển thị thông báo thành công
+        Swal.fire({
+          title: "Success",
+          text: "Workspace updated successfully",
+          icon: "success",
+        });
+      } else {
+        Swal.fire({
+          title: "Error",
+          text: "Failed to update workspace",
+          icon: "error",
+        });
+      }
+    } catch (err) {
+      console.error("err", err);
       Swal.fire({
-        title: "Success",
-        text: "Workspace updated successfully",
-        icon: "success",
+        title: "Error",
+        text: "Failed to update workspace",
+        icon: "error",
       });
     }
-  } catch (error) {
-    console.error(error);
-    Swal.fire({
-      title: "Error",
-      text: "Failed to update workspace",
-      icon: "error",
-    });
-  }
-};
-
-
-
+  };
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Workspace Management</h1>
-        <button 
-          className="btn btn-primary gap-2"
-          onClick={handleOpenModalAdd}
-        >
+        <button className="btn btn-primary gap-2" onClick={handleOpenModalAdd}>
           <FiPlus className="w-5 h-5" />
           Add Workspace
         </button>
@@ -305,15 +370,15 @@ const handleUpdateWorkspace = async () => {
       {openModalAdd && (
         <div className="modal modal-open">
           <div className="modal-box max-w-3xl relative">
-            <button 
+            <button
               className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
               onClick={handleCloseModalAdd}
             >
               <FiX className="w-5 h-5" />
             </button>
-            
+
             <h3 className="font-bold text-2xl mb-6">Add New Workspace</h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Workspace Name */}
               <div className="form-control">
@@ -349,7 +414,10 @@ const handleUpdateWorkspace = async () => {
                 >
                   <option value="">Select Building</option>
                   {buildings.map((building) => (
-                    <option key={building.building_id} value={building.building_id}>
+                    <option
+                      key={building.building_id}
+                      value={building.building_id}
+                    >
                       {building.building_name}
                     </option>
                   ))}
@@ -372,7 +440,10 @@ const handleUpdateWorkspace = async () => {
                 >
                   <option value="">Select Workspace Type</option>
                   {workspacesTypes.map((type) => (
-                    <option key={type.workspace_type_id} value={type.workspace_type_id}>
+                    <option
+                      key={type.workspace_type_id}
+                      value={type.workspace_type_id}
+                    >
                       {type.workspace_type_name}
                     </option>
                   ))}
@@ -384,14 +455,48 @@ const handleUpdateWorkspace = async () => {
                 <label className="label">
                   <span className="label-text flex items-center gap-2">
                     <FiDollarSign className="w-4 h-4" />
-                    Price
+                    Price per hour
                   </span>
                 </label>
                 <input
                   type="number"
-                  name="workspace_price"
+                  name="workspace_price_hour"
                   placeholder="Enter price"
-                  value={newWorkspace.workspace_price}
+                  value={newWorkspace.workspace_price_hour}
+                  onChange={handleAddChange}
+                  className="input input-bordered w-full"
+                />
+              </div>
+
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text flex items-center gap-2">
+                    <FiDollarSign className="w-4 h-4" />
+                    Price per day
+                  </span>
+                </label>
+                <input
+                  type="number"
+                  name="workspace_price_day"
+                  placeholder="Enter price"
+                  value={newWorkspace.workspace_price_day}
+                  onChange={handleAddChange}
+                  className="input input-bordered w-full"
+                />
+              </div>
+
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text flex items-center gap-2">
+                    <FiDollarSign className="w-4 h-4" />
+                    Price per month
+                  </span>
+                </label>
+                <input
+                  type="number"
+                  name="workspace_price_month"
+                  placeholder="Enter price"
+                  value={newWorkspace.workspace_price_month}
                   onChange={handleAddChange}
                   className="input input-bordered w-full"
                 />
@@ -475,16 +580,10 @@ const handleUpdateWorkspace = async () => {
 
             {/* Action Buttons */}
             <div className="modal-action mt-6 flex justify-end gap-2">
-              <button 
-                className="btn btn-ghost"
-                onClick={handleCloseModalAdd}
-              >
+              <button className="btn btn-ghost" onClick={handleCloseModalAdd}>
                 Cancel
               </button>
-              <button 
-                className="btn btn-primary"
-                onClick={handleAddWorkspace}
-              >
+              <button className="btn btn-primary" onClick={handleAddWorkspace}>
                 Add Workspace
               </button>
             </div>
@@ -495,15 +594,15 @@ const handleUpdateWorkspace = async () => {
       {openModalUpdate && (
         <div className="modal modal-open">
           <div className="modal-box max-w-3xl relative">
-            <button 
+            <button
               className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
               onClick={handleCloseModalUpdate}
             >
               <FiX className="w-5 h-5" />
             </button>
-            
+
             <h3 className="font-bold text-2xl mb-6">Update Workspace</h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Workspace Name */}
               <div className="form-control">
@@ -533,13 +632,16 @@ const handleUpdateWorkspace = async () => {
                 </label>
                 <select
                   name="building_id"
-                  value={updateWorkspace.building_id}
+                  value={updateWorkspace.Building.building_id}
                   onChange={handleUpdateChange}
                   className="select select-bordered w-full"
                 >
                   <option value="">Select Building</option>
                   {buildings.map((building) => (
-                    <option key={building.building_id} value={building.building_id}>
+                    <option
+                      key={building.building_id}
+                      value={building.building_id}
+                    >
                       {building.building_name}
                     </option>
                   ))}
@@ -562,7 +664,10 @@ const handleUpdateWorkspace = async () => {
                 >
                   <option value="">Select Workspace Type</option>
                   {workspacesTypes.map((type) => (
-                    <option key={type.workspace_type_id} value={type.workspace_type_id}>
+                    <option
+                      key={type.workspace_type_id}
+                      value={type.workspace_type_id}
+                    >
                       {type.workspace_type_name}
                     </option>
                   ))}
@@ -574,14 +679,48 @@ const handleUpdateWorkspace = async () => {
                 <label className="label">
                   <span className="label-text flex items-center gap-2">
                     <FiDollarSign className="w-4 h-4" />
-                    Price
+                    Price per hour
                   </span>
                 </label>
                 <input
                   type="number"
-                  name="workspace_price"
+                  name="workspace_price_hour"
                   placeholder="Enter price"
-                  value={updateWorkspace.workspace_price}
+                  value={updateWorkspace.price_per_hour}
+                  onChange={handleUpdateChange}
+                  className="input input-bordered w-full"
+                />
+              </div>
+
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text flex items-center gap-2">
+                    <FiDollarSign className="w-4 h-4" />
+                    Price per day
+                  </span>
+                </label>
+                <input
+                  type="number"
+                  name="workspace_price_day"
+                  placeholder="Enter price"
+                  value={updateWorkspace.price_per_day}
+                  onChange={handleUpdateChange}
+                  className="input input-bordered w-full"
+                />
+              </div>
+
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text flex items-center gap-2">
+                    <FiDollarSign className="w-4 h-4" />
+                    Price per month
+                  </span>
+                </label>
+                <input
+                  type="number"
+                  name="workspace_price_month"
+                  placeholder="Enter price"
+                  value={updateWorkspace.price_per_month}
                   onChange={handleUpdateChange}
                   className="input input-bordered w-full"
                 />
@@ -653,7 +792,7 @@ const handleUpdateWorkspace = async () => {
                 type="file"
                 name="images"
                 multiple
-                onChange={handleUpdateFileChange} 
+                onChange={handleUpdateFileChange}
                 className="file-input file-input-bordered w-full"
               />
               <label className="label">
@@ -665,17 +804,147 @@ const handleUpdateWorkspace = async () => {
 
             {/* Action Buttons */}
             <div className="modal-action mt-6 flex justify-end gap-2">
-              <button 
+              <button
                 className="btn btn-ghost"
                 onClick={handleCloseModalUpdate}
               >
                 Cancel
               </button>
-              <button 
+              <button
                 className="btn btn-primary"
                 onClick={handleUpdateWorkspace}
               >
                 Update Workspace
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {openModalView && viewWorkspace && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-3xl relative">
+            <button
+              className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+              onClick={handleCloseModalView}
+            >
+              <FiX className="w-5 h-5" />
+            </button>
+
+            <h3 className="font-bold text-2xl mb-6">Workspace Details</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Basic Information */}
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-lg mb-2">
+                    Basic Information
+                  </h4>
+                  <div className="space-y-2">
+                    <p className="flex items-center gap-2">
+                      <FiHome className="w-4 h-4" />
+                      <span className="font-medium">Name:</span>{" "}
+                      {viewWorkspace.workspace_name}
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <FiGrid className="w-4 h-4" />
+                      <span className="font-medium">Building:</span>{" "}
+                      {viewWorkspace.Building?.building_name}
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <FiGrid className="w-4 h-4" />
+                      <span className="font-medium">Type:</span>{" "}
+                      {viewWorkspace.WorkspaceType?.workspace_type_name}
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <span className="font-medium">Status:</span>
+                      <span
+                        className={`badge ${
+                          viewWorkspace.status === "active"
+                            ? "badge-success"
+                            : "badge-error"
+                        }`}
+                      >
+                        {viewWorkspace.status}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-lg mb-2">Specifications</h4>
+                  <div className="space-y-2">
+                    <p className="flex items-center gap-2">
+                      <FiUsers className="w-4 h-4" />
+                      <span className="font-medium">Capacity:</span>{" "}
+                      {viewWorkspace.capacity} people
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <FiSquare className="w-4 h-4" />
+                      <span className="font-medium">Area:</span>{" "}
+                      {viewWorkspace.area} sq ft
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pricing Information */}
+              <div className="space-y-4">
+                <h4 className="font-semibold text-lg mb-2">Pricing</h4>
+                <div className="space-y-2">
+                  <p className="flex items-center gap-2">
+                    <FiDollarSign className="w-4 h-4" />
+                    <span className="font-medium">Hourly Rate:</span> $
+                    {viewWorkspace.price_per_hour}
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <FiDollarSign className="w-4 h-4" />
+                    <span className="font-medium">Daily Rate:</span> $
+                    {viewWorkspace.price_per_day}
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <FiDollarSign className="w-4 h-4" />
+                    <span className="font-medium">Monthly Rate:</span> $
+                    {viewWorkspace.price_per_month}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="mt-6">
+              <h4 className="font-semibold text-lg mb-2">Description</h4>
+              <p className="text-gray-600 whitespace-pre-wrap">
+                {viewWorkspace.description}
+              </p>
+            </div>
+
+            {/* Images */}
+            {viewWorkspace.WorkspaceImages && 
+              viewWorkspace.WorkspaceImages.length > 0 && (
+                <div className="mt-6">
+                  <h4 className="font-semibold text-lg mb-2">Images</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {viewWorkspace.WorkspaceImages.map((image, index) => (
+                      <div key={index} className="relative aspect-video">
+                        <img
+                          src={image}
+                          alt={`Workspace ${index + 1}`}
+                          className="object-cover rounded-lg w-full h-full"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            {/* Close Button */}
+            <div className="modal-action">
+              <button
+                className="btn btn-primary"
+                onClick={handleCloseModalView}
+              >
+                Close
               </button>
             </div>
           </div>
@@ -726,7 +995,13 @@ const handleUpdateWorkspace = async () => {
                       {ws.status}
                     </span>
                   </td>
-                  <td>
+                  <td className="space-x-2">
+                    <button
+                      className="btn btn-sm btn-info"
+                      onClick={() => handleOpenModalView(ws)}
+                    >
+                      <FiEye className="w-4 h-4" />
+                    </button>
                     <button
                       className={`btn btn-sm ${
                         ws.status === "inactive" ? "btn-success" : "btn-error"
@@ -735,9 +1010,8 @@ const handleUpdateWorkspace = async () => {
                     >
                       {ws.status === "inactive" ? "Unblock" : "Block"}
                     </button>
-
                     <button
-                      className="btn btn-sm btn-info ml-2"
+                      className="btn btn-sm btn-info"
                       onClick={() => handleOpenModalUpdate(ws)}
                     >
                       Edit
