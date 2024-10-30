@@ -162,6 +162,7 @@ const WorkspacesTypesManagerPage = () => {
             name: "image",
             label: "Images",
             type: "file",
+            multiple: false,
             value: `${newWorkspaceType.image}`,
         },
     ];
@@ -236,25 +237,17 @@ const WorkspacesTypesManagerPage = () => {
 
     const handleUpdateChange = (e) => {
         const { name, type, value, files, checked } = e.target;
-        console.log(files); // Log để kiểm tra giá trị
 
-        setNewWorkspaceType((prev) => ({
-            ...prev,
-            [name]:
-                type === "checkbox"
-                    ? checked
-                        ? "active"
-                        : "inactive"
-                    : type === "file"
-                    ? e.target.files[0]
-                    : value,
-        }));
+        setNewWorkspaceType({
+            ...newWorkspaceType,
+            [name]: value,
+        });
     };
 
     const handleUpdateClick = (workspaceType) => {
         setNewWorkspaceType({
             ...workspaceType,
-            image: Array.isArray(workspaceType.image) ? workspaceType.image : [workspaceType.image],
+            image: workspaceType.image,
             status: workspaceType.status === "active" ? "active" : "inactive",
         });
 
@@ -269,16 +262,17 @@ const WorkspacesTypesManagerPage = () => {
             value: `${newWorkspaceType.workspace_type_name}`,
         },
         {
-            label: "Image",
-            type: "file",
-            name: "image",
-            value: `${newWorkspaceType.image}`,
-        },
-        {
             label: "Description",
             type: "text",
             name: "description",
             value: `${newWorkspaceType.description}`,
+        },
+        {
+            label: "Image",
+            type: "file",
+            name: "image",
+            multiple: false,
+            value: `${newWorkspaceType.image}`,
         },
     ];
 

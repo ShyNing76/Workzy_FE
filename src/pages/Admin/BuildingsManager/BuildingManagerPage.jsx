@@ -227,7 +227,8 @@ const BuildingManagerPage = () => {
           formData.append("images", image);
         } else if (
           typeof image === "string" &&
-          !updateBuilding.remove_images.includes(image)
+          (!updateBuilding.remove_images ||
+            !updateBuilding.remove_images.includes(image))
         ) {
           formData.append("images", image);
         }
