@@ -125,6 +125,11 @@ const getWorkspaceType = (search, page, limit) => {
   return axios.get(URL_API);
 };
 
+const getAllWorkspaceType = () => {
+  const URL_API = `api/v1/workspace-type/`;
+  return axios.get(URL_API);
+};
+
 const getWorkspaceTypeById = (workspace_type_id) => {
   const URL_API = `/api/v1/workspace-type/${workspace_type_id}`;
   return axios.get(URL_API);
@@ -384,19 +389,29 @@ const getWorkspaceById = (workspace_id) => {
   return axios.get(URL_API);
 };
 
+// add new workspace
 const postWorkspace = (newWorkspace) => {
   const URL_API = "/api/v1/workspace";
-  return axios.post(URL_API, newWorkspace);
+  return axios.post(URL_API, newWorkspace, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 
+// update workspace
 const putWorkspace = (workspace_id, updatedWorkspace) => {
   const URL_API = `/api/v1/workspace/${workspace_id}`;
-  return axios.put(URL_API, updatedWorkspace);
+  return axios.put(URL_API, updatedWorkspace, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 
 const deleteWorkspace = (workspace_id) => {
   const URL_API = `/api/v1/workspace/delete/${workspace_id}`;
-  return axios.delete(URL_API);
+  return axios.put(URL_API);
 };
 const assignWorkspaceToBuilding = (building_id, workspace_ids) => {
   const URL_API = `api/v1/workspace/assign/${building_id}`;
@@ -557,4 +572,5 @@ export {
   getBookingDataIn6DaysAdmin,
   postNewBuilding,
   changeBuildingStatus,
+  getAllWorkspaceType,
 };

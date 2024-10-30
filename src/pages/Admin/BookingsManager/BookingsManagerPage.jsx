@@ -60,9 +60,10 @@ const BookingsManagerPage = () => {
         : true)
   );
   // Open modal truyền vào 1 booking để hiển thị chi tiết booking đó
-  const handleOpenModal = (selectedBooking) => {
+  const handleOpenModal = (selectedBooking, bookingId) => {
     // param: selectedBooking là booking được chọn để hiển thị chi tiết
     setSelectedBooking(selectedBooking); // set selectedBooking là booking được chọn
+    setBookingId(bookingId);
     setOpenModal(true); // set openModal là true để hiển thị modal
   };
 
@@ -71,6 +72,7 @@ const BookingsManagerPage = () => {
     // đóng modal
     setSelectedBooking(null); // set selectedBooking là null
     setOpenModal(false); // set openModal là false để đóng modal
+    setBookingId(null);
   };
 
   // Tính thời gian thuê
