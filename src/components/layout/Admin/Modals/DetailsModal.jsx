@@ -9,7 +9,6 @@ const formatKey = (key) => {
 
 const ImagePreviewModal = ({ imageSrc }) => {
   if (!imageSrc) return null;
-
   return (
     <dialog id="image_preview_modal" className="modal">
       <div className="modal-box max-w-5xl w-11/12 p-0 bg-base-100 relative">
@@ -59,11 +58,13 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
     }
   };
 
+  console.log(currentItem)
+
   return (
     <>
       <ImagePreviewModal
         imageSrc={
-          hasImage ? currentItem.BuildingImages.map((img) => img.image) : null
+          hasImage ? currentItem.BuildingImages.map((img) => img.image) : currentItem.image ? currentItem.image : null
         }
       />
 
@@ -105,11 +106,27 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
                     </div>
                   ))}
                 </div>
-              ) : (
-                <div className="text-base-content/50 text-center">
+              ) : 
+                   typeof currentItem.image== "string" ? (
+                      <div
+                        className="relative group cursor-pointer rounded-lg overflow-hidden bg-white shadow-lg"
+                        onClick={() => openImagePreview(currentItem.image)}
+                      >
+                        <img
+                          src={currentItem.image}
+                          alt={`Preview`}
+                          className="w-full h-[150px] object-cover transform transition-transform duration-300 hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-black/0 hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
+                          <div className="bg-white/90 p-3 rounded-full transform hover:scale-110 transition-transform">
+                            <BsZoomIn className="w-6 h-6" />
+                          </div>
+                        </div>
+                      </div>
+                    ): (<div className="text-base-content/50 text-center">
                   No image available
-                </div>
-              )}
+                </div>)
+              }
             </div>
 
             {/* Right Side - Details */}
