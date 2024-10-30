@@ -16,6 +16,7 @@ const MembershipPage = () => {
   const [selectedTier, setSelectedTier] = useState("Bronze");
   const [currentTier, setCurrentTier] = useState("Bronze");
   const [isHovering, setIsHovering] = useState(null);
+  const [hoverTier, setHoverTier] = useState(null);
 
   const membershipTiers = {
     Bronze: {
@@ -202,11 +203,21 @@ const MembershipPage = () => {
                         ? `bg-gradient-to-r ${info.bgGradient}`
                         : "bg-gray-50"
                     }
-                    hover:shadow-md`}
-                  onClick={() => handleTierClick(tier)}
+                    hover:${
+                      hoverTier === tier
+                        ? `shadow-md bg-gradient-to-r ${info.bgGradient}`
+                        : "bg-gray-50"
+                    }`}
+                  // onClick={() => handleTierClick(tier)}
                   whileHover={{ scale: 1.02 }}
-                  onHoverStart={() => setIsHovering(tier)}
-                  onHoverEnd={() => setIsHovering(null)}
+                  onHoverStart={() => {
+                    setIsHovering(tier);
+                    setHoverTier(tier);
+                  }}
+                  onHoverEnd={() => {
+                    setIsHovering(null);
+                    setHoverTier(null);
+                  }}
                 >
                   <div className="flex items-center gap-4">
                     <BsFillHexagonFill
