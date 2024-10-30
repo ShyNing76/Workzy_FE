@@ -18,18 +18,34 @@ const UpdateModal = ({
 
   useEffect(() => {
     if (currentItem?.images) {
-      // Existing Firebase images
-      setPreviewImages(currentItem.images);
-      setImageFiles([]);
+      // Handle array of images (either URLs or Files)
+      const previews = currentItem.images.map((img) =>
+        typeof img === "string" ? img : URL.createObjectURL(img)
+      );
+      setPreviewImages(previews);
+      setImageFiles(currentItem.images.filter((img) => img instanceof File));
     } else if (currentItem?.BuildingImages) {
       const firebaseImages = currentItem.BuildingImages.map((img) => img.image);
       setPreviewImages(firebaseImages);
       setImageFiles([]);
     } else if (currentItem?.image) {
-      // Existing Firebase image
-      const previewImage = typeof currentItem.image === "string" ? currentItem.image : URL.createObjectURL(currentItem.image);
-      setPreviewImages([previewImage]);
-      setImageFiles([]);
+      // Handle single image (either URL or File)
+      if (Array.isArray(currentItem.image)) {
+        const previews = currentItem.image.map((img) =>
+          typeof img === "string" ? img : URL.createObjectURL(img)
+        );
+        setPreviewImages(previews);
+        setImageFiles(currentItem.image.filter((img) => img instanceof File));
+      } else {
+        const previewImage =
+          typeof currentItem.image === "string"
+            ? currentItem.image
+            : URL.createObjectURL(currentItem.image);
+        setPreviewImages([previewImage]);
+        setImageFiles(
+          currentItem.image instanceof File ? [currentItem.image] : []
+        );
+      }
     }
     setRemovedImages([]);
   }, [currentItem]);
@@ -39,92 +55,97 @@ const UpdateModal = ({
 
     // Create preview URLs for display
     const newPreviewUrls = files.map((file) => URL.createObjectURL(file));
+
     if (e.target.multiple) {
-        // Update preview images
-        setPreviewImages((prevPreviews) => [
-            ...prevPreviews,
-            ...newPreviewUrls,
-        ]);
-
-        // Store actual files
-        setImageFiles((prevFiles) => [...prevFiles, ...files]);
-
-        // Update parent component with new files
-        onInputChange({
-            target: {
-                name: "images",
-                type: "file",
-                files: [...imageFiles, ...files],
-            },
-        });
-    } else {
       // Update preview images
-        setPreviewImages([newPreviewUrls]);
-      
-        // Store actual files
-        setImageFiles(files);
+      const updatedPreviews = [...previewImages, ...newPreviewUrls];
+      setPreviewImages(updatedPreviews);
 
-        // Update parent component with new files
-        onInputChange({
-            target: {
-                name: "image",
-                type: "file",
-                value: files[0],
-          },
-        });
-    }    
+      // Store actual files
+      const updatedFiles = [...imageFiles, ...files];
+      setImageFiles(updatedFiles);
+
+      // Update parent component with new files
+      onInputChange({
+        target: {
+          name: "images",
+          type: "file",
+          files: updatedFiles,
+        },
+      });
+    } else {
+      // Single file upload
+      setPreviewImages([newPreviewUrls[0]]);
+      setImageFiles([files[0]]);
+
+      // Update parent component
+      onInputChange({
+        target: {
+          name: "image",
+          type: "file",
+          value: files[0],
+        },
+      });
+    }
   };
 
   const removeImage = (indexToRemove) => {
     const removedImage = previewImages[indexToRemove];
+    const isFirebaseImage =
+      typeof removedImage === "string" && removedImage.includes("firebase");
+    const isBlobUrl =
+      typeof removedImage === "string" && removedImage.startsWith("blob:");
 
     // Remove from preview images
-    setPreviewImages((prevPreviews) => {
-      const newPreviews = prevPreviews.filter(
-        (_, index) => index !== indexToRemove
-      );
-      return newPreviews;
-    });
+    const newPreviews = previewImages.filter(
+      (_, index) => index !== indexToRemove
+    );
+    setPreviewImages(newPreviews);
 
-    // If it's a Firebase URL
-    if (typeof removedImage === "string" && removedImage.includes("firebase")) {
-      setRemovedImages((prevRemoved) => {
-        const newRemovedImages = [...prevRemoved, removedImage];
+    if (isFirebaseImage) {
+      // Handle Firebase image removal
+      const newRemovedImages = [...removedImages, removedImage];
+      setRemovedImages(newRemovedImages);
 
-        // Update parent's remove_images state
-        onInputChange({
-          target: {
-            name: "remove_images",
-            value: newRemovedImages,
-          },
-        });
-
-        return newRemovedImages;
+      onInputChange({
+        target: {
+          name: "remove_images",
+          value: newRemovedImages,
+        },
       });
     } else {
-      // Remove from imageFiles if it's a new file
-      setImageFiles((prevFiles) => {
-        const newFiles = prevFiles.filter(
-          (_, index) => index !== indexToRemove
-        );
+      // Handle new file removal
+      const newFiles = imageFiles.filter((_, index) => index !== indexToRemove);
+      setImageFiles(newFiles);
 
-        // Update parent component
-        onInputChange({
-          target: {
-            name: "images",
-            type: "file",
-            files: newFiles,
-          },
-        });
-
-        return newFiles;
+      onInputChange({
+        target: {
+          name: "images",
+          type: "file",
+          files: newFiles,
+          value: newFiles,
+        },
       });
     }
 
-    // Cleanup preview URL
-    if (typeof removedImage === "string" && removedImage.startsWith("blob:")) {
+    // Cleanup blob URL if necessary
+    if (isBlobUrl) {
       URL.revokeObjectURL(removedImage);
     }
+
+    // Update the parent's images state
+    const remainingImages = isFirebaseImage
+      ? previewImages.filter(
+          (img, idx) => idx !== indexToRemove && !removedImages.includes(img)
+        )
+      : newFiles;
+
+    onInputChange({
+      target: {
+        name: "images",
+        value: remainingImages,
+      },
+    });
   };
 
   useEffect(() => {
