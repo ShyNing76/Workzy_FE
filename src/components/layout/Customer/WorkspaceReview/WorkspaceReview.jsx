@@ -31,7 +31,7 @@ const WorkspaceReview = ({ data, page, setPage, limit }) => {
   });
 
   return (
-    <div className="py-12 px-8 mx-auto max-w-7xl">
+    <div className="workspace-review py-12 px-8 mx-auto max-w-7xl">
       {/* Reviews Header */}
       <div className="mb-8">
         <div className="flex items-start justify-between">

@@ -6,7 +6,7 @@ const BookingAmenitiesCard = ({ amenitiesBooking }) => {
 
   if (amenitiesBooking && amenitiesBooking.length === 0) {
     return (
-      <div className="my-8">
+      <div className="m-8">
         <h3 className="text-xl font-semibold mb-4">Additional Amenities</h3>
         <div className="alert">
           <span>No additional amenities booked</span>

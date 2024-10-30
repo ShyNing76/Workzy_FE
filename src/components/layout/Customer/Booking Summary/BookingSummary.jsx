@@ -51,7 +51,7 @@ const BookingSummary = (props) => {
   }, [amountPrice, discount]);
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="sumary-booking w-full max-w-md mx-auto">
       {/* Box hiển thị thông tin */}
       <div className="bg-gray-200 p-4 rounded-lg shadow-md">
         <div className="flex justify-between mb-2">

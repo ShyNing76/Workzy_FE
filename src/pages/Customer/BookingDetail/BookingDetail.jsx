@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import PriceBreakDown from "../../../components/layout/Customer/PriceAllBreakDown/PriceBreakDown";
 import ProgressBar from "../../../components/layout/Customer/Progress Bar/ProgressBar";
@@ -13,6 +13,7 @@ import BookingAmenitiesCard from "../BookingAmenitiesCard/BookingAmenitiesCard";
 import PriceBrokenAmenities from "../../../components/layout/Customer/PriceBrokenAmenities/PriceBrokenAmenities";
 import PaymentBrokenButton from "../../../components/layout/Customer/PaymentBrokenButton/PaymentBrokenButton";
 import ReviewBox from "../../../components/layout/Customer/ReviewBox/ReviewBox";
+import DetailBookingTour from "../../../components/layout/Customer/DetailBookingTour/DetailBookingTour";
 
 const BookingDetail = () => {
   const location = useLocation();
@@ -24,6 +25,22 @@ const BookingDetail = () => {
   const [bookingStatuses, setBookingStatuses] = useState([]);
   const [amenitiesBooking, setAmenitiesBooking] = useState([]);
   const [amenitiesBroken, setAmenitiesBroken] = useState([]);
+
+  // Refs for tour elements
+  const progressBarRef = useRef(null);
+  const timelineRef = useRef(null);
+  const detailsRef = useRef(null);
+  const amenitiesRef = useRef(null);
+  const priceBreakdownRef = useRef(null);
+
+  // References object for TourGuide
+  const tourRefs = {
+    progressBarRef,
+    timelineRef,
+    detailsRef,
+    amenitiesRef,
+    priceBreakdownRef,
+  };
 
   const statusOrder = [
     "confirmed",
@@ -130,39 +147,42 @@ const BookingDetail = () => {
         </h2>
       </div>
 
-      {/* Progress bar */}
-      <ProgressBar
-        statusOrder={statusOrder}
-        booking={booking}
-        currentStatusIndex={currentStatusIndex}
-      />
+      <div ref={progressBarRef}>
+        <ProgressBar
+          statusOrder={statusOrder}
+          booking={booking}
+          currentStatusIndex={currentStatusIndex}
+        />
+      </div>
 
-      {/* Booking timeline transaction */}
-      <BookingTimeLine bookingStatuses={bookingStatuses} />
+      <div ref={timelineRef}>
+        <BookingTimeLine bookingStatuses={bookingStatuses} />
+      </div>
 
-      {/* Booking details */}
-      <BookingDetailCard
-        booking={booking}
-        workspace={workspace}
-        type={type}
-        getStatusBadgeClass={getStatusBadgeClass}
-      />
+      <div ref={detailsRef}>
+        <BookingDetailCard
+          booking={booking}
+          workspace={workspace}
+          type={type}
+          getStatusBadgeClass={getStatusBadgeClass}
+        />
+      </div>
 
       <hr />
-      <ReviewBox review={dataReview} />
 
-      {booking.BookingStatuses[0].status !== "completed" && (
-        <>
-          <hr />
-
-          <BookingAmenitiesCard amenitiesBooking={amenitiesBooking} />
-        </>
+      {dataReview && booking.BookingStatuses[0].status === "completed" && (
+        <ReviewBox review={dataReview} />
       )}
+
+      <hr />
+
+      <div ref={amenitiesRef}>
+        <BookingAmenitiesCard amenitiesBooking={amenitiesBooking} />
+      </div>
 
       {booking.report_damage_ameninites !== null && (
         <>
           <hr />
-
           <div className="flex items-center my-4">
             <div
               className={`${
@@ -185,14 +205,16 @@ const BookingDetail = () => {
         </>
       )}
 
-      {booking.BookingStatuses[0].status !== "cancelled" ? (
+      {booking.BookingStatuses[0].status !== "cancelled" && (
         <>
           <hr />
-          <PriceBreakDown booking={booking} />
+          <div ref={priceBreakdownRef}>
+            <PriceBreakDown booking={booking} />
+          </div>
         </>
-      ) : (
-        <></>
       )}
+
+      <DetailBookingTour references={tourRefs} />
     </div>
   );
 };

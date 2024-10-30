@@ -277,11 +277,19 @@ const getAllBooking = () => {
 };
 
 //Buildings Manager APIs_________________________________________________________
-
-//Buildings Manager APIs_________________________________________________________
 const getBuilding = () => {
   const URL_API = "/api/v1/building/";
   return axios.get(URL_API);
+};
+
+const postNewBuilding = (newBuilding) => {
+  const URL_API = "/api/v1/building/";
+  return axios.post(URL_API, newBuilding);
+};
+
+const changeBuildingStatus = (building_id, newStatus) => {
+  const URL_API = `/api/v1/building/${building_id}/status`;
+  return axios.put(URL_API, { status: newStatus });
 };
 
 const getCustomerById = (user_id) => {
@@ -311,6 +319,11 @@ const getBuildingById = (building_id) => {
   return axios.get(URL_API);
 };
 
+// const postNewBuilding = (newBuilding) => {
+//   const URL_API = "/api/v1/building/"
+//   return axios.post(URL_API, newBuilding)
+// }
+
 const postBuilding = (newBuilding) => {
   const URL_API = "api/v1/building/";
   const formData = new FormData();
@@ -334,9 +347,14 @@ const postBuilding = (newBuilding) => {
   });
 };
 
-const putBuilding = (building_id, updatedBuilding) => {
+const putBuilding = (building_id, formData) => {
   const URL_API = `/api/v1/building/${building_id}`;
-  return axios.put(URL_API, updatedBuilding);
+
+  return axios.put(URL_API, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 
 const assignManagerToBuilding = (building_id, manager_id) => {
@@ -552,5 +570,7 @@ export {
   getBookingDataIn6Days,
   getRevenueDataIn6DaysAdmin,
   getBookingDataIn6DaysAdmin,
-  getAllWorkspaceType
+  getAllWorkspaceType,
+  postNewBuilding,
+  changeBuildingStatus
 };

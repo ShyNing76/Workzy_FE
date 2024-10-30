@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { RxCross2 } from "react-icons/rx";
 import { FiSave, FiUpload } from "react-icons/fi";
@@ -13,36 +13,152 @@ const UpdateModal = ({
   fields,
 }) => {
   const [previewImages, setPreviewImages] = useState([]);
+  const [imageFiles, setImageFiles] = useState([]);
+  const [removedImages, setRemovedImages] = useState([]);
 
-  if (!show) return null;
+  useEffect(() => {
+    if (currentItem?.images) {
+      // Handle array of images (either URLs or Files)
+      const previews = currentItem.images.map((img) =>
+        typeof img === "string" ? img : URL.createObjectURL(img)
+      );
+      setPreviewImages(previews);
+      setImageFiles(currentItem.images.filter((img) => img instanceof File));
+    } else if (currentItem?.BuildingImages) {
+      const firebaseImages = currentItem.BuildingImages.map((img) => img.image);
+      setPreviewImages(firebaseImages);
+      setImageFiles([]);
+    } else if (currentItem?.image) {
+      // Handle single image (either URL or File)
+      if (Array.isArray(currentItem.image)) {
+        const previews = currentItem.image.map((img) =>
+          typeof img === "string" ? img : URL.createObjectURL(img)
+        );
+        setPreviewImages(previews);
+        setImageFiles(currentItem.image.filter((img) => img instanceof File));
+      } else {
+        const previewImage =
+          typeof currentItem.image === "string"
+            ? currentItem.image
+            : URL.createObjectURL(currentItem.image);
+        setPreviewImages([previewImage]);
+        setImageFiles(
+          currentItem.image instanceof File ? [currentItem.image] : []
+        );
+      }
+    }
+    setRemovedImages([]);
+  }, [currentItem]);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    const previews = files.map((file) => URL.createObjectURL(file));
-    setPreviewImages(previews);
 
-    onInputChange({
-      target: {
-        name: e.target.name,
-        value: files,
-      },
-    });
+    // Create preview URLs for display
+    const newPreviewUrls = files.map((file) => URL.createObjectURL(file));
+
+    if (e.target.multiple) {
+      // Update preview images
+      const updatedPreviews = [...previewImages, ...newPreviewUrls];
+      setPreviewImages(updatedPreviews);
+
+      // Store actual files
+      const updatedFiles = [...imageFiles, ...files];
+      setImageFiles(updatedFiles);
+
+      // Update parent component with new files
+      onInputChange({
+        target: {
+          name: "images",
+          type: "file",
+          files: updatedFiles,
+        },
+      });
+    } else {
+      // Single file upload
+      setPreviewImages([newPreviewUrls[0]]);
+      setImageFiles([files[0]]);
+
+      // Update parent component
+      onInputChange({
+        target: {
+          name: "image",
+          type: "file",
+          value: files[0],
+        },
+      });
+    }
   };
 
-  const removeImage = (index) => {
-    const newPreviews = previewImages.filter((_, i) => i !== index);
+  const removeImage = (indexToRemove) => {
+    const removedImage = previewImages[indexToRemove];
+    const isFirebaseImage =
+      typeof removedImage === "string" && removedImage.includes("firebase");
+    const isBlobUrl =
+      typeof removedImage === "string" && removedImage.startsWith("blob:");
+
+    // Remove from preview images
+    const newPreviews = previewImages.filter(
+      (_, index) => index !== indexToRemove
+    );
     setPreviewImages(newPreviews);
 
-    const newFiles = Array.from(currentItem.image || []).filter(
-      (_, i) => i !== index
-    );
+    if (isFirebaseImage) {
+      // Handle Firebase image removal
+      const newRemovedImages = [...removedImages, removedImage];
+      setRemovedImages(newRemovedImages);
+
+      onInputChange({
+        target: {
+          name: "remove_images",
+          value: newRemovedImages,
+        },
+      });
+    } else {
+      // Handle new file removal
+      const newFiles = imageFiles.filter((_, index) => index !== indexToRemove);
+      setImageFiles(newFiles);
+
+      onInputChange({
+        target: {
+          name: "images",
+          type: "file",
+          files: newFiles,
+          value: newFiles,
+        },
+      });
+    }
+
+    // Cleanup blob URL if necessary
+    if (isBlobUrl) {
+      URL.revokeObjectURL(removedImage);
+    }
+
+    // Update the parent's images state
+    const remainingImages = isFirebaseImage
+      ? previewImages.filter(
+          (img, idx) => idx !== indexToRemove && !removedImages.includes(img)
+        )
+      : newFiles;
+
     onInputChange({
       target: {
-        name: "image",
-        value: newFiles,
+        name: "images",
+        value: remainingImages,
       },
     });
   };
+
+  useEffect(() => {
+    return () => {
+      previewImages.forEach((url) => {
+        if (typeof url === "string" && url.startsWith("blob:")) {
+          URL.revokeObjectURL(url);
+        }
+      });
+    };
+  }, []);
+
+  if (!show) return null;
 
   return (
     <div className="modal modal-open">
@@ -141,7 +257,7 @@ const UpdateModal = ({
                         </div>
                         <input
                           type="file"
-                          name={field.name}
+                          name="images"
                           onChange={handleImageChange}
                           className="hidden"
                           multiple={field.multiple}
@@ -151,18 +267,12 @@ const UpdateModal = ({
                     </div>
 
                     {/* Image Preview Grid */}
-                    {(previewImages.length > 0 ||
-                      (currentItem.image && currentItem.image.length > 0)) && (
+                    {previewImages.length > 0 && (
                       <div className="grid grid-cols-3 gap-4 mt-4">
-                        {[
-                          ...(previewImages || []),
-                          ...(Array.isArray(currentItem.image)
-                            ? currentItem.image
-                            : []),
-                        ].map((img, index) => (
+                        {previewImages.map((img, index) => (
                           <div key={index} className="relative group">
                             <img
-                              src={typeof img === "string" ? img : img}
+                              src={img}
                               alt={`Preview ${index + 1}`}
                               className="w-full h-24 object-cover rounded-lg"
                             />

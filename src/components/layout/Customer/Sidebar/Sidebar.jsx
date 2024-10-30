@@ -12,14 +12,16 @@ import { TbCalendarCheck } from "react-icons/tb";
 
 import { GoSidebarCollapse } from "react-icons/go";
 
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import defaultProfile from "../../../../assets/default-profile.jpg";
 import { getUserAuthen } from "../../../../config/api";
+import { FaRegHeart } from "react-icons/fa";
 
 const Sidebar = (props) => {
   const { outlet, refresh } = props;
   const [name, setName] = useState("");
   const [avatar, setAvatar] = useState(null);
+  const location = useLocation();
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -73,33 +75,82 @@ const Sidebar = (props) => {
             </li>
             <hr />
             <li className="menu-item">
-              <Link to="/user/account">
-                <CgProfile className="icon" />
-                Profile Information
+              <Link
+                to="/user/account"
+                className={`tab h-11 ${
+                  location.pathname === "/user/account" ? "active" : ""
+                } `}
+              >
+                <div className="flex flex-1 items-center mb-2">
+                  <CgProfile className="icon " />
+                  <p className="ml-4">Profile Information</p>
+                </div>
               </Link>
             </li>
             <li className="menu-item">
-              <Link to="/user/booking">
-                <TbCalendarCheck className="icon" />
-                My Booking
+              <Link
+                to="/user/booking"
+                className={`tab h-11  ${
+                  location.pathname === "/user/booking" ? "active" : ""
+                } `}
+              >
+                <div className="flex flex-1 items-center mb-2">
+                  <TbCalendarCheck className="icon" />
+                  <p className="ml-4"> My Booking</p>
+                </div>
               </Link>
             </li>
             <li className="menu-item">
-              <Link to="/user/membership">
-                <MdCardMembership className="icon" />
-                Membership
+              <Link
+                to="/user/wishlist"
+                className={`tab h-11 ${
+                  location.pathname === "/user/wishlist" ? "active" : ""
+                } `}
+              >
+                <div className="flex flex-1 items-center mb-2">
+                  <FaRegHeart className="icon" />
+
+                  <p className="ml-4"> My Wishlist</p>
+                </div>
               </Link>
             </li>
             <li className="menu-item">
-              <Link to="/user/support">
-                <MdOutlineSupportAgent className="icon" />
-                Support Center
+              <Link
+                to="/user/membership"
+                className={`tab h-11 ${
+                  location.pathname === "/user/membership" ? "active" : ""
+                } `}
+              >
+                <div className="flex flex-1 items-center mb-2">
+                  <MdCardMembership className="icon" />
+                  <p className="ml-4"> Membership</p>
+                </div>
               </Link>
             </li>
             <li className="menu-item">
-              <Link to="/user/notification">
-                <MdOutlineNotificationsNone className="icon" />
-                Notification
+              <Link
+                to="/user/support"
+                className={`tab h-11 ${
+                  location.pathname === "/user/support" ? "active" : ""
+                } `}
+              >
+                <div className="flex flex-1 items-center mb-2">
+                  <MdOutlineSupportAgent className="icon" />
+                  <p className="ml-4"> Support Center</p>
+                </div>
+              </Link>
+            </li>
+            <li className="menu-item">
+              <Link
+                to="/user/notification"
+                className={`tab h-11 ${
+                  location.pathname === "/user/notification" ? "active" : ""
+                } `}
+              >
+                <div className="flex flex-1 items-center mb-2">
+                  <MdOutlineNotificationsNone className="icon" />
+                  <p className="ml-4"> Notification</p>
+                </div>
               </Link>
             </li>
           </ul>

@@ -4,7 +4,6 @@ import { RiArrowDropDownLine } from "react-icons/ri";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../../context/auth.context";
 import defaultProfile from "../../../../assets/default-profile.jpg";
-import Notification from "../../Customer/Notification/Notification";
 import { getUserAuthen } from "../../../../config/api";
 
 const Navbar = (props) => {
@@ -176,6 +175,9 @@ const Navbar = (props) => {
                   <Link to="/user/booking">Booking</Link>
                 </li>
                 <li>
+                  <Link to="/user/wishlist">Wishlist</Link>
+                </li>
+                <li>
                   <Link to="/user/membership">Membership</Link>
                 </li>
                 <li>
@@ -189,7 +191,8 @@ const Navbar = (props) => {
             </div>
 
             <div className="dropdown dropdown-hover dropdown-end">
-              <div
+              <Link
+                to={`/user/notification`}
                 className="btn btn-ghost btn-circle "
                 role="button"
                 tabIndex={1}
@@ -211,26 +214,7 @@ const Navbar = (props) => {
                   </svg>
                   <span className="badge badge-xs badge-neutral indicator-item"></span>
                 </div>
-              </div>
-              <ul
-                tabIndex={1}
-                className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[10] w-80 p-2 shadow"
-              >
-                <li>
-                  <Notification
-                    title="Booking infomation"
-                    description="Your booking has been confirm"
-                  />
-                  <Notification
-                    title="Booking infomation"
-                    description="Your booking has been confirm"
-                  />
-                  <Notification
-                    title="Booking infomation"
-                    description="Your booking has been confirm"
-                  />
-                </li>
-              </ul>
+              </Link>
             </div>
           </>
         ) : (

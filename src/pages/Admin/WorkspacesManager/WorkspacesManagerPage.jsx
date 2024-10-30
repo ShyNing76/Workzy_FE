@@ -37,9 +37,9 @@ const WorkspacesManagerPage = () => {
     building_id: "",
     images: [],
     workspace_type_id: "",
-    workspace_price_hour: 0,
-    workspace_price_day: 0,
-    workspace_price_month: 0,
+    price_per_hour: 0,
+    price_per_day: 0,
+    price_per_month: 0,
     capacity: 0,
     area: 0,
     description: "",
@@ -53,9 +53,9 @@ const WorkspacesManagerPage = () => {
     building_id: "",
     images: [],
     workspace_type_id: "",
-    workspace_price_hour: 0,
-    workspace_price_day: 0,
-    workspace_price_month: 0,
+    price_per_hour: 0,
+    price_per_day: 0,
+    price_per_month: 0,
     capacity: 0,
     area: 0,
     description: "",
@@ -199,9 +199,9 @@ const WorkspacesManagerPage = () => {
       building_id: "",
       images: [],
       workspace_type_id: "",
-      workspace_price_hour: 0,
-      workspace_price_day: 0,
-      workspace_price_month: 0,
+      price_per_hour: 0,
+      price_per_day: 0,
+      price_per_month: 0,
       capacity: 0,
       area: 0,
       description: "",
@@ -224,15 +224,9 @@ const WorkspacesManagerPage = () => {
       formData.append("workspace_name", newWorkspace.workspace_name);
       formData.append("building_id", newWorkspace.building_id);
       formData.append("workspace_type_id", newWorkspace.workspace_type_id);
-      formData.append(
-        "workspace_price_hour",
-        newWorkspace.workspace_price_hour
-      );
-      formData.append("workspace_price_day", newWorkspace.workspace_price_day);
-      formData.append(
-        "workspace_price_month",
-        newWorkspace.workspace_price_month
-      );
+      formData.append("price_per_hour", newWorkspace.price_per_hour);
+      formData.append("price_per_day", newWorkspace.price_per_day);
+      formData.append("price_per_month", newWorkspace.price_per_month);
       formData.append("capacity", newWorkspace.capacity);
       formData.append("area", newWorkspace.area);
       formData.append("description", newWorkspace.description);
@@ -277,8 +271,9 @@ const WorkspacesManagerPage = () => {
   const handleOpenModalUpdate = (workspace) => {
     setUpdateWorkspace({
       ...workspace,
-      building_id: workspace.building_id || "",
-      images: workspace.images || [],
+      building_id: workspace.Building.building_id || "",
+      existingImages: workspace.WorkspaceImages || [], // Lưu lại ảnh hiện có
+      images: [], // Mảng cho ảnh mới
     });
     setOpenModalUpdate(true);
   };
@@ -302,18 +297,9 @@ const WorkspacesManagerPage = () => {
       formData.append("workspace_name", updateWorkspace.workspace_name);
       formData.append("building_id", updateWorkspace.building_id);
       formData.append("workspace_type_id", updateWorkspace.workspace_type_id);
-      formData.append(
-        "workspace_price_hour",
-        updateWorkspace.workspace_price_hour
-      );
-      formData.append(
-        "workspace_price_day",
-        updateWorkspace.workspace_price_day
-      );
-      formData.append(
-        "workspace_price_month",
-        updateWorkspace.workspace_price_month
-      );
+      formData.append("price_per_hour", updateWorkspace.price_per_hour);
+      formData.append("price_per_day", updateWorkspace.price_per_day);
+      formData.append("price_per_month", updateWorkspace.price_per_month);
       formData.append("capacity", updateWorkspace.capacity);
       formData.append("area", updateWorkspace.area);
       formData.append("description", updateWorkspace.description);
@@ -460,9 +446,9 @@ const WorkspacesManagerPage = () => {
                 </label>
                 <input
                   type="number"
-                  name="workspace_price_hour"
+                  name="price_per_hour"
                   placeholder="Enter price"
-                  value={newWorkspace.workspace_price_hour}
+                  value={newWorkspace.price_per_hour}
                   onChange={handleAddChange}
                   className="input input-bordered w-full"
                 />
@@ -477,9 +463,9 @@ const WorkspacesManagerPage = () => {
                 </label>
                 <input
                   type="number"
-                  name="workspace_price_day"
+                  name="price_per_day"
                   placeholder="Enter price"
-                  value={newWorkspace.workspace_price_day}
+                  value={newWorkspace.price_per_day}
                   onChange={handleAddChange}
                   className="input input-bordered w-full"
                 />
@@ -494,9 +480,9 @@ const WorkspacesManagerPage = () => {
                 </label>
                 <input
                   type="number"
-                  name="workspace_price_month"
+                  name="price_per_month"
                   placeholder="Enter price"
-                  value={newWorkspace.workspace_price_month}
+                  value={newWorkspace.price_per_month}
                   onChange={handleAddChange}
                   className="input input-bordered w-full"
                 />
@@ -684,7 +670,7 @@ const WorkspacesManagerPage = () => {
                 </label>
                 <input
                   type="number"
-                  name="workspace_price_hour"
+                  name="price_per_hour"
                   placeholder="Enter price"
                   value={updateWorkspace.price_per_hour}
                   onChange={handleUpdateChange}
@@ -701,7 +687,7 @@ const WorkspacesManagerPage = () => {
                 </label>
                 <input
                   type="number"
-                  name="workspace_price_day"
+                  name="price_per_day"
                   placeholder="Enter price"
                   value={updateWorkspace.price_per_day}
                   onChange={handleUpdateChange}
@@ -718,7 +704,7 @@ const WorkspacesManagerPage = () => {
                 </label>
                 <input
                   type="number"
-                  name="workspace_price_month"
+                  name="price_per_month"
                   placeholder="Enter price"
                   value={updateWorkspace.price_per_month}
                   onChange={handleUpdateChange}
@@ -780,12 +766,46 @@ const WorkspacesManagerPage = () => {
               />
             </div>
 
-            {/* Images Upload - Full Width */}
+            {/* Existing Images */}
             <div className="form-control mt-4">
               <label className="label">
                 <span className="label-text flex items-center gap-2">
                   <FiImage className="w-4 h-4" />
-                  Upload Images
+                  Current Images
+                </span>
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {updateWorkspace.existingImages?.map((image, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={image.image}
+                      alt={`Workspace ${index + 1}`}
+                      className="object-cover rounded-lg w-full h-32"
+                    />
+                    <button
+                      onClick={() => {
+                        setUpdateWorkspace((prev) => ({
+                          ...prev,
+                          existingImages: prev.existingImages.filter(
+                            (_, i) => i !== index
+                          ),
+                        }));
+                      }}
+                      className="absolute top-2 right-2 btn btn-circle btn-xs btn-error opacity-0 group-hover:opacity-100"
+                    >
+                      <FiX className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Upload New Images */}
+            <div className="form-control mt-4">
+              <label className="label">
+                <span className="label-text flex items-center gap-2">
+                  <FiImage className="w-4 h-4" />
+                  Upload New Images
                 </span>
               </label>
               <input
@@ -797,7 +817,8 @@ const WorkspacesManagerPage = () => {
               />
               <label className="label">
                 <span className="label-text-alt text-gray-500">
-                  You can upload multiple images. Supported formats: JPG, PNG
+                  You can upload multiple new images. Supported formats: JPG,
+                  PNG
                 </span>
               </label>
             </div>
@@ -920,7 +941,7 @@ const WorkspacesManagerPage = () => {
             </div>
 
             {/* Images */}
-            {viewWorkspace.WorkspaceImages && 
+            {viewWorkspace.WorkspaceImages &&
               viewWorkspace.WorkspaceImages.length > 0 && (
                 <div className="mt-6">
                   <h4 className="font-semibold text-lg mb-2">Images</h4>
@@ -928,7 +949,7 @@ const WorkspacesManagerPage = () => {
                     {viewWorkspace.WorkspaceImages.map((image, index) => (
                       <div key={index} className="relative aspect-video">
                         <img
-                          src={image}
+                          src={image.image}
                           alt={`Workspace ${index + 1}`}
                           className="object-cover rounded-lg w-full h-full"
                         />
@@ -991,7 +1012,11 @@ const WorkspacesManagerPage = () => {
                   <td>{ws.workspace_id}</td>
                   <td>{ws.workspace_name}</td>
                   <td>
-                    <span className={`badge ${ws.status === 'active' ? 'badge-success' : 'badge-error'}`}>
+                    <span
+                      className={`badge ${
+                        ws.status === "active" ? "badge-success" : "badge-error"
+                      }`}
+                    >
                       {ws.status}
                     </span>
                   </td>
@@ -1006,7 +1031,9 @@ const WorkspacesManagerPage = () => {
                       className={`btn btn-sm ${
                         ws.status === "inactive" ? "btn-success" : "btn-error"
                       }`}
-                      onClick={() => handleDeleteWorkspace(ws.workspace_id, ws.status)}
+                      onClick={() =>
+                        handleDeleteWorkspace(ws.workspace_id, ws.status)
+                      }
                     >
                       {ws.status === "inactive" ? "Unblock" : "Block"}
                     </button>

@@ -14,6 +14,9 @@ import { AuthContext } from "../../../context/auth.context";
 import { useNavigate } from "react-router-dom";
 import "./BookingRoom.scss";
 import DiscountCodeForm from "../DiscountCode/DiscountCodeForm ";
+// import Wishlist from "../Wishlist/Wishlist";
+import { MdWorkspaces } from "react-icons/md";
+import WishlistButton from "../WishlistButton/WishlistButton";
 
 const BookingRoom = (props) => {
   // Props room data
@@ -237,254 +240,282 @@ const BookingRoom = (props) => {
   return (
     <>
       <ToastContainer />
-      <div className="room-name-container flex items-center">
-        <h1 className="room-name text-3xl font-black tracking-tight sm:text-5xl text-left">
-          {roomData?.workspace_name}
-        </h1>
-        <div className="status-badge badge badge-success text-white text-xl p-5 font-bold ml-6">
-          Available
-        </div>
-      </div>
-      <div className="type-capacity-container">
-        <div className="flex justify-between font-semibold">
-          <div>Type: </div>
-          <div>{workSpaceTypeName}</div>
-        </div>
-        <div className=" flex justify-between font-semibold">
-          <div>Capacity: </div>
-          <div>{roomData?.capacity} seats</div>
-        </div>
-      </div>
 
-      <div role="tablist" className="tabs tabs-lifted">
-        {/* Tab for Hour */}
-
-        <input
-          type="radio"
-          name="booking_tabs"
-          role="tab"
-          className="tab"
-          aria-label="Hourly"
-          defaultChecked={currentTab === "Hourly"}
-          onChange={() => setCurrentTab("Hourly")}
-        />
-        <div
-          role="tabpanel"
-          className={`tab-content bg-base-100 border-base-300 rounded-box p-6 ${
-            currentTab === "Hourly" ? "block" : "hidden"
-          }`}
-        >
-          {/* Price section */}
-          <div className="flex justify-between font-semibold items-center my-1">
-            <div>Price:</div>
-            <div className="text-amber-500 text-xl font-bold">
-              {roomData && formatCurrency(roomData?.price_per_hour)}/h
-            </div>
+      {/* Header Section */}
+      <div className="booking-detail flex flex-wrap items-start justify-between mb-8">
+        <div className="space-y-4  w-full">
+          <div className="flex items-center  justify-between ">
+            <h1 className="text-4xl font-bold">{roomData?.workspace_name}</h1>
+            <span className="badge badge-success badge-lg text-white p-4 font-bold mx-4">
+              Available
+            </span>
           </div>
 
-          <div className="flex justify-between font-semibold items-center my-1">
-            <div className="font-semibold mb-2">
-              Type Booking: <strong>{currentTab}</strong>
+          <div className="flex items-center space-x-6 w-full justify-between">
+            <div className="flex space-x-4">
+              <div className="flex items-center space-x-2">
+                <MdWorkspaces className="text-gray-500" />
+                <span className="text-gray-600">{workSpaceTypeName}</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 text-gray-500"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+                </svg>
+                <span className="text-gray-600">
+                  {roomData?.capacity} seats
+                </span>
+              </div>
+            </div>
+            <div>
+              <div className="flex items-center space-x-4">
+                <WishlistButton
+                  workspaceId={roomData.workspace_id}
+                  workspaceName={roomData.workspace_name}
+                />
+              </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Remaining Time section */}
-          <div className="font-semibold my-1">Remaining Time:</div>
+      <div className="card bg-base-100 shadow-xl">
+        <div className="card-body p-0">
+          <div role="tablist" className="tabs tabs-lifted">
+            {/* Tab for Hour */}
 
-          <div className="container mx-auto">
-            {/* Custom Date Picker */}
-            <div className="custom-date-time-container">
-              <div className="custom-date-picker">
-                <CustomDatePicker
-                  selectedDate={selectedDate}
-                  setSelectedDate={setSelectedDate}
+            <input
+              type="radio"
+              name="booking_tabs"
+              role="tab"
+              className="tab"
+              aria-label="Hourly"
+              defaultChecked={currentTab === "Hourly"}
+              onChange={() => setCurrentTab("Hourly")}
+            />
+            <div
+              role="tabpanel"
+              className={`tab-content bg-base-100 border-base-300 rounded-box p-6 ${
+                currentTab === "Hourly" ? "block" : "hidden"
+              }`}
+            >
+              {/* Price section */}
+              <div className="flex justify-between font-semibold items-center my-1">
+                <div>Price:</div>
+                <div className="text-amber-500 text-xl font-bold">
+                  {roomData && formatCurrency(roomData?.price_per_hour)}/h
+                </div>
+              </div>
+
+              <div className="flex justify-between font-semibold items-center my-1">
+                <div className="font-semibold mb-2">
+                  Type Booking: <strong>{currentTab}</strong>
+                </div>
+              </div>
+
+              {/* Remaining Time section */}
+              <div className="font-semibold my-1">Remaining Time:</div>
+
+              <div className="container mx-auto">
+                {/* Custom Date Picker */}
+                <div className="custom-date-time-container">
+                  <div className="custom-date-picker">
+                    <CustomDatePicker
+                      selectedDate={selectedDate}
+                      setSelectedDate={setSelectedDate}
+                      today={today}
+                    />
+                  </div>
+
+                  <div className="custom-time-picker">
+                    <TimeRangePicker
+                      selectedDate={selectedDate}
+                      today={today}
+                      startTime={startTime}
+                      setStartTime={setStartTime}
+                      endTime={endTime}
+                      setEndTime={setEndTime}
+                      convertTimeToMinutes={convertTimeToMinutes}
+                    />
+                  </div>
+                </div>
+
+                {/* Discount Code Input */}
+                {auth.isAuthenticated && (
+                  <DiscountCodeForm
+                    discountCode={discountCode}
+                    setDiscountCode={setDiscountCode}
+                    setDiscount={setDiscount}
+                    message={messageDiscount}
+                    setMessage={setMessageDiscount}
+                    setVoucherId={setVoucherId}
+                  />
+                )}
+
+                {/* Booking Summary */}
+
+                <BookingSummary
+                  handleOpenCloseModal={handleOpenCloseModal}
+                  price={roomData?.price_per_hour}
+                  numOfHours={numOfHours}
+                  amountText={amountText}
+                  setAmountText={setAmountText}
+                  amountPrice={amountPrice}
+                  setAmountPrice={setAmountPrice}
+                  discount={discount}
+                  total={total}
+                  setTotal={setTotal}
+                  subtotal={subtotal}
+                  setSubtotal={setSubtotal}
+                  tax={tax}
+                  setTax={setTax}
+                />
+              </div>
+            </div>
+
+            {/* Tab for day */}
+
+            <input
+              type="radio"
+              name="booking_tabs"
+              role="tab"
+              className="tab"
+              aria-label="Daily"
+              checked={currentTab === "Daily"}
+              onChange={() => setCurrentTab("Daily")}
+            />
+            <div
+              role="tabpanel"
+              className={`tab-content bg-base-100 border-base-300 rounded-box p-6 ${
+                currentTab === "Daily" ? "block" : "hidden"
+              }`}
+            >
+              <div className=" flex justify-between font-semibold items-center my-1">
+                <div>Price: </div>
+                <div className="text-amber-500 text-xl font-bold">
+                  {roomData && formatCurrency(roomData?.price_per_day)}/day
+                </div>
+              </div>
+              <div className="flex justify-between font-semibold items-center my-1">
+                <div className="font-semibold mb-2">
+                  Type Booking: <strong>{currentTab}</strong>
+                </div>
+              </div>
+              <div className="font-semibold mt-1 mb-2 ">Remaining Time: </div>
+              <div className="my-4">
+                <DateRangePicker
+                  startDate={startDate}
+                  endDate={endDate}
+                  setStartDate={setStartDate}
+                  setEndDate={setEndDate}
                   today={today}
                 />
               </div>
 
-              <div className="custom-time-picker">
-                <TimeRangePicker
-                  selectedDate={selectedDate}
-                  today={today}
-                  startTime={startTime}
-                  setStartTime={setStartTime}
-                  endTime={endTime}
-                  setEndTime={setEndTime}
-                  convertTimeToMinutes={convertTimeToMinutes}
+              {auth.isAuthenticated && (
+                <DiscountCodeForm
+                  discountCode={discountCode}
+                  setDiscountCode={setDiscountCode}
+                  setDiscount={setDiscount}
+                  message={messageDiscount}
+                  setMessage={setMessageDiscount}
+                  setVoucherId={setVoucherId}
                 />
-              </div>
-            </div>
+              )}
 
-            {/* Discount Code Input */}
-            {auth.isAuthenticated && (
-              <DiscountCodeForm
-                discountCode={discountCode}
-                setDiscountCode={setDiscountCode}
-                setDiscount={setDiscount}
-                message={messageDiscount}
-                setMessage={setMessageDiscount}
-                setVoucherId={setVoucherId}
+              <BookingSummary
+                handleOpenCloseModal={handleOpenCloseModal}
+                price={roomData?.price_per_day}
+                numOfDays={numOfDays}
+                amountText={amountText}
+                setAmountText={setAmountText}
+                amountPrice={amountPrice}
+                setAmountPrice={setAmountPrice}
+                discount={discount}
+                total={total}
+                setTotal={setTotal}
+                subtotal={subtotal}
+                setSubtotal={setSubtotal}
+                tax={tax}
+                setTax={setTax}
               />
-            )}
+            </div>
 
-            {/* Booking Summary */}
+            {/* Tab for Month */}
 
-            <BookingSummary
-              handleOpenCloseModal={handleOpenCloseModal}
-              price={roomData?.price_per_hour}
-              numOfHours={numOfHours}
-              amountText={amountText}
-              setAmountText={setAmountText}
-              amountPrice={amountPrice}
-              setAmountPrice={setAmountPrice}
-              discount={discount}
-              total={total}
-              setTotal={setTotal}
-              subtotal={subtotal}
-              setSubtotal={setSubtotal}
-              tax={tax}
-              setTax={setTax}
+            <input
+              type="radio"
+              name="booking_tabs"
+              role="tab"
+              className="tab"
+              aria-label="Monthly"
+              checked={currentTab === "Monthly"}
+              onChange={() => setCurrentTab("Monthly")}
             />
-          </div>
-        </div>
+            <div
+              role="tabpanel"
+              className={`tab-content bg-base-100 border-base-300 rounded-box p-6 ${
+                currentTab === "Monthly" ? "block" : "hidden"
+              }`}
+            >
+              <div className=" flex justify-between font-semibold items-center my-1">
+                <div>Price: </div>
+                <div className="text-amber-500 text-xl font-bold">
+                  {roomData && formatCurrency(roomData?.price_per_month)}/month
+                </div>
+              </div>
+              <div className="flex justify-between font-semibold items-center my-1">
+                <div className="font-semibold mb-2">
+                  Type Booking: <strong>{currentTab}</strong>
+                </div>
+              </div>
+              <div className="font-semibold mt-1 mb-2">Remaining Time: </div>
+              <div className="pb-4">
+                <MonthRangePicker
+                  startDate={startDate}
+                  setStartDate={setStartDate}
+                  endDate={endDate}
+                  setEndDate={setEndDate}
+                  numOfMonths={numOfMonths}
+                  setNumOfMonths={setNumOfMonths}
+                  today={today}
+                  setAmountPrice={setAmountPrice}
+                />
+              </div>
 
-        {/* Tab for day */}
+              {auth.isAuthenticated && (
+                <DiscountCodeForm
+                  discountCode={discountCode}
+                  setDiscountCode={setDiscountCode}
+                  setDiscount={setDiscount}
+                  message={messageDiscount}
+                  setMessage={setMessageDiscount}
+                  setVoucherId={setVoucherId}
+                />
+              )}
 
-        <input
-          type="radio"
-          name="booking_tabs"
-          role="tab"
-          className="tab"
-          aria-label="Daily"
-          checked={currentTab === "Daily"}
-          onChange={() => setCurrentTab("Daily")}
-        />
-        <div
-          role="tabpanel"
-          className={`tab-content bg-base-100 border-base-300 rounded-box p-6 ${
-            currentTab === "Daily" ? "block" : "hidden"
-          }`}
-        >
-          <div className=" flex justify-between font-semibold items-center my-1">
-            <div>Price: </div>
-            <div className="text-amber-500 text-xl font-bold">
-              {roomData && formatCurrency(roomData?.price_per_day)}/day
+              <BookingSummary
+                handleOpenCloseModal={handleOpenCloseModal}
+                price={roomData?.price_per_month}
+                numOfMonths={numOfMonths}
+                amountText={amountText}
+                setAmountText={setAmountText}
+                amountPrice={amountPrice}
+                setAmountPrice={setAmountPrice}
+                discount={discount}
+                total={total}
+                setTotal={setTotal}
+                subtotal={subtotal}
+                setSubtotal={setSubtotal}
+                tax={tax}
+                setTax={setTax}
+              />
             </div>
           </div>
-          <div className="flex justify-between font-semibold items-center my-1">
-            <div className="font-semibold mb-2">
-              Type Booking: <strong>{currentTab}</strong>
-            </div>
-          </div>
-          <div className="font-semibold mt-1 mb-2 ">Remaining Time: </div>
-          <div className="my-4">
-            <DateRangePicker
-              startDate={startDate}
-              endDate={endDate}
-              setStartDate={setStartDate}
-              setEndDate={setEndDate}
-              today={today}
-            />
-          </div>
-
-          {auth.isAuthenticated && (
-            <DiscountCodeForm
-              discountCode={discountCode}
-              setDiscountCode={setDiscountCode}
-              setDiscount={setDiscount}
-              message={messageDiscount}
-              setMessage={setMessageDiscount}
-              setVoucherId={setVoucherId}
-            />
-          )}
-
-          <BookingSummary
-            handleOpenCloseModal={handleOpenCloseModal}
-            price={roomData?.price_per_day}
-            numOfDays={numOfDays}
-            amountText={amountText}
-            setAmountText={setAmountText}
-            amountPrice={amountPrice}
-            setAmountPrice={setAmountPrice}
-            discount={discount}
-            total={total}
-            setTotal={setTotal}
-            subtotal={subtotal}
-            setSubtotal={setSubtotal}
-            tax={tax}
-            setTax={setTax}
-          />
-        </div>
-
-        {/* Tab for Month */}
-
-        <input
-          type="radio"
-          name="booking_tabs"
-          role="tab"
-          className="tab"
-          aria-label="Monthly"
-          checked={currentTab === "Monthly"}
-          onChange={() => setCurrentTab("Monthly")}
-        />
-        <div
-          role="tabpanel"
-          className={`tab-content bg-base-100 border-base-300 rounded-box p-6 ${
-            currentTab === "Monthly" ? "block" : "hidden"
-          }`}
-        >
-          <div className=" flex justify-between font-semibold items-center my-1">
-            <div>Price: </div>
-            <div className="text-amber-500 text-xl font-bold">
-              {roomData && formatCurrency(roomData?.price_per_month)}/month
-            </div>
-          </div>
-          <div className="flex justify-between font-semibold items-center my-1">
-            <div className="font-semibold mb-2">
-              Type Booking: <strong>{currentTab}</strong>
-            </div>
-          </div>
-          <div className="font-semibold mt-1 mb-2">Remaining Time: </div>
-          <div className="pb-4">
-            <MonthRangePicker
-              startDate={startDate}
-              setStartDate={setStartDate}
-              endDate={endDate}
-              setEndDate={setEndDate}
-              numOfMonths={numOfMonths}
-              setNumOfMonths={setNumOfMonths}
-              today={today}
-              setAmountPrice={setAmountPrice}
-            />
-          </div>
-
-          {auth.isAuthenticated && (
-            <DiscountCodeForm
-              discountCode={discountCode}
-              setDiscountCode={setDiscountCode}
-              setDiscount={setDiscount}
-              message={messageDiscount}
-              setMessage={setMessageDiscount}
-              setVoucherId={setVoucherId}
-            />
-          )}
-
-          <BookingSummary
-            handleOpenCloseModal={handleOpenCloseModal}
-            price={roomData?.price_per_month}
-            numOfMonths={numOfMonths}
-            amountText={amountText}
-            setAmountText={setAmountText}
-            amountPrice={amountPrice}
-            setAmountPrice={setAmountPrice}
-            discount={discount}
-            total={total}
-            setTotal={setTotal}
-            subtotal={subtotal}
-            setSubtotal={setSubtotal}
-            tax={tax}
-            setTax={setTax}
-          />
         </div>
       </div>
 

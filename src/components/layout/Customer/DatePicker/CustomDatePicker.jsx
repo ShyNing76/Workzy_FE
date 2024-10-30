@@ -11,7 +11,6 @@ const CustomDatePicker = (props) => {
   const handleDateChange = (date) => {
     // Đặt giờ, phút, giây và mili giây về 0 để tránh vấn đề về timezone
     const newDate = new Date(date);
-    newDate.setHours(0, 0, 0, 0);
     setSelectedDate(newDate);
   };
 

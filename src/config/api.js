@@ -342,6 +342,27 @@ const getVoucherValid = (voucher_code) => {
   return axios.get(URL_API);
 };
 
+const postAddToWishList = (workspace_id) => {
+  const URL_API = `api/v1/wishList`;
+  const data = {
+    workspace_id,
+  };
+
+  return axios.post(URL_API, data);
+};
+
+const deleteFromWishList = (wishList_id) => {
+  const URL_API = `api/v1/wishList/${wishList_id}`;
+
+  return axios.delete(URL_API);
+};
+
+const getNotificationOfCustomer = (limit, page) => {
+  const URL_API = `api/v1/customer/notification?limit=${limit}&page=${page}&order[]=created_at&order[]=desc`;
+
+  return axios.get(URL_API);
+};
+
 export {
   loginApi,
   registerApi,
@@ -384,4 +405,7 @@ export {
   postApprovePaypalOrderBrokenAmenities,
   getReviewByBookingId,
   getVoucherValid,
+  postAddToWishList,
+  deleteFromWishList,
+  getNotificationOfCustomer,
 };
