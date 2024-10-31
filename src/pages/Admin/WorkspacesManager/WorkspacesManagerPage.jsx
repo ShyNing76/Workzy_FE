@@ -21,6 +21,9 @@ import {
   FiPlus,
   FiEye,
 } from "react-icons/fi";
+import AddModal from "../../../components/layout/Admin/Modals/AddModal";
+import UpdateModal from "../../../components/layout/Admin/Modals/UpdateModal";
+import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal";
 
 const WorkspacesManagerPage = () => {
   const [workspaces, setWorkspaces] = useState([]);
@@ -218,7 +221,8 @@ const WorkspacesManagerPage = () => {
     setNewWorkspace({ ...newWorkspace, [e.target.name]: e.target.value });
   };
 
-  const handleAddWorkspace = async () => {
+  const handleAddWorkspace = async (e) => {
+    e.preventDefault();
     try {
       const formData = new FormData();
       formData.append("workspace_name", newWorkspace.workspace_name);
@@ -342,6 +346,25 @@ const WorkspacesManagerPage = () => {
     }
   };
 
+  const [openModalDetails, setOpenModalDetails] = useState(false);
+  const [detailWorkspace, setDetailWorkspace] = useState(null);
+
+  const handleOpenModalDetails = (workspace) => {
+    const restructuredWorkspace = {
+      ...workspace,
+      images: workspace.WorkspaceImages.map((img) => img.image),
+    };
+    setDetailWorkspace(restructuredWorkspace);
+
+    console.log("detailWorkspace", detailWorkspace);
+    setOpenModalDetails(true);
+  };
+
+  const handleCloseModalDetails = () => {
+    setOpenModalDetails(false);
+    setDetailWorkspace(null);
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -352,494 +375,47 @@ const WorkspacesManagerPage = () => {
         </button>
       </div>
 
-      {/* Modal */}
-      {openModalAdd && (
-        <div className="modal modal-open">
-          <div className="modal-box max-w-3xl relative">
-            <button
-              className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-              onClick={handleCloseModalAdd}
-            >
-              <FiX className="w-5 h-5" />
-            </button>
-
-            <h3 className="font-bold text-2xl mb-6">Add New Workspace</h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Workspace Name */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiHome className="w-4 h-4" />
-                    Workspace Name
-                  </span>
-                </label>
-                <input
-                  type="text"
-                  name="workspace_name"
-                  placeholder="Enter workspace name"
-                  value={newWorkspace.workspace_name}
-                  onChange={handleAddChange}
-                  className="input input-bordered w-full"
-                />
-              </div>
-
-              {/* Building Selection */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiGrid className="w-4 h-4" />
-                    Building
-                  </span>
-                </label>
-                <select
-                  name="building_id"
-                  value={newWorkspace.building_id}
-                  onChange={handleAddChange}
-                  className="select select-bordered w-full"
-                >
-                  <option value="">Select Building</option>
-                  {buildings.map((building) => (
-                    <option
-                      key={building.building_id}
-                      value={building.building_id}
-                    >
-                      {building.building_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Workspace Type */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiGrid className="w-4 h-4" />
-                    Workspace Type
-                  </span>
-                </label>
-                <select
-                  name="workspace_type_id"
-                  value={newWorkspace.workspace_type_id}
-                  onChange={handleAddChange}
-                  className="select select-bordered w-full"
-                >
-                  <option value="">Select Workspace Type</option>
-                  {workspacesTypes.map((type) => (
-                    <option
-                      key={type.workspace_type_id}
-                      value={type.workspace_type_id}
-                    >
-                      {type.workspace_type_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Price */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiDollarSign className="w-4 h-4" />
-                    Price per hour
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  name="price_per_hour"
-                  placeholder="Enter price"
-                  value={newWorkspace.price_per_hour}
-                  onChange={handleAddChange}
-                  className="input input-bordered w-full"
-                />
-              </div>
-
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiDollarSign className="w-4 h-4" />
-                    Price per day
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  name="price_per_day"
-                  placeholder="Enter price"
-                  value={newWorkspace.price_per_day}
-                  onChange={handleAddChange}
-                  className="input input-bordered w-full"
-                />
-              </div>
-
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiDollarSign className="w-4 h-4" />
-                    Price per month
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  name="price_per_month"
-                  placeholder="Enter price"
-                  value={newWorkspace.price_per_month}
-                  onChange={handleAddChange}
-                  className="input input-bordered w-full"
-                />
-              </div>
-
-              {/* Capacity */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiUsers className="w-4 h-4" />
-                    Capacity
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  name="capacity"
-                  placeholder="Enter capacity"
-                  value={newWorkspace.capacity}
-                  onChange={handleAddChange}
-                  className="input input-bordered w-full"
-                />
-              </div>
-
-              {/* Area */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiSquare className="w-4 h-4" />
-                    Area (sq ft)
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  name="area"
-                  placeholder="Enter area"
-                  value={newWorkspace.area}
-                  onChange={handleAddChange}
-                  className="input input-bordered w-full"
-                />
-              </div>
-            </div>
-
-            {/* Description - Full Width */}
-            <div className="form-control mt-4">
-              <label className="label">
-                <span className="label-text flex items-center gap-2">
-                  <FiFileText className="w-4 h-4" />
-                  Description
-                </span>
-              </label>
-              <textarea
-                name="description"
-                placeholder="Enter workspace description"
-                value={newWorkspace.description}
-                onChange={handleAddChange}
-                className="textarea textarea-bordered w-full min-h-[100px]"
-              />
-            </div>
-
-            {/* Images Upload - Full Width */}
-            <div className="form-control mt-4">
-              <label className="label">
-                <span className="label-text flex items-center gap-2">
-                  <FiImage className="w-4 h-4" />
-                  Upload Images
-                </span>
-              </label>
-              <input
-                type="file"
-                name="images"
-                multiple
-                onChange={handleFileChange}
-                className="file-input file-input-bordered w-full"
-              />
-              <label className="label">
-                <span className="label-text-alt text-gray-500">
-                  You can upload multiple images. Supported formats: JPG, PNG
-                </span>
-              </label>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="modal-action mt-6 flex justify-end gap-2">
-              <button className="btn btn-ghost" onClick={handleCloseModalAdd}>
-                Cancel
-              </button>
-              <button className="btn btn-primary" onClick={handleAddWorkspace}>
-                Add Workspace
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modal sử dụng AddModal */}
+      <AddModal
+        show={openModalAdd}
+        onClose={handleCloseModalAdd}
+        onSubmit={handleAddWorkspace}
+        currentItem={newWorkspace}
+        onInputChange={(e) => setNewWorkspace({ ...newWorkspace, [e.target.name]: e.target.value })}
+        fields={[
+          { name: "workspace_name", label: "Workspace Name", type: "text", required: true },
+          { name: "building_id", label: "Building", type: "select", options: buildings.map(b => ({ label: b.building_name, value: b.building_id })), required: true },
+          { name: "workspace_type_id", label: "Workspace Type", type: "select", options: workspacesTypes.map(t => ({ label: t.workspace_type_name, value: t.workspace_type_id })), required: true },
+          { name: "price_per_hour", label: "Price per Hour", type: "text", required: true },
+          { name: "price_per_day", label: "Price per Day", type: "text", required: true },
+          { name: "price_per_month", label: "Price per Month", type: "text", required: true },
+          { name: "capacity", label: "Capacity", type: "text", required: true },
+          { name: "area", label: "Area (sq ft)", type: "text", required: true },
+          { name: "description", label: "Description", type: "text", required: false },
+          { name: "images", label: "Upload Images", type: "file", multiple: true, required: false },
+        ]}
+      />
 
       {openModalUpdate && (
-        <div className="modal modal-open">
-          <div className="modal-box max-w-3xl relative">
-            <button
-              className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-              onClick={handleCloseModalUpdate}
-            >
-              <FiX className="w-5 h-5" />
-            </button>
-
-            <h3 className="font-bold text-2xl mb-6">Update Workspace</h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Workspace Name */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiHome className="w-4 h-4" />
-                    Workspace Name
-                  </span>
-                </label>
-                <input
-                  type="text"
-                  name="workspace_name"
-                  placeholder="Enter workspace name"
-                  value={updateWorkspace.workspace_name}
-                  onChange={handleUpdateChange}
-                  className="input input-bordered w-full"
-                />
-              </div>
-
-              {/* Building Selection */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiGrid className="w-4 h-4" />
-                    Building
-                  </span>
-                </label>
-                <select
-                  name="building_id"
-                  value={updateWorkspace.Building.building_id}
-                  onChange={handleUpdateChange}
-                  className="select select-bordered w-full"
-                >
-                  <option value="">Select Building</option>
-                  {buildings.map((building) => (
-                    <option
-                      key={building.building_id}
-                      value={building.building_id}
-                    >
-                      {building.building_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Workspace Type */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiGrid className="w-4 h-4" />
-                    Workspace Type
-                  </span>
-                </label>
-                <select
-                  name="workspace_type_id"
-                  value={updateWorkspace.workspace_type_id}
-                  onChange={handleUpdateChange}
-                  className="select select-bordered w-full"
-                >
-                  <option value="">Select Workspace Type</option>
-                  {workspacesTypes.map((type) => (
-                    <option
-                      key={type.workspace_type_id}
-                      value={type.workspace_type_id}
-                    >
-                      {type.workspace_type_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Price */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiDollarSign className="w-4 h-4" />
-                    Price per hour
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  name="price_per_hour"
-                  placeholder="Enter price"
-                  value={updateWorkspace.price_per_hour}
-                  onChange={handleUpdateChange}
-                  className="input input-bordered w-full"
-                />
-              </div>
-
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiDollarSign className="w-4 h-4" />
-                    Price per day
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  name="price_per_day"
-                  placeholder="Enter price"
-                  value={updateWorkspace.price_per_day}
-                  onChange={handleUpdateChange}
-                  className="input input-bordered w-full"
-                />
-              </div>
-
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiDollarSign className="w-4 h-4" />
-                    Price per month
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  name="price_per_month"
-                  placeholder="Enter price"
-                  value={updateWorkspace.price_per_month}
-                  onChange={handleUpdateChange}
-                  className="input input-bordered w-full"
-                />
-              </div>
-
-              {/* Capacity */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiUsers className="w-4 h-4" />
-                    Capacity
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  name="capacity"
-                  placeholder="Enter capacity"
-                  value={updateWorkspace.capacity}
-                  onChange={handleUpdateChange}
-                  className="input input-bordered w-full"
-                />
-              </div>
-
-              {/* Area */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiSquare className="w-4 h-4" />
-                    Area (sq ft)
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  name="area"
-                  placeholder="Enter area"
-                  value={updateWorkspace.area}
-                  onChange={handleUpdateChange}
-                  className="input input-bordered w-full"
-                />
-              </div>
-            </div>
-
-            {/* Description - Full Width */}
-            <div className="form-control mt-4">
-              <label className="label">
-                <span className="label-text flex items-center gap-2">
-                  <FiFileText className="w-4 h-4" />
-                  Description
-                </span>
-              </label>
-              <textarea
-                name="description"
-                placeholder="Enter workspace description"
-                value={updateWorkspace.description}
-                onChange={handleUpdateChange}
-                className="textarea textarea-bordered w-full min-h-[100px]"
-              />
-            </div>
-
-            {/* Existing Images */}
-            <div className="form-control mt-4">
-              <label className="label">
-                <span className="label-text flex items-center gap-2">
-                  <FiImage className="w-4 h-4" />
-                  Current Images
-                </span>
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {updateWorkspace.existingImages?.map((image, index) => (
-                  <div key={index} className="relative group">
-                    <img
-                      src={image.image}
-                      alt={`Workspace ${index + 1}`}
-                      className="object-cover rounded-lg w-full h-32"
-                    />
-                    <button
-                      onClick={() => {
-                        setUpdateWorkspace((prev) => ({
-                          ...prev,
-                          existingImages: prev.existingImages.filter(
-                            (_, i) => i !== index
-                          ),
-                        }));
-                      }}
-                      className="absolute top-2 right-2 btn btn-circle btn-xs btn-error opacity-0 group-hover:opacity-100"
-                    >
-                      <FiX className="w-3 h-3" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Upload New Images */}
-            <div className="form-control mt-4">
-              <label className="label">
-                <span className="label-text flex items-center gap-2">
-                  <FiImage className="w-4 h-4" />
-                  Upload New Images
-                </span>
-              </label>
-              <input
-                type="file"
-                name="images"
-                multiple
-                onChange={handleUpdateFileChange}
-                className="file-input file-input-bordered w-full"
-              />
-              <label className="label">
-                <span className="label-text-alt text-gray-500">
-                  You can upload multiple new images. Supported formats: JPG,
-                  PNG
-                </span>
-              </label>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="modal-action mt-6 flex justify-end gap-2">
-              <button
-                className="btn btn-ghost"
-                onClick={handleCloseModalUpdate}
-              >
-                Cancel
-              </button>
-              <button
-                className="btn btn-primary"
-                onClick={handleUpdateWorkspace}
-              >
-                Update Workspace
-              </button>
-            </div>
-          </div>
-        </div>
+        <UpdateModal
+          show={openModalUpdate}
+          onClose={handleCloseModalUpdate}
+          onSubmit={handleUpdateWorkspace}
+          currentItem={updateWorkspace}
+          onInputChange={handleUpdateChange}
+          fields={[
+            { name: "workspace_name", label: "Workspace Name", type: "text", required: true },
+            { name: "building_id", label: "Building", type: "select", options: buildings.map(b => ({ label: b.building_name, value: b.building_id })), required: true },
+            { name: "workspace_type_id", label: "Workspace Type", type: "select", options: workspacesTypes.map(t => ({ label: t.workspace_type_name, value: t.workspace_type_id })), required: true },
+            { name: "price_per_hour", label: "Price per Hour", type: "text", required: true },
+            { name: "price_per_day", label: "Price per Day", type: "text", required: true },
+            { name: "price_per_month", label: "Price per Month", type: "text", required: true },
+            { name: "capacity", label: "Capacity", type: "text", required: true },
+            { name: "area", label: "Area (sq ft)", type: "text", required: true },
+            { name: "description", label: "Description", type: "text", required: false },
+            { name: "images", label: "Upload Images", type: "file", multiple: true, required: false },
+          ]}
+        />
       )}
 
       {openModalView && viewWorkspace && (
@@ -972,6 +548,14 @@ const WorkspacesManagerPage = () => {
         </div>
       )}
 
+      {openModalDetails && detailWorkspace && (
+        <DetailsModal
+          show={openModalDetails}
+          onClose={handleCloseModalDetails}
+          currentItem={detailWorkspace}
+        />
+      )}
+
       {/* Search Bar */}
       <div className="form-control mb-6">
         <div className="input-group">
@@ -1042,6 +626,12 @@ const WorkspacesManagerPage = () => {
                       onClick={() => handleOpenModalUpdate(ws)}
                     >
                       Edit
+                    </button>
+                    <button
+                      className="btn btn-sm btn-info"
+                      onClick={() => handleOpenModalDetails(ws)}
+                    >
+                      Details
                     </button>
                   </td>
                 </tr>
