@@ -134,7 +134,7 @@ const Navbar = (props) => {
       </div>
 
       <div className="navbar-end space-x-6 mr-4">
-        <div className="dropdown dropdown-hover dropdown-end">
+        {/* <div className="dropdown dropdown-hover dropdown-end">
           <div tabIndex={0} className="flex items-center justify-center">
             <img className="w-8 h-5" src={flagVN} />
             <RiArrowDropDownLine className="text-4xl" />
@@ -150,7 +150,7 @@ const Navbar = (props) => {
               <a>English</a>
             </li>
           </ul>
-        </div>
+        </div> */}
 
         {auth.isAuthenticated ? (
           <>

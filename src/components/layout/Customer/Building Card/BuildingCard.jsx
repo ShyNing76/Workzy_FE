@@ -9,7 +9,7 @@ const BuildingCard = (props) => {
   return (
     <div className="building-card" onMouseEnter={onHover}>
       <div className="image-building">
-        <img src={BuildingImage} alt="Workspace" />
+        <img src={dataBuilding?.BuildingImages[0]?.image} alt="Workspace" />
       </div>
       <div className="building-details">
         <h1 className="building-name">{dataBuilding.building_name}</h1>
