@@ -180,11 +180,11 @@ const MyWishlist = () => {
                 <div className="w-1/4 min-w-[200px]">
                   <img
                     src={
-                      item.workspace.WorkspaceImages.image ||
+                      item.workspace.WorkspaceImages[0].image ||
                       "https://placehold.co/300x200"
                     }
                     alt={item.workspace.workspace_name}
-                    className="h-full w-full object-cover"
+                    className="h-36 w-full object-cover"
                   />
                 </div>
 
@@ -215,7 +215,9 @@ const MyWishlist = () => {
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Price per hour:</span>
+                          <span className="text-gray-600">
+                            Price per hour:{" "}
+                          </span>
                           <span className="font-medium text-amber-600">
                             {formatCurrency(item.workspace.price_per_hour)}
                           </span>

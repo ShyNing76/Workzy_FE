@@ -19,7 +19,7 @@ const BookingDetailCard = (props) => {
         <figure className="m-6 mr-0 ">
           <img
             className="rounded-lg"
-            src={imageWorkspace}
+            src={workspace.WorkspaceImages[0].image}
             alt="Room"
             style={{ width: "150px", height: "150px" }}
           />

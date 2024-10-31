@@ -92,11 +92,21 @@ const TimeBooking = (props) => {
 
     const start = new Date(booking.start_time_date);
     const end = new Date(booking.end_time_date);
+    const durationInHours = (end - start) / (1000 * 60 * 60);
+
+    let duration;
+    if (durationInHours > 24 * 30) {
+      duration = `${Math.round(durationInHours / (24 * 30))} months`;
+    } else if (durationInHours > 24) {
+      duration = `${Math.round(durationInHours / 24)} days`;
+    } else {
+      duration = `${Math.round(durationInHours)} hours`;
+    }
 
     return {
       from: formatTime(start),
       to: formatTime(end),
-      duration: `${(end - start) / (1000 * 60 * 60)} hours`,
+      duration,
     };
   };
 

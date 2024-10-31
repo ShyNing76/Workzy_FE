@@ -36,8 +36,6 @@ const TimeRangePicker = (props) => {
         setCurrentTimeInMinutes(0); // 00:00 tương đương với 0 phút
       }
     }
-
-    console.log(selectedDate);
   }, [selectedDate, today]);
 
   return (
