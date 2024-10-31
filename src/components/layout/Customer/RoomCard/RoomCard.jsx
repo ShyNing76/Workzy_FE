@@ -14,7 +14,7 @@ const RoomCard = ({ workspace, image }) => {
         {/* Image Container */}
         <div className="relative h-48 overflow-hidden">
           <img
-            src={image}
+            src={workspace?.WorkspaceImages[0]?.image}
             alt={workspace.workspace_name}
             className="h-full w-full object-cover"
           />

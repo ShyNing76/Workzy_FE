@@ -48,7 +48,7 @@ const SimilarRooms = ({
   if (!similarRooms.length) return null;
 
   return (
-    <div className=" py-12 px-8 mx-auto max-w-7xl">
+    <div className="similar-workspace py-12 px-8 mx-auto max-w-7xl">
       {/* Header Section */}
       <div className="mb-8 flex items-center justify-between px-4 sm:px-0">
         <div>

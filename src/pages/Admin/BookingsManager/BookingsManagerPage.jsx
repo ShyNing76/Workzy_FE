@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { getAllBooking } from "../../../config/api.admin";
-import { FiFilter } from "react-icons/fi";
 import { format } from "date-fns";
+import { formatCurrency } from "../../../components/context/priceFormat";
+import BookingDetailsModal from "../../../components/layout/Admin/Modals/BookingDetailModal";
+import {
+  FiFilter,
+  FiSearch,
+  FiMapPin,
+  FiClock,
+  FiCalendar,
+} from "react-icons/fi";
 const BookingsManagerPage = () => {
   const [bookings, setBookings] = useState([]);
   const [filterLocation, setFilterLocation] = useState("");
@@ -9,6 +17,7 @@ const BookingsManagerPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Fetch bookings data
   useEffect(() => {
@@ -51,9 +60,10 @@ const BookingsManagerPage = () => {
         : true)
   );
   // Open modal truyền vào 1 booking để hiển thị chi tiết booking đó
-  const handleOpenModal = (selectedBooking) => {
+  const handleOpenModal = (selectedBooking, bookingId) => {
     // param: selectedBooking là booking được chọn để hiển thị chi tiết
     setSelectedBooking(selectedBooking); // set selectedBooking là booking được chọn
+    setBookingId(bookingId);
     setOpenModal(true); // set openModal là true để hiển thị modal
   };
 
@@ -62,6 +72,7 @@ const BookingsManagerPage = () => {
     // đóng modal
     setSelectedBooking(null); // set selectedBooking là null
     setOpenModal(false); // set openModal là false để đóng modal
+    setBookingId(null);
   };
 
   // Tính thời gian thuê
@@ -105,33 +116,111 @@ const BookingsManagerPage = () => {
         </div>
 
         {/* Filters Card */}
-        <div className="card bg-base-100">
+        <div className="card bg-base-100 shadow-lg mb-6">
           <div className="card-body">
-            <h2 className="card-title">
-              <FiFilter />
-              Filters
-            </h2>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <select
-                className="select select-bordered w-full max-w-xs"
-                value={filterLocation}
-                onChange={(e) => setFilterLocation(e.target.value)}
-              >
-                <option value="">All Locations</option>
-                <option value="HCM">Ho Chi Minh City</option>
-                <option value="Hanoi">Hanoi</option>
-              </select>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="p-2 bg-primary/10 rounded-full">
+                <FiFilter className="w-5 h-5 text-primary" />
+              </div>
+              <h2 className="card-title text-xl font-bold">Advanced Filters</h2>
+              <div className="badge badge-primary badge-outline">
+                {filteredBookings.length} results
+              </div>
+            </div>
 
-              <select
-                className="select select-bordered w-full max-w-xs"
-                value={filterBookingType}
-                onChange={(e) => setFilterBookingType(e.target.value)}
-              >
-                <option value="">All Booking Types</option>
-                <option value="Hourly">Hourly</option>
-                <option value="Daily">Daily</option>
-                <option value="Monthly">Monthly</option>
-              </select>
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+              {/* Search Box - spans 6 columns */}
+              <div className="form-control md:col-span-6">
+                <div className="join w-full">
+                  <div className="join-item bg-base-200 px-3 flex items-center">
+                    <FiSearch className="w-5 h-5 text-base-content/70" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search by ID, workspace, or building..."
+                    className="input input-bordered join-item w-full"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Location Filter - spans 3 columns */}
+              <div className="form-control md:col-span-3">
+                <div className="join w-full">
+                  <div className="join-item bg-base-200 px-3 flex items-center">
+                    <FiMapPin className="w-5 h-5 text-base-content/70" />
+                  </div>
+                  <select
+                    className="select select-bordered join-item w-full"
+                    value={filterLocation}
+                    onChange={(e) => setFilterLocation(e.target.value)}
+                  >
+                    <option value="">All Locations</option>
+                    <option value="HCM">Ho Chi Minh City</option>
+                    <option value="Hanoi">Hanoi</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Booking Type Filter - spans 3 columns */}
+              <div className="form-control md:col-span-3">
+                <div className="join w-full">
+                  <div className="join-item bg-base-200 px-3 flex items-center">
+                    <FiClock className="w-5 h-5 text-base-content/70" />
+                  </div>
+                  <select
+                    className="select select-bordered join-item w-full"
+                    value={filterBookingType}
+                    onChange={(e) => setFilterBookingType(e.target.value)}
+                  >
+                    <option value="">All Booking Types</option>
+                    <option value="Hourly">Hourly</option>
+                    <option value="Daily">Daily</option>
+                    <option value="Monthly">Monthly</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Filter Tags */}
+              <div className="md:col-span-12 flex flex-wrap gap-2">
+                {filterLocation && (
+                  <div className="badge badge-primary gap-2">
+                    <FiMapPin className="w-4 h-4" />
+                    {filterLocation}
+                    <button
+                      className="btn btn-xs btn-ghost btn-circle"
+                      onClick={() => setFilterLocation("")}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+                {filterBookingType && (
+                  <div className="badge badge-primary gap-2">
+                    <FiClock className="w-4 h-4" />
+                    {filterBookingType}
+                    <button
+                      className="btn btn-xs btn-ghost btn-circle"
+                      onClick={() => setFilterBookingType("")}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+                {searchQuery && (
+                  <div className="badge badge-primary gap-2">
+                    <FiSearch className="w-4 h-4" />
+                    Search: {searchQuery}
+                    <button
+                      className="btn btn-xs btn-ghost btn-circle"
+                      onClick={() => setSearchQuery("")}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -143,7 +232,6 @@ const BookingsManagerPage = () => {
               <thead>
                 <tr>
                   <th>Index</th>
-                  <th>Booking ID</th>
                   <th>Building Name</th>
                   <th>Workspace Name</th>
                   <th>Booking Type</th>
@@ -158,7 +246,6 @@ const BookingsManagerPage = () => {
                 {filteredBookings.map((booking, index) => (
                   <tr key={booking.booking_id}>
                     <td>{index + 1}</td>
-                    <td>{booking.booking_id}</td>
                     <td>{booking.Workspace.Building.building_name}</td>
                     <td>{booking.Workspace.workspace_name}</td>
                     <td>{booking.BookingType.type}</td>
@@ -202,10 +289,10 @@ const BookingsManagerPage = () => {
                         </div>
                       )}
                     </td>
-                    <td>{booking.total_price}</td>
+                    <td>{formatCurrency(booking.total_price)}</td>
                     <td>
                       <button
-                        className="btn btn-sm hover:bg-green-500"
+                        className="btn btn-sm hover:bg-gray-500"
                         onClick={() => handleOpenModal(booking)}
                       >
                         Details
@@ -231,151 +318,11 @@ const BookingsManagerPage = () => {
         )}
 
         {/* Modal */}
-        {/*nếu openModal là true và selectedBooking khác null thì hiển thị modal*/}
         {openModal && selectedBooking && (
-          <dialog id="my_modal_3" className="modal open" open>
-            <div className="modal-box">
-              <form method="dialog">
-                <button
-                  className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-                  onClick={handleCloseModal}
-                >
-                  ✕
-                </button>
-              </form>
-              <h1 className="font-bold text-lg" style={{ color: "#f0ae44" }}>
-                Booking Details
-              </h1>
-              <h2 className="py-4">
-                <span className="font-bold" style={{ color: "#000" }}>
-                  Booking ID:
-                </span>{" "}
-                {selectedBooking.booking_id}
-              </h2>
-              <hr />
-
-              {/*User info*/}
-              <section className="text-md">
-                <h4 className="font-semibold">Customer Infomation</h4>
-                <p className="py-4">
-                  User Name: {selectedBooking.Customer.User.name}
-                </p>
-                <p className="py-4">
-                  User Email: {selectedBooking.Customer.User.email}
-                </p>
-                <p className="py-4">
-                  Wy point: {selectedBooking.Customer.point}
-                </p>
-              </section>
-              <hr />
-
-              {/*Workspace info*/}
-              <section className="text-md">
-                <h4 className="font-semibold">Workspace Infomation</h4>
-                <p className="py-4">
-                  Building Name:{" "}
-                  {selectedBooking.Workspace.Building.building_name}
-                </p>
-                <p className="py-4">
-                  Workspace Name: {selectedBooking.Workspace.workspace_name}
-                </p>
-                <p className="py-4">
-                  Price per hour: {selectedBooking.workspace_price}
-                </p>
-              </section>
-
-              <hr />
-
-              {/*Booking info*/}
-              <section className="text-md">
-                <h4 className="font-semibold">Booking workspace and Amenities Infomation</h4>
-                <p className="py-4">
-                  Booking Type: {selectedBooking.BookingType.type}
-                </p>
-                <p className="py-4">
-                  Start Time:{" "}
-                  {format(
-                    new Date(selectedBooking.start_time_date),
-                    "dd/MM/yyyy HH:mm"
-                  )}
-                </p>
-                <p className="py-4">
-                  End Time:{" "}
-                  {format(
-                    new Date(selectedBooking.end_time_date),
-                    "dd/MM/yyyy HH:mm"
-                  )}{" "}
-                </p>
-                <p className="py-4">
-                  Rent Time: {CalculateTime(selectedBooking.start_time_date, selectedBooking.end_time_date)} hours
-                </p>
-                <p className="py-4">
-                  Total workspace price: {selectedBooking.total_workspace_price}
-                </p>
-                <hr />
-
-                {/*Amenities info*/}
-                {selectedBooking.Amenities.length > 0 ? (
-                  <section className="text-md">
-                    <h4 className="font-semibold">Amenities Infomation</h4>
-                    {selectedBooking.Amenities.map((amenity, index) => (
-                      <div key={index} className="mb-1">
-                        <p className="py-3">
-                          Amenity {index + 1}: {amenity.amenity_name}
-                        </p>
-                        <p className="py-3">
-                          Quantity: {amenity.BookingAmenities.quantity}
-                        </p>
-                        <p className="py-3">
-                          Rent Price: {amenity.rent_price}
-                        </p>
-                        <p className="py-3">
-                          Status: {amenity.status}
-                        </p>
-                      </div>
-                      
-                    ))}
-                    <p className="py-4">
-                      Total Amenities Price: {selectedBooking.total_amenities_price}
-                    </p>
-                  </section>
-                ) : (
-                  <p className="py-4">No amenities</p>
-                )}
-              </section>
-              <hr />
-              <p className="py-4">
-                Booking Status:
-                {selectedBooking.BookingStatuses.length > 0 ? (
-                  <div
-                    className={`badge text-sm mx-1 my-1 rounded-lg shadow-md ${
-                      selectedBooking.BookingStatuses[0].status === "usage"
-                        ? "badge-accent"
-                        : selectedBooking.BookingStatuses[0].status === "paid"
-                        ? "badge-warning"
-                        : selectedBooking.BookingStatuses[0].status ===
-                          "cancelled"
-                        ? "badge-error"
-                        : selectedBooking.BookingStatuses[0].status ===
-                          "check-amenities"
-                        ? "badge-primary"
-                        : selectedBooking.BookingStatuses[0].status ===
-                          "completed"
-                        ? "badge-info"
-                        : "badge-neutral"
-                    }`}
-                  >
-                    {selectedBooking.BookingStatuses[0].status}
-                  </div>
-                ) : (
-                  <div className="badge badge-neutral text-lg mx-1 my-1 rounded-lg shadow-md">
-                    N/A
-                  </div>
-                )}
-              </p>
-              <p className="py-4">Total Price: {selectedBooking.total_price}</p>
-            </div>
-          </dialog>
+          <BookingDetailsModal
+            booking={selectedBooking}
+            onClose={handleCloseModal}
+          />
         )}
       </div>
     </div>

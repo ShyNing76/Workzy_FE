@@ -65,7 +65,7 @@ const BookingCard = (props) => {
       <figure className="m-6 mr-0 ">
         <img
           className="rounded-lg"
-          src={imageWorkspace}
+          src={workspace.WorkspaceImages[0].image}
           alt="Room"
           style={{ width: "250px", height: "250px" }}
         />
@@ -110,7 +110,7 @@ const BookingCard = (props) => {
         </div>
 
         <p>
-          <strong>Type</strong>: {type.type}
+          <strong>Type</strong>: {type && type.type}
         </p>
         <p>
           <strong>Total</strong>: {formatCurrency(booking.total_price)}

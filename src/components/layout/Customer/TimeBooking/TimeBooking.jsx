@@ -92,11 +92,21 @@ const TimeBooking = (props) => {
 
     const start = new Date(booking.start_time_date);
     const end = new Date(booking.end_time_date);
+    const durationInHours = (end - start) / (1000 * 60 * 60);
+
+    let duration;
+    if (durationInHours > 24 * 30) {
+      duration = `${Math.round(durationInHours / (24 * 30))} months`;
+    } else if (durationInHours > 24) {
+      duration = `${Math.round(durationInHours / 24)} days`;
+    } else {
+      duration = `${Math.round(durationInHours)} hours`;
+    }
 
     return {
       from: formatTime(start),
       to: formatTime(end),
-      duration: `${(end - start) / (1000 * 60 * 60)} hours`,
+      duration,
     };
   };
 
@@ -137,8 +147,8 @@ const TimeBooking = (props) => {
   }
 
   return (
-    <>
-      <h2 className="text-2xl font-bold mb-4 mt-4 text-gray-800">
+    <div className="time-booking">
+      <h2 className=" text-2xl font-bold mb-4 mt-4 text-gray-800">
         Available Time Slots ({format(selectedDate, "dd-MM-yyyy")})
       </h2>
       <div className="w-full p-4 ">
@@ -206,7 +216,7 @@ const TimeBooking = (props) => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

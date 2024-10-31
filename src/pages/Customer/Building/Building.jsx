@@ -10,7 +10,6 @@ import {
 import Carousel from "../../../components/layout/Customer/Carousel/Carousel";
 import RoomCard from "../../../components/layout/Customer/RoomCard/RoomCard";
 import FilterBar from "../../../components/layout/Customer/FilterBar/FilterBar";
-import buildingImage from "../../../assets/8.jpg";
 import {
   getAllWorkspacesByBuildingId,
   getBuildingById,
@@ -45,13 +44,7 @@ const Building = () => {
   const maxPrice = searchParams.get("maxPrice") || "";
   const workSpaceType = searchParams.get("workspaceType") || "";
 
-  const images = [
-    "https://picsum.photos/500/300?random=1",
-    "https://picsum.photos/500/300?random=2",
-    "https://picsum.photos/500/300?random=3",
-    "https://picsum.photos/500/300?random=4",
-    "https://picsum.photos/500/300?random=5",
-  ];
+  const [images, setImages] = useState([]);
 
   useEffect(() => {
     const fetchBuildingData = async () => {
@@ -61,6 +54,7 @@ const Building = () => {
 
         if (res && res.data && res.err === 0) {
           setBuildingData(res.data);
+          setImages(res.data.BuildingImages);
         } else {
           navigate("/404");
         }
@@ -167,11 +161,15 @@ const Building = () => {
               </div>
 
               {/* Hình ảnh */}
-              <div className="building-img flex justify-center items-center border">
+              <div className="building-img flex justify-center items-center border rounded-3xl">
                 <img
-                  src={buildingImage}
+                  src={buildingData && buildingData?.BuildingImages[0]?.image}
                   alt="Building"
-                  className="max-w-full h-full"
+                  style={{
+                    height: 600,
+                    width: 1000,
+                  }}
+                  className="rounded-3xl"
                 />
               </div>
             </div>
@@ -218,7 +216,7 @@ const Building = () => {
                 <RoomCard
                   key={`workspace-${workspace.workspace_id}`}
                   workspace={workspace}
-                  image={`https://picsum.photos/500/300?random=${index}`}
+                  // image={`https://picsum.photos/500/300?random=${index}`}
                 />
               ))
             ) : (

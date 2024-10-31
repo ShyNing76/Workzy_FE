@@ -16,41 +16,42 @@ const MembershipPage = () => {
   const [selectedTier, setSelectedTier] = useState("Bronze");
   const [currentTier, setCurrentTier] = useState("Bronze");
   const [isHovering, setIsHovering] = useState(null);
+  const [hoverTier, setHoverTier] = useState(null);
 
   const membershipTiers = {
     Bronze: {
       name: "Bronze",
       benefits:
         "Ưu đãi cơ bản cho thành viên mới. Giảm giá 5% trên các dịch vụ thuê phòng.",
-      color: "text-amber-500",
+      color: "#f59e0b", //text-amber-500
       bgGradient: "from-amber-200 to-amber-100",
     },
     Silver: {
       name: "Silver",
       benefits:
         "Ưu đãi cho thành viên Silver. Giảm giá 10%, miễn phí một số dịch vụ tiện ích.",
-      color: "text-gray-400",
+      color: " #9ca3af", //text-gray-400
       bgGradient: "from-gray-200 to-gray-100",
     },
     Gold: {
       name: "Gold",
       benefits:
         "Ưu đãi cao cấp cho thành viên Gold. Giảm giá 15%, phòng họp miễn phí.",
-      color: "text-yellow-400",
+      color: "#facc15 ", //text-yellow-400
       bgGradient: "from-yellow-200 to-yellow-100",
     },
     Emerald: {
       name: "Emerald",
       benefits:
         "Ưu đãi đặc biệt cho thành viên Emerald. Giảm giá 20%, không giới hạn dịch vụ.",
-      color: "text-emerald-500",
+      color: "#10b981", //text-emerald-500
       bgGradient: "from-emerald-200 to-emerald-100",
     },
     Diamond: {
       name: "Diamond",
       benefits:
         "Ưu đãi cao nhất cho thành viên Diamond. Giảm giá 30%, ưu tiên đặt phòng VIP.",
-      color: "text-blue-400",
+      color: "#60a5fa ", //text-blue-400
       bgGradient: "from-blue-200 to-blue-100",
     },
   };
@@ -63,14 +64,19 @@ const MembershipPage = () => {
     const determineTier = () => {
       if (currentPoints >= tierPoints.Diamond) {
         setCurrentTier("Diamond");
+        setSelectedTier("Diamond");
       } else if (currentPoints >= tierPoints.Emerald) {
         setCurrentTier("Emerald");
+        setSelectedTier("Emerald");
       } else if (currentPoints >= tierPoints.Gold) {
         setCurrentTier("Gold");
+        setSelectedTier("Gold");
       } else if (currentPoints >= tierPoints.Silver) {
         setCurrentTier("Silver");
+        setSelectedTier("Silver");
       } else {
         setCurrentTier("Bronze");
+        setSelectedTier("Bronze");
       }
     };
     determineTier();
@@ -136,7 +142,10 @@ const MembershipPage = () => {
                 className="inline-block"
               >
                 <BsFillHexagonFill
-                  className={`text-8xl ${membershipTiers[currentTier].color} mx-auto`}
+                  className={`text-8xl mx-auto`}
+                  style={{
+                    color: `${membershipTiers[currentTier].color}`,
+                  }}
                 />
               </motion.div>
               <h3 className="text-2xl font-bold mt-4">
@@ -166,9 +175,10 @@ const MembershipPage = () => {
                   initial={{ width: 0 }}
                   animate={{ width: `${calculateProgress()}%` }}
                   transition={{ duration: 1 }}
-                  className={`h-full ${membershipTiers[
-                    currentTier
-                  ].color.replace("text", "bg")}`}
+                  className={`h-full `}
+                  style={{
+                    backgroundColor: `${membershipTiers[currentTier].color}`,
+                  }}
                 />
               </div>
               {currentTier !== "Diamond" && (
@@ -193,14 +203,29 @@ const MembershipPage = () => {
                         ? `bg-gradient-to-r ${info.bgGradient}`
                         : "bg-gray-50"
                     }
-                    hover:shadow-md`}
-                  onClick={() => handleTierClick(tier)}
+                    hover:${
+                      hoverTier === tier
+                        ? `shadow-md bg-gradient-to-r ${info.bgGradient}`
+                        : "bg-gray-50"
+                    }`}
+                  // onClick={() => handleTierClick(tier)}
                   whileHover={{ scale: 1.02 }}
-                  onHoverStart={() => setIsHovering(tier)}
-                  onHoverEnd={() => setIsHovering(null)}
+                  onHoverStart={() => {
+                    setIsHovering(tier);
+                    setHoverTier(tier);
+                  }}
+                  onHoverEnd={() => {
+                    setIsHovering(null);
+                    setHoverTier(null);
+                  }}
                 >
                   <div className="flex items-center gap-4">
-                    <BsFillHexagonFill className={`text-2xl ${info.color}`} />
+                    <BsFillHexagonFill
+                      className={`text-2xl`}
+                      style={{
+                        color: `${info.color}`,
+                      }}
+                    />
                     <div>
                       <h4 className="font-semibold">{info.name}</h4>
                       <p className="text-sm text-gray-600 mt-1">

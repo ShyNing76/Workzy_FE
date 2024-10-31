@@ -1,11 +1,8 @@
-import {
-  IoLogOutOutline,
-} from "react-icons/io5";
+import { IoLogOutOutline } from "react-icons/io5";
 
 import { useContext } from "react";
 import { AuthContext } from "../../../context/auth.context";
 import { Link, useNavigate } from "react-router-dom";
-import logoWorkzy from "../../../../../public/WORKZY_LOGO_BGR.png";
 
 const AdminHeader = () => {
   const { auth, setAuth, setRoleId } = useContext(AuthContext);
@@ -34,7 +31,11 @@ const AdminHeader = () => {
                 color: "#1f2937",
               }}
             >
-              <img src={logoWorkzy} alt="logo" className="w-20 h-20" />
+              <img
+                src="../../../../../WORKZY_LOGO_BGR.png"
+                alt="logo"
+                className="w-20 h-20"
+              />
               <span> WORKZY ADMIN</span>
             </div>
           </Link>

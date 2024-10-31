@@ -16,6 +16,7 @@ import { getAmenityIcon } from "../../../components/context/iconGenerate";
 import SimilarRooms from "../../../components/layout/Customer/SimilarRoom/SimilarRooms";
 import WorkspaceReview from "../../../components/layout/Customer/WorkspaceReview/WorkspaceReview";
 import TimeBooking from "../../../components/layout/Customer/TimeBooking/TimeBooking";
+import RoomDetailTour from "../../../components/layout/Customer/RoomDetailTour/RoomDetailTour";
 
 const RoomDetail = () => {
   const { roomid } = useParams();
@@ -130,10 +131,11 @@ const RoomDetail = () => {
     <>
       {!isLoading ? (
         <>
+          <RoomDetailTour />
           <div className="detail-room-container mx-auto grid max-w-2xl grid-cols-1 items-start gap-x-8 gap-y-16 px-4 py-24 sm:px-6 sm:py-10 lg:max-w-7xl lg:grid-cols-2 lg:px-8">
             <div className="detail-room-container-left-col">
               <div className="gallery-contain">
-                <GallerySwiper />
+                <GallerySwiper images={roomData.WorkspaceImages} />
               </div>
 
               {currentTab === "Hourly" && (

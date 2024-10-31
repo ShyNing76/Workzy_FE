@@ -1,7 +1,16 @@
 import { useLocation } from "react-router-dom";
 import React, { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 
-import { getBuilding, getManager, postBuilding, putBuilding, assignManagerToBuilding, removeManagerFromBuilding, deleteBuilding } from "../../../config/api.admin";
+import {
+  getBuilding,
+  getBuildingById,
+  postNewBuilding,
+  getManager,
+  changeBuildingStatus,
+  putBuilding,
+  getManagerById,
+} from "../../../config/api.admin";
 import AddModal from "../../../components/layout/Admin/Modals/AddModal";
 import DeleteModal from "../../../components/layout/Admin/Modals/DeleteModal.jsx";
 import UpdateModal from "../../../components/layout/Admin/Modals/UpdateModal";
@@ -10,6 +19,7 @@ import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.
 import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
 import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
 import BlockButton from "../../../components/layout/Admin/Buttons/BlockButton.jsx";
+import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal.jsx";
 
 const BuildingManagerPage = () => {
   const location = useLocation();
@@ -18,33 +28,33 @@ const BuildingManagerPage = () => {
   const [error, setError] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [buildingToDelete, setBuildingToDelete] = useState(null);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [successMessage, setSuccessMessage] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [locationFilter, setLocationFilter] = useState("all");
+  const [selectedBuildingDetails, setSelectedBuildingDetails] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [newBuilding, setNewBuilding] = useState({
-    building_name: '',
-    location: '',
-    address: '',
-    rating: 0,
-    images: [],
-    description: '',
-    status: 'active',
-    google_address: ''
+    building_name: "",
+    location: "",
+    address: "",
+    rating: 5,
+    image: [],
+    description: "",
+    status: "active",
+    google_address: "",
   });
   const [updateBuilding, setUpdateBuilding] = useState({
-    building_name: '',
-    location: '',
-    address: '',
-    rating: 0,
+    building_name: "",
+    location: "",
+    address: "",
+    rating: 5,
     images: [],
-    description: '',
-    status: 'active',
-    google_address: ''
+    description: "",
+    status: "active",
+    google_address: "",
+    remove_images: [],
   });
-  const [managers, setManagers] = useState([]);
 
   // Fetch building và managers
   const fetchBuilding = async () => {
@@ -58,89 +68,142 @@ const BuildingManagerPage = () => {
     }
   };
 
-  const fetchManagers = async () => {
-    try {
-      const res = await getManager();
-      setManagers(res.data || []);
-    } catch (err) {
-      console.error("Failed to fetch managers:", err);
-    }
-  };
-
   useEffect(() => {
     fetchBuilding();
-    fetchManagers();
   }, []);
 
-    // Utility function to get manager name by ID
-    const getManagerNameById = (managerId) => {
-      const manager = managers.find(manager => manager.user_id === managerId);
-      return manager ? manager.name : 'N/A';
+  const handleRowClick = async (building) => {
+    const buildingDetails = {
+      ...building,
+      manager_name: building?.Manager?.User?.name || "None",
+      location: getDisplayLocation(building.location),
+      images: building.BuildingImages || null,
     };
+
+    setSelectedBuildingDetails(buildingDetails);
+    console.log("Building Details:", buildingDetails);
+    setShowDetailsModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedBuildingDetails(null);
+    setShowDetailsModal(false);
+  };
+
+  const getDisplayLocation = (location) => {
+    const locationMappings = {
+      HCM: "Hồ Chí Minh",
+      Hanoi: "Hà Nội",
+    };
+    return locationMappings[location] || location;
+  };
 
   // Extract unique locations from the buildings
   const getUniqueLocations = () => {
     if (!building) return [];
-    return ["all", ...new Set(building.map(b => b.location))];
+    return ["all", ...new Set(building.map((b) => b.location))];
   };
 
   // Xử lý thêm building
   const handleAddBuilding = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
 
+    const formData = new FormData();
     for (let key in newBuilding) {
-      if (key === 'images' && newBuilding.images.length > 0) {
-        Array.from(newBuilding.images).forEach(file => formData.append('images', file));
+      if (key === "image") {
+        Array.from(newBuilding.image).forEach((file) =>
+          formData.append("images", file)
+        );
       } else {
         formData.append(key, newBuilding[key]);
       }
     }
 
     try {
-      const Building = await postBuilding(formData);
-      if (Building && Building.data) {
-        fetchBuilding();
+      const response = await postNewBuilding(formData);
+      // Handle successful addition
+      if (response && response.err === 0) {
         setShowAddModal(false);
-        setSuccessMessage('Building added successfully!');
-        setNewBuilding({
-          building_name: '',
-          location: '',
-          address: '',
-          rating: 0,
-          images: [],
-          description: '',
-          status: 'active',
-          google_address: ''
+        fetchBuilding(); // Refresh the building list
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: response.message,
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: response.message,
         });
       }
     } catch (err) {
-      console.error('Failed to add building:', err);
+      console.error("Failed to add building:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "An unexpected error occurred while adding the building.",
+      });
     }
   };
 
   const addBuildingFields = [
-    { name: "building_name", label: "Building Name", type: "text", value: `${newBuilding.building_name}` },
-    { name: "location", label: "Location", type: "text", value: `${newBuilding.location}` },
-    { name: "address", label: "Address", type: "text", value: `${newBuilding.address}` },
-    { name: "rating", label: "Rating", type: "number", value: `${newBuilding.rating}` },
-    { name: 'google_address', label: 'Google Address', type: 'text', value: `${newBuilding.google_address}` },
-    { name: "description", label: "Description", type: "text", value: `${newBuilding.description}` },
-    { name: 'images', label: 'Images', type: 'file', multiple: true }
+    {
+      name: "building_name",
+      label: "Building Name",
+      type: "text",
+      value: `${newBuilding.building_name}`,
+    },
+    {
+      name: "location",
+      label: "Location",
+      type: "select",
+      options: [
+        { value: "HCM", label: "Hồ Chí Minh" },
+        { value: "Hanoi", label: "Hà Nội" },
+      ],
+      value: `${newBuilding.location}`,
+    },
+    {
+      name: "address",
+      label: "Address",
+      type: "text",
+      value: `${newBuilding.address}`,
+    },
+    {
+      name: "google_address",
+      label: "Google Address",
+      type: "text",
+      value: `${newBuilding.google_address}`,
+    },
+    {
+      name: "description",
+      label: "Description",
+      type: "text",
+      value: `${newBuilding.description}`,
+    },
+    { name: "image", label: "Images", type: "file", multiple: true },
   ];
 
-  
+  const handleInputChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "image") {
+      setNewBuilding({ ...newBuilding, image: Array.from(value) });
+    } else {
+      setNewBuilding({ ...newBuilding, [name]: value });
+    }
+  };
 
   const resetNewBuilding = () => {
     setNewBuilding({
-      building_name: '',
-      location: '',
-      address: '',
-      rating: 0,
-      google_address: '',
-      description: '',
-      image: null,
-      status: 'active'
+      building_name: "",
+      location: "",
+      address: "",
+      rating: 5,
+      google_address: "",
+      description: "",
+      images: [],
+      status: "active",
     });
   };
 
@@ -149,112 +212,224 @@ const BuildingManagerPage = () => {
     e.preventDefault();
     const formData = new FormData();
 
-    for (let key in updateBuilding) {
-      if (key === 'images' && updateBuilding.images.length > 0) {
-        Array.from(updateBuilding.images).forEach(file => formData.append('images', file));
-      } else {
-        formData.append(key, updateBuilding[key]);
-      }
+    // Add basic fields
+    formData.append("building_name", updateBuilding.building_name || "");
+    formData.append("location", updateBuilding.location || "");
+    formData.append("address", updateBuilding.address || "");
+    formData.append("google_address", updateBuilding.google_address || "");
+    formData.append("description", updateBuilding.description || "");
+    formData.append("rating", parseInt(updateBuilding.rating) || 0);
+    formData.append("status", updateBuilding.status || "");
+
+    // Handle images
+    if (updateBuilding.images && updateBuilding.images.length > 0) {
+      updateBuilding.images.forEach((image) => {
+        if (image instanceof File) {
+          formData.append("images", image);
+        } else if (
+          typeof image === "string" &&
+          (!updateBuilding.remove_images ||
+            !updateBuilding.remove_images.includes(image))
+        ) {
+          formData.append("images", image);
+        }
+      });
+    }
+
+    // Add removed images to formData
+    if (
+      updateBuilding.remove_images &&
+      updateBuilding.remove_images.length > 0
+    ) {
+      updateBuilding.remove_images.forEach((image) => {
+        formData.append("remove_images", image);
+      });
+    }
+
+    // Log formData contents for debugging
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
     }
 
     try {
-      await putBuilding(updateBuilding.building_id, formData);
-      if (updateBuilding.manager_id) {
-        await assignManagerToBuilding(updateBuilding.building_id, updateBuilding.manager_id);
-      } else {
-        await removeManagerFromBuilding(updateBuilding.building_id);
+      const response = await putBuilding(updateBuilding.building_id, formData);
+      if (response && response.err === 0) {
+        setShowUpdateModal(false);
+        fetchBuilding();
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: response.message,
+        });
       }
-      fetchBuilding();
-      setShowUpdateModal(false);
-      setSuccessMessage('Building updated successfully!');
     } catch (err) {
-      console.error("Error updating building:", err);
-    }
-  };
-
-  // Xử lý xóa building
-  const handleDeleteBuilding = async () => {
-    if (!buildingToDelete) return;
-
-    try {
-      await deleteBuilding(buildingToDelete.building_id);
-      fetchBuilding();
-      setShowDeleteModal(false);
-      setSuccessMessage('Building deleted successfully!');
-    } catch (err) {
-      console.error('Failed to delete building:', err);
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === 'images') {
-      setNewBuilding({ ...newBuilding, images: files });
-    } else {
-      setNewBuilding({ ...newBuilding, [name]: value });
+      console.error("Failed to update building:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "An unexpected error occurred while updating the building.",
+      });
     }
   };
 
   const handleUpdateChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === 'images') {
-      setUpdateBuilding({ ...updateBuilding, images: files });
-    } else {
-      setUpdateBuilding({ ...updateBuilding, [name]: value });
+    const { name, type, files, value } = e.target;
+
+    setUpdateBuilding((prev) => {
+      if (type === "file") {
+        const newFiles = Array.from(files);
+        return {
+          ...prev,
+          images: [...(prev.images || []), ...newFiles],
+        };
+      } else if (name === "images") {
+        // Nhận danh sách ảnh mới từ modal
+        return {
+          ...prev,
+          images: value,
+        };
+      } else if (name === "remove_images") {
+        // Nhận danh sách ảnh đã xóa từ modal
+        return {
+          ...prev,
+          remove_images: value,
+        };
+      }
+      return {
+        ...prev,
+        [name]: value,
+      };
+    });
+  };
+
+  const updateBuildingFields = [
+    {
+      name: "building_name",
+      label: "Building Name",
+      type: "text",
+      value: `${updateBuilding.building_name}`,
+    },
+    {
+      name: "location",
+      label: "Location",
+      type: "select",
+      options: [
+        { value: "HCM", label: "Hồ Chí Minh" },
+        { value: "Hanoi", label: "Hà Nội" },
+      ],
+      value: `${newBuilding.location}`,
+    },
+    {
+      name: "address",
+      label: "Address",
+      type: "text",
+      value: `${updateBuilding.address}`,
+    },
+    {
+      name: "google_address",
+      label: "Google Address",
+      type: "text",
+      value: `${updateBuilding.google_address}`,
+    },
+    {
+      name: "description",
+      label: "Description",
+      type: "text",
+      value: `${updateBuilding.description}`,
+    },
+    {
+      name: "images", // Đổi thành images thay vì image
+      label: "Images",
+      type: "file",
+      multiple: true,
+    },
+  ];
+
+  // Xử lý status building
+
+  const handleChangeStatus = async (building) => {
+    const newStatus = building.status === "active" ? "inactive" : "active";
+
+    try {
+      const response = await changeBuildingStatus(
+        building.building_id,
+        newStatus
+      );
+      if (response && response.err === 0) {
+        fetchBuilding();
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: `Building status changed to ${newStatus}.`,
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: response.message || "Failed to change status.",
+        });
+      }
+    } catch (err) {
+      console.error("Failed to change building status:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "An unexpected error occurred while changing the building status.",
+      });
     }
   };
 
-
-  const updateBuildingFields = [
-    { name: "location", label: "Location", type: "text", value: `${updateBuilding.location}` },
-    { name: "address", label: "Address", type: "text", value: `${updateBuilding.address}` },
-    { name: "rating", label: "Rating", type: "number", value: `${updateBuilding.rating}` },
-    { name: 'google_address', label: 'Google Address', type: 'text', value: `${updateBuilding.google_address}` },
-    { name: "description", label: "Description", type: "text", value: `${updateBuilding.description}` },
-    { name: 'images', label: 'Images', type: 'file', multiple: true }
-  ];
-
   const filteredBuilding = Array.isArray(building)
-  ? building.filter((item) => {
-      const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
-      const matchesSearchTerm = item.building_name.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchesStatus && matchesSearchTerm;
-    })
-  : [];
+    ? building.filter((item) => {
+        const matchesStatus =
+          statusFilter === "all" || item.status === statusFilter;
+        const matchesSearchTerm = item.building_name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+        const matchesLocation =
+          locationFilter === "all" || item.location === locationFilter;
+        return matchesStatus && matchesSearchTerm && matchesLocation;
+      })
+    : [];
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-4xl font-black mb-4">Building List</h1>
 
-      <div className="grid grid-cols-2">
-        <div className="ml-2">
-        <SearchBar
-          searchTerm={searchTerm}
-          handleSearchChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search by Building Name"
-        />
-          
-          <AddButton onClick={() => {
-            resetNewBuilding();
-            setShowAddModal(true)
-          }} 
-            label="Add Building" />
+      <div className="flex justify-between items-center my-4">
+        <div className="flex-grow mr-4">
+          <SearchBar
+            searchTerm={searchTerm}
+            handleSearchChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search by Building Name"
+          />
         </div>
+        <AddButton
+          onClick={() => {
+            resetNewBuilding();
+            setShowAddModal(true);
+          }}
+          label="Add Building"
+        />
       </div>
 
-      <div className="flex justify-end mr-2">
+      <div className="flex mr-2">
+        <div className="form-control w-full max-w-xs">
           <select
+            className="select select-bordered select-sm w-full max-w-xs"
             value={locationFilter}
             onChange={(e) => setLocationFilter(e.target.value)}
-            className="px-4 py-2 border rounded-md"
           >
             {getUniqueLocations().map((location, index) => (
               <option key={index} value={location}>
-                {location === "all" ? "All Locations" : location}
+                {location === "all"
+                  ? "All Locations"
+                  : getDisplayLocation(location)}
               </option>
             ))}
           </select>
         </div>
+      </div>
 
       <div className="overflow-x-auto flex flex-1">
         <table className="table w-full">
@@ -270,32 +445,53 @@ const BuildingManagerPage = () => {
           </thead>
           <tbody>
             {filteredBuilding.map((building) => (
-                <tr key={building.building_id}>
-                  <td>{building.building_name}</td>
-                  <td>{getManagerNameById(building.manager_id)}</td>
-                  <td>{building.location}</td>
-                  <td>{building.address}</td>
-                  <td>{building.status}</td>
+              <tr key={building.building_id} className="hover:bg-gray-100 ">
+                <td>{building.building_name}</td>
+                <td>{building?.Manager?.User?.name || "None"}</td>
+                <td>{getDisplayLocation(building.location)}</td>
+                <td>{building.address}</td>
+                <td>
+                  <div
+                    className={`badge uppercase w-20 font-bold text-gray-100 ${
+                      building.status === "active"
+                        ? "badge-success"
+                        : "badge-error"
+                    }`}
+                  >
+                    {" "}
+                    {building.status}
+                  </div>
+                </td>
 
-                  <td className="flex space-x-2">
-                    <UpdateButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setUpdateBuilding(building);
-                        setShowUpdateModal(true);
-                      }}
-                    />
-
-                    <DeleteButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setBuildingToDelete(building);
-                        setShowDeleteModal(true);
-                      }}
-                    />
-                  </td>
-                </tr>
-              ))}
+                <td className="flex space-x-2">
+                  <button
+                    className="btn btn-info btn-sm w-20"
+                    onClick={() => handleRowClick(building)}
+                  >
+                    Details
+                  </button>
+                  <UpdateButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Restructure the building object
+                      const restructuredBuilding = {
+                        ...building,
+                        images: building.BuildingImages.map((img) => img.image),
+                      };
+                      setUpdateBuilding(restructuredBuilding);
+                      setShowUpdateModal(true);
+                    }}
+                  />
+                  <BlockButton
+                    status={building.status}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleChangeStatus(building);
+                    }}
+                  />
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -320,12 +516,10 @@ const BuildingManagerPage = () => {
         successMessage={successMessage}
       />
 
-      <DeleteModal
-        show={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onSubmit={handleDeleteBuilding}
-        itemToDelete={buildingToDelete}
-        successMessage={successMessage}
+      <DetailsModal
+        show={showDetailsModal}
+        onClose={handleCloseModal}
+        currentItem={selectedBuildingDetails}
       />
     </div>
   );

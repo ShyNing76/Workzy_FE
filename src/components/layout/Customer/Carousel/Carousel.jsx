@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./Carousel.scss";
 // Import Swiper styles and components
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -29,7 +29,12 @@ const Carousel = (props) => {
     >
       {images.map((image, index) => (
         <SwiperSlide key={`Swiper-slide-${index}`}>
-          <img src={image} alt="Slide 1" />
+          <img
+            style={{ height: 280 }}
+            className="w-full"
+            src={image.image}
+            alt="Slide 1"
+          />
         </SwiperSlide>
       ))}
     </Swiper>

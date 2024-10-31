@@ -9,7 +9,6 @@ const formatKey = (key) => {
 
 const ImagePreviewModal = ({ imageSrc }) => {
   if (!imageSrc) return null;
-
   return (
     <dialog id="image_preview_modal" className="modal">
       <div className="modal-box max-w-5xl w-11/12 p-0 bg-base-100 relative">
@@ -20,7 +19,7 @@ const ImagePreviewModal = ({ imageSrc }) => {
         </form>
         <figure className="w-full">
           <img
-            src={imageSrc}
+            src={typeof imageSrc === "string" ? imageSrc : imageSrc[0]}
             alt="Preview"
             className="w-full h-auto max-h-[80vh] object-contain"
           />
@@ -46,24 +45,38 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
 
   if (!show) return null;
 
-  const hasImage = currentItem?.image;
+  const hasImage = Array.isArray(currentItem?.images)
+    ? currentItem.images.length > 0
+    : false;
 
-  const openImagePreview = () => {
+  const openImagePreview = (imageSrc) => {
     const modal = document.getElementById("image_preview_modal");
     if (modal) {
+      document.getElementById("image_preview_modal").querySelector("img").src =
+        imageSrc;
       modal.showModal();
     }
   };
 
+  console.log(currentItem);
+
   return (
     <>
-      <ImagePreviewModal imageSrc={currentItem?.image} />
+      <ImagePreviewModal
+        imageSrc={
+          hasImage
+            ? currentItem.images.map((img) => img.image)
+            : currentItem.image
+            ? currentItem.image
+            : null
+        }
+      />
 
       <div className="modal modal-open">
-        <div className="modal-box max-w-4xl w-11/12 p-0 bg-base-100">
+        <div className="modal-box max-w-6xl w-11/12 p-0 bg-base-100">
           {/* Header */}
           <div className="flex justify-between items-center p-4 border-b border-base-300">
-            <h2 className="text-2xl font-bold">Chi tiết</h2>
+            <h2 className="text-2xl font-bold">Details</h2>
             <button
               onClick={onClose}
               className="btn btn-ghost btn-circle btn-sm hover:bg-base-200"
@@ -72,61 +85,89 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
             </button>
           </div>
 
-          {/* Content Area */}
-          <div className="p-6 space-y-6">
-            {/* Image Preview Card */}
-            {hasImage && (
-              <div className="card bg-base-200 shadow-lg overflow-hidden">
-                <figure
-                  className="relative group cursor-pointer"
-                  onClick={openImagePreview}
+          {/* Split Layout Container */}
+          <div className="flex flex-col md:flex-row h-[calc(100vh-300px)]">
+            {/* Left Side - Details */}
+            <div className="md:w-1/2 h-full p-6 flex flex-col items-center justify-center bg-base-200">
+              {hasImage ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full">
+                  {currentItem.images.map((img, index) => (
+                    <div
+                      key={index}
+                      className="relative group cursor-pointer rounded-lg overflow-hidden bg-white shadow-lg"
+                      onClick={() => openImagePreview(img.image)}
+                    >
+                      <img
+                        src={img.image}
+                        alt={`Preview ${index}`}
+                        className="w-full h-[150px] object-cover transform transition-transform duration-300 hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-black/0 hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
+                        <div className="bg-white/90 p-3 rounded-full transform hover:scale-110 transition-transform">
+                          <BsZoomIn className="w-6 h-6" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : typeof currentItem.image == "string" ? (
+                <div
+                  className="relative group cursor-pointer rounded-lg overflow-hidden bg-white shadow-lg"
+                  onClick={() => openImagePreview(currentItem.image)}
                 >
                   <img
                     src={currentItem.image}
-                    alt="Preview"
-                    className="w-full h-[300px] object-cover transform transition-transform duration-300 hover:scale-105"
+                    alt={`Preview`}
+                    className="w-full h-[150px] object-cover transform transition-transform duration-300 hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-black/0 hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
                     <div className="bg-white/90 p-3 rounded-full transform hover:scale-110 transition-transform">
                       <BsZoomIn className="w-6 h-6" />
                     </div>
                   </div>
-                </figure>
-              </div>
-            )}
+                </div>
+              ) : (
+                <div className="text-base-content/50 text-center">
+                  No image available
+                </div>
+              )}
+            </div>
 
-            {/* Details List with Custom Scrollbar */}
-            <div className="overflow-y-auto max-h-[400px] pr-2 scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-100">
+            {/* Right Side - Details */}
+            <div className="md:w-1/2 p-6 border-r border-base-300 overflow-y-auto scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-100">
               <div className="divide-y divide-base-200">
-                {currentItem &&
-                  Object.entries(currentItem)
-                    .filter(
-                      ([key]) =>
-                        key !== "Manager" &&
-                        key !== "Staff" &&
-                        key !== "google_token" &&
-                        key !== "User" &&
-                        key !== "image"
-                    )
-                    .map(([key, value]) => (
-                      <div
-                        key={key}
-                        className="grid grid-cols-2 gap-4 py-3 px-4 hover:bg-base-200/50 rounded-lg transition-colors duration-200"
-                      >
-                        <span className="font-medium text-base-content">
-                          {formatKey(key)}
-                        </span>
-                        <span className="text-base-content/80 text-right break-words">
-                          {value === null
-                            ? "N/A"
-                            : typeof value === "object"
-                            ? JSON.stringify(value, null, 2)
-                            : Array.isArray(value)
-                            ? value.join(", ")
-                            : value}
-                        </span>
+                {Object.entries(currentItem)
+                  .filter(
+                    ([key]) =>
+                      key !== "images" &&
+                      key !== "Manager" &&
+                      key !== "Staff" &&
+                      key !== "google_token" &&
+                      key !== "User" &&
+                      key !== "image" &&
+                      key !== "manager_id" &&
+                      key !== "BuildingImages" &&
+                      key !== "WorkspaceImages"
+                  )
+                  .map(([key, value]) => (
+                    <div
+                      key={key}
+                      className="py-3 px-4 hover:bg-base-200/50 rounded-lg transition-colors duration-200"
+                    >
+                      <div className="font-medium text-base-content mb-1">
+                        {formatKey(key)}
                       </div>
-                    ))}
+                      <div className="text-base-content/80 break-words">
+                        {value === null
+                          ? "N/A"
+                          : typeof value === "object"
+                          ? JSON.stringify(value, null, 2)
+                          : Array.isArray(value)
+                          ? value.join(", ")
+                          : value}
+                      </div>
+                    </div>
+                  ))}
               </div>
             </div>
           </div>
@@ -134,7 +175,7 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
           {/* Footer */}
           <div className="modal-action px-6 py-4 border-t border-base-300">
             <button className="btn btn-primary" onClick={onClose}>
-              Đóng
+              Close
             </button>
           </div>
         </div>
@@ -150,7 +191,10 @@ DetailsModal.propTypes = {
 };
 
 ImagePreviewModal.propTypes = {
-  imageSrc: PropTypes.string,
+  imageSrc: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.arrayOf(PropTypes.string),
+  ]),
 };
 
 export default DetailsModal;

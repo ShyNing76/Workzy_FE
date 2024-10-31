@@ -1,5 +1,8 @@
 import { useState } from "react";
 import OfficeLocations from "../../../components/layout/Customer/OfficeLocation/OfficeLocation";
+import { postSendEmailContact } from "../../../config/api";
+import Swal from "sweetalert2";
+import { toast, ToastContainer } from "react-toastify";
 
 const contactPage = () => {
   const [formData, setFormData] = useState({
@@ -8,18 +11,34 @@ const contactPage = () => {
     message: "",
   });
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Xử lý logic gửi form ở đây
-    console.log(formData);
+    try {
+      setIsLoading(true);
+      const res = await postSendEmailContact(formData);
+
+      if (res && res.err === 0) {
+        toast.success("Send Email Successful !!!");
+      } else {
+        toast.error(res.message);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <>
+      <ToastContainer />
       <section className="bg-gray-100 py-12 px-4" id="contact">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center">
           {/* Section Title */}
@@ -94,6 +113,9 @@ const contactPage = () => {
                 </div>
 
                 <button type="submit" className="btn btn-neutral w-full">
+                  {isLoading && (
+                    <span className="loading loading-spinner"></span>
+                  )}
                   Send Message
                 </button>
               </form>

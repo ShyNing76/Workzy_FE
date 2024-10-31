@@ -242,7 +242,7 @@ const BookingRoom = (props) => {
       <ToastContainer />
 
       {/* Header Section */}
-      <div className="flex flex-wrap items-start justify-between mb-8">
+      <div className="booking-detail flex flex-wrap items-start justify-between mb-8">
         <div className="space-y-4  w-full">
           <div className="flex items-center  justify-between ">
             <h1 className="text-4xl font-bold">{roomData?.workspace_name}</h1>

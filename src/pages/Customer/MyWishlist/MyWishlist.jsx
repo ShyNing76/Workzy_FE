@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { getWorkspaceById } from "../../../config/api.admin";
 import { formatCurrency } from "../../../components/context/priceFormat";
 import Swal from "sweetalert2";
+import { FaRegHeart } from "react-icons/fa";
 
 const MyWishlist = () => {
   const [wishlists, setWishlists] = useState([]);
@@ -155,19 +156,7 @@ const MyWishlist = () => {
       {wishlists.length === 0 ? (
         <div className="text-center py-12">
           <div className="mb-4">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              />
-            </svg>
+            <FaRegHeart className="mx-auto h-12 w-12 text-gray-400" />
           </div>
           <h3 className="text-xl font-medium text-gray-900 mb-1">
             Your wishlist is empty
@@ -191,11 +180,11 @@ const MyWishlist = () => {
                 <div className="w-1/4 min-w-[200px]">
                   <img
                     src={
-                      item.workspace.WorkspaceImages.image ||
+                      item.workspace.WorkspaceImages[0].image ||
                       "https://placehold.co/300x200"
                     }
                     alt={item.workspace.workspace_name}
-                    className="h-full w-full object-cover"
+                    className="h-36 w-full object-cover"
                   />
                 </div>
 
@@ -226,7 +215,9 @@ const MyWishlist = () => {
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Price per hour:</span>
+                          <span className="text-gray-600">
+                            Price per hour:{" "}
+                          </span>
                           <span className="font-medium text-amber-600">
                             {formatCurrency(item.workspace.price_per_hour)}
                           </span>

@@ -363,6 +363,12 @@ const getNotificationOfCustomer = (limit, page) => {
   return axios.get(URL_API);
 };
 
+const postSendEmailContact = (formData) => {
+  const URL_API = `api/v1/notification/sendMail`;
+
+  return axios.post(URL_API, formData);
+};
+
 export {
   loginApi,
   registerApi,
@@ -408,4 +414,5 @@ export {
   postAddToWishList,
   deleteFromWishList,
   getNotificationOfCustomer,
+  postSendEmailContact,
 };
