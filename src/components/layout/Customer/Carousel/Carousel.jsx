@@ -29,7 +29,12 @@ const Carousel = (props) => {
     >
       {images.map((image, index) => (
         <SwiperSlide key={`Swiper-slide-${index}`}>
-          <img style={{ height: 280 }} src={image.image} alt="Slide 1" />
+          <img
+            style={{ height: 280 }}
+            className="w-full"
+            src={image.image}
+            alt="Slide 1"
+          />
         </SwiperSlide>
       ))}
     </Swiper>

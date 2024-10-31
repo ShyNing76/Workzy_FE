@@ -346,7 +346,7 @@ const WorkspacesTypesManagerPage = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 sm:px-8">
+    <div className="container mx-auto p-4 sm:px-8 ">
       <h1 className="text-4xl font-black mb-4">Manage Workspace Types</h1>
 
       <div className="grid grid-cols-3">

@@ -6,6 +6,7 @@ import {
   postWorkspace,
   getAllWorkspaceType,
   putWorkspace,
+  getTotalWorkspace,
 } from "../../../config/api.admin";
 import Swal from "sweetalert2";
 import {
@@ -24,6 +25,7 @@ import {
 import AddModal from "../../../components/layout/Admin/Modals/AddModal";
 import UpdateModal from "../../../components/layout/Admin/Modals/UpdateModal";
 import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal";
+import Pagination from "../../../components/layout/Shared/Pagination/Pagination";
 
 const WorkspacesManagerPage = () => {
   const [workspaces, setWorkspaces] = useState([]);
@@ -32,6 +34,11 @@ const WorkspacesManagerPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(8);
+  const [totalWorkSpace, setTotalWorkSpace] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
   //-----------------------------------------------------------------//
   // ADD
   const [openModalAdd, setOpenModalAdd] = useState(false);
@@ -84,10 +91,9 @@ const WorkspacesManagerPage = () => {
   const fetchWorkspaces = async () => {
     setIsLoading(true);
     try {
-      const res = await getWorkspace();
+      const res = await getWorkspace(page, limit);
       if (res && res.data) {
         setWorkspaces(res.data);
-        console.log(res.data);
       }
     } catch (error) {
       console.log(error);
@@ -95,9 +101,34 @@ const WorkspacesManagerPage = () => {
       setIsLoading(false);
     }
   };
+
+  const fetchTotalWorkspaces = async () => {
+    try {
+      setIsLoading(true);
+
+      const res = await getTotalWorkspace();
+      if (res && res.data) {
+        setTotalWorkSpace(res.data);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchWorkspaces();
-  }, []);
+    fetchTotalWorkspaces();
+  }, [page, setPage]);
+
+  useEffect(() => {
+    if (totalWorkSpace > 0) {
+      setTotalPages(Math.ceil(totalWorkSpace / limit)); // Calculate total pages
+    } else {
+      setTotalPages(1);
+    }
+  }, [totalWorkSpace, limit]);
 
   useEffect(() => {
     const fetchBuildings = async () => {
@@ -105,7 +136,6 @@ const WorkspacesManagerPage = () => {
         const res = await getBuilding();
         if (res && res.data) {
           setBuildings(res.data);
-          console.log("building", res.data);
         }
       } catch (error) {
         console.log(error);
@@ -120,7 +150,6 @@ const WorkspacesManagerPage = () => {
         const res = await getAllWorkspaceType();
         if (res && res.data) {
           setWorkspacesType(res.data.rows);
-          console.log("workspace type", res.data.rows);
         }
       } catch (error) {
         console.log(error);
@@ -422,10 +451,15 @@ const WorkspacesManagerPage = () => {
     setDetailWorkspace(null);
   };
 
+  const getBuildingNameById = (buildingId) => {
+    const building = buildings.find((b) => b.building_id === buildingId);
+    return building ? building.building_name : "Unknown";
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Workspace Management</h1>
+        <h1 className="text-4xl font-black mb-4">Workspace Management</h1>
         <button className="btn btn-primary gap-2" onClick={handleOpenModalAdd}>
           <FiPlus className="w-5 h-5" />
           Add Workspace
@@ -611,11 +645,13 @@ const WorkspacesManagerPage = () => {
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="table w-full">
+        <table className="table w-full ">
           <thead>
             <tr>
               <th>Workspace ID</th>
               <th>Workspace Name</th>
+              <th>Workspace Type</th>
+              <th>Locate Building</th>
               <th>Status</th>
               <th>Action</th>
             </tr>
@@ -629,9 +665,11 @@ const WorkspacesManagerPage = () => {
               </tr>
             ) : (
               searchedWorkspaces.map((ws) => (
-                <tr key={ws.workspace_id}>
+                <tr className="hover" key={ws.workspace_id}>
                   <td>{ws.workspace_id}</td>
                   <td>{ws.workspace_name}</td>
+                  <td>{ws.WorkspaceType.workspace_type_name}</td>
+                  <td>{getBuildingNameById(ws.Building.building_id)}</td>
                   <td>
                     <div
                       className={`badge uppercase w-20 font-bold text-gray-100 ${
@@ -673,6 +711,7 @@ const WorkspacesManagerPage = () => {
           </tbody>
         </table>
       </div>
+      <Pagination page={page} setPage={setPage} totalPages={totalPages} />
     </div>
   );
 };

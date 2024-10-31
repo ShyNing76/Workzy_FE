@@ -374,8 +374,8 @@ const deleteBuilding = (building_id) => {
 };
 
 //Workspace Manager APIs_________________________________________________________
-const getWorkspace = () => {
-  const URL_API = "/api/v1/workspace/";
+const getWorkspace = (page, limit) => {
+  const URL_API = `api/v1/workspace/?page=${page}&limit=${limit}`;
   return axios.get(URL_API);
 };
 
