@@ -58,13 +58,17 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
     }
   };
 
-  console.log(currentItem)
+  console.log(currentItem);
 
   return (
     <>
       <ImagePreviewModal
         imageSrc={
-          hasImage ? currentItem.images.map((img) => img.image) : currentItem.image ? currentItem.image : null
+          hasImage
+            ? currentItem.images.map((img) => img.image)
+            : currentItem.image
+            ? currentItem.image
+            : null
         }
       />
 
@@ -106,27 +110,27 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
                     </div>
                   ))}
                 </div>
-              ) : 
-                   typeof currentItem.image== "string" ? (
-                      <div
-                        className="relative group cursor-pointer rounded-lg overflow-hidden bg-white shadow-lg"
-                        onClick={() => openImagePreview(currentItem.image)}
-                      >
-                        <img
-                          src={currentItem.image}
-                          alt={`Preview`}
-                          className="w-full h-[150px] object-cover transform transition-transform duration-300 hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-black/0 hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
-                          <div className="bg-white/90 p-3 rounded-full transform hover:scale-110 transition-transform">
-                            <BsZoomIn className="w-6 h-6" />
-                          </div>
-                        </div>
-                      </div>
-                    ): (<div className="text-base-content/50 text-center">
+              ) : typeof currentItem.image == "string" ? (
+                <div
+                  className="relative group cursor-pointer rounded-lg overflow-hidden bg-white shadow-lg"
+                  onClick={() => openImagePreview(currentItem.image)}
+                >
+                  <img
+                    src={currentItem.image}
+                    alt={`Preview`}
+                    className="w-full h-[150px] object-cover transform transition-transform duration-300 hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black/0 hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
+                    <div className="bg-white/90 p-3 rounded-full transform hover:scale-110 transition-transform">
+                      <BsZoomIn className="w-6 h-6" />
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-base-content/50 text-center">
                   No image available
-                </div>)
-              }
+                </div>
+              )}
             </div>
 
             {/* Right Side - Details */}
@@ -141,7 +145,8 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
                       key !== "google_token" &&
                       key !== "User" &&
                       key !== "image" &&
-                      key !== "manager_id"
+                      key !== "manager_id" &&
+                      key !== "BuildingImages"
                   )
                   .map(([key, value]) => (
                     <div

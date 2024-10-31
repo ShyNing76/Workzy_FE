@@ -25,11 +25,7 @@ const ManagerHeader = () => {
       <div className="workzy-manager-header-content">
         <Link to="/manager" className="title-manager-header">
           <div className="flex items-center">
-            <img
-              src="../../../../../public/WORKZY_LOGO_BGR.png"
-              alt="logo"
-              className="w-20 h-20"
-            />
+            <img src="/WORKZY_LOGO_BGR.png" alt="logo" className="w-20 h-20" />
             <span> WORKZY MANAGER</span>
           </div>
         </Link>

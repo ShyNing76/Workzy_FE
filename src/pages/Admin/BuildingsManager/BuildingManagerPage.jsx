@@ -450,7 +450,18 @@ const BuildingManagerPage = () => {
                 <td>{building?.Manager?.User?.name || "None"}</td>
                 <td>{getDisplayLocation(building.location)}</td>
                 <td>{building.address}</td>
-                <td>{building.status}</td>
+                <td>
+                  <div
+                    className={`badge uppercase w-20 font-bold text-gray-100 ${
+                      building.status === "active"
+                        ? "badge-success"
+                        : "badge-error"
+                    }`}
+                  >
+                    {" "}
+                    {building.status}
+                  </div>
+                </td>
 
                 <td className="flex space-x-2">
                   <button

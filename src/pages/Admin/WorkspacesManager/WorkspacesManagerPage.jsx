@@ -330,7 +330,10 @@ const WorkspacesManagerPage = () => {
       // Add basic fields
       formData.append("workspace_name", updateWorkspace.workspace_name || "");
       formData.append("building_id", updateWorkspace.building_id || "");
-      formData.append("workspace_type_id", updateWorkspace.workspace_type_id || "");
+      formData.append(
+        "workspace_type_id",
+        updateWorkspace.workspace_type_id || ""
+      );
       formData.append("price_per_hour", updateWorkspace.price_per_hour || "");
       formData.append("price_per_day", updateWorkspace.price_per_day || "");
       formData.append("price_per_month", updateWorkspace.price_per_month || "");
@@ -435,18 +438,69 @@ const WorkspacesManagerPage = () => {
         onClose={handleCloseModalAdd}
         onSubmit={handleAddWorkspace}
         currentItem={newWorkspace}
-        onInputChange={(e) => setNewWorkspace({ ...newWorkspace, [e.target.name]: e.target.value })}
+        onInputChange={(e) =>
+          setNewWorkspace({ ...newWorkspace, [e.target.name]: e.target.value })
+        }
         fields={[
-          { name: "workspace_name", label: "Workspace Name", type: "text", required: true },
-          { name: "building_id", label: "Building", type: "select", options: buildings.map(b => ({ label: b.building_name, value: b.building_id })), required: true },
-          { name: "workspace_type_id", label: "Workspace Type", type: "select", options: workspacesTypes.map(t => ({ label: t.workspace_type_name, value: t.workspace_type_id })), required: true },
-          { name: "price_per_hour", label: "Price per Hour", type: "text", required: true },
-          { name: "price_per_day", label: "Price per Day", type: "text", required: true },
-          { name: "price_per_month", label: "Price per Month", type: "text", required: true },
+          {
+            name: "workspace_name",
+            label: "Workspace Name",
+            type: "text",
+            required: true,
+          },
+          {
+            name: "building_id",
+            label: "Building",
+            type: "select",
+            options: buildings.map((b) => ({
+              label: b.building_name,
+              value: b.building_id,
+            })),
+            required: true,
+          },
+          {
+            name: "workspace_type_id",
+            label: "Workspace Type",
+            type: "select",
+            options: workspacesTypes.map((t) => ({
+              label: t.workspace_type_name,
+              value: t.workspace_type_id,
+            })),
+            required: true,
+          },
+          {
+            name: "price_per_hour",
+            label: "Price per Hour",
+            type: "text",
+            required: true,
+          },
+          {
+            name: "price_per_day",
+            label: "Price per Day",
+            type: "text",
+            required: true,
+          },
+          {
+            name: "price_per_month",
+            label: "Price per Month",
+            type: "text",
+            required: true,
+          },
           { name: "capacity", label: "Capacity", type: "text", required: true },
           { name: "area", label: "Area (sq ft)", type: "text", required: true },
-          { name: "description", label: "Description", type: "text", required: false },
-          { name: "images", label: "Upload Images", type: "file", multiple: true, required: false },
+          {
+            name: "description",
+            label: "Description",
+            type: "text",
+            required: false,
+          },
+          {
+            name: "images",
+            label: "Upload Images",
+            type: "file",
+            multiple: true,
+            required: false,
+          },
         ]}
       />
 
@@ -458,21 +512,78 @@ const WorkspacesManagerPage = () => {
           currentItem={updateWorkspace}
           onInputChange={handleUpdateChange}
           fields={[
-            { name: "workspace_name", label: "Workspace Name", type: "text", required: true },
-            { name: "building_id", label: "Building", type: "select", options: buildings.map(b => ({ label: b.building_name, value: b.building_id })), required: true },
-            { name: "workspace_type_id", label: "Workspace Type", type: "select", options: workspacesTypes.map(t => ({ label: t.workspace_type_name, value: t.workspace_type_id })), required: true },
-            { name: "price_per_hour", label: "Price per Hour", type: "text", required: true },
-            { name: "price_per_day", label: "Price per Day", type: "text", required: true },
-            { name: "price_per_month", label: "Price per Month", type: "text", required: true },
-            { name: "capacity", label: "Capacity", type: "text", required: true },
-            { name: "area", label: "Area (sq ft)", type: "text", required: true },
-            { name: "description", label: "Description", type: "text", required: false },
-            { name: "images", label: "Upload Images", type: "file", multiple: true, required: false },
+            {
+              name: "workspace_name",
+              label: "Workspace Name",
+              type: "text",
+              required: true,
+            },
+            {
+              name: "building_id",
+              label: "Building",
+              type: "select",
+              options: buildings.map((b) => ({
+                label: b.building_name,
+                value: b.building_id,
+              })),
+              required: true,
+            },
+            {
+              name: "workspace_type_id",
+              label: "Workspace Type",
+              type: "select",
+              options: workspacesTypes.map((t) => ({
+                label: t.workspace_type_name,
+                value: t.workspace_type_id,
+              })),
+              required: true,
+            },
+            {
+              name: "price_per_hour",
+              label: "Price per Hour",
+              type: "text",
+              required: true,
+            },
+            {
+              name: "price_per_day",
+              label: "Price per Day",
+              type: "text",
+              required: true,
+            },
+            {
+              name: "price_per_month",
+              label: "Price per Month",
+              type: "text",
+              required: true,
+            },
+            {
+              name: "capacity",
+              label: "Capacity",
+              type: "text",
+              required: true,
+            },
+            {
+              name: "area",
+              label: "Area (sq ft)",
+              type: "text",
+              required: true,
+            },
+            {
+              name: "description",
+              label: "Description",
+              type: "text",
+              required: false,
+            },
+            {
+              name: "images",
+              label: "Upload Images",
+              type: "file",
+              multiple: true,
+              required: false,
+            },
           ]}
         />
       )}
-
-     
 
       {openModalDetails && detailWorkspace && (
         <DetailsModal
@@ -522,37 +633,38 @@ const WorkspacesManagerPage = () => {
                   <td>{ws.workspace_id}</td>
                   <td>{ws.workspace_name}</td>
                   <td>
-                    <span
-                      className={`badge ${
+                    <div
+                      className={`badge uppercase w-20 font-bold text-gray-100 ${
                         ws.status === "active" ? "badge-success" : "badge-error"
                       }`}
                     >
+                      {" "}
                       {ws.status}
-                    </span>
+                    </div>
                   </td>
                   <td className="space-x-2">
-                    
                     <button
-                      className={`btn btn-sm ${
+                      className="btn btn-sm btn-info w-20"
+                      onClick={() => handleOpenModalDetails(ws)}
+                    >
+                      Details
+                    </button>
+
+                    <button
+                      className="btn btn-sm btn-warning w-20"
+                      onClick={() => handleOpenModalUpdate(ws)}
+                    >
+                      Update
+                    </button>
+                    <button
+                      className={`btn btn-sm w-20 ${
                         ws.status === "inactive" ? "btn-success" : "btn-error"
-                      }`}
+                      } `}
                       onClick={() =>
                         handleDeleteWorkspace(ws.workspace_id, ws.status)
                       }
                     >
                       {ws.status === "inactive" ? "Unblock" : "Block"}
-                    </button>
-                    <button
-                      className="btn btn-sm btn-info"
-                      onClick={() => handleOpenModalUpdate(ws)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="btn btn-sm btn-info"
-                      onClick={() => handleOpenModalDetails(ws)}
-                    >
-                      Details
                     </button>
                   </td>
                 </tr>
