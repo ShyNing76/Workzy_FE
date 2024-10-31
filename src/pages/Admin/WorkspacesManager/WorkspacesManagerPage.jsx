@@ -8,7 +8,22 @@ import {
   putWorkspace,
 } from "../../../config/api.admin";
 import Swal from "sweetalert2";
-import { FiX, FiDollarSign, FiUsers, FiSquare, FiImage, FiHome, FiGrid, FiFileText, FiSearch, FiPlus } from 'react-icons/fi';
+import {
+  FiX,
+  FiDollarSign,
+  FiUsers,
+  FiSquare,
+  FiImage,
+  FiHome,
+  FiGrid,
+  FiFileText,
+  FiSearch,
+  FiPlus,
+  FiEye,
+} from "react-icons/fi";
+import AddModal from "../../../components/layout/Admin/Modals/AddModal";
+import UpdateModal from "../../../components/layout/Admin/Modals/UpdateModal";
+import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal";
 
 const WorkspacesManagerPage = () => {
   const [workspaces, setWorkspaces] = useState([]);
@@ -17,7 +32,7 @@ const WorkspacesManagerPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
-//-----------------------------------------------------------------//
+  //-----------------------------------------------------------------//
   // ADD
   const [openModalAdd, setOpenModalAdd] = useState(false);
   const [newWorkspace, setNewWorkspace] = useState({
@@ -25,20 +40,25 @@ const WorkspacesManagerPage = () => {
     building_id: "",
     images: [],
     workspace_type_id: "",
-    workspace_price: 0,
+    price_per_hour: 0,
+    price_per_day: 0,
+    price_per_month: 0,
     capacity: 0,
     area: 0,
     description: "",
     status: "active",
   });
-//-----------------------------------------------------------------//
-  const [openModalUpdate, setOpenModalUpdate] = useState(false)
-  const [updateWorkspace, setUpdateWorkspace] = useState ({
+  //-----------------------------------------------------------------//
+  // UPDATE
+  const [openModalUpdate, setOpenModalUpdate] = useState(false);
+  const [updateWorkspace, setUpdateWorkspace] = useState({
     workspace_name: "",
     building_id: "",
     images: [],
     workspace_type_id: "",
-    workspace_price: 0,
+    price_per_hour: 0,
+    price_per_day: 0,
+    price_per_month: 0,
     capacity: 0,
     area: 0,
     description: "",
@@ -46,24 +66,37 @@ const WorkspacesManagerPage = () => {
   });
 
   //----------------------------------------------------------//
+  // VIEW
+  const [openModalView, setOpenModalView] = useState(false);
+  const [viewWorkspace, setViewWorkspace] = useState(null);
 
+  const handleOpenModalView = (workspace) => {
+    setOpenModalView(true);
+    setViewWorkspace(workspace);
+  };
 
-  
-    const fetchWorkspaces = async () => {
-      setIsLoading(true);
-      try {
-        const res = await getWorkspace();
-        if (res && res.data) {
-          setWorkspaces(res.data);
-        }
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setIsLoading(false);
+  const handleCloseModalView = () => {
+    setOpenModalView(false);
+    setViewWorkspace(null);
+  };
+  //-------------------------------------------------------------//
+
+  const fetchWorkspaces = async () => {
+    setIsLoading(true);
+    try {
+      const res = await getWorkspace();
+      if (res && res.data) {
+        setWorkspaces(res.data);
+        console.log(res.data);
       }
-    };
-    useEffect(() => {
-      fetchWorkspaces();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchWorkspaces();
   }, []);
 
   useEffect(() => {
@@ -72,6 +105,7 @@ const WorkspacesManagerPage = () => {
         const res = await getBuilding();
         if (res && res.data) {
           setBuildings(res.data);
+          console.log("building", res.data);
         }
       } catch (error) {
         console.log(error);
@@ -86,12 +120,13 @@ const WorkspacesManagerPage = () => {
         const res = await getAllWorkspaceType();
         if (res && res.data) {
           setWorkspacesType(res.data.rows);
+          console.log("workspace type", res.data.rows);
         }
       } catch (error) {
         console.log(error);
       }
     };
-    
+
     fetchWorkspaceType();
   }, []);
 
@@ -125,16 +160,21 @@ const WorkspacesManagerPage = () => {
               ws.workspace_id === workspaceId
                 ? {
                     ...ws,
-                    status: currentStatus === "inactive" ? "active" : "inactive",
+                    status:
+                      currentStatus === "inactive" ? "active" : "inactive",
                   }
                 : ws
             )
           );
           Swal.fire({
-            title: currentStatus === "inactive" ? "Workspace Unblocked!" : "Workspace Blocked!",
-            text: currentStatus === "inactive"
-              ? "Workspace has been successfully unblocked."
-              : "Workspace has been successfully blocked.",
+            title:
+              currentStatus === "inactive"
+                ? "Workspace Unblocked!"
+                : "Workspace Blocked!",
+            text:
+              currentStatus === "inactive"
+                ? "Workspace has been successfully unblocked."
+                : "Workspace has been successfully blocked.",
             icon: "success",
           });
           setIsLoaded(false);
@@ -149,8 +189,8 @@ const WorkspacesManagerPage = () => {
       });
     }
   };
-// -------------------------------------------------
-// ADD 
+  // -------------------------------------------------
+  // ADD
   const handleOpenModalAdd = () => {
     setOpenModalAdd(true);
   };
@@ -162,7 +202,9 @@ const WorkspacesManagerPage = () => {
       building_id: "",
       images: [],
       workspace_type_id: "",
-      workspace_price: 0,
+      price_per_hour: 0,
+      price_per_day: 0,
+      price_per_month: 0,
       capacity: 0,
       area: 0,
       description: "",
@@ -179,13 +221,16 @@ const WorkspacesManagerPage = () => {
     setNewWorkspace({ ...newWorkspace, [e.target.name]: e.target.value });
   };
 
-  const handleAddWorkspace = async () => {
+  const handleAddWorkspace = async (e) => {
+    e.preventDefault();
     try {
       const formData = new FormData();
       formData.append("workspace_name", newWorkspace.workspace_name);
       formData.append("building_id", newWorkspace.building_id);
       formData.append("workspace_type_id", newWorkspace.workspace_type_id);
-      formData.append("workspace_price", newWorkspace.workspace_price);
+      formData.append("price_per_hour", newWorkspace.price_per_hour);
+      formData.append("price_per_day", newWorkspace.price_per_day);
+      formData.append("price_per_month", newWorkspace.price_per_month);
       formData.append("capacity", newWorkspace.capacity);
       formData.append("area", newWorkspace.area);
       formData.append("description", newWorkspace.description);
@@ -199,15 +244,21 @@ const WorkspacesManagerPage = () => {
       if (res && res.err === 0) {
         // Đóng modal trước
         handleCloseModalAdd();
-        
+
         // Fetch lại dữ liệu mới
         await fetchWorkspaces();
-        
+
         // Hiển thị thông báo thành công
         Swal.fire({
           title: "Success",
           text: "Workspace added successfully",
           icon: "success",
+        });
+      } else {
+        Swal.fire({
+          title: "Error",
+          text: "Failed to add workspace",
+          icon: "error",
         });
       }
     } catch (error) {
@@ -219,467 +270,216 @@ const WorkspacesManagerPage = () => {
       });
     }
   };
-//----------------------------------------------------------------------------
-// UPDATE
-const handleOpenModalUpdate = (workspace) => {
-  setUpdateWorkspace({
-    ...workspace,
-    building_id: workspace.building_id || "",
-    images: workspace.images || [],
-  });
-  setOpenModalUpdate(true);
-}
+  //----------------------------------------------------------------------------
+  // UPDATE
+  const handleOpenModalUpdate = (workspace) => {
+    const restructuredWorkspace = {
+      ...workspace,
+      images: workspace.WorkspaceImages.map((img) => img.image),
+    };
+    setUpdateWorkspace(restructuredWorkspace);
 
-const handleCloseModalUpdate = () => {
-  setOpenModalUpdate(false);
-}
+    console.log("updateWorkspace", updateWorkspace);
+    setOpenModalUpdate(true);
+  };
 
-const handleUpdateChange = (e) => {
-  setUpdateWorkspace({ ...updateWorkspace, [e.target.name]: e.target.value });
-};
+  const handleCloseModalUpdate = () => {
+    setOpenModalUpdate(false);
+  };
 
-const handleUpdateFileChange = (e) => {
-  const files = Array.from(e.target.files);
-  setUpdateWorkspace({ ...updateWorkspace, images: files });
-};
+  const handleUpdateChange = (e) => {
+    const { name, type, files, value } = e.target;
 
-const handleUpdateWorkspace = async () => {
-  try {
-    const formData = new FormData();
-    formData.append("workspace_name", updateWorkspace.workspace_name);
-    formData.append("building_id", updateWorkspace.building_id);
-    formData.append("workspace_type_id", updateWorkspace.workspace_type_id);
-    formData.append("workspace_price", updateWorkspace.workspace_price);
-    formData.append("capacity", updateWorkspace.capacity);
-    formData.append("area", updateWorkspace.area);
-    formData.append("description", updateWorkspace.description);
-    formData.append("status", updateWorkspace.status);
+    setUpdateWorkspace((prev) => {
+      if (type === "file") {
+        const newFiles = Array.from(files);
+        return {
+          ...prev,
+          images: [...(prev.images || []), ...newFiles],
+        };
+      } else if (name === "images") {
+        // Nhận danh sách ảnh mới từ modal
+        return {
+          ...prev,
+          images: value,
+        };
+      } else if (name === "remove_images") {
+        // Nhận danh sách ảnh đã xóa từ modal
+        return {
+          ...prev,
+          remove_images: value,
+        };
+      }
+      return {
+        ...prev,
+        [name]: value,
+      };
+    });
+  };
 
-    if (Array.isArray(updateWorkspace.images)) {
-      updateWorkspace.images.forEach((file) => formData.append("images", file));
-    }
+  const handleUpdateFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    setUpdateWorkspace({ ...updateWorkspace, images: files });
+  };
 
-    
-    const res = await putWorkspace(updateWorkspace.workspace_id, formData);
-    if (res && res.err === 0) {
-      // Đóng modal trước
-      handleCloseModalUpdate();
-      
-      // Fetch lại dữ liệu mới
-      await fetchWorkspaces();
-      
-      // Hiển thị thông báo thành công
+  const handleUpdateWorkspace = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+
+      // Add basic fields
+      formData.append("workspace_name", updateWorkspace.workspace_name || "");
+      formData.append("building_id", updateWorkspace.building_id || "");
+      formData.append("workspace_type_id", updateWorkspace.workspace_type_id || "");
+      formData.append("price_per_hour", updateWorkspace.price_per_hour || "");
+      formData.append("price_per_day", updateWorkspace.price_per_day || "");
+      formData.append("price_per_month", updateWorkspace.price_per_month || "");
+      formData.append("capacity", updateWorkspace.capacity || "");
+      formData.append("area", updateWorkspace.area || "");
+      formData.append("description", updateWorkspace.description || "");
+      formData.append("status", updateWorkspace.status || "");
+
+      // Handle images
+      if (updateWorkspace.images && updateWorkspace.images.length > 0) {
+        updateWorkspace.images.forEach((image) => {
+          if (image instanceof File) {
+            formData.append("images", image);
+          } else if (
+            typeof image === "string" &&
+            (!updateWorkspace.remove_images ||
+              !updateWorkspace.remove_images.includes(image))
+          ) {
+            formData.append("images", image);
+          }
+        });
+      }
+
+      // Add removed images to formData
+      if (
+        updateWorkspace.remove_images &&
+        updateWorkspace.remove_images.length > 0
+      ) {
+        updateWorkspace.remove_images.forEach((image) => {
+          formData.append("remove_images", image);
+        });
+      }
+
+      // Log formData contents for debugging
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
+
+      const res = await putWorkspace(updateWorkspace.workspace_id, formData);
+      if (res && res.err === 0) {
+        // Đóng modal trước
+        handleCloseModalUpdate();
+
+        // Fetch lại dữ liệu mới
+        await fetchWorkspaces();
+
+        // Hiển thị thông báo thành công
+        Swal.fire({
+          title: "Success",
+          text: "Workspace updated successfully",
+          icon: "success",
+        });
+      } else {
+        Swal.fire({
+          title: "Error",
+          text: "Failed to update workspace",
+          icon: "error",
+        });
+      }
+    } catch (err) {
+      console.error("err", err);
       Swal.fire({
-        title: "Success",
-        text: "Workspace updated successfully",
-        icon: "success",
+        title: "Error",
+        text: "Failed to update workspace",
+        icon: "error",
       });
     }
-  } catch (error) {
-    console.error(error);
-    Swal.fire({
-      title: "Error",
-      text: "Failed to update workspace",
-      icon: "error",
-    });
-  }
-};
+  };
 
+  const [openModalDetails, setOpenModalDetails] = useState(false);
+  const [detailWorkspace, setDetailWorkspace] = useState(null);
 
+  const handleOpenModalDetails = (workspace) => {
+    const restructuredWorkspace = {
+      ...workspace,
+      images: workspace.WorkspaceImages.map((img) => ({ image: img.image })),
+    };
+    setDetailWorkspace(restructuredWorkspace);
 
+    console.log("detailWorkspace", detailWorkspace);
+    setOpenModalDetails(true);
+  };
+
+  const handleCloseModalDetails = () => {
+    setOpenModalDetails(false);
+    setDetailWorkspace(null);
+  };
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Workspace Management</h1>
-        <button 
-          className="btn btn-primary gap-2"
-          onClick={handleOpenModalAdd}
-        >
+        <button className="btn btn-primary gap-2" onClick={handleOpenModalAdd}>
           <FiPlus className="w-5 h-5" />
           Add Workspace
         </button>
       </div>
 
-      {/* Modal */}
-      {openModalAdd && (
-        <div className="modal modal-open">
-          <div className="modal-box max-w-3xl relative">
-            <button 
-              className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-              onClick={handleCloseModalAdd}
-            >
-              <FiX className="w-5 h-5" />
-            </button>
-            
-            <h3 className="font-bold text-2xl mb-6">Add New Workspace</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Workspace Name */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiHome className="w-4 h-4" />
-                    Workspace Name
-                  </span>
-                </label>
-                <input
-                  type="text"
-                  name="workspace_name"
-                  placeholder="Enter workspace name"
-                  value={newWorkspace.workspace_name}
-                  onChange={handleAddChange}
-                  className="input input-bordered w-full"
-                />
-              </div>
-
-              {/* Building Selection */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiGrid className="w-4 h-4" />
-                    Building
-                  </span>
-                </label>
-                <select
-                  name="building_id"
-                  value={newWorkspace.building_id}
-                  onChange={handleAddChange}
-                  className="select select-bordered w-full"
-                >
-                  <option value="">Select Building</option>
-                  {buildings.map((building) => (
-                    <option key={building.building_id} value={building.building_id}>
-                      {building.building_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Workspace Type */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiGrid className="w-4 h-4" />
-                    Workspace Type
-                  </span>
-                </label>
-                <select
-                  name="workspace_type_id"
-                  value={newWorkspace.workspace_type_id}
-                  onChange={handleAddChange}
-                  className="select select-bordered w-full"
-                >
-                  <option value="">Select Workspace Type</option>
-                  {workspacesTypes.map((type) => (
-                    <option key={type.workspace_type_id} value={type.workspace_type_id}>
-                      {type.workspace_type_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Price */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiDollarSign className="w-4 h-4" />
-                    Price
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  name="workspace_price"
-                  placeholder="Enter price"
-                  value={newWorkspace.workspace_price}
-                  onChange={handleAddChange}
-                  className="input input-bordered w-full"
-                />
-              </div>
-
-              {/* Capacity */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiUsers className="w-4 h-4" />
-                    Capacity
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  name="capacity"
-                  placeholder="Enter capacity"
-                  value={newWorkspace.capacity}
-                  onChange={handleAddChange}
-                  className="input input-bordered w-full"
-                />
-              </div>
-
-              {/* Area */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiSquare className="w-4 h-4" />
-                    Area (sq ft)
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  name="area"
-                  placeholder="Enter area"
-                  value={newWorkspace.area}
-                  onChange={handleAddChange}
-                  className="input input-bordered w-full"
-                />
-              </div>
-            </div>
-
-            {/* Description - Full Width */}
-            <div className="form-control mt-4">
-              <label className="label">
-                <span className="label-text flex items-center gap-2">
-                  <FiFileText className="w-4 h-4" />
-                  Description
-                </span>
-              </label>
-              <textarea
-                name="description"
-                placeholder="Enter workspace description"
-                value={newWorkspace.description}
-                onChange={handleAddChange}
-                className="textarea textarea-bordered w-full min-h-[100px]"
-              />
-            </div>
-
-            {/* Images Upload - Full Width */}
-            <div className="form-control mt-4">
-              <label className="label">
-                <span className="label-text flex items-center gap-2">
-                  <FiImage className="w-4 h-4" />
-                  Upload Images
-                </span>
-              </label>
-              <input
-                type="file"
-                name="images"
-                multiple
-                onChange={handleFileChange}
-                className="file-input file-input-bordered w-full"
-              />
-              <label className="label">
-                <span className="label-text-alt text-gray-500">
-                  You can upload multiple images. Supported formats: JPG, PNG
-                </span>
-              </label>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="modal-action mt-6 flex justify-end gap-2">
-              <button 
-                className="btn btn-ghost"
-                onClick={handleCloseModalAdd}
-              >
-                Cancel
-              </button>
-              <button 
-                className="btn btn-primary"
-                onClick={handleAddWorkspace}
-              >
-                Add Workspace
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modal sử dụng AddModal */}
+      <AddModal
+        show={openModalAdd}
+        onClose={handleCloseModalAdd}
+        onSubmit={handleAddWorkspace}
+        currentItem={newWorkspace}
+        onInputChange={(e) => setNewWorkspace({ ...newWorkspace, [e.target.name]: e.target.value })}
+        fields={[
+          { name: "workspace_name", label: "Workspace Name", type: "text", required: true },
+          { name: "building_id", label: "Building", type: "select", options: buildings.map(b => ({ label: b.building_name, value: b.building_id })), required: true },
+          { name: "workspace_type_id", label: "Workspace Type", type: "select", options: workspacesTypes.map(t => ({ label: t.workspace_type_name, value: t.workspace_type_id })), required: true },
+          { name: "price_per_hour", label: "Price per Hour", type: "text", required: true },
+          { name: "price_per_day", label: "Price per Day", type: "text", required: true },
+          { name: "price_per_month", label: "Price per Month", type: "text", required: true },
+          { name: "capacity", label: "Capacity", type: "text", required: true },
+          { name: "area", label: "Area (sq ft)", type: "text", required: true },
+          { name: "description", label: "Description", type: "text", required: false },
+          { name: "images", label: "Upload Images", type: "file", multiple: true, required: false },
+        ]}
+      />
 
       {openModalUpdate && (
-        <div className="modal modal-open">
-          <div className="modal-box max-w-3xl relative">
-            <button 
-              className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-              onClick={handleCloseModalUpdate}
-            >
-              <FiX className="w-5 h-5" />
-            </button>
-            
-            <h3 className="font-bold text-2xl mb-6">Update Workspace</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Workspace Name */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiHome className="w-4 h-4" />
-                    Workspace Name
-                  </span>
-                </label>
-                <input
-                  type="text"
-                  name="workspace_name"
-                  placeholder="Enter workspace name"
-                  value={updateWorkspace.workspace_name}
-                  onChange={handleUpdateChange}
-                  className="input input-bordered w-full"
-                />
-              </div>
+        <UpdateModal
+          show={openModalUpdate}
+          onClose={handleCloseModalUpdate}
+          onSubmit={handleUpdateWorkspace}
+          currentItem={updateWorkspace}
+          onInputChange={handleUpdateChange}
+          fields={[
+            { name: "workspace_name", label: "Workspace Name", type: "text", required: true },
+            { name: "building_id", label: "Building", type: "select", options: buildings.map(b => ({ label: b.building_name, value: b.building_id })), required: true },
+            { name: "workspace_type_id", label: "Workspace Type", type: "select", options: workspacesTypes.map(t => ({ label: t.workspace_type_name, value: t.workspace_type_id })), required: true },
+            { name: "price_per_hour", label: "Price per Hour", type: "text", required: true },
+            { name: "price_per_day", label: "Price per Day", type: "text", required: true },
+            { name: "price_per_month", label: "Price per Month", type: "text", required: true },
+            { name: "capacity", label: "Capacity", type: "text", required: true },
+            { name: "area", label: "Area (sq ft)", type: "text", required: true },
+            { name: "description", label: "Description", type: "text", required: false },
+            { name: "images", label: "Upload Images", type: "file", multiple: true, required: false },
+          ]}
+        />
+      )}
 
-              {/* Building Selection */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiGrid className="w-4 h-4" />
-                    Building
-                  </span>
-                </label>
-                <select
-                  name="building_id"
-                  value={updateWorkspace.building_id}
-                  onChange={handleUpdateChange}
-                  className="select select-bordered w-full"
-                >
-                  <option value="">Select Building</option>
-                  {buildings.map((building) => (
-                    <option key={building.building_id} value={building.building_id}>
-                      {building.building_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+     
 
-              {/* Workspace Type */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiGrid className="w-4 h-4" />
-                    Workspace Type
-                  </span>
-                </label>
-                <select
-                  name="workspace_type_id"
-                  value={updateWorkspace.workspace_type_id}
-                  onChange={handleUpdateChange}
-                  className="select select-bordered w-full"
-                >
-                  <option value="">Select Workspace Type</option>
-                  {workspacesTypes.map((type) => (
-                    <option key={type.workspace_type_id} value={type.workspace_type_id}>
-                      {type.workspace_type_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Price */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiDollarSign className="w-4 h-4" />
-                    Price
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  name="workspace_price"
-                  placeholder="Enter price"
-                  value={updateWorkspace.workspace_price}
-                  onChange={handleUpdateChange}
-                  className="input input-bordered w-full"
-                />
-              </div>
-
-              {/* Capacity */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiUsers className="w-4 h-4" />
-                    Capacity
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  name="capacity"
-                  placeholder="Enter capacity"
-                  value={updateWorkspace.capacity}
-                  onChange={handleUpdateChange}
-                  className="input input-bordered w-full"
-                />
-              </div>
-
-              {/* Area */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text flex items-center gap-2">
-                    <FiSquare className="w-4 h-4" />
-                    Area (sq ft)
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  name="area"
-                  placeholder="Enter area"
-                  value={updateWorkspace.area}
-                  onChange={handleUpdateChange}
-                  className="input input-bordered w-full"
-                />
-              </div>
-            </div>
-
-            {/* Description - Full Width */}
-            <div className="form-control mt-4">
-              <label className="label">
-                <span className="label-text flex items-center gap-2">
-                  <FiFileText className="w-4 h-4" />
-                  Description
-                </span>
-              </label>
-              <textarea
-                name="description"
-                placeholder="Enter workspace description"
-                value={updateWorkspace.description}
-                onChange={handleUpdateChange}
-                className="textarea textarea-bordered w-full min-h-[100px]"
-              />
-            </div>
-
-            {/* Images Upload - Full Width */}
-            <div className="form-control mt-4">
-              <label className="label">
-                <span className="label-text flex items-center gap-2">
-                  <FiImage className="w-4 h-4" />
-                  Upload Images
-                </span>
-              </label>
-              <input
-                type="file"
-                name="images"
-                multiple
-                onChange={handleUpdateFileChange} 
-                className="file-input file-input-bordered w-full"
-              />
-              <label className="label">
-                <span className="label-text-alt text-gray-500">
-                  You can upload multiple images. Supported formats: JPG, PNG
-                </span>
-              </label>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="modal-action mt-6 flex justify-end gap-2">
-              <button 
-                className="btn btn-ghost"
-                onClick={handleCloseModalUpdate}
-              >
-                Cancel
-              </button>
-              <button 
-                className="btn btn-primary"
-                onClick={handleUpdateWorkspace}
-              >
-                Update Workspace
-              </button>
-            </div>
-          </div>
-        </div>
+      {openModalDetails && detailWorkspace && (
+        <DetailsModal
+          show={openModalDetails}
+          onClose={handleCloseModalDetails}
+          currentItem={detailWorkspace}
+        />
       )}
 
       {/* Search Bar */}
@@ -722,25 +522,37 @@ const handleUpdateWorkspace = async () => {
                   <td>{ws.workspace_id}</td>
                   <td>{ws.workspace_name}</td>
                   <td>
-                    <span className={`badge ${ws.status === 'active' ? 'badge-success' : 'badge-error'}`}>
+                    <span
+                      className={`badge ${
+                        ws.status === "active" ? "badge-success" : "badge-error"
+                      }`}
+                    >
                       {ws.status}
                     </span>
                   </td>
-                  <td>
+                  <td className="space-x-2">
+                    
                     <button
                       className={`btn btn-sm ${
                         ws.status === "inactive" ? "btn-success" : "btn-error"
                       }`}
-                      onClick={() => handleDeleteWorkspace(ws.workspace_id, ws.status)}
+                      onClick={() =>
+                        handleDeleteWorkspace(ws.workspace_id, ws.status)
+                      }
                     >
                       {ws.status === "inactive" ? "Unblock" : "Block"}
                     </button>
-
                     <button
-                      className="btn btn-sm btn-info ml-2"
+                      className="btn btn-sm btn-info"
                       onClick={() => handleOpenModalUpdate(ws)}
                     >
                       Edit
+                    </button>
+                    <button
+                      className="btn btn-sm btn-info"
+                      onClick={() => handleOpenModalDetails(ws)}
+                    >
+                      Details
                     </button>
                   </td>
                 </tr>
