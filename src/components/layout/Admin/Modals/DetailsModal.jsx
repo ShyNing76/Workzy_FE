@@ -45,8 +45,8 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
 
   if (!show) return null;
 
-  const hasImage = Array.isArray(currentItem?.BuildingImages)
-    ? currentItem.BuildingImages.length > 0
+  const hasImage = Array.isArray(currentItem?.images)
+    ? currentItem.images.length > 0
     : false;
 
   const openImagePreview = (imageSrc) => {
@@ -64,7 +64,7 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
     <>
       <ImagePreviewModal
         imageSrc={
-          hasImage ? currentItem.BuildingImages.map((img) => img.image) : currentItem.image ? currentItem.image : null
+          hasImage ? currentItem.images.map((img) => img.image) : currentItem.image ? currentItem.image : null
         }
       />
 
@@ -87,7 +87,7 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
             <div className="md:w-1/2 h-full p-6 flex flex-col items-center justify-center bg-base-200">
               {hasImage ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full">
-                  {currentItem.BuildingImages.map((img, index) => (
+                  {currentItem.images.map((img, index) => (
                     <div
                       key={index}
                       className="relative group cursor-pointer rounded-lg overflow-hidden bg-white shadow-lg"
@@ -135,7 +135,7 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
                 {Object.entries(currentItem)
                   .filter(
                     ([key]) =>
-                      key !== "BuildingImages" &&
+                      key !== "images" &&
                       key !== "Manager" &&
                       key !== "Staff" &&
                       key !== "google_token" &&

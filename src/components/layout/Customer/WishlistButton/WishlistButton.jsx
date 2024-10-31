@@ -3,6 +3,7 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../context/auth.context";
 import { postAddToWishList } from "../../../../config/api";
+import { CiBookmarkPlus } from "react-icons/ci";
 
 const WishlistButton = ({ workspaceId, workspaceName }) => {
   const navigate = useNavigate();
@@ -82,23 +83,11 @@ const WishlistButton = ({ workspaceId, workspaceName }) => {
   return (
     <button
       onClick={handleAddToWishlist}
-      className="btn btn-ghost btn-circle text-red-500 hover:bg-red-50"
+      className="btn btn-ghost  text-red-500 hover:bg-red-50"
       aria-label="Add to wishlist"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-        />
-      </svg>
+      <CiBookmarkPlus className="h-6 w-6" />
+      Add to wishlist
     </button>
   );
 };

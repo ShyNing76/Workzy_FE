@@ -24,8 +24,8 @@ const UpdateModal = ({
       );
       setPreviewImages(previews);
       setImageFiles(currentItem.images.filter((img) => img instanceof File));
-    } else if (currentItem?.BuildingImages) {
-      const firebaseImages = currentItem.BuildingImages.map((img) => img.image);
+    } else if (currentItem?.Images) {
+      const firebaseImages = currentItem.Images.map((img) => img.image);
       setPreviewImages(firebaseImages);
       setImageFiles([]);
     } else if (currentItem?.image) {

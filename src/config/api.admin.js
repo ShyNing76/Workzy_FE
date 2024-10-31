@@ -126,9 +126,9 @@ const getWorkspaceType = (search, page, limit) => {
 };
 
 const getAllWorkspaceType = () => {
-  const URL_API = `api/v1/workspace-type/`
-  return axios.get(URL_API)
-}
+  const URL_API = `api/v1/workspace-type/`;
+  return axios.get(URL_API);
+};
 
 const getWorkspaceTypeById = (workspace_type_id) => {
   const URL_API = `/api/v1/workspace-type/${workspace_type_id}`;
@@ -570,7 +570,7 @@ export {
   getBookingDataIn6Days,
   getRevenueDataIn6DaysAdmin,
   getBookingDataIn6DaysAdmin,
-  getAllWorkspaceType,
   postNewBuilding,
-  changeBuildingStatus
+  changeBuildingStatus,
+  getAllWorkspaceType,
 };

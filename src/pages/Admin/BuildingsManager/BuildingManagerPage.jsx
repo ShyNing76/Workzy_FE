@@ -77,10 +77,11 @@ const BuildingManagerPage = () => {
       ...building,
       manager_name: building?.Manager?.User?.name || "None",
       location: getDisplayLocation(building.location),
-      image: building.BuildingImages || null,
+      images: building.BuildingImages || null,
     };
 
     setSelectedBuildingDetails(buildingDetails);
+    console.log("Building Details:", buildingDetails);
     setShowDetailsModal(true);
   };
 
