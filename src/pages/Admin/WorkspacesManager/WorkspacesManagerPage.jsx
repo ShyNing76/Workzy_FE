@@ -273,12 +273,13 @@ const WorkspacesManagerPage = () => {
   //----------------------------------------------------------------------------
   // UPDATE
   const handleOpenModalUpdate = (workspace) => {
-    setUpdateWorkspace({
+    const restructuredWorkspace = {
       ...workspace,
-      building_id: workspace.Building.building_id || "",
-      existingImages: workspace.WorkspaceImages || [], // Lưu lại ảnh hiện có
-      images: [], // Mảng cho ảnh mới
-    });
+      images: workspace.WorkspaceImages.map((img) => img.image),
+    };
+    setUpdateWorkspace(restructuredWorkspace);
+
+    console.log("updateWorkspace", updateWorkspace);
     setOpenModalUpdate(true);
   };
 
@@ -287,7 +288,33 @@ const WorkspacesManagerPage = () => {
   };
 
   const handleUpdateChange = (e) => {
-    setUpdateWorkspace({ ...updateWorkspace, [e.target.name]: e.target.value });
+    const { name, type, files, value } = e.target;
+
+    setUpdateWorkspace((prev) => {
+      if (type === "file") {
+        const newFiles = Array.from(files);
+        return {
+          ...prev,
+          images: [...(prev.images || []), ...newFiles],
+        };
+      } else if (name === "images") {
+        // Nhận danh sách ảnh mới từ modal
+        return {
+          ...prev,
+          images: value,
+        };
+      } else if (name === "remove_images") {
+        // Nhận danh sách ảnh đã xóa từ modal
+        return {
+          ...prev,
+          remove_images: value,
+        };
+      }
+      return {
+        ...prev,
+        [name]: value,
+      };
+    });
   };
 
   const handleUpdateFileChange = (e) => {
@@ -295,24 +322,51 @@ const WorkspacesManagerPage = () => {
     setUpdateWorkspace({ ...updateWorkspace, images: files });
   };
 
-  const handleUpdateWorkspace = async () => {
+  const handleUpdateWorkspace = async (e) => {
+    e.preventDefault();
     try {
       const formData = new FormData();
-      formData.append("workspace_name", updateWorkspace.workspace_name);
-      formData.append("building_id", updateWorkspace.building_id);
-      formData.append("workspace_type_id", updateWorkspace.workspace_type_id);
-      formData.append("price_per_hour", updateWorkspace.price_per_hour);
-      formData.append("price_per_day", updateWorkspace.price_per_day);
-      formData.append("price_per_month", updateWorkspace.price_per_month);
-      formData.append("capacity", updateWorkspace.capacity);
-      formData.append("area", updateWorkspace.area);
-      formData.append("description", updateWorkspace.description);
-      formData.append("status", updateWorkspace.status);
 
-      if (Array.isArray(updateWorkspace.images)) {
-        updateWorkspace.images.forEach((file) =>
-          formData.append("images", file)
-        );
+      // Add basic fields
+      formData.append("workspace_name", updateWorkspace.workspace_name || "");
+      formData.append("building_id", updateWorkspace.building_id || "");
+      formData.append("workspace_type_id", updateWorkspace.workspace_type_id || "");
+      formData.append("price_per_hour", updateWorkspace.price_per_hour || "");
+      formData.append("price_per_day", updateWorkspace.price_per_day || "");
+      formData.append("price_per_month", updateWorkspace.price_per_month || "");
+      formData.append("capacity", updateWorkspace.capacity || "");
+      formData.append("area", updateWorkspace.area || "");
+      formData.append("description", updateWorkspace.description || "");
+      formData.append("status", updateWorkspace.status || "");
+
+      // Handle images
+      if (updateWorkspace.images && updateWorkspace.images.length > 0) {
+        updateWorkspace.images.forEach((image) => {
+          if (image instanceof File) {
+            formData.append("images", image);
+          } else if (
+            typeof image === "string" &&
+            (!updateWorkspace.remove_images ||
+              !updateWorkspace.remove_images.includes(image))
+          ) {
+            formData.append("images", image);
+          }
+        });
+      }
+
+      // Add removed images to formData
+      if (
+        updateWorkspace.remove_images &&
+        updateWorkspace.remove_images.length > 0
+      ) {
+        updateWorkspace.remove_images.forEach((image) => {
+          formData.append("remove_images", image);
+        });
+      }
+
+      // Log formData contents for debugging
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
       }
 
       const res = await putWorkspace(updateWorkspace.workspace_id, formData);
@@ -352,7 +406,7 @@ const WorkspacesManagerPage = () => {
   const handleOpenModalDetails = (workspace) => {
     const restructuredWorkspace = {
       ...workspace,
-      images: workspace.WorkspaceImages.map((img) => img.image),
+      images: workspace.WorkspaceImages.map((img) => ({ image: img.image })),
     };
     setDetailWorkspace(restructuredWorkspace);
 
@@ -418,135 +472,7 @@ const WorkspacesManagerPage = () => {
         />
       )}
 
-      {openModalView && viewWorkspace && (
-        <div className="modal modal-open">
-          <div className="modal-box max-w-3xl relative">
-            <button
-              className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-              onClick={handleCloseModalView}
-            >
-              <FiX className="w-5 h-5" />
-            </button>
-
-            <h3 className="font-bold text-2xl mb-6">Workspace Details</h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Basic Information */}
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-semibold text-lg mb-2">
-                    Basic Information
-                  </h4>
-                  <div className="space-y-2">
-                    <p className="flex items-center gap-2">
-                      <FiHome className="w-4 h-4" />
-                      <span className="font-medium">Name:</span>{" "}
-                      {viewWorkspace.workspace_name}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <FiGrid className="w-4 h-4" />
-                      <span className="font-medium">Building:</span>{" "}
-                      {viewWorkspace.Building?.building_name}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <FiGrid className="w-4 h-4" />
-                      <span className="font-medium">Type:</span>{" "}
-                      {viewWorkspace.WorkspaceType?.workspace_type_name}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <span className="font-medium">Status:</span>
-                      <span
-                        className={`badge ${
-                          viewWorkspace.status === "active"
-                            ? "badge-success"
-                            : "badge-error"
-                        }`}
-                      >
-                        {viewWorkspace.status}
-                      </span>
-                    </p>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold text-lg mb-2">Specifications</h4>
-                  <div className="space-y-2">
-                    <p className="flex items-center gap-2">
-                      <FiUsers className="w-4 h-4" />
-                      <span className="font-medium">Capacity:</span>{" "}
-                      {viewWorkspace.capacity} people
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <FiSquare className="w-4 h-4" />
-                      <span className="font-medium">Area:</span>{" "}
-                      {viewWorkspace.area} sq ft
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Pricing Information */}
-              <div className="space-y-4">
-                <h4 className="font-semibold text-lg mb-2">Pricing</h4>
-                <div className="space-y-2">
-                  <p className="flex items-center gap-2">
-                    <FiDollarSign className="w-4 h-4" />
-                    <span className="font-medium">Hourly Rate:</span> $
-                    {viewWorkspace.price_per_hour}
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <FiDollarSign className="w-4 h-4" />
-                    <span className="font-medium">Daily Rate:</span> $
-                    {viewWorkspace.price_per_day}
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <FiDollarSign className="w-4 h-4" />
-                    <span className="font-medium">Monthly Rate:</span> $
-                    {viewWorkspace.price_per_month}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Description */}
-            <div className="mt-6">
-              <h4 className="font-semibold text-lg mb-2">Description</h4>
-              <p className="text-gray-600 whitespace-pre-wrap">
-                {viewWorkspace.description}
-              </p>
-            </div>
-
-            {/* Images */}
-            {viewWorkspace.WorkspaceImages &&
-              viewWorkspace.WorkspaceImages.length > 0 && (
-                <div className="mt-6">
-                  <h4 className="font-semibold text-lg mb-2">Images</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {viewWorkspace.WorkspaceImages.map((image, index) => (
-                      <div key={index} className="relative aspect-video">
-                        <img
-                          src={image.image}
-                          alt={`Workspace ${index + 1}`}
-                          className="object-cover rounded-lg w-full h-full"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-            {/* Close Button */}
-            <div className="modal-action">
-              <button
-                className="btn btn-primary"
-                onClick={handleCloseModalView}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+     
 
       {openModalDetails && detailWorkspace && (
         <DetailsModal
@@ -605,12 +531,7 @@ const WorkspacesManagerPage = () => {
                     </span>
                   </td>
                   <td className="space-x-2">
-                    <button
-                      className="btn btn-sm btn-info"
-                      onClick={() => handleOpenModalView(ws)}
-                    >
-                      <FiEye className="w-4 h-4" />
-                    </button>
+                    
                     <button
                       className={`btn btn-sm ${
                         ws.status === "inactive" ? "btn-success" : "btn-error"
