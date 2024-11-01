@@ -7,12 +7,14 @@ import { getStaffBuildingId } from "../../../config/api.staff";
 import { FaRegHeart } from "react-icons/fa";
 import { BsBuildings } from "react-icons/bs";
 import { PiCalendarCheckBold } from "react-icons/pi";
+import StaffHeader from "../../../components/layout/staff/StaffHeader/StaffHeader";
 
 const Staff = () => {
   const { auth, setAuth, appLoading, setAppLoading, setRoleId, roleId } =
     useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
+
   const [buildingName, setBuildingName] = useState("");
   const [buildingId, setBuildingId] = useState("");
 
@@ -47,6 +49,12 @@ const Staff = () => {
   }, [setAuth, setRoleId, setAppLoading, auth.isAuthenticated]);
 
   useEffect(() => {
+    if (!auth.isAuthenticated) {
+      navigate("/");
+    }
+  }, [auth.isAuthenticated, navigate]);
+
+  useEffect(() => {
     const fetchBuildingData = async () => {
       try {
         const { buildingId, buildingName } = await fetchBuildingId();
@@ -67,25 +75,6 @@ const Staff = () => {
     return { buildingId, buildingName };
   };
 
-  const handleLogoutStaff = () => {
-    localStorage.clear("access_token", "roleId");
-    setAuth({
-      isAuthenticated: false,
-    });
-    setRoleId(null);
-    navigate("/");
-  };
-
-  const handleLogoClick = () => {
-    navigate("/staff");
-  };
-
-  useEffect(() => {
-    if (!auth.isAuthenticated) {
-      navigate("/");
-    }
-  }, [auth.isAuthenticated, navigate]);
-
   return (
     <>
       {appLoading ? (
@@ -94,33 +83,10 @@ const Staff = () => {
         </div>
       ) : (
         <div className="main-container">
-          <header className="header items-center">
-            <div
-              className="logo-container"
-              onClick={() => handleLogoClick()}
-              style={{ cursor: "pointer" }}
-            >
-              <div className="circle">WZ</div>
-            </div>
+          <div className="sticky top-0 z-50 shadow-lg">
+            <StaffHeader buildingName={buildingName} />
+          </div>
 
-            <div className="flex justify-between w-full">
-              <h1 className="font-bold text-4xl">
-                Workzy Staff at {buildingName}
-              </h1>
-              <button
-                onClick={() => handleLogoutStaff()}
-                className="btn"
-                style={{
-                  cursor: "pointer",
-                }}
-              >
-                Logout
-              </button>
-            </div>
-            <label htmlFor="my-drawer-2" className="btn btn-primary lg:hidden">
-              Open drawer
-            </label>
-          </header>
           <div className="drawer lg:drawer-open">
             <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
             <div className="drawer-content flex flex-col items-center justify-center">
@@ -129,21 +95,31 @@ const Staff = () => {
               </main>
             </div>
             <div className="drawer-side">
-              <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay"></label>
+              <label
+                htmlFor="my-drawer-2"
+                aria-label="close sidebar"
+                className="drawer-overlay"
+              ></label>
               <ul className="menu bg-base-200 text-base-content min-h-full w-50 p-4">
                 <li>
                   <Link
                     to="/staff/buildingroom"
-                    className={`menu-item ${location.pathname === "/staff/buildingroom" ? "active" : ""}`}
+                    className={`menu-item ${
+                      location.pathname === "/staff/buildingroom"
+                        ? "active"
+                        : ""
+                    }`}
                   >
-                    <BsBuildings className="mr-2 text-xl h-[calc(6vh-1rem)]" /> 
+                    <BsBuildings className="mr-2 text-xl h-[calc(6vh-1rem)]" />
                     Building's Workspaces
                   </Link>
                 </li>
                 <li>
                   <Link
                     to="/staff/bookings"
-                    className={`menu-item ${location.pathname === "/staff/bookings" ? "active" : ""}`}
+                    className={`menu-item ${
+                      location.pathname === "/staff/bookings" ? "active" : ""
+                    }`}
                   >
                     <PiCalendarCheckBold className="mr-2 text-xl h-[calc(6vh-1rem)]" />
                     Bookings Management
@@ -152,9 +128,11 @@ const Staff = () => {
                 <li>
                   <Link
                     to="/staff/wishlist"
-                    className={`menu-item ${location.pathname === "/staff/wishlist" ? "active" : ""}`}
+                    className={`menu-item ${
+                      location.pathname === "/staff/wishlist" ? "active" : ""
+                    }`}
                   >
-                    <FaRegHeart className="mr-2 text-xl h-[calc(6vh-1rem)]" /> 
+                    <FaRegHeart className="mr-2 text-xl h-[calc(6vh-1rem)]" />
                     Wishlist
                   </Link>
                 </li>
