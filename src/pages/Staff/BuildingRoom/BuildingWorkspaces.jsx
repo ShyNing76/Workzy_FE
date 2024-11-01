@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 import Hourly from '../../../components/layout/staff/building/RoomRow/Hourly';
 import Daily from '../../../components/layout/staff/building/RoomRow/Daily';
@@ -6,7 +6,6 @@ import Monthly from '../../../components/layout/staff/building/RoomRow/Monthly';
 import { getWorkspaceByBuildingId, getBookingWorkspace } from '../../../config/api.staff';
 import "./BuildingWorkspaces.scss";
 
-// Hàm chuyển đổi thời gian về múi giờ Việt Nam
 const convertToVietnamTime = (date) => {
   return new Date(date).toLocaleString('sv-SE', { timeZone: 'Asia/Ho_Chi_Minh' });
 };
@@ -46,22 +45,23 @@ const BuildingWorkspaces = () => {
     fetchWorkspaces();
   }, [buildingId]);
 
-  // Fetch bookings for each workspace
+  // Memoize bookingsCache to avoid re-fetching
   const fetchBookingsForWorkspaces = useCallback(async () => {
-    if (workspaces.length === 0) return;
+    if (!workspaces.length || !buildingId) return;
 
     try {
       const updatedWorkspaces = await Promise.all(
         workspaces.map(async (workspace) => {
           const cacheKey = `${workspace.workspace_id}_${selectedDate}`;
+
+          // Kiểm tra cache trước khi gọi API
           if (bookingsCache[cacheKey]) return { ...workspace, bookings: bookingsCache[cacheKey] };
 
+          // Gọi API nếu cache không có
           const response = await getBookingWorkspace(buildingId, workspace.workspace_id, selectedDate);
           const bookings = response?.data?.rows.map(booking => {
             const startTime = convertToVietnamTime(booking.start_time_date);
             const endTime = convertToVietnamTime(booking.end_time_date);
-
-            // Không còn xử lý thêm ngày cho booking từ 00:00 đến 07:00
             return {
               startTime: new Date(startTime),
               endTime: new Date(endTime),
@@ -70,41 +70,37 @@ const BuildingWorkspaces = () => {
             };
           }) || [];
 
-          setBookingsCache(prevCache => {
-            const newCache = { ...prevCache, [cacheKey]: bookings };
-            // Giới hạn kích thước cache, chỉ lưu tối đa 50 items
-            if (Object.keys(newCache).length > 50) {
-              delete newCache[Object.keys(newCache)[0]];
-            }
-            return newCache;
-          });
-
+          // Cập nhật cache
+          setBookingsCache(prevCache => ({ ...prevCache, [cacheKey]: bookings }));
           return { ...workspace, bookings };
         })
       );
+
       setWorkspaces(updatedWorkspaces);
     } catch (error) {
       console.error('Error fetching bookings:', error);
     }
-  }, [workspaces, selectedDate, bookingsCache, buildingId]);
+  },
+  [workspaces, selectedDate, buildingId] // Chỉ để lại các dependency cần thiết
+);
 
-  // Fetch bookings when selectedDate or workspaces change
+
   useEffect(() => {
     fetchBookingsForWorkspaces();
-  }, [fetchBookingsForWorkspaces, selectedDate]);
+  }, [fetchBookingsForWorkspaces]);
 
   const handleDateChange = (e) => {
     const dateValue = e.target.value;
     let date;
     if (selectedType === 'monthly') {
       const [year, month] = dateValue.split('-');
-      date = new Date(year, month - 1);
+      date = new Date(year, month);
       setSelectedYear(year);
     } else {
       date = new Date(dateValue);
     }
 
-    if (!isNaN(date.getTime())) { // Kiểm tra nếu ngày hợp lệ
+    if (!isNaN(date.getTime())) {
       const dateString = date.toISOString().split('T')[0];
       if (dateString !== currentDate) {
         setBookingsCache({});
@@ -113,12 +109,6 @@ const BuildingWorkspaces = () => {
       }
     } else {
       console.error('Invalid date selected');
-    }
-
-    const dateString = date.toISOString().split('T')[0];
-    if (dateString !== currentDate) {
-      setCurrentDate(dateString);
-      setSelectedDate(dateString);
     }
   };
 
@@ -138,7 +128,7 @@ const BuildingWorkspaces = () => {
       case 'daily':
         return <Daily selectedDate={currentDate} selectedStatus={selectedStatus} selectedType={selectedType} workspaces={filteredWorkspaces} onWorkspaceClick={handleWorkspaceClick} />;
       case 'monthly':
-        return <Monthly selectedStatus={selectedStatus} workspaces={filteredWorkspaces} onWorkspaceClick={handleWorkspaceClick} />;
+        return <Monthly selectedDate={currentDate} selectedStatus={selectedStatus} workspaces={filteredWorkspaces} onWorkspaceClick={handleWorkspaceClick} />;
       default:
         return null;
     }
@@ -156,7 +146,13 @@ const BuildingWorkspaces = () => {
       <div className="status-labels">
         {statusLabels.map((label, index) => (
           <div key={index} className="status-label">
-            <div className="circle" style={{ backgroundColor: label.color }}></div>
+            <div
+              className="circle"
+              style={{
+                backgroundColor: label.color,
+                border: label.status === 'Available' ? '1px solid black' : 'none',
+              }}
+            ></div>
             <span>{label.status}</span>
           </div>
         ))}

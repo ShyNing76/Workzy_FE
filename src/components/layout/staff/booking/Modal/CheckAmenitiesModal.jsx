@@ -27,7 +27,7 @@ const CheckAmenitiesModal = ({ bookingId, onClose, handleChangeStatus, handleSen
                     throw new Error("Invalid response structure");
                 }
   
-                const uniqueAmenities = response.data.uniqueAmenitiesWithQuantity; // Đã thay đổi ở đây
+                const uniqueAmenities = response.data.uniqueAmenitiesWithQuantity;
                 if (Array.isArray(uniqueAmenities)) {
                     setAmenities(uniqueAmenities);
                 } else {
@@ -49,19 +49,25 @@ const CheckAmenitiesModal = ({ bookingId, onClose, handleChangeStatus, handleSen
             const found = prev.find((item) => item.amenity_name === amenity.amenity_name);
             
             if (found) {
-                // Nếu đã có tiện ích này, loại bỏ nó
+                // Bỏ chọn tiện ích nếu đã tồn tại
                 return prev.filter((item) => item.amenity_name !== amenity.amenity_name);
             } else {
-                // Nếu chưa có, thêm vào với thông tin chính xác
-                return [...prev, { 
-                    amenity_name: amenity.amenity_name, 
-                    quantity: amenity.quantity
-                }];
+                // Thêm tiện ích vào danh sách với quantity mặc định là 1
+                return [...prev, { amenity_name: amenity.amenity_name, quantity: 1 }];
             }
         });
-    };    
-    
-    
+    };
+
+    const handleQuantityChange = (amenity, value) => {
+        setSelectedAmenities((prev) => 
+            prev.map((item) => 
+                item.amenity_name === amenity.amenity_name
+                    ? { ...item, quantity: value }
+                    : item
+            )
+        );
+    };
+
     const handleDone = async () => {
         try {
             if (selectedAmenities.length === 0) {
@@ -72,8 +78,6 @@ const CheckAmenitiesModal = ({ bookingId, onClose, handleChangeStatus, handleSen
                     title: "Status updated successfully to completed!",
                     showConfirmButton: false,
                     timer: 1500,
-                }).then(() => {
-                    window.location.reload(); // Reload the page after the alert is closed
                 });
             } else {
                 await handleSendBrokenAmenities(bookingId, selectedAmenities);
@@ -84,7 +88,7 @@ const CheckAmenitiesModal = ({ bookingId, onClose, handleChangeStatus, handleSen
                     showConfirmButton: false,
                     timer: 1500,
                 }).then(() => {
-                    window.location.reload(); // Reload the page after the alert is closed
+                    window.location.reload();
                 });
             }
         } catch (err) {
@@ -95,41 +99,62 @@ const CheckAmenitiesModal = ({ bookingId, onClose, handleChangeStatus, handleSen
                 text: "An error occurred while updating the status!",
             });
         } finally {
-            onClose(); // Đóng modal sau khi xử lý xong
+            onClose();
         }
-    };    
-    
+        console.log("Final selected amenities with quantities:", selectedAmenities); // Log toàn bộ dữ liệu đã chọn
+    };
+
     const handleModalClick = (event) => {
         event.stopPropagation();
     };
-  
+
     if (loading) return <div>Loading...</div>;
     if (error) return <div>{error}</div>;
-  
+
     return (
         <dialog className="modal" open onClick={onClose}>
             <div className="modal-box" onClick={handleModalClick}>
                 <h3 className="font-bold text-lg">List of amenities</h3>
                 <ul>
                     {amenities.length > 0 ? (
-                        amenities.map((amenity, index) => (
-                            <li key={index}>
-                                <label>
+                        amenities.map((amenity, index) => {
+                            const isSelected = selectedAmenities.some(
+                                (item) => item.amenity_name === amenity.amenity_name
+                            );
+                            return (
+                                <li key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <label style={{ flexGrow: 1 }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={isSelected}
+                                            onChange={() => handleCheckboxChange(amenity)}
+                                        />
+                                        {amenity.amenity_name} - {amenity.quantity}
+                                    </label>
                                     <input
-                                        type="checkbox"
-                                        onChange={() => handleCheckboxChange(amenity)} // Truyền toàn bộ đối tượng
+                                        type="number"
+                                        min="1"
+                                        max={amenity.quantity}
+                                        value={
+                                            isSelected
+                                                ? selectedAmenities.find((item) => item.amenity_name === amenity.amenity_name)?.quantity || 1
+                                                : 1
+                                        }
+                                        onChange={(e) =>
+                                            handleQuantityChange(amenity, parseInt(e.target.value))
+                                        }
+                                        disabled={!isSelected} // Vô hiệu hóa input nếu chưa chọn checkbox
+                                        style={{ marginLeft: "8px", width: "60px" }}
                                     />
-                                    {amenity.amenity_name} (Quantity: {amenity.quantity})
-                                </label>
-                            </li>
-
-                        ))
+                                </li>
+                            );
+                        })
                     ) : (
                         <li>No amenities available</li>
                     )}
                 </ul>
                 <div className="modal-action">
-                    <button type="button" onClick={handleDone}>
+                    <button type="button" onClick={handleDone} className="px-4 py-2 mt-4 bg-gray-300 rounded">
                         Done
                     </button>
                 </div>
@@ -137,5 +162,5 @@ const CheckAmenitiesModal = ({ bookingId, onClose, handleChangeStatus, handleSen
         </dialog>
     );
 };
-  
+
 export default CheckAmenitiesModal;

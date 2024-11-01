@@ -44,6 +44,21 @@ const getBookingTypeById = (booking_type_id) => {
   return axios.get(URL_API);
 };
 
+const getWishlist = () => {
+  const URL_API = "/api/v1/wishList/";
+  return axios.get(URL_API);
+}
+
+const getCustomerById = (customer_id) => {
+  const URL_API = `/api/v1/customer/${customer_id}`
+  return axios.get(URL_API, customer_id)
+}
+
+const sendNotification = (wishlist_id, description, type = 'system') => {
+  const URL_API = "/api/v1/notification";
+  return axios.post(URL_API, { wishlist_id, description, type });
+};
+
 export {
   getStaffBuildingId,
   getWorkspaceByBuildingId,
@@ -52,5 +67,8 @@ export {
   getAmenitiesByBookingId,
   sendBrokenAmenities, 
   getBookingWorkspace,
-  getBookingTypeById
+  getBookingTypeById,
+  getWishlist,
+  getCustomerById,
+  sendNotification,
 };
