@@ -1,101 +1,118 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import './Wishlist.scss';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Đảm bảo import useNavigate
+import { getWishlist, getWorkspaceById } from "../../../config/api.staff"; // Đảm bảo đường dẫn đúng
 
 const Wishlist = () => {
-    const [bookings, setBookings] = useState([]);
-    const [error, setError] = useState(null);
-    const [successMessage, setSuccessMessage] = useState(null);
+  const [wishlists, setWishlists] = useState([]);
+  const [workspaces, setWorkspaces] = useState({});
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchBookings = async () => {
-            try {
-                const response = await axios.get('/api/v1/bookings');
-                if (Array.isArray(response.data)) {
-                    setBookings(response.data);
-                } else {
-                    console.error("Data is not an array", response.data);
-                    setBookings([]);
-                }
-            } catch (err) {
-                console.error("Error fetching bookings", err);
-                setBookings([]);
-            }
-        };
-
-        fetchBookings();
-    }, []);
-
-    const handleSendNotification = async (customerID, workspaceName) => {
-        try {
-            const response = await axios.post('/api/v1/wishList/', {
-                workspace_ids: [workspaceName],
-                customer_id: customerID
-            }, {
-                headers: {
-                    'Authorization': 'your_token_here'
-                }
-            });
-            setSuccessMessage(`Notification sent for ${workspaceName}`);
-        } catch (error) {
-            setError("Error sending notification");
-        }
+  useEffect(() => {
+    const fetchWishlistData = async () => {
+      try {
+        setLoading(true);
+        const response = await getWishlist();
+        setWishlists(response.data);
+      } catch (error) {
+        console.error("Error fetching wishlist data:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
+    fetchWishlistData();
+  }, []);
+
+  const uniqueWorkspaces = {};
+
+  useEffect(() => {
+    const fetchWorkspaces = async () => {
+      setLoading(true);
+      const newWorkspaces = {};
+      await Promise.all(
+        wishlists.map(async (wishlist) => {
+          const workspaceId = wishlist.workspace_id;
+          if (!newWorkspaces[workspaceId]) {
+            try {
+              const workspaceData = await getWorkspaceById(workspaceId);
+              newWorkspaces[workspaceId] = workspaceData.data;
+            } catch (error) {
+              console.error("Error fetching workspace data:", error);
+            }
+          }
+        })
+      );
+      setLoading(false);
+      setWorkspaces(newWorkspaces);
+    };
+
+    if (wishlists.length) fetchWorkspaces();
+  }, [wishlists]);
+
+  const handleViewClick = (workspaceId) => {
+    const customers = wishlists
+      .filter((item) => item.Workspaces.workspace_id === workspaceId)
+      .map((item) => ({
+        name: item.Customers.User.name,
+        id: item.Customers.customer_id,
+        wishlist_id: item.wishlist_id,
+      }));
+
+    const imageUrl =
+      workspaces[workspaceId]?.WorkspaceImages &&
+      workspaces[workspaceId]?.WorkspaceImages[0]?.image;
+
+    navigate("view-wishlist", {
+      state: { customers: customers, imageUrl: imageUrl },
+    });
+  };
+
+  if (loading) {
     return (
-        <div className="wishlist">
-            {error && <div className="error">{error}</div>}
-            {successMessage && <div className="success">{successMessage}</div>}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Customer ID</th>
-                        <th>Customer Name</th>
-                        <th>Workspace Type</th>
-                        <th>Workspace Name</th>
-                        <th>Description</th>
-                        <th>Booking Type</th> 
-                        <th>Start Time</th>
-                        <th>End time</th>
-                        <th>Price</th>
-                        <th>Amenities</th>
-                        <th>Creation Date</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {bookings.map((customer) => (
-                        customer.workspaces.map((workspace, index) => (
-                            <tr key={`${customer.customerID}-${index}`}>
-                                {index === 0 && (
-                                    <>
-                                        <td rowSpan={customer.workspaces.length}>{customer.customerID}</td>
-                                        <td rowSpan={customer.workspaces.length}>{customer.customerName}</td>
-                                    </>
-                                )}
-                                <td>{workspace.workspaceType}</td>
-                                <td>{workspace.workspaceName}</td>
-                                <td>{workspace.description.split("\n").map((line, i) => (
-                                    <div key={i}>{line}</div>
-                                ))}</td>
-                                <td>{workspace.bookingType}</td>
-                                <td>{workspace.price}</td>
-                                <td>{workspace.amenities}</td>
-                                <td>{workspace.creationDate}</td>
-                                <td>{workspace.status}</td>
-                                <td>
-                                    <button onClick={() => handleSendNotification(customer.customerID, workspace.workspaceName)}>
-                                        Send Notification
-                                    </button>
-                                </td>
-                            </tr>
-                        ))
-                    ))}
-                </tbody>
-            </table>
-        </div>
+      <div className="flex justify-center items-center h-screen">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
     );
+  }
+
+  return (
+    <div className="wishlist-container grid grid-cols-3 gap-16 p-4 max-h-[80vh] overflow-y-auto">
+      {wishlists.map((wishlist) => {
+        const workspaceId = wishlist.Workspaces.workspace_id;
+
+        if (uniqueWorkspaces[workspaceId]) {
+          return null;
+        }
+
+        uniqueWorkspaces[workspaceId] = true;
+
+        return (
+          <div
+            key={workspaceId}
+            className="card shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
+            onClick={() => handleViewClick(workspaceId)}
+          >
+            <figure>
+              <img
+                src={
+                  workspaces[wishlist.workspace_id]?.WorkspaceImages &&
+                  workspaces[wishlist.workspace_id]?.WorkspaceImages[0]?.image
+                }
+                alt={wishlist.Workspaces.workspace_name}
+                className="w-full h-48 object-cover"
+              />
+            </figure>
+            <div className="card-body">
+              <h2 className="card-title">
+                {wishlist.Workspaces.workspace_name}
+              </h2>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
 };
 
 export default Wishlist;

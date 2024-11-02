@@ -6,6 +6,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import { getUserAuthen, registerApi } from "../../../config/api";
 import { AuthContext } from "../../../components/context/auth.context";
+import { encryptRoleId } from "../../../utils/encryptRoleId";
 
 const RegisterPage = () => {
   const [email, setEmail] = useState("");
@@ -51,8 +52,11 @@ const RegisterPage = () => {
 
         if (userRes && userRes.data && userRes.err === 0) {
           const { role_id } = userRes.data;
-          localStorage.setItem("roleId", role_id);
-          setRoleId(role_id);
+
+          const encryptedRoleId = encryptRoleId(role_id);
+
+          localStorage.setItem("roleId", encryptedRoleId);
+          setRoleId(role_id); // int
 
           // Điều hướng theo vai trò của người dùng
           switch (role_id) {

@@ -7,6 +7,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { getUserAuthen, loginApi } from "../../../config/api";
 import { AuthContext } from "../../../components/context/auth.context";
 import { FcGoogle } from "react-icons/fc";
+import { encryptRoleId } from "../../../utils/encryptRoleId";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -42,8 +43,11 @@ const LoginPage = () => {
 
       if (userRes && userRes.data && userRes.err == 0) {
         const { role_id } = userRes.data;
-        localStorage.setItem("roleId", role_id);
-        setRoleId(role_id);
+
+        const encryptedRoleId = encryptRoleId(role_id);
+
+        localStorage.setItem("roleId", encryptedRoleId);
+        setRoleId(role_id); // int
 
         switch (role_id) {
           case 1: {

@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import { extractToken, isTokenExpired } from "../../utils/userToken.authen";
+import { decryptRoleId, encryptRoleId } from "../../utils/encryptRoleId";
 
 export const AuthContext = createContext();
 
@@ -14,7 +15,12 @@ export const AuthWrapper = ({ children }) => {
   });
 
   const [roleId, setRoleId] = useState(() => {
-    return localStorage.getItem("roleId") || null;
+    const storedEncryptedRoleId = localStorage.getItem("roleId");
+    const decryptedRoleId = storedEncryptedRoleId
+      ? decryptRoleId(storedEncryptedRoleId)
+      : null;
+
+    return decryptedRoleId;
   });
 
   const [appLoading, setAppLoading] = useState(false);
@@ -29,7 +35,9 @@ export const AuthWrapper = ({ children }) => {
 
   useEffect(() => {
     if (roleId) {
-      localStorage.setItem("roleId", roleId);
+      const encryptedRoleId = encryptRoleId(roleId);
+
+      localStorage.setItem("roleId", encryptedRoleId);
       updateTawkWidget(parseInt(roleId));
     } else {
       localStorage.removeItem("roleId");
@@ -98,7 +106,8 @@ export const AuthWrapper = ({ children }) => {
 
   useEffect(() => {
     const bearerToken = localStorage.getItem("access_token");
-    const storedRoleId = localStorage.getItem("roleId");
+    const localRoleId = localStorage.getItem("roleId");
+    const storedRoleId = localRoleId ? decryptRoleId(localRoleId) : null;
 
     if (bearerToken && storedRoleId) {
       setAuth({ isAuthenticated: true });

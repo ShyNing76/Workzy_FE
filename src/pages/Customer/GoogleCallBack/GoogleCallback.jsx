@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AuthContext } from "../../../components/context/auth.context";
 import { getUserAuthen } from "../../../config/api";
+import { encryptRoleId } from "../../../utils/encryptRoleId";
 
 const GoogleCallback = () => {
   const [searchParams] = useSearchParams();
@@ -27,8 +28,11 @@ const GoogleCallback = () => {
 
           if (userRes && userRes.data && userRes.err === 0) {
             const { role_id } = userRes.data;
-            localStorage.setItem("roleId", role_id);
-            setRoleId(role_id);
+
+            const encryptedRoleId = encryptRoleId(role_id);
+
+            localStorage.setItem("roleId", encryptedRoleId);
+            setRoleId(role_id); // int
 
             // Điều hướng người dùng dựa trên role_id
             switch (role_id) {

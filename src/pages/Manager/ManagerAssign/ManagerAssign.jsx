@@ -480,7 +480,7 @@ const ManagerAssign = () => {
                       <div className="avatar">
                         <div className="w-12 h-12 mask mask-squircle">
                           <img
-                            src={building.image_url}
+                            src={building.BuildingImages[0].image}
                             alt={building.building_name}
                           />
                         </div>

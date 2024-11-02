@@ -20,23 +20,20 @@
     filter: brightness(40%);
   }
 
-  .overlay-text,
-  .header,
-  .tabs,
-  .content {
+  .overlay-text, .header, .tabs, .content {
     position: relative;
     z-index: 1;
   }
 
   .overlay-text {
     position: absolute;
-    top: 50%;
+    top: 40%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: balck;
+    color: black;
     font-size: 3rem;
     text-align: center;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.401);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
     padding: 20px;
     font-weight: bolder;
   }
@@ -45,7 +42,6 @@
     display: flex;
     padding: 10px 20px;
     background-color: rgba(248, 249, 250, 0.014);
-    border-bottom: 1px solid black;
 
     .logo-container {
       display: flex;
@@ -71,44 +67,6 @@
         color: black;
         font-weight: normal;
         white-space: nowrap;
-      }
-    }
-  }
-
-  .tabs {
-    display: flex;
-    align-items: flex-start;
-    margin-top: 5px;
-    height: 60px;
-    background-color: rgba(248, 249, 250, 0.014);
-
-    .tab {
-      padding: 10px 20px;
-      cursor: pointer;
-      text-decoration: none;
-      color: rgba(58, 56, 56, 0.63);
-      font-weight: bold;
-      margin-right: 5px;
-      border: 1px solid black;
-      border-radius: 5px 5px 0 0;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      transition: background-color 0.3s, color 0.3s;
-      line-height: 1;
-      background-color: rgba(248, 249, 250, 0.014);
-
-      &.active,
-      &:hover {
-        background-color: #ffffff;
-        font-weight: extrabold;
-        color: black;
-        border-bottom: 1px solid black;
-        z-index: 1;
-      }
-
-      svg {
-        margin-right: 5px;
       }
     }
   }

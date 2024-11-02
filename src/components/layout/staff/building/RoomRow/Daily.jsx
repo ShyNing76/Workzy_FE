@@ -2,17 +2,6 @@ import React, { useState } from 'react';
 import './RoomSchedule.scss';
 import RoomModal from '../../building/RoomModal/RoomModal';
 
-const convertToVietnamTime = (dateTime) => {
-    const date = new Date(dateTime);
-    const options = { timeZone: 'Asia/Ho_Chi_Minh' };
-    const vietnamTime = date.toLocaleString('en-US', options);
-    
-    // In ra console ngày đã chuyển đổi
-    console.log('Ngày đã chuyển đổi:', vietnamTime);
-    
-    return vietnamTime;
-};
-
 const Daily = ({ selectedDate, workspaces }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState(null);
@@ -31,38 +20,35 @@ const Daily = ({ selectedDate, workspaces }) => {
             const startTime = new Date(booking.startTime);
             const endTime = new Date(booking.endTime);
 
-            // Kiểm tra nếu booking kéo dài ít nhất 24 giờ và nằm trong khoảng thời gian ngày cụ thể
-            return (endTime - startTime >= 24 * 60 * 60 * 1000) && (startTime < endOfDay && endTime >= startOfDay);
-        });
-    };
+            // Exclude completed or cancelled bookings
+            if (booking.status === 'completed' || booking.status === 'cancelled') {
+                return false;
+            }
 
-    const isEndOfBookingInPreviousDay = (bookings, day) => {
-        return bookings.some(booking => {
-            const endTime = new Date(booking.endTime);
-            return endTime.getDate() === day && endTime.getHours() === 23 && endTime.getMinutes() === 59;
+            return (endTime - startTime >= 24 * 60 * 60 * 1000) && 
+                   (startTime < endOfDay && endTime >= startOfDay);
         });
     };
 
     const getCellStyle = (bookings, day) => {
         const bookedSlots = checkIfBooked(bookings, day);
-
-        // Nếu không có booking, trả về style mặc định
+    
         if (bookedSlots.length === 0) {
             return { backgroundColor: 'white', padding: 0, border: '1px solid #ddd', position: 'relative' };
         }
-
-        // Nếu có booking, kiểm tra xem nó có bắt đầu từ ngày này không
+    
         const startTime = new Date(bookedSlots[0].startTime);
         const endTime = new Date(bookedSlots[0].endTime);
-
-        const isStartOfBooking = day === startTime.getDate() && startTime.getHours() === 0;
-        const isEndOfBooking = day === endTime.getDate() || isEndOfBookingInPreviousDay(bookings, day);
-
+    
+        const isStartOfBooking = day === startTime.getDate() && startTime.getMonth() === dateObj.getMonth();
+        const isEndOfBooking = day === endTime.getDate() && endTime.getMonth() === dateObj.getMonth();
+    
         return {
             padding: 0,
             border: '1px solid #ddd',
             position: 'relative',
-            borderRadius: `${isStartOfBooking ? '15px 0 0 15px' : ''}${isEndOfBooking ? '0 15px 15px 0' : ''}`,
+            borderRadius: `${isStartOfBooking ? '15px 0 0 15px' : ''} ${isEndOfBooking ? '0 15px 15px 0' : ''}`.trim(),
+            backgroundColor: bookedSlots.length > 0 ? 'transparent' : 'white',
         };
     };
 
@@ -71,15 +57,15 @@ const Daily = ({ selectedDate, workspaces }) => {
             case 'confirm':
             case 'paid':
             case 'check-in':
-                return '#90EE90'; // Màu xanh lá
+                return '#90EE90';
             case 'usage':
             case 'check-out':
             case 'check-amenities':
-                return '#ADD8E6'; // Màu xanh dương
+                return '#ADD8E6';
             case 'damaged-payment':
                 return '#F95454';
             default:
-                return 'transparent'; // Không có màu
+                return 'transparent';
         }
     };
 
@@ -88,9 +74,9 @@ const Daily = ({ selectedDate, workspaces }) => {
             <table>
                 <thead>
                     <tr>
-                        <th style={{ width: '120px' }}>Workspaces</th>
+                        <th style={{ width: '140px' }}>Workspaces</th>
                         {daysInMonth.map(day => (
-                            <th key={day}>{day}</th>
+                            <th key={day} style={{ fontSize: '0.90rem', textAlign: 'center' }}>{day}</th>
                         ))}
                     </tr>
                 </thead>
@@ -124,13 +110,13 @@ const Daily = ({ selectedDate, workspaces }) => {
                                             {bookedSlots.length > 0 && (
                                                 <div
                                                     style={{
-                                                        backgroundColor: statusColor, // Màu sắc dựa trên trạng thái
+                                                        backgroundColor: statusColor,
                                                         height: '75%', 
                                                         width: '100%',
                                                         position: 'absolute',
                                                         top: '13%', 
                                                         left: 0,
-                                                        borderRadius: cellStyle.borderRadius, 
+                                                        borderRadius: cellStyle.borderRadius,
                                                     }}
                                                 />
                                             )}

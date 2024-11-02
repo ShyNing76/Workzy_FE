@@ -12,91 +12,81 @@ const Hourly = ({ selectedDate, workspaces}) => {
         const bookings = workspace.bookings.filter(booking => {
             const bookingStart = new Date(booking.startTime);
             const bookingEnd = new Date(booking.endTime);
-            const selectedDateString = new Date(selectedDate).toLocaleDateString('en-GB');
-            
-            // Chỉ kiểm tra giờ trong cùng ngày đã chọn và không bỏ qua các khoảng thời gian từ 00:00 đến trước 7:00
+            const selectedDateStart = new Date(selectedDate).setHours(0, 0, 0, 0);
+            const selectedDateEnd = new Date(selectedDate).setHours(23, 59, 59, 999);
+    
             return (
-                bookingStart.toLocaleDateString('en-GB') <= selectedDateString &&
-                bookingEnd.toLocaleDateString('en-GB') >= selectedDateString &&
-                bookingStart.getHours() <= hour &&
-                bookingEnd.getHours() >= hour
+                (bookingStart <= selectedDateEnd && bookingEnd >= selectedDateStart) &&
+                bookingStart.getHours() <= hour && bookingEnd.getHours() >= hour
             );
         });
     
-        setSelectedRoom({ workspace, hour });
-        setBookingsForModal(bookings); // Cập nhật bookings cho modal
-        setModalOpen(true); // Mở modal
-    };
+        // Check if any booking at this hour is "completed" or "cancelled"
+        const isNonClickable = bookings.some(({ status }) => 
+            status === 'completed' || status === 'cancelled'
+        );
     
+        // Open modal only if the booking is clickable
+        if (!isNonClickable) {
+            setSelectedRoom({ workspace, hour });
+            setBookingsForModal(bookings);
+            setModalOpen(true);
+        }
+    };   
     
-    // Lấy danh sách khoảng thời gian booking
     const getBookingRanges = (bookings, date) => {
         if (!Array.isArray(bookings)) return [];
     
+        const currentDateStart = new Date(date).setHours(0, 0, 0, 0);
+        const currentDateEnd = new Date(date).setHours(23, 59, 59, 999);
+    
         return bookings.reduce((acc, { startTime, endTime, status }) => {
-            if (status === 'cancelled') return acc; // Bỏ qua booking có trạng thái cancelled
+            if (status === 'cancelled') return acc;
     
             const start = new Date(startTime);
             const end = new Date(endTime);
-            const currentDate = new Date(date);
     
-            // Định dạng ngày với múi giờ Việt Nam
-            const currentDateString = currentDate.toLocaleDateString('en-GB');
-            const startDateString = start.toLocaleDateString('en-GB');
-            const endDateString = end.toLocaleDateString('en-GB');
-    
-            // Chỉ lấy booking trong ngày đã chọn và không tô ô ngày trước đó
-            if (startDateString <= currentDateString && endDateString >= currentDateString) {
-                const startHour = startDateString === currentDateString ? start.getHours() : 0;
-                let endHour = endDateString === currentDateString ? end.getHours() - 1 : 23;
-    
-                // Nếu giờ kết thúc là 23:59, tô luôn ô giờ thứ 23
-                if (end.getHours() === 23 && end.getMinutes() === 59) {
-                    endHour = 23;
-                }
-    
+            if (start <= currentDateEnd && end >= currentDateStart) {
+                const isStartDate = start.toDateString() === new Date(date).toDateString();
+                const isEndDate = end.toDateString() === new Date(date).toDateString();
+                
                 acc.push({
-                    startHour,
-                    endHour,
-                    status // Lưu trạng thái vào khoảng thời gian booking
+                    startHour: start < currentDateStart ? 0 : start.getHours(),
+                    endHour: end > currentDateEnd ? 23 : end.getHours(),
+                    status,
+                    isActualStart: isStartDate,
+                    isActualEnd: isEndDate
                 });
             }
             return acc;
         }, []);
-    };
-    
-    
-    // Style ô dựa vào trạng thái booking
-    const renderCellStyle = (isBooked, isStart, isEnd) => ({
-        backgroundColor: isBooked ? '#90EE90' : 'white',
-        padding: 0,
-        border: '1px solid #ddd',
-        borderRadius: isStart ? '15px 0 0 15px' : isEnd ? '0 15px 15px 0' : '0', // Bo góc trái khi là ô bắt đầu và phải khi là ô kết thúc
-        cursor: isBooked ? 'pointer' : 'default',
-    });
+    };    
 
     const renderBookingCell = (workspace, hour, bookingRanges) => {
-        // Tìm tất cả booking cho giờ hiện tại
-        const bookingsAtHour = bookingRanges.filter(({ startHour, endHour }) => hour >= startHour && hour <= endHour);
-        const isBooked = bookingsAtHour.length > 0; // Kiểm tra nếu có booking
-        const isSingleBooking = bookingsAtHour.length === 1; // Kiểm tra nếu có đúng 1 booking
-        const booking = isSingleBooking ? bookingsAtHour[0] : null; // Nếu có 1 booking, lấy nó
+        const bookingsAtHour = bookingRanges.filter(({ startHour, endHour }) => 
+            hour >= startHour && hour <= endHour
+        );
+        const isBooked = bookingsAtHour.length > 0;
+        const isSingleBooking = bookingsAtHour.length === 1;
+        const booking = isSingleBooking ? bookingsAtHour[0] : null;
+        
+        const isStart = isSingleBooking && hour === booking.startHour && booking.isActualStart;
+        const isEnd = isSingleBooking && hour === booking.endHour && booking.isActualEnd;
     
-        const isStart = isSingleBooking && hour === booking.startHour; // Ô bắt đầu
-        const isEnd = isSingleBooking && hour === booking.endHour; // Ô kết thúc
+        let cellColor = 'white';
+        let isClickable = true; // Default to clickable
     
-        // Tùy chỉnh màu sắc dựa trên trạng thái
-        let cellColor = 'white'; // Mặc định là màu trắng
         if (isBooked) {
-            const status = isSingleBooking ? booking.status : 'multi'; // Nếu có nhiều booking, gán trạng thái khác
+            const status = isSingleBooking ? booking.status : 'multi';
             if (['confirm', 'paid', 'check-in'].includes(status)) {
-                cellColor = '#90EE90'; // Màu xanh lá
+                cellColor = '#90EE90';
             } else if (['usage', 'check-out', 'check-amenities'].includes(status)) {
-                cellColor = '#ADD8E6'; // Màu xanh dương
+                cellColor = '#ADD8E6';
             } else if (['damaged-payment'].includes(status)) {
-                cellColor = '#F95454'; // Màu đỏ 
+                cellColor = '#F95454';
             } else if (['complete', 'cancelled'].includes(status)) {
-                cellColor = 'white'; // Màu trắng
+                cellColor = 'white';
+                isClickable = false; // Disable clicking for completed/cancelled bookings
             }
         }
     
@@ -104,51 +94,48 @@ const Hourly = ({ selectedDate, workspaces}) => {
             <td
                 key={`${workspace.workspace_id}-${hour}`}
                 style={{
-                    ...renderCellStyle(isBooked, isStart, isEnd),
                     position: 'relative',
                     backgroundColor: isBooked ? 'transparent' : 'white',
-                    borderRadius: isStart && isEnd ? '15px' : isStart ? '15px 0 0 15px' : isEnd ? '0 15px 15px 0' : '0',
+                    padding: 0,
+                    border: '1px solid #ddd',
+                    cursor: isClickable && isBooked ? 'pointer' : 'default',
                 }}
-                onClick={() => isBooked && handleCellClick(workspace, hour)}
+                onClick={() => isClickable && isBooked && handleCellClick(workspace, hour)}
             >
                 {isBooked && (
                     <div
                         style={{
                             backgroundColor: cellColor,
-                            height: '75%', // Chiều cao của màu tô
+                            height: '75%',
                             width: '100%',
                             position: 'absolute',
-                            top: '13%', // Điều chỉnh vị trí
-                            borderRadius: isStart && isEnd ? '15px' : isStart ? '15px 0 0 15px' : isEnd ? '0 15px 15px 0' : '0',
+                            top: '13%',
+                            borderRadius: isStart && isEnd ? '15px' : 
+                                        isStart ? '15px 0 0 15px' : 
+                                        isEnd ? '0 15px 15px 0' : '0',
                         }}
                     />
                 )}
             </td>
         );
     };
-    
 
-    // Tính toán booking ranges cho tất cả workspaces
     const bookingRangesByWorkspace = useMemo(() => 
         workspaces.map(workspace => ({
             workspaceId: workspace.workspace_id,
             bookingRanges: getBookingRanges(workspace.bookings, selectedDate),
         })), 
         [workspaces, selectedDate]
-        
     );
-
-    useEffect(() => {
-    }, [workspaces]);
 
     return (
         <div className='room-schedule'>
             <table>
                 <thead>
                     <tr>
-                        <th style={{ width: '120px' }}>Workspaces</th>
+                        <th style={{ width: '140px' }}>Workspaces</th>
                         {hours.map(hour => (
-                            <th key={hour}>{hour}:00</th>
+                            <th key={hour} style={{ fontSize: '0.90rem', textAlign: 'center' }}>{hour}:00</th>
                         ))}
                     </tr>
                 </thead>

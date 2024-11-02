@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { CiCircleInfo } from "react-icons/ci";
-import { FaRegCheckCircle } from "react-icons/fa";
+import { FaRegCheckCircle, FaRegHeart } from "react-icons/fa";
 import { format } from "date-fns";
 import Pagination from "../../../components/layout/Shared/Pagination/Pagination";
 import NotificationItem from "../../../components/layout/Customer/Notification/NotificationItem";
 import { getNotificationOfCustomer } from "../../../config/api";
+import { Link } from "react-router-dom";
+import { IoIosNotifications } from "react-icons/io";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -46,7 +48,7 @@ const NotificationsPage = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto my-8 p-6 bg-white rounded-lg shadow-lg">
+    <div className="max-w-5xl mx-auto my-8 p-6 bg-white rounded-lg shadow-lg w-full h-96">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
@@ -55,17 +57,33 @@ const NotificationsPage = () => {
       </div>
 
       <div className="space-y-4">
-        {notifications.rows &&
+        {notifications.rows > 0 ? (
           notifications.rows.map((notification) => (
             <NotificationItem
               key={notification.notification_id}
               {...notification}
             />
-          ))}
+          ))
+        ) : (
+          <div className="text-center py-12">
+            <div className="mb-4">
+              <IoIosNotifications className="mx-auto h-12 w-12 text-gray-400" />
+            </div>
+            <h3 className="text-xl font-medium text-gray-900 mb-1">
+              Your notification is empty
+            </h3>
+            <p className="text-gray-500 mb-4">Enjoy your booking with Workzy</p>
+            <Link to="/location" className="btn btn-neutral">
+              Browse Workspaces
+            </Link>
+          </div>
+        )}
       </div>
 
       <div className="mt-4">
-        <Pagination page={page} totalPages={totalPages} setPage={setPage} />
+        {totalPages > 0 && (
+          <Pagination page={page} totalPages={totalPages} setPage={setPage} />
+        )}
       </div>
     </div>
   );
