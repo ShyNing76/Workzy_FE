@@ -37,16 +37,16 @@ const BookingSummary = (props) => {
     }
   }, [numOfHours, numOfDays, numOfMonths, price]); // Thêm `price` vào dependency để cập nhật khi thay đổi
 
-  // Calculate the total price
   useEffect(() => {
-    // Calculate the subtotal first
-    const newSubtotal = amountPrice - amountPrice * discount;
+    // Calculate the subtotal first by applying the discount
+    const newSubtotal = amountPrice * (1 - discount); // Discount as a percentage
 
-    // Then calculate the tax based on the subtotal
+    // Calculate the tax based on the subtotal
     const newTax = newSubtotal * 0.1; // Assuming tax is 10%
 
+    // Set subtotal, tax, and total
     setSubtotal(newSubtotal);
-    setTax(newTax); // Giả sử thuế là 10%
+    setTax(newTax);
     setTotal(newSubtotal + newTax);
   }, [amountPrice, discount]);
 
