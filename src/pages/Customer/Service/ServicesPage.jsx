@@ -3,6 +3,9 @@ import ServiceHeader from "../../../components/layout/Customer/OurServiceHeader/
 import podSingleImg from "../../../assets/single-pod.png";
 import podDoubleImg from "../../../assets/double-pod.png";
 import quadPodImg from "../../../assets/quad-pod.jpg";
+import workingRoomImg from "../../../assets/workingRoomImage1.jpg";
+import meetingRoomImg from "../../../assets/meetingRoomImage2.jpg";
+import eventSpaceImg from "../../../assets/eventSpaceImage3.jpg";
 import swiperImg1 from "../../../assets/ourServiceSwiper1.jpg";
 import swiperImg2 from "../../../assets/ourServiceSwiper2.jpg";
 import swiperImg3 from "../../../assets/ourServiceSwiper3.jpg";
@@ -20,7 +23,6 @@ const personalServices = [
   {
     title: "Single POD",
     utilities: ["24/7", "Wifi", "Community connection"],
-    price: "$50/hour",
     imageUrl: podSingleImg,
     linkUrl: "/services/single-pod",
     icons: [<CiCalendar />, <FaWifi />, <MdOutlineConnectWithoutContact />], // Icons tương ứng với mỗi utility
@@ -28,7 +30,6 @@ const personalServices = [
   {
     title: "Double POD",
     utilities: ["24/7", "Wifi", "Community connection"],
-    price: "$50/hour",
     imageUrl: podDoubleImg,
     linkUrl: "/services/double-pod",
     icons: [<CiCalendar />, <FaWifi />, <MdOutlineConnectWithoutContact />], // Icons tương ứng với mỗi utility
@@ -36,7 +37,6 @@ const personalServices = [
   {
     title: "Quad POD",
     utilities: ["24/7", "Wifi", "Community connection"],
-    price: "$50/hour",
     imageUrl: quadPodImg,
     linkUrl: "/services/quad-pod",
     icons: [<CiCalendar />, <FaWifi />, <MdOutlineConnectWithoutContact />], // Icons tương ứng với mỗi utility
@@ -47,23 +47,20 @@ const businessServices = [
   {
     title: "Working room",
     utilities: ["24/7", "Wifi", "Community connection"],
-    price: "$70/hour",
-    imageUrl: podSingleImg,
+    imageUrl: workingRoomImg,
     linkUrl: "/services/working-room",
     icons: [<CiCalendar />, <FaWifi />, <MdOutlineConnectWithoutContact />], // Icons tương ứng với mỗi utility
   },
   {
     title: "Meeting room",
     utilities: ["24/7", "Wifi", "Community connection"],
-    price: "$90/hour",
-    imageUrl: podSingleImg,
+    imageUrl: meetingRoomImg,
     linkUrl: "/services/meeting-room",
     icons: [<CiCalendar />, <FaWifi />, <MdOutlineConnectWithoutContact />], // Icons tương ứng với mỗi utility
   },
   {
     title: "Event space",
     utilities: ["Large space", "Wifi", "Community connection"],
-    price: "$120/hour",
     imageUrl: podSingleImg,
     linkUrl: "/services/event-space",
     icons: [<FaSquarespace />, <FaWifi />, <MdOutlineConnectWithoutContact />], // Icons tương ứng với mỗi utility
@@ -85,8 +82,11 @@ const ServicesPage = () => {
 
       <div className="our-service-card-container">
         {/* Business Services */}
-        <div className="business-title">
-          <h2>Business services</h2>
+        <div className="flex items-center gap-4 mb-8 mt-16 ml-32">
+          <div className="h-12 w-2 bg-primary rounded-full"></div>
+          <h2 className="text-4xl font-bold text-base-content">
+            Business Services
+          </h2>
         </div>
         <div className="business-container">
           {businessServices.map((service, index) => (
@@ -101,10 +101,18 @@ const ServicesPage = () => {
             />
           ))}
         </div>
+        <br />
+        <section className="image-about-between">
+          <h1>WORKZY</h1>
+          <h3>Do it your way, we've got you covered.</h3>
+        </section>
 
         {/* Personal Services */}
-        <div className="personal-title">
-          <h2>Personal services</h2>
+        <div className="flex items-center gap-4 mb-8 mt-16 ml-32">
+          <div className="h-12 w-2 bg-secondary rounded-full"></div>
+          <h2 className="text-4xl font-bold text-base-content">
+            Personal Services
+          </h2>
         </div>
         <div className="personal-container">
           {personalServices.map((service, index) => (
