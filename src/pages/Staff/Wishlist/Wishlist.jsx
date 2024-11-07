@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // Đảm bảo import useNavigate
-import { getWishlist, getWorkspaceById } from "../../../config/api.staff"; // Đảm bảo đường dẫn đúng
+import { useNavigate } from "react-router-dom";
+import { getWishlist, getWorkspaceById } from "../../../config/api.staff";
 
 const Wishlist = () => {
   const [wishlists, setWishlists] = useState([]);
@@ -77,40 +77,43 @@ const Wishlist = () => {
   }
 
   return (
-    <div className="wishlist-container grid grid-cols-3 gap-16 p-4 max-h-[80vh] overflow-y-auto">
-      {wishlists.map((wishlist) => {
-        const workspaceId = wishlist.Workspaces.workspace_id;
+    <div className="container mx-auto p-4">
+      <h2 className="text-4xl font-black mt-5 ml-2">Wishlist</h2>
+      <div className="grid grid-cols-3 gap-4 mt-6">
+        {wishlists.map((wishlist) => {
+          const workspaceId = wishlist.Workspaces.workspace_id;
 
-        if (uniqueWorkspaces[workspaceId]) {
-          return null;
-        }
+          if (uniqueWorkspaces[workspaceId]) {
+            return null;
+          }
 
-        uniqueWorkspaces[workspaceId] = true;
+          uniqueWorkspaces[workspaceId] = true;
 
-        return (
-          <div
-            key={workspaceId}
-            className="card shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
-            onClick={() => handleViewClick(workspaceId)}
-          >
-            <figure>
-              <img
-                src={
-                  workspaces[wishlist.workspace_id]?.WorkspaceImages &&
-                  workspaces[wishlist.workspace_id]?.WorkspaceImages[0]?.image
-                }
-                alt={wishlist.Workspaces.workspace_name}
-                className="w-full h-48 object-cover"
-              />
-            </figure>
-            <div className="card-body">
-              <h2 className="card-title">
-                {wishlist.Workspaces.workspace_name}
-              </h2>
+          return (
+            <div
+              key={workspaceId}
+              className="card card-compact bg-base-100 shadow-xl cursor-pointer transition-transform transform hover:scale-105"
+              onClick={() => handleViewClick(workspaceId)}
+            >
+              <figure>
+                <img
+                  src={
+                    workspaces[wishlist.workspace_id]?.WorkspaceImages &&
+                    workspaces[wishlist.workspace_id]?.WorkspaceImages[0]?.image
+                  }
+                  alt={wishlist.Workspaces.workspace_name}
+                  className="w-full h-72 object-cover"
+                />
+              </figure>
+              <div className="card-body">
+                <h2 className="card-title text-center">
+                  {wishlist.Workspaces.workspace_name}
+                </h2>
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 };

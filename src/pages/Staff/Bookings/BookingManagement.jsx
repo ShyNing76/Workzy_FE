@@ -252,6 +252,8 @@ const BookingManagement = () => {
 
   return (
     <div className="booking-container m-6 ">
+      <h2 className="text-4xl font-black mt-5">Bookings Management</h2>
+      <br/>
       <div className="main-bookings-content">
         <BookingFilters
           searchQuery={searchQuery}
@@ -259,6 +261,7 @@ const BookingManagement = () => {
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
         />
+        <br/>
         <BookingTable
           bookings={currentFilteredBookings}
           currentPage={currentPage}
@@ -266,6 +269,7 @@ const BookingManagement = () => {
           setSelectedBooking={setSelectedBooking}
           setShowDetailModal={setShowDetailModal}
         />
+        <br/>
         <BookingPagination
           currentPage={currentPage}
           totalFilteredPages={totalFilteredPages}

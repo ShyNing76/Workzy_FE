@@ -12,9 +12,9 @@ const BookingTable = ({ bookings, currentPage, handleChangeStatus, setSelectedBo
                     <th style={{ width: '150px'}}>Start Time</th>
                     <th style={{ width: '150px'}}>End Time</th>
                     <th style={{ width: '130px'}}>Booking Type</th>
-                    <th style={{ width: '140px'}}>Total Price</th>
-                    <th style={{ width: '160px'}}>Status</th>
-                    <th style={{ width: '250px'}}>Actions</th>
+                    <th style={{ width: '130px'}}>Total Price</th>
+                    <th style={{ width: '165px'}}>Status</th>
+                    <th style={{ width: '260px'}}>Actions</th>
                 </tr>
             </thead>
             <tbody>

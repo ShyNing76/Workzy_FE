@@ -5,8 +5,8 @@ import { AuthContext } from "../../../components/context/auth.context";
 import { getUserAuthen } from "../../../config/api";
 import { getStaffBuildingId } from "../../../config/api.staff";
 import { FaRegHeart } from "react-icons/fa";
-import { BsBuildings } from "react-icons/bs";
 import { PiCalendarCheckBold } from "react-icons/pi";
+import { FiCheckCircle } from "react-icons/fi";
 import StaffHeader from "../../../components/layout/staff/StaffHeader/StaffHeader";
 
 const Staff = () => {
@@ -103,15 +103,15 @@ const Staff = () => {
               <ul className="menu bg-base-200 text-base-content min-h-full w-50 p-4">
                 <li>
                   <Link
-                    to="/staff/buildingroom"
+                    to="/staff/workspacestatus"
                     className={`menu-item ${
-                      location.pathname === "/staff/buildingroom"
+                      location.pathname === "/staff/workspacestatus"
                         ? "active"
                         : ""
                     }`}
                   >
-                    <BsBuildings className="mr-2 text-xl h-[calc(6vh-1rem)]" />
-                    Building's Workspaces
+                    <FiCheckCircle  className="mr-2 text-xl h-[calc(6vh-1rem)]" />
+                    Workspace's Status
                   </Link>
                 </li>
                 <li>
@@ -122,7 +122,7 @@ const Staff = () => {
                     }`}
                   >
                     <PiCalendarCheckBold className="mr-2 text-xl h-[calc(6vh-1rem)]" />
-                    Bookings Management
+                    Bookings
                   </Link>
                 </li>
                 <li>

@@ -91,7 +91,7 @@ const DetailModal = ({ booking, onClose }) => {
                     </ul>
 
                     <div className="modal-action">
-                        <button onClick={onClose} className="px-4 py-2 mt-4 bg-gray-300 rounded">
+                        <button onClick={onClose} className="btn btn-primary">
                             Close
                         </button>
                     </div>

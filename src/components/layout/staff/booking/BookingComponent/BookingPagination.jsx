@@ -1,20 +1,19 @@
 import React from 'react';
 
 const BookingPagination = ({ currentPage, totalFilteredPages, setCurrentPage, isLoading }) => (
-    <div className="pagination">
+    <div className="join flex justify-center mb-10">
         <button 
-            className='btn btn-xs btn-outline'
-            style={{ marginRight: "20px" }}
+            className='join-item btn'
             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
             disabled={currentPage === 1 || isLoading}
         >
-            Previous
+            Prev
         </button>
-        <span style={{ marginRight: "20px"}}>
-            {`Page ${currentPage} of ${totalFilteredPages || 1}`}
+        <span className='join-item btn'>
+            {`${currentPage}`}
         </span>
         <button 
-            className='btn btn-xs btn-outline'
+            className='join-item btn'
             onClick={() => setCurrentPage(prev => Math.min(totalFilteredPages, prev + 1))}
             disabled={currentPage === totalFilteredPages || isLoading}
         >

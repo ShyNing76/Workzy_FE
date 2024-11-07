@@ -49,10 +49,8 @@ const CheckAmenitiesModal = ({ bookingId, onClose, handleChangeStatus, handleSen
             const found = prev.find((item) => item.amenity_name === amenity.amenity_name);
             
             if (found) {
-                // Bỏ chọn tiện ích nếu đã tồn tại
                 return prev.filter((item) => item.amenity_name !== amenity.amenity_name);
             } else {
-                // Thêm tiện ích vào danh sách với quantity mặc định là 1
                 return [...prev, { amenity_name: amenity.amenity_name, quantity: 1 }];
             }
         });
@@ -101,7 +99,7 @@ const CheckAmenitiesModal = ({ bookingId, onClose, handleChangeStatus, handleSen
         } finally {
             onClose();
         }
-        console.log("Final selected amenities with quantities:", selectedAmenities); // Log toàn bộ dữ liệu đã chọn
+        console.log("Final selected amenities with quantities:", selectedAmenities); 
     };
 
     const handleModalClick = (event) => {
@@ -113,23 +111,26 @@ const CheckAmenitiesModal = ({ bookingId, onClose, handleChangeStatus, handleSen
 
     return (
         <dialog className="modal" open onClick={onClose}>
-            <div className="modal-box" onClick={handleModalClick}>
-                <h3 className="font-bold text-lg">List of amenities</h3>
-                <ul>
+            <div className="modal-box max-w-md bg-white rounded-lg shadow-xl p-6" onClick={handleModalClick}>
+                <h3 className="text-xl font-bold text-gray-800 mb-4">List of amenities</h3>
+                <div className="space-y-4">
                     {amenities.length > 0 ? (
                         amenities.map((amenity, index) => {
                             const isSelected = selectedAmenities.some(
                                 (item) => item.amenity_name === amenity.amenity_name
                             );
                             return (
-                                <li key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <label style={{ flexGrow: 1 }}>
+                                <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg">
+                                    <label className="flex items-center space-x-2 flex-grow cursor-pointer">
                                         <input
                                             type="checkbox"
                                             checked={isSelected}
                                             onChange={() => handleCheckboxChange(amenity)}
+                                            defaultChecked className="checkbox"
                                         />
-                                        {amenity.amenity_name} - {amenity.quantity}
+                                        <span className="text-gray-600">
+                                            {amenity.amenity_name} - {amenity.quantity}
+                                        </span>
                                     </label>
                                     <input
                                         type="number"
@@ -143,18 +144,23 @@ const CheckAmenitiesModal = ({ bookingId, onClose, handleChangeStatus, handleSen
                                         onChange={(e) =>
                                             handleQuantityChange(amenity, parseInt(e.target.value))
                                         }
-                                        disabled={!isSelected} // Vô hiệu hóa input nếu chưa chọn checkbox
-                                        style={{ marginLeft: "8px", width: "60px" }}
+                                        disabled={!isSelected}
+                                        className={`w-20 px-2 py-1 border rounded-md text-center focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                            !isSelected ? 'bg-gray-100 text-gray-400' : 'bg-white'
+                                        }`}
                                     />
-                                </li>
+                                </div>
                             );
                         })
                     ) : (
-                        <li>No amenities available</li>
+                        <div className="text-gray-500 text-center py-4">No amenities available</div>
                     )}
-                </ul>
-                <div className="modal-action">
-                    <button type="button" onClick={handleDone} className="px-4 py-2 mt-4 bg-gray-300 rounded">
+                </div>
+                <div className="modal-action mt-6 flex justify-end">
+                    <button
+                        onClick={handleDone}
+                        className="btn btn-primary"
+                    >
                         Done
                     </button>
                 </div>

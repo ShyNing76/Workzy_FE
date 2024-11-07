@@ -95,21 +95,19 @@ const ViewWishlist = () => {
   }
 
   return (
-    <div className="view-wishlist flex gap-5">
-      <div className="flex-none w-1/3 ml-5">
-        <div className=" shadow-lg" style={{ overflow: "hidden" }}>
-          <figure className="w-full h-full">
-            <img
-              src={imageUrl}
-              alt="Sample"
-              className="w-full h-full min-h-screen object-cover"
-            />
-          </figure>
-        </div>
+    <div className="view-wishlist flex gap-5 justify-between items-start p-4">
+      <div className="flex-none w-[600px] h-[400px] ml-1 shadow-lg rounded-lg" style={{ overflow: "hidden" }}>
+        <figure className="w-full h-full">
+          <img
+            src={imageUrl}
+            alt="Sample"
+            className="w-full h-full object-cover rounded-lg"
+          />
+        </figure>
       </div>
-      <div className="flex-grow w-1/2 overflow-x-auto p-4">
+        <div className="flex-grow w-2/3 overflow-x-auto p-4">
         <h2 className="text-4xl font-bold mb-5">Wishlist</h2>
-        <table className="table table-xl">
+        <table className="table table-xl w-full">
           <thead>
             <tr style={{ fontSize: "18px" }}>
               <th>Index</th>
