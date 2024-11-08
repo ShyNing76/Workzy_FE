@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
+import { FiClock } from "react-icons/fi";
+import { MdOutlineWorkspaces } from "react-icons/md";
 import Hourly from "../../../components/layout/staff/building/RoomRow/Hourly";
 import Daily from "../../../components/layout/staff/building/RoomRow/Daily";
 import Monthly from "../../../components/layout/staff/building/RoomRow/Monthly";
@@ -7,7 +9,7 @@ import {
   getWorkspaceByBuildingId,
   getBookingWorkspace,
 } from "../../../config/api.staff";
-import "./BuildingWorkspaces.scss";
+import "./WorkspaceStatus.scss";
 
 const convertToVietnamTime = (date) => {
   return new Date(date).toLocaleString("sv-SE", {
@@ -15,7 +17,7 @@ const convertToVietnamTime = (date) => {
   });
 };
 
-const BuildingWorkspaces = () => {
+const WorkspaceStatus = () => {
   const { buildingId } = useOutletContext();
   const [workspaces, setWorkspaces] = useState([]);
   const [workspaceTypes, setWorkspaceTypes] = useState([]);
@@ -207,44 +209,48 @@ const BuildingWorkspaces = () => {
 
   return (
     <div className="room-controls-wrapper m-6" style={{ width: "100%" }}>
+      <h2 className="text-4xl font-black mt-5 ml-6">Workspace's Status</h2>
+      <br/>
       <div className="room-controls">
         <div className="control-row">
           <div className="control">
-            <label htmlFor="workspace-type-select">Select Workspace Type</label>
-            <select
-              id="workspace-type-select"
-              value={workspaceType}
-              onChange={(e) => setWorkspaceType(e.target.value)}
-            >
-              <option value="">All Workspace Types</option>
-              {workspaceTypes.map((type, index) => (
-                <option key={index} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
+            <div className="join w-full">
+              <div className="join-item bg-base-200 px-3 flex items-center">
+                <MdOutlineWorkspaces className="w-5 h-5 text-base-content/70" />
+              </div>
+              <select
+                className="select select-bordered select-sm w-full max-w-xs"
+                id="workspace-type-select"
+                value={workspaceType}
+                onChange={(e) => setWorkspaceType(e.target.value)}
+              >
+                <option value="">All Workspace Types</option>
+                {workspaceTypes.map((type, index) => (
+                  <option key={index} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <div className="control">
-            <label htmlFor="type-select">Select Booking Type</label>
-            <select
-              id="type-select"
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-            >
-              <option value="hourly">Hourly</option>
-              <option value="daily">Daily</option>
-              <option value="monthly">Monthly</option>
-            </select>
+              <div className="join w-full">
+                <div className="join-item bg-base-200 px-3 flex items-center">
+                  <FiClock className="w-5 h-5 text-base-content/70" />
+                </div>
+                <select
+                  className="select select-bordered select-sm w-full max-w-xs"
+                  id="type-select"
+                  value={selectedType}
+                  onChange={(e) => setSelectedType(e.target.value)}
+                >
+                  <option value="hourly">Hourly</option>
+                  <option value="daily">Daily</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+              </div>
           </div>
           <div className="control">
-            <label htmlFor="date-picker">
-              Select{" "}
-              {selectedType === "hourly"
-                ? "Date"
-                : selectedType === "daily"
-                ? "Month and Year"
-                : "Year"}
-            </label>
             {selectedType === "monthly" ? (
               <input
                 type="month"
@@ -266,7 +272,8 @@ const BuildingWorkspaces = () => {
         {renderStatusLabels()}
       </div>
     </div>
-  );
+);
+
 };
 
-export default BuildingWorkspaces;
+export default WorkspaceStatus;

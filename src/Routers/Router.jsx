@@ -41,7 +41,7 @@ import VouchersManagerPage from "../pages/Admin/VouchersManager/VouchersManagerP
 
 import MainPage from "../pages/Staff/MainPage/MainPage.jsx";
 import BookingManagement from "../pages/Staff/Bookings/BookingManagement.jsx";
-import BuildingWorkspaces from "../pages/Staff/BuildingRoom/BuildingWorkspaces.jsx";
+import WorkspaceStatus from "../pages/Staff/WorkspaceStatus/WorkspaceStatus.jsx";
 import PaymentPage from "../pages/Customer/Payment/Payment.jsx";
 import Wishlist from "../pages/Staff/Wishlist/Wishlist.jsx";
 import MyBooking from "../pages/Customer/MyBooking/MyBooking.jsx";
@@ -300,8 +300,8 @@ export const router = createBrowserRouter([
         element: <MainPage />,
       },
       {
-        path: "buildingroom",
-        element: <BuildingWorkspaces />,
+        path: "workspacestatus",
+        element: <WorkspaceStatus />,
       },
       {
         path: "bookings",
