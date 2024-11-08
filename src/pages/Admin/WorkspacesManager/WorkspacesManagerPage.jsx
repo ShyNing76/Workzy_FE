@@ -26,6 +26,8 @@ import AddModal from "../../../components/layout/Admin/Modals/AddModal";
 import UpdateModal from "../../../components/layout/Admin/Modals/UpdateModal";
 import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal";
 import Pagination from "../../../components/layout/Shared/Pagination/Pagination";
+import AddButton from "../../../components/layout/Admin/Buttons/AddButton";
+import { u } from "framer-motion/client";
 
 const WorkspacesManagerPage = () => {
   const [workspaces, setWorkspaces] = useState([]);
@@ -286,7 +288,7 @@ const WorkspacesManagerPage = () => {
       } else {
         Swal.fire({
           title: "Error",
-          text: "Failed to add workspace",
+          text: res.message,
           icon: "error",
         });
       }
@@ -305,10 +307,10 @@ const WorkspacesManagerPage = () => {
     const restructuredWorkspace = {
       ...workspace,
       images: workspace.WorkspaceImages.map((img) => img.image),
+      building_id: workspace.Building?.building_id,
     };
     setUpdateWorkspace(restructuredWorkspace);
 
-    console.log("updateWorkspace", updateWorkspace);
     setOpenModalUpdate(true);
   };
 
@@ -439,10 +441,11 @@ const WorkspacesManagerPage = () => {
     const restructuredWorkspace = {
       ...workspace,
       images: workspace.WorkspaceImages.map((img) => ({ image: img.image })),
+      WorkspaceType: workspace.WorkspaceType.workspace_type_name,
+      building_name: getBuildingNameById(workspace.Building?.building_id),
     };
     setDetailWorkspace(restructuredWorkspace);
 
-    console.log("detailWorkspace", detailWorkspace);
     setOpenModalDetails(true);
   };
 
@@ -460,10 +463,7 @@ const WorkspacesManagerPage = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-4xl font-black mb-4">Workspace Management</h1>
-        <button className="btn btn-primary gap-2" onClick={handleOpenModalAdd}>
-          <FiPlus className="w-5 h-5" />
-          Add Workspace
-        </button>
+        <AddButton onClick={handleOpenModalAdd} label="Add Workspace" />
       </div>
 
       {/* Modal sử dụng AddModal */}

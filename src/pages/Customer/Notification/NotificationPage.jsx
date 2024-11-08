@@ -48,7 +48,7 @@ const NotificationsPage = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto my-8 p-6 bg-white rounded-lg shadow-lg w-full h-96">
+    <div className="max-w-5xl mx-auto my-8 p-6 bg-white rounded-lg shadow-lg w-full">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
@@ -57,7 +57,7 @@ const NotificationsPage = () => {
       </div>
 
       <div className="space-y-4">
-        {notifications.rows > 0 ? (
+        {notifications.rows ? (
           notifications.rows.map((notification) => (
             <NotificationItem
               key={notification.notification_id}
@@ -65,7 +65,7 @@ const NotificationsPage = () => {
             />
           ))
         ) : (
-          <div className="text-center py-12">
+          <div className="text-center py-12 h-96">
             <div className="mb-4">
               <IoIosNotifications className="mx-auto h-12 w-12 text-gray-400" />
             </div>

@@ -60,7 +60,7 @@ const GallerySwiper = (props) => {
           {images &&
             images.map((item, index) => (
               <SwiperSlide key={`image-rooom-${index}`}>
-                <img src={item.image} />
+                <img style={{ width: 85 }} src={item.image} />
               </SwiperSlide>
             ))}
         </Swiper>

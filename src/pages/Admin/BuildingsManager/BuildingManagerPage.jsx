@@ -394,7 +394,7 @@ const BuildingManagerPage = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-4xl font-black mb-4">Building List</h1>
+      <h1 className="text-4xl font-black mb-4">Building Management</h1>
 
       <div className="flex justify-between items-center my-4">
         <div className="flex-grow mr-4">

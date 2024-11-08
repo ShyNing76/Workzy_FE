@@ -52,7 +52,9 @@ const AddModal = ({
     onInputChange({
       target: {
         name: e.target.name,
-        value: e.target.multiple ? [...(currentItem.image || []), ...files] : files[0],
+        value: e.target.multiple
+          ? [...(currentItem.image || []), ...files]
+          : files[0],
       },
     });
   };
@@ -108,6 +110,16 @@ const AddModal = ({
     return errorMissing && errorMissing.includes(fieldLabel);
   };
 
+  const handleSelectChange = (e, fieldName) => {
+    const value = e.target.value;
+
+    onInputChange({
+      target: {
+        name: fieldName,
+        value: value,
+      },
+    });
+  };
   return (
     <div className="modal modal-open">
       <div className="modal-box w-3/4 max-w-3xl">
@@ -168,13 +180,12 @@ const AddModal = ({
                   <select
                     name={field.name}
                     value={currentItem[field.name] || ""}
-                    onChange={onInputChange}
-                    className={
-                      field.className || "select select-bordered w-full"
-                    }
-                    required
+                    onChange={(e) => handleSelectChange(e, field.name)}
+                    className="select select-bordered w-full"
+                    required={field.required}
                   >
-                    {field.options.map((option) => (
+                    <option value="">Select {field.label}</option>
+                    {field.options?.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>

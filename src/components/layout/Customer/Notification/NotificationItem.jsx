@@ -8,7 +8,7 @@ const NotificationItem = ({ description, createdAt, type }) => {
   const getIcon = () => {
     switch (type) {
       case "booking":
-        return <FaRegCheckCircle className="w-5 h-5 text-blue-500" />;
+        return <FaRegCheckCircle className="w-5 h-5 text-green-600" />;
       default:
         return <CiCircleInfo className="w-5 h-5 text-gray-500" />;
     }

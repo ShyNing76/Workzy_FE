@@ -89,6 +89,27 @@ const UpdateModal = ({
     }
   };
 
+  // const handleSelectChange = (e, fieldName) => {
+  //   const value = e.target.value;
+  //   onInputChange({
+  //     target: {
+  //       name: fieldName,
+  //       value: value,
+  //     },
+  //   });
+  // };
+
+  const handleSelectChange = (e, fieldName) => {
+    const value = e.target.value;
+
+    onInputChange({
+      target: {
+        name: fieldName,
+        value: value,
+      },
+    });
+  };
+
   const removeImage = (indexToRemove) => {
     const removedImage = previewImages[indexToRemove];
     const isFirebaseImage =
@@ -204,14 +225,13 @@ const UpdateModal = ({
                 {field.type === "select" && (
                   <select
                     name={field.name}
+                    // Đối với building_id và workspace_type_id, ta lấy giá trị trực tiếp từ currentItem
                     value={currentItem[field.name] || ""}
-                    onChange={onInputChange}
+                    onChange={(e) => handleSelectChange(e, field.name)}
                     className="select select-bordered w-full"
-                    required
+                    required={field.required}
                   >
-                    <option value="" disabled>
-                      Select {field.label}
-                    </option>
+                    <option value="">Select {field.label}</option>
                     {field.options?.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
