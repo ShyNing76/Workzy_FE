@@ -36,6 +36,9 @@ const RoomDetail = () => {
   // Tab hiện tại
   const [currentTab, setCurrentTab] = useState("Hourly");
 
+  // Is Fully Booking
+  const [isFullyBooked, setIsFullyBooked] = useState(false);
+
   // fetch room data
   useEffect(() => {
     const fetchWorkspaceData = async () => {
@@ -142,6 +145,7 @@ const RoomDetail = () => {
                 <TimeBooking
                   workspaceId={roomData.workspace_id}
                   selectedDate={selectedDate}
+                  setIsFullyBooked={setIsFullyBooked}
                 />
               )}
 
@@ -193,6 +197,7 @@ const RoomDetail = () => {
                 setSelectedDate={setSelectedDate}
                 currentTab={currentTab}
                 setCurrentTab={setCurrentTab}
+                isFullyBooked={isFullyBooked}
               />
             </div>
           </div>

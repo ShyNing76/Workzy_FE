@@ -85,18 +85,18 @@ const Navbar = (props) => {
           </ul>
         </div>
         <Link to="/" className=" text-3xl font-black">
-        <div
-              className="flex items-center"
-              style={{
-                fontSize: "1.875rem",
-                fontWeight: "900",
-                color: "#1f2937",
-              }}
-            >
-              <img
-                src="../../../../../WORKZY_LOGO_BGR.png"
-                alt="logo"
-              className="w-20 h-20"
+          <div
+            className="flex items-center"
+            style={{
+              fontSize: "1.875rem",
+              fontWeight: "900",
+              color: "#1f2937",
+            }}
+          >
+            <img
+              src="../../../../../WORKZY_LOGO_BGR.png"
+              alt="logo"
+              className="w-8 h-8 mr-2"
             />
             WORKZY
           </div>
