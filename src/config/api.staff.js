@@ -10,10 +10,14 @@ const getWorkspaceByBuildingId = (building_id) => {
   return axios.get(URL_API);
 };
 
-const getBooking = (building_id, page, limit) => {
-  const URL_API = `/api/v1/booking/get/?building_id=${building_id}&page=${page}&limit=${limit}`;
+const getBooking = (building_id, page, limit, booking_id = "") => {
+  let URL_API = `/api/v1/booking/get/?building_id=${building_id}&page=${page}&limit=${limit}`;
+  if (booking_id) {
+    URL_API += `&booking_id=${booking_id}`;
+  }
   return axios.get(URL_API);
 };
+
 
 const getBookingWorkspace = (building_id, workspace_id) => {
   const URL_API = `/api/v1/booking/get/?building_id=${building_id}&workspace_id=${workspace_id}`;

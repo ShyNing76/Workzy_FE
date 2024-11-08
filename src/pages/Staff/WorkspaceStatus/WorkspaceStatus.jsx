@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
-import { FiClock } from "react-icons/fi";
+import { FiClock, FiCalendar } from "react-icons/fi";
 import { MdOutlineWorkspaces } from "react-icons/md";
 import Hourly from "../../../components/layout/staff/building/RoomRow/Hourly";
 import Daily from "../../../components/layout/staff/building/RoomRow/Daily";
@@ -9,7 +9,6 @@ import {
   getWorkspaceByBuildingId,
   getBookingWorkspace,
 } from "../../../config/api.staff";
-import "./WorkspaceStatus.scss";
 
 const convertToVietnamTime = (date) => {
   return new Date(date).toLocaleString("sv-SE", {
@@ -33,7 +32,6 @@ const WorkspaceStatus = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Fetch workspaces based on buildingId
   useEffect(() => {
     if (!buildingId) return;
 
@@ -58,7 +56,6 @@ const WorkspaceStatus = () => {
     fetchWorkspaces();
   }, [buildingId]);
 
-  // Memoize bookingsCache to avoid re-fetching
   const fetchBookingsForWorkspaces = useCallback(
     async () => {
       if (!workspaces.length || !buildingId) return;
@@ -68,11 +65,10 @@ const WorkspaceStatus = () => {
           workspaces.map(async (workspace) => {
             const cacheKey = `${workspace.workspace_id}_${selectedDate}`;
 
-            // Kiểm tra cache trước khi gọi API
-            if (bookingsCache[cacheKey])
+            if (bookingsCache[cacheKey]) {
               return { ...workspace, bookings: bookingsCache[cacheKey] };
+            }
 
-            // Gọi API nếu cache không có
             const response = await getBookingWorkspace(
               buildingId,
               workspace.workspace_id,
@@ -90,7 +86,6 @@ const WorkspaceStatus = () => {
                 };
               }) || [];
 
-            // Cập nhật cache
             setBookingsCache((prevCache) => ({
               ...prevCache,
               [cacheKey]: bookings,
@@ -104,7 +99,7 @@ const WorkspaceStatus = () => {
         console.error("Error fetching bookings:", error);
       }
     },
-    [workspaces, selectedDate, buildingId] // Chỉ để lại các dependency cần thiết
+    [workspaces, selectedDate, buildingId]
   );
 
   useEffect(() => {
@@ -180,100 +175,128 @@ const WorkspaceStatus = () => {
     }
   };
 
-  const renderStatusLabels = () => {
-    const statusLabels = [
-      { status: "Available", color: "white" },
-      { status: "Booked", color: "#90EE90" },
-      { status: "Usage", color: "#ADD8E6" },
-      { status: "Damaged-payment", color: "#F95454" },
-    ];
-
-    return (
-      <div className="status-labels">
-        {statusLabels.map((label, index) => (
-          <div key={index} className="status-label">
-            <div
-              className="circle"
-              style={{
-                backgroundColor: label.color,
-                border:
-                  label.status === "Available" ? "1px solid black" : "none",
-              }}
-            ></div>
-            <span>{label.status}</span>
-          </div>
-        ))}
-      </div>
-    );
-  };
-
   return (
-    <div className="room-controls-wrapper m-6" style={{ width: "100%" }}>
-      <h2 className="text-4xl font-black mt-5 ml-6">Workspace's Status</h2>
-      <br/>
-      <div className="room-controls">
-        <div className="control-row">
-          <div className="control">
-            <div className="join w-full">
-              <div className="join-item bg-base-200 px-3 flex items-center">
-                <MdOutlineWorkspaces className="w-5 h-5 text-base-content/70" />
-              </div>
-              <select
-                className="select select-bordered select-sm w-full max-w-xs"
-                id="workspace-type-select"
-                value={workspaceType}
-                onChange={(e) => setWorkspaceType(e.target.value)}
-              >
-                <option value="">All Workspace Types</option>
-                {workspaceTypes.map((type, index) => (
-                  <option key={index} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
+    <div className="container mx-auto px-4 py-6">
+      {/* Header Section */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-base-content">
+          Workspace Status
+        </h2>
+      </div>
+
+      {/* Controls Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {/* Workspace Type Select */}
+        <div className="form-control w-full">
+          <label className="label">
+            <span className="label-text font-bold">Workspace Type</span>
+          </label>
+          <div className="join w-full">
+            <div className="btn btn-sm join-item">
+              <MdOutlineWorkspaces className="h-4 w-4" />
             </div>
+            <select 
+              className="select select-bordered select-sm w-full join-item"
+              value={workspaceType}
+              onChange={(e) => setWorkspaceType(e.target.value)}
+            >
+              <option value="">All Types</option>
+              {workspaceTypes.map((type, index) => (
+                <option key={index} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
           </div>
-          <div className="control">
-              <div className="join w-full">
-                <div className="join-item bg-base-200 px-3 flex items-center">
-                  <FiClock className="w-5 h-5 text-base-content/70" />
-                </div>
-                <select
-                  className="select select-bordered select-sm w-full max-w-xs"
-                  id="type-select"
-                  value={selectedType}
-                  onChange={(e) => setSelectedType(e.target.value)}
-                >
-                  <option value="hourly">Hourly</option>
-                  <option value="daily">Daily</option>
-                  <option value="monthly">Monthly</option>
-                </select>
-              </div>
+        </div>
+
+        {/* View Type Select */}
+        <div className="form-control w-full">
+          <label className="label">
+            <span className="label-text font-bold">View Type</span>
+          </label>
+          <div className="join w-full">
+            <div className="btn btn-sm join-item">
+              <FiClock className="h-4 w-4" />
+            </div>
+            <select
+              className="select select-bordered select-sm w-full join-item"
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value)}
+            >
+              <option value="hourly">Hourly</option>
+              <option value="daily">Daily</option>
+              <option value="monthly">Monthly</option>
+            </select>
           </div>
-          <div className="control">
+        </div>
+
+        {/* Date Picker */}
+        <div className="form-control w-full">
+          <label className="label">
+            <span className="label-text font-bold">Select Date</span>
+          </label>
+          <div className="join w-full">
+            <div className="btn btn-sm join-item">
+              <FiCalendar className="h-4 w-4" />
+            </div>
             {selectedType === "monthly" ? (
               <input
                 type="month"
-                id="date-picker"
+                className="input input-bordered input-sm w-full join-item"
                 value={currentDate.slice(0, 7)}
                 onChange={handleDateChange}
               />
             ) : (
               <input
                 type="date"
-                id="date-picker"
+                className="input input-bordered input-sm w-full join-item"
                 value={currentDate}
                 onChange={handleDateChange}
               />
             )}
           </div>
         </div>
-        <div className="room-tables">{renderTable()}</div>
-        {renderStatusLabels()}
+      </div>
+
+      {/* Table Section */}
+      <div className="card bg-base-100 shadow-xl">
+        <div className="card-body p-0">
+          <div className="overflow-x-auto">
+            {renderTable()}
+          </div>
+        </div>
+      </div>
+
+      {/* Status Note */}
+      <div className="mt-6">
+        <div className="card bg-base-100 shadow-lg">
+          <div className="card-body">
+            <h3 className="card-title text-sm mb-4">Status Note</h3>
+            <div className="flex flex-wrap gap-6 justify-center">
+              {[
+                { status: "Available", color: "white", border: true },
+                { status: "Booked", color: "#90EE90" },
+                { status: "Usage", color: "#ADD8E6" },
+                { status: "Damaged-Payment", color: "#F95454" }
+              ].map((label, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <div
+                    className="w-4 h-4 rounded-full"
+                    style={{
+                      backgroundColor: label.color,
+                      border: label.border ? '1px solid currentColor' : 'none'
+                    }}
+                  ></div>
+                  <span className="text-sm">{label.status}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-);
-
+  );
 };
 
 export default WorkspaceStatus;

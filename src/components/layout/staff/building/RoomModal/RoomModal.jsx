@@ -1,5 +1,4 @@
 import React from 'react';
-import './RoomModal.scss';
 
 const convertToVietnamTime = (dateString) => {
     const date = new Date(dateString);
@@ -10,24 +9,24 @@ const convertToVietnamTime = (dateString) => {
 };
 
 const capitalizeFirstLetter = (string) => {
-    if (!string) return ''; // Trả về chuỗi rỗng nếu không có chuỗi
+    if (!string) return ''; // Return empty string if no input
     return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
 const Modal = ({ isOpen, onClose, workspaceType, bookings }) => {
     if (!isOpen) return null;
     return (
-        <div className="modal-overlay">
-            <div className="modal-content">
-                <button className="close-button" onClick={onClose}>×</button>
-                <h2 className="modal-title">
+        <div className="modal modal-open">
+            <div className="modal-box">
+                <button className="btn btn-sm btn-circle absolute right-2 top-2" onClick={onClose}>×</button>
+                <h2 className="text-lg font-bold">
                     {workspaceType || 'Workspace Details'}
                 </h2>
                 {bookings && bookings.length > 0 ? (
-                    <div className="bookings-info">
+                    <div className="my-4">
                         {bookings.map((booking, index) => (
-                            <div key={index} className="booking-item">
-                                <h3>Customer: {booking.customerName}</h3>
+                            <div key={index} className="border p-4 my-2 rounded">
+                                <h3 className="font-semibold">Customer: {booking.customerName}</h3>
                                 <p>Start Time: {convertToVietnamTime(booking.startTime)}</p>
                                 <p>End Time: {convertToVietnamTime(booking.endTime)}</p>
                                 <p>Status: {capitalizeFirstLetter(booking.status)}</p>
@@ -35,7 +34,7 @@ const Modal = ({ isOpen, onClose, workspaceType, bookings }) => {
                         ))}
                     </div>
                 ) : (
-                    <div>No bookings available.</div>
+                    <div className="text-gray-500">No bookings available.</div>
                 )}
             </div>
         </div>

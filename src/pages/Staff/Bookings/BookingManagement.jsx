@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import "./BookingManagement.scss";
 import Swal from "sweetalert2";
 import DetailModal from "../../../components/layout/staff/booking/Modal/DetailModal.jsx";
 import CheckAmenitiesModal from "../../../components/layout/staff/booking/Modal/CheckAmenitiesModal.jsx";
@@ -19,13 +18,13 @@ const BookingManagement = () => {
   const [showAmenitiesModal, setShowAmenitiesModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(7);
+  const [itemsPerPage] = useState(5);
   const [isFetched, setIsFetched] = useState(false);
   const { buildingId } = useOutletContext();
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
-  const [allBookings, setAllBookings] = useState([]); // Thêm state này
+  const [allBookings, setAllBookings] = useState([]); 
 
   const [selectedDate, setSelectedDate] = useState(() => {
     const today = new Date();
@@ -59,27 +58,23 @@ const BookingManagement = () => {
     try {
       setIsLoading(true);
       if (!buildingId) return;
-  
-      // First call to get total count and first page
+
       const firstPageResponse = await getBooking(buildingId, 1, itemsPerPage);
-      
       if (!firstPageResponse?.data?.rows || !firstPageResponse?.data?.count) {
         throw new Error("Invalid response format from server");
       }
-  
+
       const totalItems = firstPageResponse.data.count;
       const totalPages = Math.ceil(totalItems / itemsPerPage);
       let allBookingsData = [];
       const bookingTypeCache = new Map();
-  
-      // Process all pages sequentially
+
       for (let page = 1; page <= totalPages; page++) {
         const pageResponse = page === 1 ? firstPageResponse : await getBooking(buildingId, page, itemsPerPage);
         const bookings = pageResponse.data.rows;
-  
+
         for (const booking of bookings) {
           try {
-            // Check cache first for booking type
             let bookingType;
             if (bookingTypeCache.has(booking.booking_type_id)) {
               bookingType = bookingTypeCache.get(booking.booking_type_id);
@@ -91,7 +86,7 @@ const BookingManagement = () => {
               bookingType = bookingTypeResponse.data.type;
               bookingTypeCache.set(booking.booking_type_id, bookingType);
             }
-  
+
             const bookingAmenities = booking.Amenities?.map((amenity) => {
               const details = amenity.BookingAmenities || {};
               return {
@@ -101,7 +96,7 @@ const BookingManagement = () => {
                 total_price: formatCurrency(details.total_price || 0),
               };
             });
-  
+
             allBookingsData.push({
               booking_id: booking.booking_id,
               workspace_id: booking.workspace_id,
@@ -124,12 +119,11 @@ const BookingManagement = () => {
           }
         }
       }
-  
+
       setAllBookings(allBookingsData);
       setTotalCount(totalItems);
       setIsLoading(false);
       setIsFetched(true);
-  
     } catch (error) {
       console.error("Error fetching booking data:", error);
       setIsLoading(false);
@@ -140,14 +134,13 @@ const BookingManagement = () => {
       });
     }
   };
-  
 
   useEffect(() => {
     if (buildingId) {
       setIsFetched(false);
       fetchAllBookingData();
     }
-  }, [buildingId]); // Bỏ currentPage dependency
+  }, [buildingId]);
 
   const handleSendBrokenAmenities = async (bookingId, selectedAmenities) => {
     try {
@@ -182,8 +175,6 @@ const BookingManagement = () => {
   const handleChangeStatus = async (booking_id, status) => {
     try {
       const response = await postBookingStatus(booking_id, status);
-      
-      // Kiểm tra response
       if (response?.data?.err) {
         throw new Error(response.data.message || "Unknown error occurred");
       }
@@ -196,7 +187,6 @@ const BookingManagement = () => {
         timer: 1500,
       });
   
-      // Update local state
       const updatedBookings = allBookings.map((booking) =>
         booking.booking_id === booking_id ? { ...booking, status } : booking
       );
@@ -218,7 +208,7 @@ const BookingManagement = () => {
         text: error.message || "Failed to update status",
       });
     }
-  };  
+  };
 
   const handleAmenitiesDone = () => {
     if (selectedBooking) {
@@ -271,48 +261,56 @@ const BookingManagement = () => {
         booking.booking_id.toString().includes(searchQuery)
       );
 
-      const totalFilteredPages = Math.ceil(searchedBookings.length / itemsPerPage);
+  const totalFilteredPages = Math.ceil(searchedBookings.length / itemsPerPage);
 
-  // Phân trang từ dữ liệu đã được lọc
   const currentFilteredBookings = searchedBookings.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-  
 
   return (
-    <div className="booking-container m-6 ">
-      <h2 className="text-4xl font-black mt-5">Bookings Management</h2>
-      <br/>
-      <div className="main-bookings-content">
-        <BookingFilters
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          selectedDate={selectedDate}
-          setSelectedDate={setSelectedDate}
-        />
-        <br/>
-        <BookingTable
-          bookings={currentFilteredBookings}
-          currentPage={currentPage}
-          handleChangeStatus={handleChangeStatus}
-          setSelectedBooking={setSelectedBooking}
-          setShowDetailModal={setShowDetailModal}
-        />
-        <br/>
-        <BookingPagination
-          currentPage={currentPage}
-          totalFilteredPages={totalFilteredPages}
-          setCurrentPage={setCurrentPage}
-          isLoading={isLoading}
-        />
+    <div className="container mx-auto px-4 py-6">
+      {/* Header Section */}
+      <h2 className="text-2xl font-bold text-base-content mb-6">Bookings Management</h2>
+
+      {/* Filters Section */}
+      <BookingFilters
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+      />
+
+      {/* Booking Table Section */}
+      <div className="card bg-base-100 shadow-lg overflow-hidden my-6">
+        <div className="card-body p-0">
+          <BookingTable
+            bookings={currentFilteredBookings}
+            currentPage={currentPage}
+            handleChangeStatus={handleChangeStatus}
+            setSelectedBooking={setSelectedBooking}
+            setShowDetailModal={setShowDetailModal}
+          />
+        </div>
       </div>
+
+      {/* Pagination Section */}
+      <BookingPagination
+        currentPage={currentPage}
+        totalFilteredPages={totalFilteredPages}
+        setCurrentPage={setCurrentPage}
+        isLoading={isLoading}
+      />
+
+      {/* Detail Modal */}
       {showDetailModal && selectedBooking && (
         <DetailModal
           booking={selectedBooking}
           onClose={() => setShowDetailModal(false)}
         />
       )}
+
+      {/* Amenities Modal */}
       {showAmenitiesModal && selectedBooking && (
         <CheckAmenitiesModal
           bookingId={selectedBooking.booking_id}
