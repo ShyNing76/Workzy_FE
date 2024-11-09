@@ -62,11 +62,10 @@ import eventSpaceImage3 from "../../../assets/eventSpaceImage3.jpg";
 import Comment from "../../../components/layout/Customer/CommentSection/Comment";
 import { ToastContainer } from "react-toastify";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
-
 import { FaPhone, FaTruck } from "react-icons/fa";
 import { CiMail } from "react-icons/ci";
 import { FiMapPin } from "react-icons/fi";
-
+import { MdOutlineMailOutline } from "react-icons/md";
 const HomePage = () => {
   // Define the slides for the Swiper
   const [activeTab, setActiveTab] = useState(0);
@@ -81,7 +80,7 @@ const HomePage = () => {
       ],
       serviceDetails: [
         { Icon: FaRegCalendarAlt, details: "Open 24/7" },
-        { Icon: FaWifi, details: "Strong, stable Wi-Fi" },
+        { Icon: FaWifi, details: "Stable Wi-Fi" },
         { Icon: BsCupHot, details: "Coffee and Tea" },
         { Icon: MdConnectWithoutContact, details: "Community connection" },
         { Icon: MdOutlineContactSupport, details: "Support" },
@@ -99,7 +98,7 @@ const HomePage = () => {
       ],
       serviceDetails: [
         { Icon: FaRegCalendarAlt, details: "Open 24/7" },
-        { Icon: FaWifi, details: "Strong, stable Wi-Fi" },
+        { Icon: FaWifi, details: "Stable Wi-Fi" },
         { Icon: BsCupHot, details: "Coffee and Tea" },
         { Icon: MdConnectWithoutContact, details: "Community connection" },
         { Icon: MdOutlinePeopleAlt, details: "1-2 People" },
@@ -117,7 +116,7 @@ const HomePage = () => {
       ],
       serviceDetails: [
         { Icon: FaRegCalendarAlt, details: "Open 24/7" },
-        { Icon: FaWifi, details: "Strong, stable Wi-Fi" },
+        { Icon: FaWifi, details: "Stable Wi-Fi" },
         { Icon: BsCupHot, details: "Coffee and Tea" },
         { Icon: FiPrinter, details: "Printer" },
         { Icon: MdGroups2, details: "2-4 People" },
@@ -134,7 +133,7 @@ const HomePage = () => {
         { image: workingRoomImage3 },
       ],
       serviceDetails: [
-        { Icon: FaWifi, details: "Strong, stable Wi-Fi" },
+        { Icon: FaWifi, details: "Stable Wi-Fi" },
         { Icon: MdConnectWithoutContact, details: "Community connection" },
         { Icon: FiPrinter, details: "Printer" },
         { Icon: BsFillTelephoneFill, details: "Telephone for room" },
@@ -152,7 +151,7 @@ const HomePage = () => {
         { image: meetingRoomImage3 },
       ],
       serviceDetails: [
-        { Icon: FaWifi, details: "Strong, stable Wi-Fi" },
+        { Icon: FaWifi, details: "Stable Wi-Fi" },
         { Icon: MdGroups2, details: "6-15 people" },
         { Icon: MdOutlineSecurity, details: "Security" },
         { Icon: PiProjectorScreenDuotone, details: "Projector" },
@@ -171,7 +170,7 @@ const HomePage = () => {
       ],
       serviceDetails: [
         { Icon: LiaHandsHelpingSolid, details: "Event-ready and Supportive" },
-        { Icon: FaWifi, details: "Strong, stable Wi-Fi" },
+        { Icon: FaWifi, details: "Stable Wi-Fi" },
         { Icon: BsCupHot, details: "Coffee and Tea" },
         { Icon: MdGroups2, details: "50-150 people" },
         { Icon: PiProjectorScreenDuotone, details: "Projector" },
@@ -224,8 +223,8 @@ const HomePage = () => {
             link="/contact"
           />
           <ServiceCard
-            title="Explore our web"
-            description="View our web to find your workspace"
+            title="About Us"
+            description="Discover our mission and values in creating ideal workspaces."
             Icon={RiPhoneFindLine}
             link="/about"
           />
@@ -433,7 +432,7 @@ const HomePage = () => {
                 to={`contact`}
                 className="w-full lg:w-auto mt-8 px-8 py-4 btn-neutral btn text-white rounded-xl font-medium hover:bg-neutral-600 transition-colors duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
               >
-                <FiMapPin className="w-5 h-5" />
+                <MdOutlineMailOutline className="w-5 h-5" />
                 <span>Contact Us</span>
               </Link>
             </div>

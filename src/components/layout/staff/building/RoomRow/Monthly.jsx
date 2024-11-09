@@ -100,9 +100,13 @@ const Monthly = ({ selectedDate, workspaces = [] }) => {
     
         let cellColor = 'white';
         if (status === 'confirm' || status === 'paid' || status === 'check-in') {
-            cellColor = '#85F685';
-        } else if (status === 'usage' || status === 'check-out' || status === 'check-amenities' || status === 'damaged-payment') {
-            cellColor = '#85C1F6';
+            cellColor = '#90EE90'; // Light Green
+        } else if (status === 'usage' || status === 'check-out' || status === 'check-amenities') {
+            cellColor = '#ADD8E6'; // Light Blue
+        } else if (status === 'damaged-payment') {
+            cellColor = '#F95454'; // Red
+        } else if (status === 'complete' || status === 'cancelled') {
+            cellColor = '#FFFFFF'; // White
         }
     
         return {

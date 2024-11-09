@@ -3,8 +3,8 @@ import React from 'react';
 const BookingFilters = ({ searchQuery, setSearchQuery, selectedDate, setSelectedDate }) => (
     <div className="flex justify-between items-center gap-6 w-full">
         {/* Search Input */}
-        <div className="form-control w-full max-w-md">
-            <label className="input-group">
+        <div className="form-control w-full max-w-md flex items-center">
+            <div className="flex w-full">
                 <input
                     type="text"
                     placeholder="Search by Booking ID"
@@ -12,7 +12,13 @@ const BookingFilters = ({ searchQuery, setSearchQuery, selectedDate, setSelected
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
-            </label>
+                <button
+                    className="btn btn-active ml-2"
+                    onClick={() => setSearchQuery('')}
+                >
+                    Clear
+                </button>
+            </div>
         </div>
 
         {/* Date Filter */}

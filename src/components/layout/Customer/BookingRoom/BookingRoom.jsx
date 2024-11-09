@@ -28,6 +28,7 @@ const BookingRoom = (props) => {
     setSelectedDate,
     currentTab,
     setCurrentTab,
+    isFullyBooked,
   } = props;
 
   // Auth context
@@ -244,10 +245,14 @@ const BookingRoom = (props) => {
       {/* Header Section */}
       <div className="booking-detail flex flex-wrap items-start justify-between mb-8">
         <div className="space-y-4  w-full">
-          <div className="flex items-center  justify-between ">
+          <div className="flex items-center justify-between">
             <h1 className="text-4xl font-bold">{roomData?.workspace_name}</h1>
-            <span className="badge badge-success badge-lg text-white p-4 font-bold mx-4">
-              Available
+            <span
+              className={`badge ${
+                isFullyBooked ? "badge-error" : "badge-success"
+              } badge-lg text-white p-4 font-bold mx-4`}
+            >
+              {isFullyBooked ? "Unavailable" : "Available"}
             </span>
           </div>
 

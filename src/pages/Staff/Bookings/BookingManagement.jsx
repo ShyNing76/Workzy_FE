@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Swal from "sweetalert2";
 import DetailModal from "../../../components/layout/staff/booking/Modal/DetailModal.jsx";
 import CheckAmenitiesModal from "../../../components/layout/staff/booking/Modal/CheckAmenitiesModal.jsx";
@@ -25,6 +25,7 @@ const BookingManagement = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [allBookings, setAllBookings] = useState([]); 
+  const [searchedBookings, setSearchedBookings] = useState([]);
 
   const [selectedDate, setSelectedDate] = useState(() => {
     const today = new Date();
@@ -54,7 +55,7 @@ const BookingManagement = () => {
       .replace(",", "");
   };
 
-  const fetchAllBookingData = async () => {
+  const fetchAllBookingData = useCallback(async () => {
     try {
       setIsLoading(true);
       if (!buildingId) return;
@@ -133,14 +134,14 @@ const BookingManagement = () => {
         text: "Failed to load bookings. Please try again later.",
       });
     }
-  };
+  }, [buildingId, itemsPerPage]);
 
   useEffect(() => {
     if (buildingId) {
       setIsFetched(false);
       fetchAllBookingData();
     }
-  }, [buildingId]);
+  }, [buildingId, fetchAllBookingData]);
 
   const handleSendBrokenAmenities = async (bookingId, selectedAmenities) => {
     try {
@@ -253,13 +254,84 @@ const BookingManagement = () => {
     });
   };
 
-  const filteredBookings = filterBookingsByDate(allBookings, selectedDate);
+  const filteredBookings = useMemo(() => filterBookingsByDate(allBookings, selectedDate), [allBookings, selectedDate]);
 
-  const searchedBookings = searchQuery.trim() === ""
-    ? filteredBookings
-    : filteredBookings.filter((booking) =>
-        booking.booking_id.toString().includes(searchQuery)
-      );
+  const searchBooking = useCallback(async (booking_id) => {
+    try {
+      const response = await getBooking(buildingId, 1, itemsPerPage, booking_id);
+      if (response.data && response.data.rows.length > 0) {
+        const bookings = response.data.rows;
+        const bookingTypeCache = new Map();
+        const formattedBookings = [];
+
+        for (const booking of bookings) {
+          try {
+            let bookingType;
+            if (bookingTypeCache.has(booking.booking_type_id)) {
+              bookingType = bookingTypeCache.get(booking.booking_type_id);
+            } else {
+              const bookingTypeResponse = await getBookingTypeById(booking.booking_type_id);
+              if (!bookingTypeResponse?.data?.type) {
+                throw new Error("Invalid booking type response");
+              }
+              bookingType = bookingTypeResponse.data.type;
+              bookingTypeCache.set(booking.booking_type_id, bookingType);
+            }
+
+            const bookingAmenities = booking.Amenities?.map((amenity) => {
+              const details = amenity.BookingAmenities || {};
+              return {
+                amenity_name: amenity.amenity_name,
+                rent_price: formatCurrency(details.price || 0),
+                quantity: details.quantity || 0,
+                total_price: formatCurrency(details.total_price || 0),
+              };
+            });
+
+            formattedBookings.push({
+              booking_id: booking.booking_id,
+              workspace_id: booking.workspace_id,
+              workspace_name: booking.Workspace?.workspace_name || "Unknown",
+              start_time_date: formatDate(booking.start_time_date),
+              end_time_date: formatDate(booking.end_time_date),
+              workspace_price: formatCurrency(booking.workspace_price),
+              total_price: formatCurrency(booking.total_price),
+              total_workspace_price: formatCurrency(booking.total_workspace_price),
+              status: booking.BookingStatuses?.at(-1)?.status || "N/A",
+              booking_type: bookingType,
+              total_amenities_price: formatCurrency(booking.total_amenities_price || 0),
+              total_broken_price: formatCurrency(booking.total_broken_price || 0),
+              customer_name: booking.Customer?.User?.name || "Unknown",
+              amenities: bookingAmenities,
+            });
+          } catch (error) {
+            console.error(`Error processing booking ${booking.booking_id}:`, error);
+            continue;
+          }
+        }
+
+        return formattedBookings;
+      } else {
+        return [];
+      }
+    } catch (error) {
+      console.error("Error searching booking:", error);
+      return [];
+    }
+  }, [buildingId, itemsPerPage]);
+
+  const handleSearch = useCallback(async () => {
+    if (searchQuery.trim() !== "") {
+      const result = await searchBooking(searchQuery);
+      setSearchedBookings(result);
+    } else {
+      setSearchedBookings(filteredBookings);
+    }
+  }, [searchQuery, filteredBookings, searchBooking]);
+
+  useEffect(() => {
+    handleSearch();
+  }, [handleSearch]);
 
   const totalFilteredPages = Math.ceil(searchedBookings.length / itemsPerPage);
 

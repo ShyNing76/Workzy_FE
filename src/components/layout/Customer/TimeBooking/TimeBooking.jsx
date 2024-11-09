@@ -5,7 +5,7 @@ import { getTimeBookingInRoomAndDate } from "../../../../config/api";
 import { format, formatISO, startOfDay } from "date-fns";
 
 const TimeBooking = (props) => {
-  const { workspaceId, selectedDate } = props;
+  const { workspaceId, selectedDate, setIsFullyBooked } = props;
 
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -25,6 +25,8 @@ const TimeBooking = (props) => {
         );
         if (res.err === 0) {
           setBookings(res.data);
+          // Kiểm tra xem tất cả các slot có được booking không
+          checkFullyBooked(res.data);
         } else {
           setError(res.message);
         }
@@ -37,6 +39,29 @@ const TimeBooking = (props) => {
 
     fetchBookings();
   }, [workspaceId, selectedDate]);
+
+  const checkFullyBooked = (bookingData) => {
+    // Tạo mảng 24 slot thời gian
+    const timeSlots = Array.from({ length: 24 }, (_, i) => {
+      const hour = (i + 1).toString().padStart(2, "0");
+      return `${hour}:00`;
+    });
+
+    // Kiểm tra từng slot có được booking không
+    const allSlotsBooked = timeSlots.every((timeStr) => {
+      const slotDate = new Date(selectedDate);
+      const [hours] = timeStr.split(":");
+      slotDate.setHours(parseInt(hours), 0, 0, 0);
+
+      return bookingData.some((booking) => {
+        const bookingStart = new Date(booking.start_time_date);
+        const bookingEnd = new Date(booking.end_time_date);
+        return slotDate >= bookingStart && slotDate < bookingEnd;
+      });
+    });
+
+    setIsFullyBooked(allSlotsBooked);
+  };
 
   const getBookingInfo = (timeStr) => {
     if (!bookings.length || !selectedDate) return null;

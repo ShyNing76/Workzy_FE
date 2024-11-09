@@ -1,7 +1,7 @@
 import React from "react";
 import "./SinglePOD.scss";
 import Hero from "../../../components/layout/Customer/Hero/Hero";
-import imageSinglePod from "../../../assets/imageSinglePod.jpg";
+import imageSinglePod from "../../../assets/singlePODimage3.jpg";
 import BenefitService from "../../../components/layout/Customer/BenefitService/BenefitService";
 import { FaWifi, FaCoins } from "react-icons/fa";
 import { MdConnectWithoutContact } from "react-icons/md";
