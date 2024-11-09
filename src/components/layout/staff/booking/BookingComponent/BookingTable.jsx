@@ -2,19 +2,19 @@ import React from 'react';
 import BookingRow from './BookingRow';
 
 const BookingTable = ({ bookings, currentPage, handleChangeStatus, setSelectedBooking, setShowDetailModal }) => (
-    <div className="table-container">
-        <table className="table table-xs table-pin-rows table-pin-cols">
+    <div className="overflow-x-auto">
+        <table className="table table-compact w-full">
             <thead>
-                <tr style={{fontSize: '16px'}}>
-                    <th style={{ width: '50px'}}>Index</th>
-                    <th style={{ width: '160px'}}>Customer Name</th>
-                    <th style={{ width: '160px'}}>Workspace Name</th>
-                    <th style={{ width: '150px'}}>Start Time</th>
-                    <th style={{ width: '150px'}}>End Time</th>
-                    <th style={{ width: '130px'}}>Booking Type</th>
-                    <th style={{ width: '130px'}}>Total Price</th>
-                    <th style={{ width: '165px'}}>Status</th>
-                    <th style={{ width: '260px'}}>Actions</th>
+                <tr className="bg-base-200 text-base-content text-sm">
+                    <th className="w-10">Index</th>
+                    <th className="w-35">Customer Name</th>
+                    <th className="w-30">Workspace Name</th>
+                    <th className="w-36">Start Time</th>
+                    <th className="w-36">End Time</th>
+                    <th className="w-30">Booking Type</th>
+                    <th className="w-30">Total Price</th>
+                    <th className="w-50">Status</th>
+                    <th className="w-60">Actions</th>
                 </tr>
             </thead>
             <tbody>
