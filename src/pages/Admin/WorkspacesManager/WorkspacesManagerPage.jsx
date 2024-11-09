@@ -7,6 +7,7 @@ import {
   getAllWorkspaceType,
   putWorkspace,
   getTotalWorkspace,
+  getAllAmenity,
 } from "../../../config/api.admin";
 import Swal from "sweetalert2";
 import {
@@ -40,6 +41,9 @@ const WorkspacesManagerPage = () => {
   const [limit, setLimit] = useState(8);
   const [totalWorkSpace, setTotalWorkSpace] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [allAmenities, setAllAmenities] = useState([]);
+  const [selectedAmenitiesWithQuantity, setSelectedAmenitiesWithQuantity] =
+    useState([]);
 
   //-----------------------------------------------------------------//
   // ADD
@@ -143,10 +147,7 @@ const WorkspacesManagerPage = () => {
         console.log(error);
       }
     };
-    fetchBuildings();
-  }, []);
 
-  useEffect(() => {
     const fetchWorkspaceType = async () => {
       try {
         const res = await getAllWorkspaceType();
@@ -158,7 +159,20 @@ const WorkspacesManagerPage = () => {
       }
     };
 
+    const fetchAllAmenities = async () => {
+      try {
+        const res = await getAllAmenity();
+        if (res && res.data) {
+          setAllAmenities(res.data.rows);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
     fetchWorkspaceType();
+    fetchBuildings();
+    fetchAllAmenities();
   }, []);
 
   const handleSearch = (e) => {
@@ -254,8 +268,11 @@ const WorkspacesManagerPage = () => {
 
   const handleAddWorkspace = async (e) => {
     e.preventDefault();
+
     try {
       const formData = new FormData();
+
+      // Append basic workspace information
       formData.append("workspace_name", newWorkspace.workspace_name);
       formData.append("building_id", newWorkspace.building_id);
       formData.append("workspace_type_id", newWorkspace.workspace_type_id);
@@ -267,19 +284,56 @@ const WorkspacesManagerPage = () => {
       formData.append("description", newWorkspace.description);
       formData.append("status", newWorkspace.status);
 
+      // Handle images
       newWorkspace.images.forEach((file) => {
         formData.append("images", file);
       });
 
-      const res = await postWorkspace(formData);
-      if (res && res.err === 0) {
-        // Đóng modal trước
-        handleCloseModalAdd();
+      // Handle amenities with quantity - Fixed version
+      if (
+        selectedAmenitiesWithQuantity &&
+        selectedAmenitiesWithQuantity.length > 0
+      ) {
+        // Transform amenities to include quantity
+        const amenitiesWithQuantity = selectedAmenitiesWithQuantity.map(
+          (amenity) => ({
+            amenity_id: amenity.amenity_id,
+            quantity: amenity.quantity,
+          })
+        );
+        formData.append("addAmenities", JSON.stringify(amenitiesWithQuantity));
+      }
 
-        // Fetch lại dữ liệu mới
+      // Log all FormData entries
+      console.log("=== FormData Content ===");
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ": ", pair[1]);
+      }
+
+      // Log specific data types for debugging
+      console.log("\n=== Data Types ===");
+      console.log(
+        "workspace_name type:",
+        typeof formData.get("workspace_name")
+      );
+      console.log("building_id type:", typeof formData.get("building_id"));
+      console.log(
+        "price_per_hour type:",
+        typeof formData.get("price_per_hour")
+      );
+      console.log(
+        "images type:",
+        formData.getAll("images").map((file) => file.name)
+      );
+      console.log("amenities type:", typeof formData.get("addAmenities"));
+      console.log("amenities value:", formData.get("addAmenities"));
+
+      const res = await postWorkspace(formData);
+
+      if (res && res.err === 0) {
+        handleCloseModalAdd();
         await fetchWorkspaces();
 
-        // Hiển thị thông báo thành công
         Swal.fire({
           title: "Success",
           text: "Workspace added successfully",
@@ -288,12 +342,12 @@ const WorkspacesManagerPage = () => {
       } else {
         Swal.fire({
           title: "Error",
-          text: res.message,
+          text: res.message || "Failed to add workspace",
           icon: "error",
         });
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error adding workspace:", error);
       Swal.fire({
         title: "Error",
         text: "Failed to add workspace",
@@ -313,6 +367,13 @@ const WorkspacesManagerPage = () => {
 
     setOpenModalUpdate(true);
   };
+
+  useEffect(() => {
+    console.log(
+      "🚀 ~ WorkspacesManagerPage ~ updateWorkspace:",
+      updateWorkspace
+    );
+  }, [updateWorkspace]);
 
   const handleCloseModalUpdate = () => {
     setOpenModalUpdate(false);
@@ -396,6 +457,20 @@ const WorkspacesManagerPage = () => {
         updateWorkspace.remove_images.forEach((image) => {
           formData.append("remove_images", image);
         });
+      }
+
+      if (
+        selectedAmenitiesWithQuantity &&
+        selectedAmenitiesWithQuantity.length > 0
+      ) {
+        // Transform amenities to include quantity
+        const amenitiesWithQuantity = selectedAmenitiesWithQuantity.map(
+          (amenity) => ({
+            amenity_id: amenity.amenity_id,
+            quantity: amenity.quantity,
+          })
+        );
+        formData.append("addAmenities", JSON.stringify(amenitiesWithQuantity));
       }
 
       // Log formData contents for debugging
@@ -536,6 +611,9 @@ const WorkspacesManagerPage = () => {
             required: false,
           },
         ]}
+        amenities={allAmenities.length > 0 ? allAmenities : []}
+        setSelectedAmenitiesWithQuantity={setSelectedAmenitiesWithQuantity}
+        selectedAmenitiesWithQuantity={selectedAmenitiesWithQuantity}
       />
 
       {openModalUpdate && (
@@ -616,6 +694,9 @@ const WorkspacesManagerPage = () => {
               required: false,
             },
           ]}
+          amenities={allAmenities.length > 0 ? allAmenities : []}
+          setSelectedAmenitiesWithQuantity={setSelectedAmenitiesWithQuantity}
+          selectedAmenitiesWithQuantity={selectedAmenitiesWithQuantity}
         />
       )}
 

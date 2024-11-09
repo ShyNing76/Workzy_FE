@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { useState } from "react";
-import { FiPlus } from "react-icons/fi";
+import { FiMinus, FiPlus, FiSearch } from "react-icons/fi";
 import { RxCross2 } from "react-icons/rx";
 import { FiSave, FiUpload } from "react-icons/fi";
 import { RiDeleteBinLine } from "react-icons/ri";
@@ -13,9 +13,19 @@ const AddModal = ({
   currentItem,
   onInputChange,
   fields,
+  amenities = [],
+  selectedAmenitiesWithQuantity,
+  setSelectedAmenitiesWithQuantity,
 }) => {
   const [errorMissing, setErrorMissing] = useState([]);
   const [previewImages, setPreviewImages] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Filter amenities based on search term
+  const filteredAmenities = amenities.filter((amenity) =>
+    amenity.amenity_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (e.target === document.querySelector(".modal")) {
@@ -37,6 +47,43 @@ const AddModal = ({
       window.removeEventListener("keydown", handleEscape);
     };
   }, [onClose]);
+
+  const handleAmenityChange = (amenityId) => {
+    const isSelected = selectedAmenitiesWithQuantity.some(
+      (item) => item.amenity_id === amenityId
+    );
+
+    if (!isSelected) {
+      setSelectedAmenitiesWithQuantity([
+        ...selectedAmenitiesWithQuantity,
+        { amenity_id: amenityId, quantity: 1 },
+      ]);
+    } else {
+      setSelectedAmenitiesWithQuantity(
+        selectedAmenitiesWithQuantity.filter(
+          (item) => item.amenity_id !== amenityId
+        )
+      );
+    }
+  };
+
+  const updateQuantity = (amenityId, change) => {
+    setSelectedAmenitiesWithQuantity((prev) =>
+      prev.map((item) => {
+        if (item.amenity_id === amenityId) {
+          const newQuantity = Math.max(1, item.quantity + change);
+          return { ...item, quantity: newQuantity };
+        }
+        return item;
+      })
+    );
+  };
+
+  const removeSelectedAmenity = (amenityId) => {
+    setSelectedAmenitiesWithQuantity((prev) =>
+      prev.filter((item) => item.amenity_id !== amenityId)
+    );
+  };
 
   if (!show) return null;
 
@@ -263,6 +310,116 @@ const AddModal = ({
                 )}
               </div>
             ))}
+
+            {/* Amenities Section */}
+            {amenities.length > 0 && (
+              <div className="col-span-2 space-y-2">
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-medium">Amenities</span>
+                    <span className="label-text-alt text-gray-500">
+                      {selectedAmenitiesWithQuantity.length} selected
+                    </span>
+                  </label>
+
+                  {/* Search Input */}
+                  <div className="relative mb-2">
+                    <input
+                      type="text"
+                      className="input input-bordered w-full pr-10"
+                      placeholder="Search amenities..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <FiSearch
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                      size={18}
+                    />
+                  </div>
+
+                  {/* Selected Amenities with Quantity */}
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {selectedAmenitiesWithQuantity.map((item) => {
+                      const amenityDetails = amenities.find(
+                        (a) => a.amenity_id === item.amenity_id
+                      );
+                      return (
+                        <div
+                          key={item.amenity_id}
+                          className="badge badge-lg gap-2 p-3 flex items-center"
+                        >
+                          <span className="mr-2">
+                            {amenityDetails?.amenity_name}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateQuantity(item.amenity_id, -1)
+                              }
+                              className="btn btn-ghost btn-xs btn-circle"
+                            >
+                              <FiMinus size={12} />
+                            </button>
+                            <span className="min-w-[20px] text-center">
+                              {item.quantity}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => updateQuantity(item.amenity_id, 1)}
+                              className="btn btn-ghost btn-xs btn-circle"
+                            >
+                              <FiPlus size={12} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                removeSelectedAmenity(item.amenity_id)
+                              }
+                              className="btn btn-ghost btn-xs btn-circle ml-1"
+                            >
+                              <RxCross2 size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Amenities List */}
+                  <div className="bg-base-200 rounded-lg max-h-48 overflow-y-auto">
+                    {filteredAmenities.length > 0 ? (
+                      <div className="p-2 grid grid-cols-2 gap-2">
+                        {filteredAmenities.map((amenity) => (
+                          <label
+                            key={amenity.amenity_id}
+                            className="flex items-center gap-2 p-2 bg-base-100 rounded-lg hover:bg-base-300 cursor-pointer"
+                          >
+                            <input
+                              type="checkbox"
+                              className="checkbox checkbox-sm"
+                              checked={selectedAmenitiesWithQuantity.some(
+                                (item) => item.amenity_id === amenity.amenity_id
+                              )}
+                              onChange={() =>
+                                handleAmenityChange(amenity.amenity_id)
+                              }
+                            />
+                            <span className="flex-1 truncate">
+                              {amenity.amenity_name}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-4 text-center text-gray-500">
+                        No amenities found
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Buttons below the fields */}
