@@ -274,12 +274,29 @@ const AssignManagerPage = () => {
                     <div className="avatar placeholder">
                       <div className="bg-neutral text-neutral-content rounded-full w-12 h-12">
                         <span className="text-xl">
-                          {managers
-                            .find(
-                              (m) =>
-                                m.Manager.manager_id === building.manager_id
-                            )
-                            ?.name?.charAt(0) || "?"}
+                          {managers.find(
+                            (m) => m.Manager.manager_id === building.manager_id
+                          )?.image ? (
+                            <img
+                              src={
+                                managers.find(
+                                  (m) =>
+                                    m.Manager.manager_id === building.manager_id
+                                )?.image
+                              }
+                              alt="Manager avatar"
+                              className="w-8 h-8 rounded-full object-cover"
+                            />
+                          ) : (
+                            <span>
+                              {managers
+                                .find(
+                                  (m) =>
+                                    m.Manager.manager_id === building.manager_id
+                                )
+                                ?.name?.charAt(0) || "?"}
+                            </span>
+                          )}
                         </span>
                       </div>
                     </div>
@@ -388,12 +405,32 @@ const AssignManagerPage = () => {
                       <div className="avatar placeholder">
                         <div className="bg-neutral text-neutral-content rounded-full w-10 h-10">
                           <span>
-                            {managers
-                              .find(
-                                (m) =>
-                                  m.Manager.manager_id === building.manager_id
-                              )
-                              ?.name?.charAt(0) || "?"}
+                            {managers.find(
+                              (m) =>
+                                m.Manager.manager_id === building.manager_id
+                            )?.image ? (
+                              <img
+                                src={
+                                  managers.find(
+                                    (m) =>
+                                      m.Manager.manager_id ===
+                                      building.manager_id
+                                  )?.image
+                                }
+                                alt="Manager avatar"
+                                className="w-8 h-8 rounded-full object-cover"
+                              />
+                            ) : (
+                              <span>
+                                {managers
+                                  .find(
+                                    (m) =>
+                                      m.Manager.manager_id ===
+                                      building.manager_id
+                                  )
+                                  ?.name?.charAt(0) || "?"}
+                              </span>
+                            )}
                           </span>
                         </div>
                       </div>

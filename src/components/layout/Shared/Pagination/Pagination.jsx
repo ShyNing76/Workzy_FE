@@ -33,7 +33,9 @@ const Pagination = (props) => {
             >
               1
             </button>
-            {adjustedStartPage > 2 && <span className="join-item">...</span>}
+            {adjustedStartPage > 2 && (
+              <button className={`join-item btn `}>...</button>
+            )}
           </>
         )}
 
@@ -57,7 +59,9 @@ const Pagination = (props) => {
         {/* Trang cuối */}
         {endPage < totalPages && (
           <>
-            {endPage < totalPages - 1 && <span className="join-item">...</span>}
+            {endPage < totalPages - 1 && (
+              <button className={`join-item btn `}>...</button>
+            )}
             <button
               className={`join-item btn ${
                 page === totalPages ? "btn-active" : ""

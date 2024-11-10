@@ -278,7 +278,10 @@ export const router = createBrowserRouter([
         path: "assignmanager",
         element: <AssignManagerPage />,
       },
-      
+      {
+        path: "profile",
+        element: <Profile />,
+      },
     ],
     // condition: (user) => user.isAdmin, // Add condition to check if user is admin before rendering the routes
   },
@@ -314,6 +317,10 @@ export const router = createBrowserRouter([
       {
         path: "wishlist/:customerNames",
         element: <ViewWishlist />,
+      },
+      {
+        path: "profile",
+        element: <Profile />,
       },
     ],
   },
@@ -370,6 +377,10 @@ export const router = createBrowserRouter([
       {
         path: "manager-manage-review",
         element: <ManageReview />,
+      },
+      {
+        path: "profile",
+        element: <Profile />,
       },
     ],
   },

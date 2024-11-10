@@ -5,6 +5,11 @@ import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../../context/auth.context";
 import defaultProfile from "../../../../assets/default-profile.jpg";
 import { getUserAuthen } from "../../../../config/api";
+import { CgProfile } from "react-icons/cg";
+import { TbCalendarCheck } from "react-icons/tb";
+import { FaRegHeart } from "react-icons/fa";
+import { MdCardMembership, MdOutlineSupportAgent } from "react-icons/md";
+import { IoLogOutOutline } from "react-icons/io5";
 
 const Navbar = (props) => {
   const { auth, setAuth, setRoleId } = useContext(AuthContext);
@@ -183,23 +188,36 @@ const Navbar = (props) => {
                 className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[10] w-48 p-2 shadow "
               >
                 <li>
-                  <Link to="/user/account">Profile</Link>
+                  <Link to="/user/account">
+                    <CgProfile /> Profile
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/user/booking">Booking</Link>
+                  <Link to="/user/booking">
+                    {" "}
+                    <TbCalendarCheck /> Booking
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/user/wishlist">Wishlist</Link>
+                  <Link to="/user/wishlist">
+                    <FaRegHeart /> Wishlist
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/user/membership">Membership</Link>
+                  <Link to="/user/membership">
+                    <MdCardMembership /> Membership
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/user/support">Support Center</Link>
+                  <Link to="/user/support">
+                    <MdOutlineSupportAgent /> Support Center
+                  </Link>
                 </li>
                 <hr />
                 <li>
-                  <span onClick={() => handleLogout()}>Logout</span>
+                  <span onClick={() => handleLogout()}>
+                    <IoLogOutOutline /> Logout
+                  </span>
                 </li>
               </ul>
             </div>

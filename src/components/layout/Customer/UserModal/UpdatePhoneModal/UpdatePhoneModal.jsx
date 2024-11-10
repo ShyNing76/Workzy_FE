@@ -4,13 +4,15 @@ import {
   putUpdateCustomerPassword,
   putUpdatePhoneNumber,
 } from "../../../../../config/api";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 
 const UpdatePhoneModal = (props) => {
   const { setUpdateSuccess } = props;
 
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const [error, setError] = useState("");
 
   //   validate Phone number
   function validateVietnamPhoneNumber(phone) {
@@ -28,10 +30,10 @@ const UpdatePhoneModal = (props) => {
       const modal = document.getElementById("modal-update-phone");
 
       if (!validateVietnamPhoneNumber(phoneNumber)) {
-        toast.error("Invalid Phone number");
         if (modal) {
           setPhoneNumber("");
-          modal.close();
+          setError("Invalid Phone number");
+          // modal.close();
         }
         setIsLoading(false);
         return;
@@ -64,6 +66,7 @@ const UpdatePhoneModal = (props) => {
 
   return (
     <>
+      <ToastContainer />
       <dialog id="modal-update-phone" className="modal">
         <div className="modal-box">
           <form method="dialog">
@@ -99,6 +102,9 @@ const UpdatePhoneModal = (props) => {
                   required
                   autoComplete=""
                 />
+                {error && (
+                  <div className="text-red-500 text-sm mt-2">{error}</div>
+                )}
               </div>
             </div>
           </form>

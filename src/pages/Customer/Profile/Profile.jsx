@@ -31,6 +31,18 @@ const Profile = (props) => {
   const [googleToken, setGoogleToken] = useState("");
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const [errors, setErrors] = useState({
+    name: "",
+    date: "",
+    gender: "",
+  });
+  const AUTO_DISMISS_DURATION = 3000; // 3 seconds
+
+  useEffect(() => {
+    setSuccessMessage("");
+  }, [name, date, gender]);
 
   // FetchUserInfo
   const fetchUserInfo = async () => {
@@ -48,6 +60,20 @@ const Profile = (props) => {
       setGoogleToken(data?.google_token || null);
     }
   };
+
+  useEffect(() => {
+    let timeoutId;
+    if (successMessage) {
+      timeoutId = setTimeout(() => {
+        setSuccessMessage("");
+      }, AUTO_DISMISS_DURATION);
+    }
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [successMessage]);
 
   // Call function in the first time
   useEffect(() => {
@@ -90,8 +116,16 @@ const Profile = (props) => {
 
   // Handle submit
   const handleSubmitProfile = async (e) => {
-    setLoading(true);
     e.preventDefault();
+    setLoading(true);
+    // Reset errors
+    setErrors({
+      name: "",
+      date: "",
+      gender: "",
+    });
+
+    let hasErrors = false;
     const today = new Date();
     const dob = new Date(date);
     const maxAgeLimit = 120;
@@ -101,33 +135,54 @@ const Profile = (props) => {
       today.getDate()
     );
 
+    // Validate name
     if (!name) {
-      toast.error("Name needs to be fill !!!");
+      setErrors((prev) => ({
+        ...prev,
+        name: "Name needs to be filled",
+      }));
+      hasErrors = true;
     }
 
-    if (!dob || isNaN(dob.getTime())) {
-      toast.error("Date Of Birth needs to be fill !!!");
-    } else {
-      if (dob >= today) {
-        toast.error(
-          `Date of Birth cannot be larger than ${today.toLocaleDateString()}!!!`
-        );
-        setLoading(false);
-        return;
-      }
-
-      // Kiểm tra nếu tuổi quá xa (quá 120 năm)
-      if (dob <= minDate) {
-        toast.error(
-          `Date of Birth cannot be more than ${minDate.toLocaleDateString()} !!!`
-        );
-        setLoading(false);
-        return;
-      }
+    // Validate date of birth
+    if (!date) {
+      setErrors((prev) => ({
+        ...prev,
+        date: "Date of Birth needs to be filled",
+      }));
+      hasErrors = true;
+    } else if (!dob || isNaN(dob.getTime())) {
+      setErrors((prev) => ({
+        ...prev,
+        date: "Invalid date format",
+      }));
+      hasErrors = true;
+    } else if (dob >= today) {
+      setErrors((prev) => ({
+        ...prev,
+        date: `Date of Birth cannot be larger than ${today.toLocaleDateString()}`,
+      }));
+      hasErrors = true;
+    } else if (dob <= minDate) {
+      setErrors((prev) => ({
+        ...prev,
+        date: `Date of Birth cannot be more than ${maxAgeLimit} years ago`,
+      }));
+      hasErrors = true;
     }
 
+    // Validate gender
     if (!gender) {
-      toast.error("Gender needs to be fill !!!");
+      setErrors((prev) => ({
+        ...prev,
+        gender: "Gender needs to be selected",
+      }));
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
+      setLoading(false);
+      return;
     }
 
     try {
@@ -135,12 +190,20 @@ const Profile = (props) => {
 
       if (res && res.err === 0) {
         setUpdateSuccess(true);
-        toast.success(res.message);
+        setSuccessMessage("Profile updated successfully!");
+        window.scrollTo({ top: 0, behavior: "smooth" }); // Scroll to top to show success message
       } else {
-        toast.error(res.message);
+        setErrors((prev) => ({
+          ...prev,
+          submit: res.message,
+        }));
       }
     } catch (error) {
       console.error(error);
+      setErrors((prev) => ({
+        ...prev,
+        submit: "An error occurred while updating profile",
+      }));
     }
     setLoading(false);
   };
@@ -149,9 +212,27 @@ const Profile = (props) => {
     <>
       <ToastContainer />
       <div className="max-w-5xl container mx-auto my-20 p-8 bg-white rounded-lg shadow-lg">
+        {/* Success Message */}
+        {successMessage && (
+          <div className="alert alert-success mb-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="stroke-current shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span>{successMessage}</span>
+          </div>
+        )}
         <div className="flex">
           {/* Left Content */}
-
           <div className="left-content w-1/2 pr-8">
             <form action="" onSubmit={handleSubmitProfile}>
               <h1 className="text-2xl font-semibold mb-4">
@@ -175,13 +256,22 @@ const Profile = (props) => {
                     <GoPencil className="text-gray-600 w-5 h-5" />
                   </div>
                 </div>
-                <input
-                  type="text"
-                  placeholder="Enter your name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="input input-bordered w-full max-w-xs"
-                />
+                <div className="flex flex-col w-full">
+                  <input
+                    type="text"
+                    placeholder="Enter your name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className={`input input-bordered w-full max-w-xs ${
+                      errors.name ? "input-error" : ""
+                    }`}
+                  />
+                  {errors.name && (
+                    <span className="text-error text-sm mt-1">
+                      {errors.name}
+                    </span>
+                  )}
+                </div>
               </div>
 
               {/* Hidden file input */}
@@ -200,55 +290,80 @@ const Profile = (props) => {
                 </label>
                 <input
                   type="date"
-                  className="input input-bordered w-full"
+                  className={`input input-bordered w-full ${
+                    errors.date ? "input-error" : ""
+                  }`}
                   value={date || ""}
                   onChange={(e) => setDate(e.target.value)}
                 />
+                {errors.date && (
+                  <span className="text-error text-sm mt-1">{errors.date}</span>
+                )}
               </div>
 
               {/* Gender */}
               <div className="mb-4">
                 <label className="block font-semibold mb-2">Gender</label>
-                <div className="flex items-center space-x-4">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="Male"
-                      checked={gender === "Male"}
-                      onChange={handleGenderChange}
-                      className="radio  mr-2"
-                    />
-                    <span>Male</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="Female"
-                      checked={gender === "Female"}
-                      onChange={handleGenderChange}
-                      className="radio  mr-2"
-                    />
-                    <span>Female</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="Others"
-                      checked={gender === "Others"}
-                      onChange={handleGenderChange}
-                      className="radio mr-2"
-                    />
-                    <span>Others</span>
-                  </label>
+                <div className="flex flex-col">
+                  <div className="flex items-center space-x-4">
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="gender"
+                        value="Male"
+                        checked={gender === "Male"}
+                        onChange={handleGenderChange}
+                        className={`radio mr-2 ${
+                          errors.gender ? "radio-error" : ""
+                        }`}
+                      />
+                      <span>Male</span>
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="gender"
+                        value="Female"
+                        checked={gender === "Female"}
+                        onChange={handleGenderChange}
+                        className={`radio mr-2 ${
+                          errors.gender ? "radio-error" : ""
+                        }`}
+                      />
+                      <span>Female</span>
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="gender"
+                        value="Others"
+                        checked={gender === "Others"}
+                        onChange={handleGenderChange}
+                        className={`radio mr-2 ${
+                          errors.gender ? "radio-error" : ""
+                        }`}
+                      />
+                      <span>Others</span>
+                    </label>
+                  </div>
+                  {errors.gender && (
+                    <span className="text-error text-sm mt-1">
+                      {errors.gender}
+                    </span>
+                  )}
                 </div>
               </div>
 
+              {/* General submit error */}
+              {errors.submit && (
+                <div className="alert alert-error mb-4">
+                  <span>{errors.submit}</span>
+                </div>
+              )}
+
               <div className="text-center mt-10">
                 {!loading ? (
-                  <button type="submit" className="btn btn-neutral ">
+                  <button type="submit" className="btn btn-neutral">
                     Save changes
                   </button>
                 ) : (
@@ -290,7 +405,7 @@ const Profile = (props) => {
                 <MdOutlineEmail className="text-xl mr-3" />
                 <p>{email ? email : "No Email"}</p>
               </div>
-              <button className="btn btn-outline btn-sm">Update</button>
+              {/* <button className="btn btn-outline btn-sm">Update</button> */}
             </div>
 
             {/* Change Password */}
@@ -311,13 +426,13 @@ const Profile = (props) => {
                 Update
               </button>
             </div>
-            <div className="flex items-center mb-4 justify-between">
+            {/* <div className="flex items-center mb-4 justify-between">
               <div className="flex">
                 <FaRegTrashAlt className="text-xl mr-3" />
                 <p>Request account deletion</p>
               </div>
               <button className="btn btn-outline btn-sm">Request</button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

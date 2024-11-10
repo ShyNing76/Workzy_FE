@@ -6,10 +6,14 @@ import { AuthContext } from "../../../context/auth.context";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoLogOutOutline } from "react-icons/io5";
+import { CgProfile } from "react-icons/cg";
+import defaultProfile from "../../../../assets/default-profile.jpg";
 
-const ManagerHeader = () => {
+const ManagerHeader = (props) => {
   const { auth, setAuth, setRoleId } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  const { staff } = props;
 
   const handleLogout = () => {
     localStorage.clear("access_token", "roleId");
@@ -38,7 +42,7 @@ const ManagerHeader = () => {
             <div className="w-10 rounded-full">
               <img
                 alt="Avatar"
-                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                src={(staff && staff.image) || defaultProfile}
               />
             </div>
           </div>
@@ -50,13 +54,21 @@ const ManagerHeader = () => {
               <div className="mask mask-circle w-10">
                 <img
                   alt="Avatar"
-                  src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                  src={(staff && staff.image) || defaultProfile}
                 />
               </div>
               <div className="flex flex-col">
-                <h1 className="ml-2 text-xl font-semibold">Manager</h1>
+                <h1 className="ml-2 text-xl font-semibold">
+                  {staff && staff.name}
+                </h1>
               </div>
             </div>
+            <li>
+              <div onClick={() => navigate("profile")}>
+                <CgProfile />
+                Profile
+              </div>
+            </li>
             <li>
               <div onClick={handleLogout}>
                 <IoLogOutOutline />
