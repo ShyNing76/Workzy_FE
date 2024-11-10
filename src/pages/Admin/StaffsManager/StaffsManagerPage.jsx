@@ -124,25 +124,6 @@ const StaffsManagerPage = () => {
     }
   }, [successMessage]);
 
-  //Hiện detail khi click vô 1 hàng
-  
-  const handleRowClick = async (user_id) => {
-    try {
-      const res = await getStaffById(user_id);
-      if (res && res.data) {
-        // Format the date using formatDate before setting it in state
-        const staffDetails = {
-          ...res.data,
-          date_of_birth: formatDate(res.data.date_of_birth),
-        };
-  
-        setSelectedStaffDetails(staffDetails);
-        setShowDetailsModal(true);
-      }
-    } catch (err) {
-      console.error("Error fetching staff type details: ", err);
-    }
-  };
 
   //Khu vực hàm dành cho add
    const handleAddStaff = async (e) => {
@@ -442,7 +423,7 @@ const StaffsManagerPage = () => {
           </thead>
           <tbody>
             {filteredStaff.map((staff) => (
-                <tr key={staff.user_id} className="hover:bg-gray-100 cursor-pointer" onClick={() => handleRowClick(staff.user_id)}>
+                <tr key={staff.user_id} className="hover:bg-gray-100" onClick={() => handleRowClick(staff.user_id)}>
                   <td>{staff.name}</td>
                   <td>{staff.email}</td>
                   <td>{staff.gender}</td>

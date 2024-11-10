@@ -455,7 +455,7 @@ const ManagersManagerPage = () => {
               // <tr key={manager.user_id} className="cursor-pointer">
               <tr
                 key={manager.Manager.user_id}
-                className="hover:bg-gray-100 cursor-pointer"
+                className="hover:bg-gray-100"
                 onClick={() => handleRowClick(manager.Manager.user_id)}
               >
                 <td>{manager.name}</td>
