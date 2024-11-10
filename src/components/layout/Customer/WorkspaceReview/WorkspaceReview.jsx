@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaStar } from "react-icons/fa6";
-import userImage from "../../../../assets/user1.jpg";
+import defaultProfile from "../../../../assets/default-profile.jpg";
 import Pagination from "../../Shared/Pagination/Pagination";
 
 const WorkspaceReview = ({ data, page, setPage, limit }) => {
@@ -87,7 +87,9 @@ const WorkspaceReview = ({ data, page, setPage, limit }) => {
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4">
                   <img
-                    src={userImage}
+                    src={
+                      review?.Booking?.Customer?.User?.image || defaultProfile
+                    }
                     alt={review?.Booking?.Customer?.User?.name}
                     className="h-10 w-10 rounded-full object-cover"
                   />

@@ -1,15 +1,17 @@
 import { Link, useNavigate } from "react-router-dom";
-import flagVN from "/src/assets/images.png";
-import { RiArrowDropDownLine } from "react-icons/ri";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../../context/auth.context";
 import defaultProfile from "../../../../assets/default-profile.jpg";
 import { getUserAuthen } from "../../../../config/api";
 import { CgProfile } from "react-icons/cg";
 import { TbCalendarCheck } from "react-icons/tb";
-import { FaRegHeart } from "react-icons/fa";
-import { MdCardMembership, MdOutlineSupportAgent } from "react-icons/md";
+import {
+  MdBookmarkAdd,
+  MdCardMembership,
+  MdOutlineSupportAgent,
+} from "react-icons/md";
 import { IoLogOutOutline } from "react-icons/io5";
+import { BsBookmarkPlus } from "react-icons/bs";
 
 const Navbar = (props) => {
   const { auth, setAuth, setRoleId } = useContext(AuthContext);
@@ -200,7 +202,7 @@ const Navbar = (props) => {
                 </li>
                 <li>
                   <Link to="/user/wishlist">
-                    <FaRegHeart /> Wishlist
+                    <BsBookmarkPlus className="font-bold" /> Wishlist
                   </Link>
                 </li>
                 <li>

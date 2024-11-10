@@ -139,12 +139,6 @@ const LoginPage = () => {
                     <FaEye className="eye-icon" onClick={handleShowPassword} />
                   )}
                 </div>
-
-                <label className="label">
-                  <a href="#" className="label-text-alt link link-hover">
-                    Forgot password?
-                  </a>
-                </label>
               </div>
 
               {!loginLoading ? (

@@ -27,6 +27,7 @@ const PaymentPage = () => {
     discount,
     tax,
     total,
+    rankDiscount,
   } = location.state || {};
 
   // Countdown timer
@@ -132,8 +133,12 @@ const PaymentPage = () => {
                   <span>{formatCurrency(amountPrice)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Discount:</span>
-                  <span>- {formatCurrency(discount)}</span>
+                  <span>Voucher Discount:</span>
+                  <span>- {formatCurrency(discount * amountPrice)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Rank Discount:</span>
+                  <span>- {formatCurrency(rankDiscount * amountPrice)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Subtotal:</span>

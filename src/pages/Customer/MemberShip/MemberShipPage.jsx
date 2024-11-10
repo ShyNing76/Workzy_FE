@@ -21,36 +21,35 @@ const MembershipPage = () => {
   const membershipTiers = {
     Bronze: {
       name: "Bronze",
-      benefits:
-        "Basic offer for new members. 5% discount on room rental services.",
+      benefits: "Basic offer for new members. ",
       color: "#f59e0b", //text-amber-500
       bgGradient: "from-amber-200 to-amber-100",
     },
     Silver: {
       name: "Silver",
       benefits:
-        "Special offer for Silver members. 10% discount, free some utility services.",
+        "Special offer for Silver members. 5% discount on room rental services.",
       color: " #9ca3af", //text-gray-400
       bgGradient: "from-gray-200 to-gray-100",
     },
     Gold: {
       name: "Gold",
       benefits:
-        "Premium offer for Gold members. 15% discount, free meeting room.",
+        "Premium offer for Gold members. 10% discount on room rental services.",
       color: "#facc15 ", //text-yellow-400
       bgGradient: "from-yellow-200 to-yellow-100",
     },
     Emerald: {
       name: "Emerald",
       benefits:
-        "Special offer for Emerald members. 20% discount, unlimited services.",
+        "Special offer for Emerald members. 15% discount on room rental services.",
       color: "#10b981", //text-emerald-500
       bgGradient: "from-emerald-200 to-emerald-100",
     },
     Diamond: {
       name: "Diamond",
       benefits:
-        "Highest offer for Diamond members. 30% discount, VIP room booking priority.",
+        "Highest offer for Diamond members. 20% discount on room rental services.",
       color: "#60a5fa ", //text-blue-400
       bgGradient: "from-blue-200 to-blue-100",
     },

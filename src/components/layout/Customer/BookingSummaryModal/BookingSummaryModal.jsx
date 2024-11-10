@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import React from "react";
+import React, { useEffect } from "react";
 import { formatCurrency } from "../../../context/priceFormat";
 
 const BookingSummaryModal = (props) => {
@@ -22,6 +22,7 @@ const BookingSummaryModal = (props) => {
     tax,
     total,
     handleConfirmBooking,
+    rankDiscount,
   } = props;
 
   const formatDate = format(selectedDate, "dd-MM-yyyy");
@@ -99,13 +100,15 @@ const BookingSummaryModal = (props) => {
                   <div className="border-t-2 p-4 mt-2 flex justify-between">
                     <div>
                       <p>Amount: ({amountText}) </p>
-                      <p>Discount: </p>
+                      <p>Voucher Discount: </p>
+                      <p>Rank Discount: </p>
                       <p>Subtotal: </p>
                       <p>Tax: </p>
                     </div>
                     <div className="text-right">
                       <p>{formatCurrency(amountPrice)}</p>
-                      <p>{formatCurrency(discount)}</p>
+                      <p>- {formatCurrency(discount * amountPrice)}</p>
+                      <p>- {formatCurrency(rankDiscount * amountPrice)}</p>
                       <p>{formatCurrency(subtotal)}</p>
                       <p>{formatCurrency(tax)}</p>
                     </div>

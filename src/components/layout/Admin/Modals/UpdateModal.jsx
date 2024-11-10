@@ -14,6 +14,7 @@ const UpdateModal = ({
   amenities = [],
   selectedAmenitiesWithQuantity,
   setSelectedAmenitiesWithQuantity,
+  errorMessage = {},
 }) => {
   const [previewImages, setPreviewImages] = useState([]);
   const [imageFiles, setImageFiles] = useState([]);

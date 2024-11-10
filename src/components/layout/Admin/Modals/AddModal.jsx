@@ -16,6 +16,7 @@ const AddModal = ({
   amenities = [],
   selectedAmenitiesWithQuantity,
   setSelectedAmenitiesWithQuantity,
+  errorMessage = {}, // Default của errorMessage là một object rỗng để khi mở modal không có lỗi
 }) => {
   const [errorMissing, setErrorMissing] = useState([]);
   const [previewImages, setPreviewImages] = useState([]);
@@ -26,6 +27,7 @@ const AddModal = ({
     amenity.amenity_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const [error, setError] = useState({});
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (e.target === document.querySelector(".modal")) {
