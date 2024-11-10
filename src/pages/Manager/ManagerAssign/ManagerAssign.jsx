@@ -176,7 +176,7 @@ const ManagerAssign = () => {
         await fetchStaffAndBuilding();
       } else {
         throw new Error(
-          response.message || "Có lỗi xảy ra khi gán/cập nhật nhân viên"
+          response.message || "Error assigning/updating the staff to the building"
         );
       }
     } catch (error) {
