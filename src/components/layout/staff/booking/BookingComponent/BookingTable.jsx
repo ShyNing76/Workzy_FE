@@ -1,7 +1,7 @@
 import React from 'react';
 import BookingRow from './BookingRow';
 
-const BookingTable = ({ bookings, currentPage, handleChangeStatus, setSelectedBooking, setShowDetailModal }) => (
+const BookingTable = ({ bookings, currentPage,itemsPerPage, handleChangeStatus, setSelectedBooking, setShowDetailModal }) => (
     <div className="overflow-x-auto">
         <table className="table table-compact w-full">
             <thead>
@@ -24,6 +24,7 @@ const BookingTable = ({ bookings, currentPage, handleChangeStatus, setSelectedBo
                         booking={booking}
                         index={index}
                         currentPage={currentPage}
+                        itemsPerPage={itemsPerPage}
                         handleChangeStatus={handleChangeStatus}
                         setSelectedBooking={setSelectedBooking}
                         setShowDetailModal={setShowDetailModal}
