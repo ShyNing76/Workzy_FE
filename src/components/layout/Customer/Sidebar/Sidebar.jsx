@@ -16,6 +16,8 @@ import { Link, useLocation } from "react-router-dom";
 import defaultProfile from "../../../../assets/default-profile.jpg";
 import { getUserAuthen } from "../../../../config/api";
 import { FaRegHeart } from "react-icons/fa";
+import { CiBookmarkPlus } from "react-icons/ci";
+import { BsBookmarkPlus } from "react-icons/bs";
 
 const Sidebar = (props) => {
   const { outlet, refresh } = props;
@@ -108,8 +110,7 @@ const Sidebar = (props) => {
                 } `}
               >
                 <div className="flex flex-1 items-center mb-2">
-                  <FaRegHeart className="icon" />
-
+                  <BsBookmarkPlus className="icon" />
                   <p className="ml-4"> My Wishlist</p>
                 </div>
               </Link>

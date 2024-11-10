@@ -1,7 +1,13 @@
-import { MdOutlineAir, MdOutlineFax, MdAdfScanner } from "react-icons/md";
+import {
+  MdOutlineAir,
+  MdOutlineFax,
+  MdAdfScanner,
+  MdMonitor,
+} from "react-icons/md";
 import { TfiBlackboard } from "react-icons/tfi";
 import { AiFillPrinter } from "react-icons/ai";
 import { LuProjector } from "react-icons/lu";
+import { RiHomeWifiLine } from "react-icons/ri";
 
 const getAmenityIcon = (amenityName) => {
   switch (amenityName) {
@@ -19,6 +25,8 @@ const getAmenityIcon = (amenityName) => {
       return <MdAdfScanner className="text-2xl mr-2" />;
     case "Whiteboard":
       return <TfiBlackboard className="text-2xl mr-2" />;
+    case "Monitor":
+      return <MdMonitor className="text-2xl mr-2" />;
     default:
       return <RiHomeWifiLine className="text-2xl mr-2" />; // Default icon
   }

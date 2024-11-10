@@ -11,11 +11,7 @@ import { deleteVoucher } from "../../../config/api.admin.js";
 import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
 import AddModal from "../../../components/layout/Admin/Modals/AddModal.jsx";
 import DeleteModal from "../../../components/layout/Admin/Modals/DeleteModal.jsx";
-import UpdateModal from "../../../components/layout/Admin/Modals/UpdateModal.jsx";
 import AddButton from "../../../components/layout/Admin/Buttons/AddButton.jsx";
-import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.jsx";
-import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
-import SuccessAlert from "../../../components/layout/Admin/SuccessAlert/SuccessAlert.jsx";
 import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal.jsx";
 import BlockButton from "../../../components/layout/Admin/Buttons/BlockButton.jsx";
 
@@ -27,7 +23,6 @@ const VouchersManagerPage = () => {
   const [error, setError] = useState(null); // State lỗi
   //const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedVoucherDetails, setSelectedVoucherDetails] = useState("");
@@ -127,22 +122,7 @@ const VouchersManagerPage = () => {
   }, [successMessage]);
 
   //Hàm click lên hàng để hiện more details
-  const handleRowClick = async (voucher_id) => {
-    try {
-      const res = await getVoucherById(voucher_id);
-      if (res && res.data) {
-        const formattedDetails = {
-          ...res.data,
-          discount: `${res.data.discount * 100}%`,
-          expired_date: convertDateToMMDDYYYY(res.data.expired_date),
-        };
-        setSelectedVoucherDetails(formattedDetails);
-        setShowDetailsModal(true);
-      }
-    } catch (err) {
-      console.error("Error fetching voucher details", err);
-    }
-  };
+ 
 
   //Khu vực hàm dành cho add
   const handleAddVoucher = async (e) => {
@@ -490,7 +470,7 @@ const VouchersManagerPage = () => {
             {filteredVoucher.map((voucher) => (
               <tr
                 key={voucher.voucher_id}
-                className="hover:bg-gray-100 cursor-pointer"
+                className="hover:bg-gray-100"
                 onClick={() => handleRowClick(voucher.voucher_id)}
               >
                 <td>{voucher.voucher_name}</td>

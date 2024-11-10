@@ -74,6 +74,11 @@ const getAmenity = (search, page, limit) => {
   return axios.get(URL_API);
 };
 
+const getAllAmenity = () => {
+  const URL_API = `/api/v1/amenity`;
+  return axios.get(URL_API);
+};
+
 const getAmenityById = (amenity_id) => {
   const URL_API = `api/v1/amenity/${amenity_id}`;
   return axios.get(URL_API);
@@ -573,4 +578,5 @@ export {
   postNewBuilding,
   changeBuildingStatus,
   getAllWorkspaceType,
+  getAllAmenity,
 };

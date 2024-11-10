@@ -1,15 +1,27 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./ManagerPage.scss";
 import ManagerHeader from "../../components/layout/Manager/ManagerHeader/ManagerHeader";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { FaChartBar } from "react-icons/fa";
-import { MdOutlineManageAccounts, MdOutlineAssignmentInd } from "react-icons/md";
+import {
+  MdOutlineManageAccounts,
+  MdOutlineAssignmentInd,
+} from "react-icons/md";
 import { AuthContext } from "../../components/context/auth.context";
 import { VscFeedback } from "react-icons/vsc";
+import { getUserAuthen } from "../../config/api";
 
 const ManagerPage = () => {
   const location = useLocation();
   const { auth, setAuth, setAppLoading, setRoleId } = useContext(AuthContext);
+  const [staff, setStaff] = useState(null);
+
+  const [refresh, setRefresh] = useState(false);
+
+  // function render both sideBar and outlet
+  const handleUpdate = () => {
+    setRefresh((prev) => !prev);
+  };
 
   useEffect(() => {
     const fetchAccount = async () => {
@@ -41,11 +53,31 @@ const ManagerPage = () => {
     fetchAccount();
   }, [setAuth, setRoleId, setAppLoading, auth.isAuthenticated]);
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      setAppLoading(true);
+      try {
+        const res = await getUserAuthen();
+        if (res && res.data && res.err === 0) {
+          setStaff(res.data);
+        } else {
+          setStaff(null);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        setAppLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [refresh]);
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
       <div className="navbar bg-base-200 shadow-lg sticky top-0 z-50">
-        <ManagerHeader />
+        <ManagerHeader staff={staff} />
       </div>
 
       {/* Drawer Container */}
@@ -55,7 +87,7 @@ const ManagerPage = () => {
         {/* Main Content */}
         <div className="drawer-content flex-col justify-center">
           <div className="mx-auto w-full p-4">
-            <Outlet />
+            <Outlet context={{ handleUpdate }} />
           </div>
 
           {/* Mobile Drawer Toggle */}
@@ -83,13 +115,13 @@ const ManagerPage = () => {
         {/* Sidebar */}
         <div className="drawer-side">
           <label htmlFor="my-drawer-2" className="drawer-overlay"></label>
-          
+
           <ul className="menu bg-base-200 text-base-content min-h-full w-60 p-3">
             {/* Manager Dashboard Section */}
             <h2 className="font-semibold ml-2 mb-2 text-gray-500">
               Manager Dashboard
             </h2>
-            
+
             <li className="mb-1">
               <Link
                 to="/manager"
@@ -113,7 +145,9 @@ const ManagerPage = () => {
               <Link
                 to="/manager/manager-assign"
                 className={`tab h-11 ${
-                  location.pathname === "/manager/manager-assign" ? "active" : ""
+                  location.pathname === "/manager/manager-assign"
+                    ? "active"
+                    : ""
                 }`}
               >
                 <div className="flex flex-1 items-center mb-2">
@@ -127,7 +161,9 @@ const ManagerPage = () => {
               <Link
                 to="/manager/manager-manage-staff"
                 className={`tab h-11 ${
-                  location.pathname === "/manager/manager-manage-staff" ? "active" : ""
+                  location.pathname === "/manager/manager-manage-staff"
+                    ? "active"
+                    : ""
                 }`}
               >
                 <div className="flex flex-1 items-center mb-2">
@@ -146,7 +182,9 @@ const ManagerPage = () => {
               <Link
                 to="/manager/manager-manage-review"
                 className={`tab h-11 ${
-                  location.pathname === "/manager/manager-manage-review" ? "active" : ""
+                  location.pathname === "/manager/manager-manage-review"
+                    ? "active"
+                    : ""
                 }`}
               >
                 <div className="flex flex-1 items-center mb-2">

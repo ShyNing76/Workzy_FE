@@ -8,7 +8,7 @@ import TimeRangePicker from "../TimePicker/TimeRangePicker";
 import { formatDateTime } from "../../../context/dateFormat";
 import { formatCurrency } from "../../../context/priceFormat";
 import BookingSummaryModal from "../BookingSummaryModal/BookingSummaryModal";
-import { postCreateBooking } from "../../../../config/api";
+import { getPointOfCustomer, postCreateBooking } from "../../../../config/api";
 import { toast, ToastContainer } from "react-toastify";
 import { AuthContext } from "../../../context/auth.context";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +17,11 @@ import DiscountCodeForm from "../DiscountCode/DiscountCodeForm ";
 // import Wishlist from "../Wishlist/Wishlist";
 import { MdWorkspaces } from "react-icons/md";
 import WishlistButton from "../WishlistButton/WishlistButton";
+import {
+  calculateRank,
+  getRankDiscount,
+  RankDiscountDisplay,
+} from "../../../../utils/rankDiscountSystem";
 
 const BookingRoom = (props) => {
   // Props room data
@@ -73,6 +78,33 @@ const BookingRoom = (props) => {
   // Previous Tab
   const isInitialMount = useRef(true);
   const prevTabRef = useRef(currentTab);
+
+  // Add new state for rank discount
+  const [rankDiscount, setRankDiscount] = useState(0);
+  const [customerPoints, setCustomerPoints] = useState(0);
+  const [rankDiscountAmount, setRankDiscountAmount] = useState(0);
+
+  // Add useEffect to fetch customer points
+  useEffect(() => {
+    const fetchCustomerPoints = async () => {
+      if (auth.isAuthenticated) {
+        try {
+          const res = await getPointOfCustomer();
+
+          if (res && res.err === 0) {
+            setCustomerPoints(res.data);
+            const rank = calculateRank(res.data);
+            const discount = getRankDiscount(rank);
+            setRankDiscount(discount);
+          }
+        } catch (error) {
+          console.error("Error fetching customer points:", error);
+        }
+      }
+    };
+
+    fetchCustomerPoints();
+  }, [auth.isAuthenticated]);
 
   // Effect for handling tab changes
   useEffect(() => {
@@ -226,6 +258,7 @@ const BookingRoom = (props) => {
             discountCode,
             tax,
             total,
+            rankDiscount,
           },
         });
       } else {
@@ -361,6 +394,13 @@ const BookingRoom = (props) => {
                   />
                 )}
 
+                {auth.isAuthenticated && (
+                  <RankDiscountDisplay
+                    points={customerPoints}
+                    rankDiscount={rankDiscount}
+                  />
+                )}
+
                 {/* Booking Summary */}
 
                 <BookingSummary
@@ -378,6 +418,9 @@ const BookingRoom = (props) => {
                   setSubtotal={setSubtotal}
                   tax={tax}
                   setTax={setTax}
+                  rankDiscount={rankDiscount}
+                  setRankDiscountAmount={setRankDiscountAmount}
+                  rankDiscountAmount={rankDiscountAmount}
                 />
               </div>
             </div>
@@ -432,6 +475,13 @@ const BookingRoom = (props) => {
                 />
               )}
 
+              {auth.isAuthenticated && (
+                <RankDiscountDisplay
+                  points={customerPoints}
+                  rankDiscount={rankDiscount}
+                />
+              )}
+
               <BookingSummary
                 handleOpenCloseModal={handleOpenCloseModal}
                 price={roomData?.price_per_day}
@@ -447,6 +497,9 @@ const BookingRoom = (props) => {
                 setSubtotal={setSubtotal}
                 tax={tax}
                 setTax={setTax}
+                rankDiscount={rankDiscount}
+                setRankDiscountAmount={setRankDiscountAmount}
+                rankDiscountAmount={rankDiscountAmount}
               />
             </div>
 
@@ -503,6 +556,13 @@ const BookingRoom = (props) => {
                 />
               )}
 
+              {auth.isAuthenticated && (
+                <RankDiscountDisplay
+                  points={customerPoints}
+                  rankDiscount={rankDiscount}
+                />
+              )}
+
               <BookingSummary
                 handleOpenCloseModal={handleOpenCloseModal}
                 price={roomData?.price_per_month}
@@ -518,6 +578,9 @@ const BookingRoom = (props) => {
                 setSubtotal={setSubtotal}
                 tax={tax}
                 setTax={setTax}
+                rankDiscount={rankDiscount}
+                setRankDiscountAmount={setRankDiscountAmount}
+                rankDiscountAmount={rankDiscountAmount}
               />
             </div>
           </div>
@@ -543,6 +606,7 @@ const BookingRoom = (props) => {
         tax={tax}
         total={total}
         handleConfirmBooking={handleConfirmBooking}
+        rankDiscount={rankDiscount}
       />
     </>
   );

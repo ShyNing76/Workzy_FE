@@ -96,30 +96,30 @@ const ViewWishlist = () => {
 
   return (
     <div className="view-wishlist flex gap-5 justify-between items-start p-4">
-      <div className="flex-none w-[600px] h-[400px] ml-1 shadow-lg rounded-lg" style={{ overflow: "hidden" }}>
+      <div className="flex-none w-[600px] h-[400px] ml-1 shadow-lg rounded-lg overflow-hidden">
         <figure className="w-full h-full">
           <img
             src={imageUrl}
-            alt="Sample"
+            alt="Wishlist image"
             className="w-full h-full object-cover rounded-lg"
           />
         </figure>
       </div>
-        <div className="flex-grow w-2/3 overflow-x-auto p-4">
+      <div className="flex-grow w-2/3 overflow-x-auto p-4">
         <h2 className="text-4xl font-bold mb-5">Wishlist</h2>
-        <table className="table table-xl w-full">
+        <table className="table table-zebra w-full">
           <thead>
-            <tr style={{ fontSize: "18px" }}>
-              <th>Index</th>
-              <th>Name</th>
-              <th>ZyCoin</th>
-              <th>Action</th>
+            <tr>
+              <th className="text-lg font-medium">Index</th>
+              <th className="text-lg font-medium">Name</th>
+              <th className="text-lg font-medium">ZyCoin</th>
+              <th className="text-lg font-medium">Action</th>
             </tr>
           </thead>
           <tbody>
             {customers.map((customer, index) => (
-              <tr key={customer.id} style={{ fontSize: "15px" }}>
-                <th>{index + 1}</th>
+              <tr key={customer.id}>
+                <td>{index + 1}</td>
                 <td>{customer.name}</td>
                 <td>{customerZycoins[customer.id]}</td>
                 <td>

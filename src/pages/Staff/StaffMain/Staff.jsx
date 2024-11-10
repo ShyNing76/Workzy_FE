@@ -1,5 +1,11 @@
 import React, { useContext } from "react";
-import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
+import {
+  Link,
+  Outlet,
+  useNavigate,
+  useLocation,
+  useOutletContext,
+} from "react-router-dom";
 import { useState, useEffect } from "react";
 import { AuthContext } from "../../../components/context/auth.context";
 import { getUserAuthen } from "../../../config/api";
@@ -17,6 +23,14 @@ const Staff = () => {
 
   const [buildingName, setBuildingName] = useState("");
   const [buildingId, setBuildingId] = useState("");
+  const [staff, setStaff] = useState(null);
+
+  const [refresh, setRefresh] = useState(false);
+
+  // function render both sideBar and outlet
+  const handleUpdate = () => {
+    setRefresh((prev) => !prev);
+  };
 
   useEffect(() => {
     const fetchAccount = async () => {
@@ -65,8 +79,25 @@ const Staff = () => {
       }
     };
 
+    const fetchUser = async () => {
+      setAppLoading(true);
+      try {
+        const res = await getUserAuthen();
+        if (res && res.data && res.err === 0) {
+          setStaff(res.data);
+        } else {
+          setStaff(null);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        setAppLoading(false);
+      }
+    };
+
+    fetchUser();
     fetchBuildingData();
-  }, []);
+  }, [refresh]);
 
   const fetchBuildingId = async () => {
     const BuildingIdRes = await getStaffBuildingId();
@@ -84,14 +115,14 @@ const Staff = () => {
       ) : (
         <div className="main-container">
           <div className="sticky top-0 z-50 shadow-lg">
-            <StaffHeader buildingName={buildingName} />
+            <StaffHeader buildingName={buildingName} staff={staff} />
           </div>
 
           <div className="drawer lg:drawer-open">
             <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
             <div className="drawer-content flex flex-col items-center justify-center">
               <main className="content">
-                <Outlet context={{ buildingId }} />
+                <Outlet context={{ buildingId, handleUpdate }} />
               </main>
             </div>
             <div className="drawer-side">
@@ -110,7 +141,7 @@ const Staff = () => {
                         : ""
                     }`}
                   >
-                    <FiCheckCircle  className="mr-2 text-xl h-[calc(6vh-1rem)]" />
+                    <FiCheckCircle className="mr-2 text-xl h-[calc(6vh-1rem)]" />
                     Workspace's Status
                   </Link>
                 </li>

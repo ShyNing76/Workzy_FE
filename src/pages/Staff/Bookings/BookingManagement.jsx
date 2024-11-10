@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import "./BookingManagement.scss";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Swal from "sweetalert2";
 import DetailModal from "../../../components/layout/staff/booking/Modal/DetailModal.jsx";
 import CheckAmenitiesModal from "../../../components/layout/staff/booking/Modal/CheckAmenitiesModal.jsx";
@@ -18,14 +17,16 @@ const BookingManagement = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showAmenitiesModal, setShowAmenitiesModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
-  const [bookings, setBookings] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(5);
   const [isFetched, setIsFetched] = useState(false);
   const { buildingId } = useOutletContext();
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
+  const [allBookings, setAllBookings] = useState([]); 
+  const [searchedBookings, setSearchedBookings] = useState([]);
+  const [totalFilteredItems, setTotalFilteredItems] = useState(0);
 
   const [selectedDate, setSelectedDate] = useState(() => {
     const today = new Date();
@@ -55,82 +56,93 @@ const BookingManagement = () => {
       .replace(",", "");
   };
 
-  const fetchBookingData = async (page = 1) => {
+  const fetchAllBookingData = useCallback(async () => {
     try {
       setIsLoading(true);
       if (!buildingId) return;
 
-      const response = await getBooking(buildingId, page, itemsPerPage);
-      if (!response?.data?.rows) throw new Error("Unexpected data format.");
-
-      const bookings = response.data.rows;
-      setTotalCount(response.data.count || 0);
-
-      if (bookings.length === 0) {
-        setIsLoading(false);
-        return;
+      const firstPageResponse = await getBooking(buildingId, 1, itemsPerPage);
+      if (!firstPageResponse?.data?.rows || !firstPageResponse?.data?.count) {
+        throw new Error("Invalid response format from server");
       }
 
-      const bookingTypeCache = {};
+      const totalItems = firstPageResponse.data.count;
+      const totalPages = Math.ceil(totalItems / itemsPerPage);
+      let allBookingsData = [];
+      const bookingTypeCache = new Map();
 
-      const getBookingType = async (booking_type_id) => {
-        if (bookingTypeCache[booking_type_id]) {
-          return bookingTypeCache[booking_type_id];
+      for (let page = 1; page <= totalPages; page++) {
+        const pageResponse = page === 1 ? firstPageResponse : await getBooking(buildingId, page, itemsPerPage);
+        const bookings = pageResponse.data.rows;
+
+        for (const booking of bookings) {
+          try {
+            let bookingType;
+            if (bookingTypeCache.has(booking.booking_type_id)) {
+              bookingType = bookingTypeCache.get(booking.booking_type_id);
+            } else {
+              const bookingTypeResponse = await getBookingTypeById(booking.booking_type_id);
+              if (!bookingTypeResponse?.data?.type) {
+                throw new Error("Invalid booking type response");
+              }
+              bookingType = bookingTypeResponse.data.type;
+              bookingTypeCache.set(booking.booking_type_id, bookingType);
+            }
+
+            const bookingAmenities = booking.Amenities?.map((amenity) => {
+              const details = amenity.BookingAmenities || {};
+              return {
+                amenity_name: amenity.amenity_name,
+                rent_price: formatCurrency(details.price || 0),
+                quantity: details.quantity || 0,
+                total_price: formatCurrency(details.total_price || 0),
+              };
+            });
+
+            allBookingsData.push({
+              booking_id: booking.booking_id,
+              workspace_id: booking.workspace_id,
+              workspace_name: booking.Workspace?.workspace_name || "Unknown",
+              start_time_date: formatDate(booking.start_time_date),
+              end_time_date: formatDate(booking.end_time_date),
+              workspace_price: formatCurrency(booking.workspace_price),
+              total_price: formatCurrency(booking.total_price),
+              total_workspace_price: formatCurrency(booking.total_workspace_price),
+              status: booking.BookingStatuses?.at(-1)?.status || "N/A",
+              booking_type: bookingType,
+              total_amenities_price: formatCurrency(booking.total_amenities_price || 0),
+              total_broken_price: formatCurrency(booking.total_broken_price || 0),
+              customer_name: booking.Customer?.User?.name || "Unknown",
+              amenities: bookingAmenities,
+            });
+          } catch (error) {
+            console.error(`Error processing booking ${booking.booking_id}:`, error);
+            continue;
+          }
         }
-        const response = await getBookingTypeById(booking_type_id);
-        const bookingType = response?.data?.type || "Unknown";
-        bookingTypeCache[booking_type_id] = bookingType;
-        return bookingType;
-      };
-
-      const bookingsData = [];
-      for (const booking of bookings) {
-        const bookingType = await getBookingType(booking.booking_type_id);
-        const bookingAmenities = booking.Amenities?.map((amenity) => {
-          const details = amenity.BookingAmenities || {};
-          return {
-            amenity_name: amenity.amenity_name,
-            rent_price: formatCurrency(details.price || 0),
-            quantity: details.quantity || 0,
-            total_price: formatCurrency(details.total_price || 0),
-          };
-        });
-
-        bookingsData.push({
-          booking_id: booking.booking_id,
-          workspace_id: booking.workspace_id,
-          workspace_name: booking.Workspace?.workspace_name || "Unknown",
-          start_time_date: formatDate(booking.start_time_date),
-          end_time_date: formatDate(booking.end_time_date),
-          workspace_price: formatCurrency(booking.workspace_price),
-          total_price: formatCurrency(booking.total_price),
-          total_workspace_price: formatCurrency(booking.total_workspace_price),
-          status: booking.BookingStatuses?.at(-1)?.status || "N/A",
-          booking_type: bookingType,
-          total_amenities_price: formatCurrency(
-            booking.total_amenities_price || 0
-          ),
-          total_broken_price: formatCurrency(booking.total_broken_price || 0),
-          customer_name: booking.Customer?.User?.name || "Unknown",
-          amenities: bookingAmenities,
-        });
       }
 
-      setBookings(bookingsData);
+      setAllBookings(allBookingsData);
+      setTotalCount(totalItems);
       setIsLoading(false);
       setIsFetched(true);
     } catch (error) {
       console.error("Error fetching booking data:", error);
       setIsLoading(false);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to load bookings. Please try again later.",
+      });
     }
-  };
+  }, [buildingId, itemsPerPage]);
 
   useEffect(() => {
     if (buildingId) {
       setIsFetched(false);
-      fetchBookingData(currentPage);
+      fetchAllBookingData();
     }
-  }, [buildingId, currentPage]);
+  }, [buildingId, fetchAllBookingData]);
 
   const handleSendBrokenAmenities = async (bookingId, selectedAmenities) => {
     try {
@@ -165,8 +177,10 @@ const BookingManagement = () => {
   const handleChangeStatus = async (booking_id, status) => {
     try {
       const response = await postBookingStatus(booking_id, status);
-      if (response?.data?.err) throw new Error("Unknown error.");
-
+      if (response?.data?.err) {
+        throw new Error(response.data.message || "Unknown error occurred");
+      }
+  
       Swal.fire({
         position: "center",
         icon: "success",
@@ -174,12 +188,12 @@ const BookingManagement = () => {
         showConfirmButton: false,
         timer: 1500,
       });
-
-      const updatedBookings = bookings.map((booking) =>
+  
+      const updatedBookings = allBookings.map((booking) =>
         booking.booking_id === booking_id ? { ...booking, status } : booking
       );
-      setBookings(updatedBookings);
-
+      setAllBookings(updatedBookings);
+  
       if (status === "check-in" || status === "check-amenities") {
         setSelectedBooking(
           updatedBookings.find((b) => b.booking_id === booking_id)
@@ -190,6 +204,11 @@ const BookingManagement = () => {
       }
     } catch (error) {
       console.error("Error while updating status:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Failed to update status",
+      });
     }
   };
 
@@ -236,53 +255,137 @@ const BookingManagement = () => {
     });
   };
 
-  const filteredBookings = filterBookingsByDate(bookings, selectedDate);
-  const searchedBookings =
-    searchQuery.trim() === ""
-      ? filteredBookings
-      : filteredBookings.filter((booking) =>
-          booking.booking_id.toString().includes(searchQuery)
-        );
+  const filteredBookings = useMemo(() => filterBookingsByDate(allBookings, selectedDate), [allBookings, selectedDate]);
+
+  const searchBooking = useCallback(async (booking_id) => {
+    try {
+      const response = await getBooking(buildingId, 1, itemsPerPage, booking_id);
+      if (response.data && response.data.rows.length > 0) {
+        const bookings = response.data.rows;
+        const bookingTypeCache = new Map();
+        const formattedBookings = [];
+
+        for (const booking of bookings) {
+          try {
+            let bookingType;
+            if (bookingTypeCache.has(booking.booking_type_id)) {
+              bookingType = bookingTypeCache.get(booking.booking_type_id);
+            } else {
+              const bookingTypeResponse = await getBookingTypeById(booking.booking_type_id);
+              if (!bookingTypeResponse?.data?.type) {
+                throw new Error("Invalid booking type response");
+              }
+              bookingType = bookingTypeResponse.data.type;
+              bookingTypeCache.set(booking.booking_type_id, bookingType);
+            }
+
+            const bookingAmenities = booking.Amenities?.map((amenity) => {
+              const details = amenity.BookingAmenities || {};
+              return {
+                amenity_name: amenity.amenity_name,
+                rent_price: formatCurrency(details.price || 0),
+                quantity: details.quantity || 0,
+                total_price: formatCurrency(details.total_price || 0),
+              };
+            });
+
+            formattedBookings.push({
+              booking_id: booking.booking_id,
+              workspace_id: booking.workspace_id,
+              workspace_name: booking.Workspace?.workspace_name || "Unknown",
+              start_time_date: formatDate(booking.start_time_date),
+              end_time_date: formatDate(booking.end_time_date),
+              workspace_price: formatCurrency(booking.workspace_price),
+              total_price: formatCurrency(booking.total_price),
+              total_workspace_price: formatCurrency(booking.total_workspace_price),
+              status: booking.BookingStatuses?.at(-1)?.status || "N/A",
+              booking_type: bookingType,
+              total_amenities_price: formatCurrency(booking.total_amenities_price || 0),
+              total_broken_price: formatCurrency(booking.total_broken_price || 0),
+              customer_name: booking.Customer?.User?.name || "Unknown",
+              amenities: bookingAmenities,
+            });
+          } catch (error) {
+            console.error(`Error processing booking ${booking.booking_id}:`, error);
+            continue;
+          }
+        }
+
+        return formattedBookings;
+      } else {
+        return [];
+      }
+    } catch (error) {
+      console.error("Error searching booking:", error);
+      return [];
+    }
+  }, [buildingId, itemsPerPage]);
+
+  useEffect(() => {
+    const doSearch = async () => {
+      if (searchQuery.trim() !== "") {
+        const result = await searchBooking(searchQuery);
+        setSearchedBookings(result);
+        setTotalFilteredItems(result.length);
+      } else {
+        setSearchedBookings(filteredBookings);
+        setTotalFilteredItems(filteredBookings.length);
+      }
+    };
+    doSearch();
+  }, [searchQuery, filteredBookings, searchBooking]);
 
   const totalFilteredPages = Math.ceil(searchedBookings.length / itemsPerPage);
-  const currentFilteredBookings = searchedBookings.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentFilteredBookings = searchedBookings.slice(startIndex, endIndex);
 
   return (
-    <div className="booking-container m-6 ">
-      <h2 className="text-4xl font-black mt-5">Bookings Management</h2>
-      <br/>
-      <div className="main-bookings-content">
-        <BookingFilters
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          selectedDate={selectedDate}
-          setSelectedDate={setSelectedDate}
-        />
-        <br/>
-        <BookingTable
-          bookings={currentFilteredBookings}
-          currentPage={currentPage}
-          handleChangeStatus={handleChangeStatus}
-          setSelectedBooking={setSelectedBooking}
-          setShowDetailModal={setShowDetailModal}
-        />
-        <br/>
-        <BookingPagination
-          currentPage={currentPage}
-          totalFilteredPages={totalFilteredPages}
-          setCurrentPage={setCurrentPage}
-          isLoading={isLoading}
-        />
+    <div className="container mx-auto px-4 py-6">
+      {/* Header Section */}
+      <h2 className="text-2xl font-bold text-base-content mb-6">Bookings Management</h2>
+
+      {/* Filters Section */}
+      <BookingFilters
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+      />
+
+      {/* Booking Table Section */}
+      <div className="card bg-base-100 shadow-lg overflow-hidden my-6">
+        <div className="card-body p-0">
+          <BookingTable
+            bookings={currentFilteredBookings}
+            currentPage={currentPage}
+            itemsPerPage={itemsPerPage}
+            handleChangeStatus={handleChangeStatus}
+            setSelectedBooking={setSelectedBooking}
+            setShowDetailModal={setShowDetailModal}
+          />
+        </div>
       </div>
+
+      {/* Pagination Section */}
+      <BookingPagination
+        currentPage={currentPage}
+        totalFilteredPages={totalFilteredPages}
+        setCurrentPage={setCurrentPage}
+        isLoading={isLoading}
+        totalItems={totalFilteredItems}
+      />
+
+      {/* Detail Modal */}
       {showDetailModal && selectedBooking && (
         <DetailModal
           booking={selectedBooking}
           onClose={() => setShowDetailModal(false)}
         />
       )}
+
+      {/* Amenities Modal */}
       {showAmenitiesModal && selectedBooking && (
         <CheckAmenitiesModal
           bookingId={selectedBooking.booking_id}

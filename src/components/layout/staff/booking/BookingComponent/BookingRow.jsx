@@ -1,6 +1,6 @@
 import React from 'react';
 
-const BookingRow = ({ booking, index, currentPage, handleChangeStatus, setSelectedBooking, setShowDetailModal }) => {
+const BookingRow = ({ booking, index, currentPage, itemsPerPage, handleChangeStatus, setSelectedBooking, setShowDetailModal }) => {
     const statusClass = (() => {
         switch (booking.status) {
             case "usage":
@@ -20,7 +20,7 @@ const BookingRow = ({ booking, index, currentPage, handleChangeStatus, setSelect
 
     return (
         <tr style={{ fontSize: '13px' }} className="hover" key={booking.booking_id}>
-            <td>{(currentPage - 1) * 10 + index + 1}</td>
+            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
             <td>{booking.customer_name}</td>
             <td>{booking.workspace_name}</td>
             <td>{booking.start_time_date}</td>

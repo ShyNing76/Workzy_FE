@@ -358,7 +358,7 @@ const MyBooking = () => {
         <h2 className="text-2xl font-bold text-neutral mb-8 text-left">
           My Booking
         </h2>
-        <label className="input input-bordered flex items-center gap-2 ">
+        {/* <label className="input input-bordered flex items-center gap-2 ">
           <input type="text" className="grow" placeholder="Search" />
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -372,7 +372,7 @@ const MyBooking = () => {
               clipRule="evenodd"
             />
           </svg>
-        </label>
+        </label> */}
       </div>
 
       {/* Component Tabs */}

@@ -16,11 +16,10 @@ import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.
 import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
 import SuccessAlert from "../../../components/layout/Admin/SuccessAlert/SuccessAlert.jsx";
 import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal.jsx";
-import BlockButton from '../../../components/layout/Admin/Buttons/BlockButton.jsx'; 
+import BlockButton from "../../../components/layout/Admin/Buttons/BlockButton.jsx";
 
 import { useLocation } from "react-router-dom";
-import Swal from 'sweetalert2';
-
+import Swal from "sweetalert2";
 
 const ManagersManagerPage = () => {
   const location = useLocation();
@@ -33,36 +32,36 @@ const ManagersManagerPage = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showDetailsModal, setShowDetailsModal] = useState(false)
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [managerToDelete, setManagerToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [selectedManagerDetails, setSelectedManagerDetails] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState("all");
   const [newManager, setNewManager] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    date_of_birth: '',
-    phone: '',
-    status: '',
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    date_of_birth: "",
+    phone: "",
+    status: "",
   });
   const [responseData, setResponseData] = useState(null);
 
   const formatDate = (dateString) => {
     if (!dateString) return "None";
-    
+
     const date = new Date(dateString);
-    
+
     if (isNaN(date.getTime())) {
       return "None";
     }
-  
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); 
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
-  
+
     return `${day}/${month}/${year}`;
   };
 
@@ -85,102 +84,95 @@ const ManagersManagerPage = () => {
 
   useEffect(() => {
     fetchManager();
-}, []);
+  }, []);
 
-const fetchData = async () => {
-  try {
-    const staffRes = await getStaff();
-    const customerRes = await getCustomer();
-    
-    setStaff(staffRes.data.rows || []);
-    setCustomer(customerRes.data.rows || []);
-  } catch (err) {
-    setError(err);
-  } finally {
-    setLoading(false);
-  }
-};
+  const fetchData = async () => {
+    try {
+      const staffRes = await getStaff();
+      const customerRes = await getCustomer();
 
-useEffect(() => {
-  fetchData();
-}, []);
-
-useEffect(() => {
-  if (successMessage) {
-    Swal.fire({
-      icon: "success",
-      title: "Success",
-      text: successMessage,
-      position: "top-end",
-      toast: true, // makes it a toast message
-      timer: 3000,
-      timerProgressBar: true,
-      showConfirmButton: false,
-    }).then(() => setSuccessMessage("")); // clear the message after showing
-  }
-}, [successMessage]);
-
-//Hiện detail khi click vô 1 hàng
-
-const handleRowClick = async (user_id) => {
-  try {
-    const res = await getManagerById(user_id);
-    if (res && res.data) {
-      const details = {
-        ...res.data,
-        date_of_birth: formatDate(res.data.date_of_birth), // Format date
-      };
-      setSelectedManagerDetails(details);
-      setShowDetailsModal(true);
+      setStaff(staffRes.data.rows || []);
+      setCustomer(customerRes.data.rows || []);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error("Error fetching manager details: ", err);
-  }
-};
+  };
 
-//Khu vực hàm dành cho add
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-const handleAddManger = async (e) => {
-  e.preventDefault();
+  useEffect(() => {
+    if (successMessage) {
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: successMessage,
+        position: "top-end",
+        toast: true, // makes it a toast message
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      }).then(() => setSuccessMessage("")); // clear the message after showing
+    }
+  }, [successMessage]);
 
-  if (!newManager.name || !newManager.email || !newManager.password || !newManager.phone) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Validation Error',
-      text: 'All fields are required.',
-      position: 'top-end',
-      toast: true,
-      timer: 3000,
-      timerProgressBar: true,
-      showConfirmButton: false,
-    });
-    return;
-  }
+  //Hiện detail khi click vô 1 hàng
 
-  if (newManager.password !== newManager.confirmPassword) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Password Error',
-      text: 'Passwords do not match.',
-      position: 'top-end',
-      toast: true,
-      timer: 3000,
-      timerProgressBar: true,
-      showConfirmButton: false,
-    });
-    return;
-  }
+  //Khu vực hàm dành cho add
+
+  const handleAddManger = async (e) => {
+    e.preventDefault();
+
+    if (
+      !newManager.name ||
+      !newManager.email ||
+      !newManager.password ||
+      !newManager.phone
+    ) {
+      Swal.fire({
+        icon: "error",
+        title: "Validation Error",
+        text: "All fields are required.",
+        position: "top-end",
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    if (newManager.password !== newManager.confirmPassword) {
+      Swal.fire({
+        icon: "error",
+        title: "Password Error",
+        text: "Passwords do not match.",
+        position: "top-end",
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+      return;
+    }
 
     // Attempt to find duplicates in manager, staff, and customer lists
-    const emailExists = [...manager, ...staff, ...customer].some((item) => item.email === newManager.email);
-    const phoneExists = [...manager, ...staff, ...customer].some((item) => item.phone === newManager.phone);
-  
+    const emailExists = [...manager, ...staff, ...customer].some(
+      (item) => item.email === newManager.email
+    );
+    const phoneExists = [...manager, ...staff, ...customer].some(
+      (item) => item.phone === newManager.phone
+    );
+
     if (emailExists) {
       Swal.fire({
-        icon: 'error',
-        title: 'Validation Error',
-        text: 'A user with this email already exists.',
-        position: 'top-end',
+        icon: "error",
+        title: "Validation Error",
+        text: "A user with this email already exists.",
+        position: "top-end",
         toast: true,
         timer: 3000,
         timerProgressBar: true,
@@ -188,13 +180,13 @@ const handleAddManger = async (e) => {
       });
       return;
     }
-  
+
     if (phoneExists) {
       Swal.fire({
-        icon: 'error',
-        title: 'Validation Error',
-        text: 'A user with this phone number already exists.',
-        position: 'top-end',
+        icon: "error",
+        title: "Validation Error",
+        text: "A user with this phone number already exists.",
+        position: "top-end",
         toast: true,
         timer: 3000,
         timerProgressBar: true,
@@ -203,13 +195,14 @@ const handleAddManger = async (e) => {
       return;
     }
 
-    const emailDuplicate = staff && staff.some((item) => item.email === newManager.email);
+    const emailDuplicate =
+      staff && staff.some((item) => item.email === newManager.email);
     if (emailDuplicate) {
       Swal.fire({
-        icon: 'error',
-        title: 'Validation Error',
-        text: 'A staff member with this email already exists.',
-        position: 'top-end',
+        icon: "error",
+        title: "Validation Error",
+        text: "A staff member with this email already exists.",
+        position: "top-end",
         toast: true,
         timer: 3000,
         timerProgressBar: true,
@@ -217,14 +210,15 @@ const handleAddManger = async (e) => {
       });
       return;
     }
-  
-    const phoneDuplicate = staff && staff.some((item) => item.phone === newManager.phone);
+
+    const phoneDuplicate =
+      staff && staff.some((item) => item.phone === newManager.phone);
     if (phoneDuplicate) {
       Swal.fire({
-        icon: 'error',
-        title: 'Validation Error',
-        text: 'A staff member with this phone number already exists.',
-        position: 'top-end',
+        icon: "error",
+        title: "Validation Error",
+        text: "A staff member with this phone number already exists.",
+        position: "top-end",
         toast: true,
         timer: 3000,
         timerProgressBar: true,
@@ -233,87 +227,104 @@ const handleAddManger = async (e) => {
       return;
     }
 
+    const formData = new FormData();
 
+    formData.append("name", newManager.name);
+    formData.append("email", newManager.email);
+    formData.append("password", newManager.password);
+    formData.append("phone", newManager.phone);
 
-  const formData = new FormData();
+    try {
+      const Manager = await postManager(newManager);
+      setResponseData(Manager);
 
-  formData.append('name', newManager.name);
-  formData.append('email', newManager.email);
-  formData.append('password', newManager.password);
-  formData.append('phone', newManager.phone);
-
-  try {
-    const Manager = await postManager(newManager);
-    setResponseData(Manager);
-
-    fetchManager();
-    setShowAddModal(false);
-    setSuccessMessage("Manager Added Successfully!");
-    setNewManager({ 
-      name: '', 
-      email: '', 
-      password: '',
-      confirmPassword: '', 
-      phone: '',
-      status: 'active'
-    });
-  } catch(err){
-    console.error("Error adding Manager: ", err);
-  }
-};
-
-
-
-const addManagerFields = [
-  { label: "Name", type: "text", name: "name", value: `${newManager.name}` },
-  { label: "Email", type: "text", name: "email", value: `${newManager.email}` },
-  { label: "Password", type: "password", name: "password", value: `${newManager.password}` },
-  { label: "Confirm Password", type: "password", name: "confirmPassword", value: `${newManager.confirmPassword}` },
-  { label: "Phone number:", type: "text", name: "phone", value: `${newManager.phone}` },
-];
-
-const handleInputChange = (e) => {
-  const { name, value } = e.target;
-  setNewManager({
-    ...newManager,
-    [name]: value,
-  });
-};
-
-const resetNewManager = () => {
-  setNewManager({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    date_of_birth: '',
-    phone: '',
-    status: '',
-  });
-};
-
-//Khu vực hàm dành cho delete
-
-const handleDeleteManager = async () => {
-  if (!managerToDelete) return;
-
-  try {
-    // Call the deleteWorkspaceType API to set the status to inactive
-    await deleteManager(managerToDelete.Manager.user_id);
-
-    // Update the local state to reflect the change
-    setManager(
-      manager.map((type) => 
-        type.Manager.user_id === managerToDelete.Manager.user_id
-          ? { ...type, status: "inactive" }
-          : type
-      ))
-      setShowDeleteModal(false);
-      setSuccessMessage('Manager status set to inactive successfully!');
+      fetchManager();
+      setShowAddModal(false);
+      setSuccessMessage("Manager Added Successfully!");
+      setNewManager({
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        phone: "",
+        status: "active",
+      });
     } catch (err) {
-      console.error('Failed to set manager status to inactive:', err);
+      console.error("Error adding Manager: ", err);
     }
-  }
+  };
+
+  const addManagerFields = [
+    { label: "Name", type: "text", name: "name", value: `${newManager.name}` },
+    {
+      label: "Email",
+      type: "text",
+      name: "email",
+      value: `${newManager.email}`,
+    },
+    {
+      label: "Password",
+      type: "password",
+      name: "password",
+      value: `${newManager.password}`,
+    },
+    {
+      label: "Confirm Password",
+      type: "password",
+      name: "confirmPassword",
+      value: `${newManager.confirmPassword}`,
+    },
+    {
+      label: "Phone number:",
+      type: "text",
+      name: "phone",
+      value: `${newManager.phone}`,
+    },
+  ];
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewManager({
+      ...newManager,
+      [name]: value,
+    });
+  };
+
+  const resetNewManager = () => {
+    setNewManager({
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      date_of_birth: "",
+      phone: "",
+      status: "",
+    });
+  };
+
+  //Khu vực hàm dành cho delete
+
+  const handleDeleteManager = async () => {
+    if (!managerToDelete) return;
+
+    try {
+      // Call the deleteWorkspaceType API to set the status to inactive
+      await deleteManager(managerToDelete.Manager.user_id);
+
+      // Update the local state to reflect the change
+      setManager(
+        manager.map((type) =>
+          type.Manager.user_id === managerToDelete.Manager.user_id
+            ? { ...type, status: "inactive" }
+            : type
+        )
+      );
+      setShowDeleteModal(false);
+      setSuccessMessage("Manager status set to inactive successfully!");
+    } catch (err) {
+      console.error("Failed to set manager status to inactive:", err);
+    }
+  };
 
   //Khu vực dành cho hàm blovk/unblock
   const handleToggleStatus = async (manager) => {
@@ -322,16 +333,19 @@ const handleDeleteManager = async () => {
 
     const result = await Swal.fire({
       title: `Are you sure you want to ${action} this manager?`,
-      icon: 'warning',
+      icon: "warning",
       showCancelButton: true,
       confirmButtonText: `Yes`,
-      cancelButtonText: 'Cancel',
+      cancelButtonText: "Cancel",
     });
 
     try {
       // Make API call to update status
-      await putManager(manager.Manager.user_id, {...manager, status: newStatus });
-  
+      await putManager(manager.Manager.user_id, {
+        ...manager,
+        status: newStatus,
+      });
+
       // Update local state to reflect the new status
       setManager((prevManagers) =>
         prevManagers.map((m) =>
@@ -341,7 +355,7 @@ const handleDeleteManager = async () => {
         )
       );
       Swal.fire({
-        icon: 'success',
+        icon: "success",
         title: `Manager status has been set to ${newStatus} successfully!`,
         showConfirmButton: false,
         timer: 1500,
@@ -349,20 +363,23 @@ const handleDeleteManager = async () => {
     } catch (error) {
       console.error("Error toggling manager status:", error);
       Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
+        icon: "error",
+        title: "Oops...",
         text: `Failed to set manager status to ${newStatus}. Try again later.`,
       });
     }
   };
 
   const filteredManager = Array.isArray(manager)
-  ? manager.filter((item) => {
-      const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
-      const matchesSearchTerm = item.name.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchesStatus && matchesSearchTerm;
-    })
-  : [];
+    ? manager.filter((item) => {
+        const matchesStatus =
+          statusFilter === "all" || item.status === statusFilter;
+        const matchesSearchTerm = item.name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+        return matchesStatus && matchesSearchTerm;
+      })
+    : [];
 
   // const handleSearchChange = (e) => {
   //   setSearchTerm(e.target.value);
@@ -397,7 +414,7 @@ const handleDeleteManager = async () => {
             onClick={() => {
               resetNewManager();
               setShowAddModal(true);
-            } }
+            }}
             label="Add Manager"
           />
         </div>
@@ -435,25 +452,28 @@ const handleDeleteManager = async () => {
           </thead>
           <tbody>
             {filteredManager.map((manager) => (
-                // <tr key={manager.user_id} className="cursor-pointer">
-                <tr key={manager.Manager.user_id} className="hover:bg-gray-100 cursor-pointer" onClick={() => handleRowClick(manager.Manager.user_id)}>
-                  <td>{manager.name}</td>
-                  <td>{manager.email}</td>
-                  <td>{manager.gender}</td>
-                  <td>{formatDate(manager.date_of_birth)}</td>
-                  <td>{manager.status}</td>
-                  <td>
-
-                    <BlockButton
+              // <tr key={manager.user_id} className="cursor-pointer">
+              <tr
+                key={manager.Manager.user_id}
+                className="hover:bg-gray-100"
+                onClick={() => handleRowClick(manager.Manager.user_id)}
+              >
+                <td>{manager.name}</td>
+                <td>{manager.email}</td>
+                <td>{manager.gender}</td>
+                <td>{formatDate(manager.date_of_birth)}</td>
+                <td>{manager.status}</td>
+                <td>
+                  <BlockButton
                     onClick={(e) => {
                       e.stopPropagation();
                       handleToggleStatus(manager);
                     }}
                     status={manager.status}
-                    />
-                  </td>
-                </tr>
-              ))}
+                  />
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

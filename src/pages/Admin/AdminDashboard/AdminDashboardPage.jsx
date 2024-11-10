@@ -44,13 +44,6 @@ const StatCard = ({ icon: Icon, title, value, trend }) => (
           <p className="text-2xl font-bold mt-1">{value}</p>
         </div>
       </div>
-      {trend && (
-        <div
-          className={`text-sm ${trend > 0 ? "text-green-500" : "text-red-500"}`}
-        >
-          {trend > 0 ? "↑" : "↓"} {Math.abs(trend)}%
-        </div>
-      )}
     </div>
   </div>
 );
@@ -338,19 +331,16 @@ const AdminDashboard = () => {
           icon={TfiStatsUp}
           title="Total Revenue"
           value={`${formatCurrency(stats.revenue)}đ`}
-          trend={12}
         />
         <StatCard
           icon={LuCalendarCheck}
           title="Total Bookings"
           value={stats.bookings}
-          trend={8}
         />
         <StatCard
           icon={RiCoupon3Line}
           title="Active Vouchers"
           value={stats.vouchers}
-          trend={-3}
         />
       </div>
 

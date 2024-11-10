@@ -32,6 +32,27 @@ const ImagePreviewModal = ({ imageSrc }) => {
   );
 };
 
+const AmenitiesSection = ({ amenities }) => {
+  if (!amenities || amenities.length === 0) return null;
+
+  return (
+    <div className="mt-4">
+      <h3 className="text-lg font-semibold mb-3">Amenities</h3>
+      <div className="grid grid-cols-1 gap-2">
+        {amenities.map((amenity, index) => (
+          <div
+            key={index}
+            className="flex justify-between items-center p-3 bg-base-200 rounded-lg"
+          >
+            <span className="font-medium">{amenity.name}</span>
+            <span className="text-base-content/80">x{amenity.quantity}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const DetailsModal = ({ show, onClose, currentItem }) => {
   useEffect(() => {
     const handleEscape = (e) => {
@@ -57,8 +78,6 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
       modal.showModal();
     }
   };
-
-  console.log(currentItem);
 
   return (
     <>
@@ -147,7 +166,11 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
                       key !== "image" &&
                       key !== "manager_id" &&
                       key !== "BuildingImages" &&
-                      key !== "WorkspaceImages"
+                      key !== "WorkspaceImages" &&
+                      key !== "Building" &&
+                      key !== "workspace_type_id" &&
+                      key !== "building_id" &&
+                      key !== "AmenitiesWorkspaces"
                   )
                   .map(([key, value]) => (
                     <div
@@ -168,6 +191,20 @@ const DetailsModal = ({ show, onClose, currentItem }) => {
                       </div>
                     </div>
                   ))}
+
+                {/* Amenities Section */}
+                {currentItem.AmenitiesWorkspaces && (
+                  <div className="py-3 px-4">
+                    <AmenitiesSection
+                      amenities={currentItem.AmenitiesWorkspaces.map(
+                        (amenity) => ({
+                          name: amenity.Amenities[0].amenity_name,
+                          quantity: amenity.quantity,
+                        })
+                      )}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>

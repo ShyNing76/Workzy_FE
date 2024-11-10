@@ -14,43 +14,29 @@ const formatCurrency = (amount) => {
 // Modal component to display booking details
 const DetailModal = ({ booking, onClose }) => {
     if (!booking) return null; // If no booking data, render nothing
+
     return (
-        <div
-            style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.5)', // Màu nền mờ
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 50,
-            }}
-        >
-            <dialog className="modal" open style={{ zIndex: 100 }}>
-                <div className="modal-box">
-                    <h3 className="font-bold text-lg">Booking Detail</h3>
-                    <ul className="list-none mt-4">
-                        <li className="flex justify-between mb-2">
-                            <span>1. Booking ID</span>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="modal modal-open">
+                <div className="modal-box max-w-xl">
+                    <h3 className="font-bold text-lg mb-4">Booking Detail</h3>
+                    <ul className="space-y-2">
+                        <li className="flex justify-between">
+                            <span className="font-medium">1. Booking ID:</span>
                             <span>{booking.booking_id}</span>
                         </li>
-                        <li className="flex justify-between mb-2">
-                            <span>2. Workspace Price</span>
-                            <span>{booking.total_workspace_price}</span>
+                        <li className="flex justify-between">
+                            <span className="font-medium">2. Workspace Price:</span>
+                            <span>{formatCurrency(parseCurrency(booking.total_workspace_price))}</span>
                         </li>
-                        <li className="flex justify-between mb-2">
-                            <span>3. Amenities</span>
-                        </li>
-                        <div className="overflow-x-auto mt-2 mb-2">
-                            <table className="table table-xs">
+                        <li className="font-medium">3. Amenities Added:</li>
+                        <div className="overflow-x-auto mb-2">
+                            <table className="table table-compact w-full">
                                 <thead>
                                     <tr>
-                                        <th style={{ width: '150px'}}>Amenity Name</th>
-                                        <th style={{ width: '130px'}}>Price</th>
-                                        <th style={{ width: '130px'}}>Quantity</th>
+                                        <th>Amenity Name</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
                                         <th>Total Price</th>
                                     </tr>
                                 </thead>
@@ -66,37 +52,31 @@ const DetailModal = ({ booking, onClose }) => {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="4" className="text-center">
-                                                No amenities added
-                                            </td>
+                                            <td colSpan="4" className="text-center">No amenities added</td>
                                         </tr>
                                     )}
                                 </tbody>
                             </table>
-                            <h1>_____________________________________________________________________</h1>
-                            <li className="flex justify-between mb-1" style={{fontSize: '12px'}}>
-                                <span>Total Amenities Price</span>
-                                <span>{booking.total_amenities_price}</span>
-                            </li>
                         </div>
-                        <li className="flex justify-between mb-1">
-                            <span>4. Broken Price</span>
-                            <span>{booking.total_broken_price}</span>
+                        <li className="flex justify-between border-t pt-2 mt-2">
+                            <span className="font-medium">Total Price Of Amenities Added:</span>
+                            <span>{formatCurrency(parseCurrency(booking.total_amenities_price))}</span>
                         </li>
-                        <p>_______________________________________________________________________</p>
-                        <li className="flex justify-between mb-2">
-                            <span>Total Price</span>
-                            <span>{booking.total_price}</span>
+                        <li className="flex justify-between">
+                            <span className="font-medium">4. Broken Price:</span>
+                            <span>{formatCurrency(parseCurrency(booking.total_broken_price))}</span>
+                        </li>
+                        <li className="flex justify-between border-t pt-2 mt-2">
+                            <span className="font-semibold">Total Price:</span>
+                            <span>{formatCurrency(parseCurrency(booking.total_price))}</span>
                         </li>
                     </ul>
 
-                    <div className="modal-action">
-                        <button onClick={onClose} className="btn btn-primary">
-                            Close
-                        </button>
+                    <div className="modal-action mt-4">
+                        <button onClick={onClose} className="btn btn-primary">Close</button>
                     </div>
                 </div>
-            </dialog>
+            </div>
         </div>
     );
 };

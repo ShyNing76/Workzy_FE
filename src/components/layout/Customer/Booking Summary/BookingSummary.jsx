@@ -19,6 +19,9 @@ const BookingSummary = (props) => {
     setSubtotal,
     tax,
     setTax,
+    rankDiscount,
+    setRankDiscountAmount,
+    rankDiscountAmount,
   } = props;
 
   useEffect(() => {
@@ -38,17 +41,19 @@ const BookingSummary = (props) => {
   }, [numOfHours, numOfDays, numOfMonths, price]); // Thêm `price` vào dependency để cập nhật khi thay đổi
 
   useEffect(() => {
-    // Calculate the subtotal first by applying the discount
-    const newSubtotal = amountPrice * (1 - discount); // Discount as a percentage
+    const baseAmount = amountPrice;
+    const voucherDiscountAmount = baseAmount * discount;
+    const rankDiscountAmount = baseAmount * rankDiscount;
+    const totalDiscountAmount = voucherDiscountAmount + rankDiscountAmount;
 
-    // Calculate the tax based on the subtotal
-    const newTax = newSubtotal * 0.1; // Assuming tax is 10%
+    const newSubtotal = baseAmount - totalDiscountAmount;
+    const newTax = newSubtotal * 0.1;
 
-    // Set subtotal, tax, and total
+    setRankDiscountAmount(rankDiscountAmount);
     setSubtotal(newSubtotal);
     setTax(newTax);
     setTotal(newSubtotal + newTax);
-  }, [amountPrice, discount]);
+  }, [amountPrice, discount, rankDiscount]);
 
   return (
     <div className="sumary-booking w-full max-w-md mx-auto">
@@ -58,11 +63,23 @@ const BookingSummary = (props) => {
           <span>Amount ({amountText}):</span>
           <span>{formatCurrency(amountPrice)}</span>
         </div>
-        <div className="flex justify-between mb-2">
-          <span>Discount:</span>
-          <span>- {formatCurrency(amountPrice * discount)}</span>
-        </div>
-        <div className="flex justify-between mb-2">
+        {discount > 0 && (
+          <div className="flex justify-between mb-2">
+            <span>Voucher Discount:</span>
+            <span>- {formatCurrency(amountPrice * discount)}</span>
+          </div>
+        )}
+        {rankDiscount > 0 && (
+          <div className="flex justify-between mb-2">
+            <span>Rank Discount:</span>
+            <span>- {formatCurrency(rankDiscountAmount || 0)}</span>
+          </div>
+        )}
+
+        <div
+          className="flex justify-between mb-2"
+          style={{ borderTop: "0.5px dashed #999" }}
+        >
           <span>Subtotal:</span>
           <span>{formatCurrency(subtotal)}</span>
         </div>
@@ -71,7 +88,7 @@ const BookingSummary = (props) => {
           <span>{formatCurrency(tax)}</span>
         </div>
         <div
-          className=" mt-2 pt-2 flex justify-between"
+          className="mt-2 pt-2 flex justify-between"
           style={{ borderTop: "0.5px solid #000" }}
         >
           <span className="font-bold">Total:</span>

@@ -21,36 +21,35 @@ const MembershipPage = () => {
   const membershipTiers = {
     Bronze: {
       name: "Bronze",
-      benefits:
-        "Ưu đãi cơ bản cho thành viên mới. Giảm giá 5% trên các dịch vụ thuê phòng.",
+      benefits: "Basic offer for new members. ",
       color: "#f59e0b", //text-amber-500
       bgGradient: "from-amber-200 to-amber-100",
     },
     Silver: {
       name: "Silver",
       benefits:
-        "Ưu đãi cho thành viên Silver. Giảm giá 10%, miễn phí một số dịch vụ tiện ích.",
+        "Special offer for Silver members. 5% discount on room rental services.",
       color: " #9ca3af", //text-gray-400
       bgGradient: "from-gray-200 to-gray-100",
     },
     Gold: {
       name: "Gold",
       benefits:
-        "Ưu đãi cao cấp cho thành viên Gold. Giảm giá 15%, phòng họp miễn phí.",
+        "Premium offer for Gold members. 10% discount on room rental services.",
       color: "#facc15 ", //text-yellow-400
       bgGradient: "from-yellow-200 to-yellow-100",
     },
     Emerald: {
       name: "Emerald",
       benefits:
-        "Ưu đãi đặc biệt cho thành viên Emerald. Giảm giá 20%, không giới hạn dịch vụ.",
+        "Special offer for Emerald members. 15% discount on room rental services.",
       color: "#10b981", //text-emerald-500
       bgGradient: "from-emerald-200 to-emerald-100",
     },
     Diamond: {
       name: "Diamond",
       benefits:
-        "Ưu đãi cao nhất cho thành viên Diamond. Giảm giá 30%, ưu tiên đặt phòng VIP.",
+        "Highest offer for Diamond members. 20% discount on room rental services.",
       color: "#60a5fa ", //text-blue-400
       bgGradient: "from-blue-200 to-blue-100",
     },

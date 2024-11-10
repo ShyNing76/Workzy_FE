@@ -56,6 +56,19 @@ const BuildingManagerPage = () => {
     remove_images: [],
   });
 
+  // Validate error message
+  const [errorMessage, setErrorMessage] = useState({
+    google_address: "",
+  });
+
+  const validationSchema = (building) => {
+    let error = {};
+    if (!building.google_address.startsWith("https://www.google.com/maps/")) {
+      error.google_address = "Google address is invalid";
+    }
+    return error;
+  }
+
   // Fetch building và managers
   const fetchBuilding = async () => {
     try {
@@ -90,6 +103,8 @@ const BuildingManagerPage = () => {
     setShowDetailsModal(false);
   };
 
+  
+
   const getDisplayLocation = (location) => {
     const locationMappings = {
       HCM: "Hồ Chí Minh",
@@ -107,6 +122,13 @@ const BuildingManagerPage = () => {
   // Xử lý thêm building
   const handleAddBuilding = async (e) => {
     e.preventDefault();
+
+    const errorInput = validationSchema(newBuilding);
+    if (Object.keys(errorInput).length > 0) {
+      setErrorMessage(errorInput);
+      console.log("errors", errorInput);
+      return; // Dừng lại nếu có lỗi
+    }
 
     const formData = new FormData();
     for (let key in newBuilding) {
@@ -175,6 +197,7 @@ const BuildingManagerPage = () => {
       label: "Google Address",
       type: "text",
       value: `${newBuilding.google_address}`,
+      showError: true,
     },
     {
       name: "description",
@@ -210,6 +233,12 @@ const BuildingManagerPage = () => {
   // Xử lý cập nhật building
   const handleUpdateBuilding = async (e) => {
     e.preventDefault();
+    const errorInput = validationSchema(updateBuilding);
+    if (Object.keys(errorInput).length > 0) {
+      setErrorMessage(errorInput);
+      console.log("errors", errorInput);
+      return; // Dừng lại nếu có lỗi
+    }
     const formData = new FormData();
 
     // Add basic fields
@@ -330,6 +359,7 @@ const BuildingManagerPage = () => {
       label: "Google Address",
       type: "text",
       value: `${updateBuilding.google_address}`,
+      showError: true,
     },
     {
       name: "description",
@@ -392,9 +422,27 @@ const BuildingManagerPage = () => {
       })
     : [];
 
+  // Open modal add building
+  const handleAddBuildingModalOpen = () => {
+    resetNewBuilding(); // Reset các trường thông tin
+    setErrorMessage({}); // Reset error message
+    setShowAddModal(true);
+  };
+
+  // Open modal update building
+  const handleUpdateBuildingModalOpen = (building) => {
+    const restructuredBuilding = {
+      ...building,
+      images: building.BuildingImages.map((img) => img.image),
+    };
+    setUpdateBuilding(restructuredBuilding);
+    setErrorMessage({}); // Reset error message
+    setShowUpdateModal(true);
+  };
+
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-4xl font-black mb-4">Building List</h1>
+      <h1 className="text-4xl font-black mb-4">Building Management</h1>
 
       <div className="flex justify-between items-center my-4">
         <div className="flex-grow mr-4">
@@ -405,10 +453,7 @@ const BuildingManagerPage = () => {
           />
         </div>
         <AddButton
-          onClick={() => {
-            resetNewBuilding();
-            setShowAddModal(true);
-          }}
+          onClick={handleAddBuildingModalOpen}
           label="Add Building"
         />
       </div>
@@ -473,13 +518,7 @@ const BuildingManagerPage = () => {
                   <UpdateButton
                     onClick={(e) => {
                       e.stopPropagation();
-                      // Restructure the building object
-                      const restructuredBuilding = {
-                        ...building,
-                        images: building.BuildingImages.map((img) => img.image),
-                      };
-                      setUpdateBuilding(restructuredBuilding);
-                      setShowUpdateModal(true);
+                      handleUpdateBuildingModalOpen(building);
                     }}
                   />
                   <BlockButton
@@ -504,6 +543,7 @@ const BuildingManagerPage = () => {
         onInputChange={handleInputChange}
         fields={addBuildingFields}
         successMessage={successMessage}
+        errorMessage={errorMessage}
       />
 
       <UpdateModal
@@ -514,6 +554,7 @@ const BuildingManagerPage = () => {
         onInputChange={handleUpdateChange}
         fields={updateBuildingFields}
         successMessage={successMessage}
+        errorMessage={errorMessage}
       />
 
       <DetailsModal

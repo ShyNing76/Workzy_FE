@@ -7,6 +7,7 @@ import {
   getAllWorkspaceType,
   putWorkspace,
   getTotalWorkspace,
+  getAllAmenity,
 } from "../../../config/api.admin";
 import Swal from "sweetalert2";
 import {
@@ -26,6 +27,8 @@ import AddModal from "../../../components/layout/Admin/Modals/AddModal";
 import UpdateModal from "../../../components/layout/Admin/Modals/UpdateModal";
 import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal";
 import Pagination from "../../../components/layout/Shared/Pagination/Pagination";
+import AddButton from "../../../components/layout/Admin/Buttons/AddButton";
+import { u } from "framer-motion/client";
 
 const WorkspacesManagerPage = () => {
   const [workspaces, setWorkspaces] = useState([]);
@@ -38,6 +41,9 @@ const WorkspacesManagerPage = () => {
   const [limit, setLimit] = useState(8);
   const [totalWorkSpace, setTotalWorkSpace] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [allAmenities, setAllAmenities] = useState([]);
+  const [selectedAmenitiesWithQuantity, setSelectedAmenitiesWithQuantity] =
+    useState([]);
 
   //-----------------------------------------------------------------//
   // ADD
@@ -87,7 +93,68 @@ const WorkspacesManagerPage = () => {
     setViewWorkspace(null);
   };
   //-------------------------------------------------------------//
+  // Validate to show error message
+  const [errorMessage, setErrorMessage] = useState({
+    price_per_hour: "",
+    price_per_day: "",
+    price_per_month: "",
+    capacity: "",
+    area: "",
+  });
 
+  const validationSchema = (workspace) => {
+    let error = {};
+
+    // Kiểm tra giá trị giá theo giờ
+    if (
+      !Number.isInteger(Number(workspace.price_per_hour)) ||
+      Number(workspace.price_per_hour) <= 0
+    ) {
+      error.price_per_hour = "Price per Hour must be a positive whole number";
+    }
+
+    // Kiểm tra giá trị giá theo ngày
+    if (
+      !Number.isInteger(Number(workspace.price_per_day)) ||
+      Number(workspace.price_per_day) <= 0
+    ) {
+      error.price_per_day = "Price per Day must be a positive whole number";
+    }
+
+    // Kiểm tra giá trị giá theo tháng
+    if (
+      !Number.isInteger(Number(workspace.price_per_month)) ||
+      Number(workspace.price_per_month) <= 0
+    ) {
+      error.price_per_month = "Price per Month must be a positive whole number";
+    }
+
+    // Kiểm tra giá trị tối thiểu
+    if (workspace.price_per_hour < 35000) {
+      error.price_per_hour = "Hourly price must be greater than 35000";
+    }
+
+    // Kiểm tra mối quan hệ giữa các giá
+    if (Number(workspace.price_per_hour) >= Number(workspace.price_per_day)) {
+      error.price_per_hour = "Hourly price must be less than daily price.";
+    }
+    if (Number(workspace.price_per_day) >= Number(workspace.price_per_month)) {
+      error.price_per_day = "Daily price must be less than monthly price.";
+    }
+    if (Number(workspace.price_per_hour) >= Number(workspace.price_per_month)) {
+      error.price_per_hour = "Hourly price must be less than monthly price.";
+    }
+    if (Number(workspace.capacity) <= 0) {
+      error.capacity = "Capacity must be greater than 0";
+    }
+    if (Number(workspace.area) <= 0) {
+      error.area = "Area must be greater than 0";
+    }
+
+    return error;
+  };
+
+  //-----------------------------------------------------------------//
   const fetchWorkspaces = async () => {
     setIsLoading(true);
     try {
@@ -141,10 +208,7 @@ const WorkspacesManagerPage = () => {
         console.log(error);
       }
     };
-    fetchBuildings();
-  }, []);
 
-  useEffect(() => {
     const fetchWorkspaceType = async () => {
       try {
         const res = await getAllWorkspaceType();
@@ -156,7 +220,20 @@ const WorkspacesManagerPage = () => {
       }
     };
 
+    const fetchAllAmenities = async () => {
+      try {
+        const res = await getAllAmenity();
+        if (res && res.data) {
+          setAllAmenities(res.data.rows);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
     fetchWorkspaceType();
+    fetchBuildings();
+    fetchAllAmenities();
   }, []);
 
   const handleSearch = (e) => {
@@ -239,6 +316,7 @@ const WorkspacesManagerPage = () => {
       description: "",
       status: "active",
     });
+    setErrorMessage({});
   };
 
   const handleFileChange = (e) => {
@@ -247,13 +325,25 @@ const WorkspacesManagerPage = () => {
   };
 
   const handleAddChange = (e) => {
-    setNewWorkspace({ ...newWorkspace, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setNewWorkspace({ ...newWorkspace, [name]: value });
   };
 
   const handleAddWorkspace = async (e) => {
     e.preventDefault();
+
+    const errorInput = validationSchema(newWorkspace); // Gọi hàm validatePrices
+
+    if (Object.keys(errorInput).length > 0) {
+      setErrorMessage(errorInput);
+      console.log("errors", errorInput);
+      return; // Dừng lại nếu có lỗi
+    }
+
     try {
       const formData = new FormData();
+
+      // Append basic workspace information
       formData.append("workspace_name", newWorkspace.workspace_name);
       formData.append("building_id", newWorkspace.building_id);
       formData.append("workspace_type_id", newWorkspace.workspace_type_id);
@@ -265,19 +355,56 @@ const WorkspacesManagerPage = () => {
       formData.append("description", newWorkspace.description);
       formData.append("status", newWorkspace.status);
 
+      // Handle images
       newWorkspace.images.forEach((file) => {
         formData.append("images", file);
       });
 
-      const res = await postWorkspace(formData);
-      if (res && res.err === 0) {
-        // Đóng modal trước
-        handleCloseModalAdd();
+      // Handle amenities with quantity - Fixed version
+      if (
+        selectedAmenitiesWithQuantity &&
+        selectedAmenitiesWithQuantity.length > 0
+      ) {
+        // Transform amenities to include quantity
+        const amenitiesWithQuantity = selectedAmenitiesWithQuantity.map(
+          (amenity) => ({
+            amenity_id: amenity.amenity_id,
+            quantity: amenity.quantity,
+          })
+        );
+        formData.append("addAmenities", JSON.stringify(amenitiesWithQuantity));
+      }
 
-        // Fetch lại dữ liệu mới
+      // Log all FormData entries
+      console.log("=== FormData Content ===");
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ": ", pair[1]);
+      }
+
+      // Log specific data types for debugging
+      console.log("\n=== Data Types ===");
+      console.log(
+        "workspace_name type:",
+        typeof formData.get("workspace_name")
+      );
+      console.log("building_id type:", typeof formData.get("building_id"));
+      console.log(
+        "price_per_hour type:",
+        typeof formData.get("price_per_hour")
+      );
+      console.log(
+        "images type:",
+        formData.getAll("images").map((file) => file.name)
+      );
+      console.log("amenities type:", typeof formData.get("addAmenities"));
+      console.log("amenities value:", formData.get("addAmenities"));
+
+      const res = await postWorkspace(formData);
+
+      if (res && res.err === 0) {
+        handleCloseModalAdd();
         await fetchWorkspaces();
 
-        // Hiển thị thông báo thành công
         Swal.fire({
           title: "Success",
           text: "Workspace added successfully",
@@ -286,12 +413,12 @@ const WorkspacesManagerPage = () => {
       } else {
         Swal.fire({
           title: "Error",
-          text: "Failed to add workspace",
+          text: res.message || "Failed to add workspace",
           icon: "error",
         });
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error adding workspace:", error);
       Swal.fire({
         title: "Error",
         text: "Failed to add workspace",
@@ -305,15 +432,23 @@ const WorkspacesManagerPage = () => {
     const restructuredWorkspace = {
       ...workspace,
       images: workspace.WorkspaceImages.map((img) => img.image),
+      building_id: workspace.Building?.building_id,
     };
     setUpdateWorkspace(restructuredWorkspace);
 
-    console.log("updateWorkspace", updateWorkspace);
     setOpenModalUpdate(true);
   };
 
+  useEffect(() => {
+    console.log(
+      "🚀 ~ WorkspacesManagerPage ~ updateWorkspace:",
+      updateWorkspace
+    );
+  }, [updateWorkspace]);
+
   const handleCloseModalUpdate = () => {
     setOpenModalUpdate(false);
+    setErrorMessage({});
   };
 
   const handleUpdateChange = (e) => {
@@ -353,6 +488,14 @@ const WorkspacesManagerPage = () => {
 
   const handleUpdateWorkspace = async (e) => {
     e.preventDefault();
+
+    const errorInput = validationSchema(updateWorkspace); // Gọi hàm validate
+
+    if (Object.keys(errorInput).length > 0) {
+      setErrorMessage(errorInput);
+      console.log("errors", errorInput);
+      return; // Dừng lại nếu có lỗi
+    }
     try {
       const formData = new FormData();
 
@@ -394,6 +537,20 @@ const WorkspacesManagerPage = () => {
         updateWorkspace.remove_images.forEach((image) => {
           formData.append("remove_images", image);
         });
+      }
+
+      if (
+        selectedAmenitiesWithQuantity &&
+        selectedAmenitiesWithQuantity.length > 0
+      ) {
+        // Transform amenities to include quantity
+        const amenitiesWithQuantity = selectedAmenitiesWithQuantity.map(
+          (amenity) => ({
+            amenity_id: amenity.amenity_id,
+            quantity: amenity.quantity,
+          })
+        );
+        formData.append("addAmenities", JSON.stringify(amenitiesWithQuantity));
       }
 
       // Log formData contents for debugging
@@ -439,10 +596,11 @@ const WorkspacesManagerPage = () => {
     const restructuredWorkspace = {
       ...workspace,
       images: workspace.WorkspaceImages.map((img) => ({ image: img.image })),
+      WorkspaceType: workspace.WorkspaceType.workspace_type_name,
+      building_name: getBuildingNameById(workspace.Building?.building_id),
     };
     setDetailWorkspace(restructuredWorkspace);
 
-    console.log("detailWorkspace", detailWorkspace);
     setOpenModalDetails(true);
   };
 
@@ -460,10 +618,7 @@ const WorkspacesManagerPage = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-4xl font-black mb-4">Workspace Management</h1>
-        <button className="btn btn-primary gap-2" onClick={handleOpenModalAdd}>
-          <FiPlus className="w-5 h-5" />
-          Add Workspace
-        </button>
+        <AddButton onClick={handleOpenModalAdd} label="Add Workspace" />
       </div>
 
       {/* Modal sử dụng AddModal */}
@@ -475,6 +630,7 @@ const WorkspacesManagerPage = () => {
         onInputChange={(e) =>
           setNewWorkspace({ ...newWorkspace, [e.target.name]: e.target.value })
         }
+        errorMessage={errorMessage}
         fields={[
           {
             name: "workspace_name",
@@ -507,21 +663,36 @@ const WorkspacesManagerPage = () => {
             label: "Price per Hour",
             type: "text",
             required: true,
+            showError: true,
           },
           {
             name: "price_per_day",
             label: "Price per Day",
             type: "text",
             required: true,
+            showError: true,
           },
           {
             name: "price_per_month",
             label: "Price per Month",
             type: "text",
             required: true,
+            showError: true,
           },
-          { name: "capacity", label: "Capacity", type: "text", required: true },
-          { name: "area", label: "Area (sq ft)", type: "text", required: true },
+          {
+            name: "capacity",
+            label: "Capacity",
+            type: "text",
+            required: true,
+            showError: true,
+          },
+          {
+            name: "area",
+            label: "Area (sq ft)",
+            type: "text",
+            required: true,
+            showError: true,
+          },
           {
             name: "description",
             label: "Description",
@@ -536,6 +707,9 @@ const WorkspacesManagerPage = () => {
             required: false,
           },
         ]}
+        amenities={allAmenities.length > 0 ? allAmenities : []}
+        setSelectedAmenitiesWithQuantity={setSelectedAmenitiesWithQuantity}
+        selectedAmenitiesWithQuantity={selectedAmenitiesWithQuantity}
       />
 
       {openModalUpdate && (
@@ -545,6 +719,7 @@ const WorkspacesManagerPage = () => {
           onSubmit={handleUpdateWorkspace}
           currentItem={updateWorkspace}
           onInputChange={handleUpdateChange}
+          errorMessage={errorMessage}
           fields={[
             {
               name: "workspace_name",
@@ -577,30 +752,35 @@ const WorkspacesManagerPage = () => {
               label: "Price per Hour",
               type: "text",
               required: true,
+              showError: true,
             },
             {
               name: "price_per_day",
               label: "Price per Day",
               type: "text",
               required: true,
+              showError: true,
             },
             {
               name: "price_per_month",
               label: "Price per Month",
               type: "text",
               required: true,
+              showError: true,
             },
             {
               name: "capacity",
               label: "Capacity",
               type: "text",
               required: true,
+              showError: true,
             },
             {
               name: "area",
               label: "Area (sq ft)",
               type: "text",
               required: true,
+              showError: true,
             },
             {
               name: "description",
@@ -616,6 +796,9 @@ const WorkspacesManagerPage = () => {
               required: false,
             },
           ]}
+          amenities={allAmenities.length > 0 ? allAmenities : []}
+          setSelectedAmenitiesWithQuantity={setSelectedAmenitiesWithQuantity}
+          selectedAmenitiesWithQuantity={selectedAmenitiesWithQuantity}
         />
       )}
 

@@ -176,7 +176,7 @@ const ManagerAssign = () => {
         await fetchStaffAndBuilding();
       } else {
         throw new Error(
-          response.message || "Có lỗi xảy ra khi gán/cập nhật nhân viên"
+          response.message || "Error assigning/updating the staff to the building"
         );
       }
     } catch (error) {
@@ -363,14 +363,14 @@ const ManagerAssign = () => {
                     <div className="avatar placeholder">
                       {staff.find(
                         (s) => s.Staff.building_id === building.building_id
-                      )?.avatar_url ? (
+                      )?.image ? (
                         <div className="w-12 h-12 rounded-full">
                           <img
                             src={
                               staff.find(
                                 (s) =>
                                   s.Staff.building_id === building.building_id
-                              )?.avatar_url
+                              )?.image
                             }
                             alt="Staff avatar"
                           />
@@ -503,14 +503,14 @@ const ManagerAssign = () => {
                       <div className="avatar placeholder">
                         {staff.find(
                           (s) => s.Staff.building_id === building.building_id
-                        )?.avatar_url ? (
+                        )?.image ? (
                           <div className="w-10 h-10 rounded-full">
                             <img
                               src={
                                 staff.find(
                                   (s) =>
                                     s.Staff.building_id === building.building_id
-                                )?.avatar_url
+                                )?.image
                               }
                               alt="Staff avatar"
                             />
