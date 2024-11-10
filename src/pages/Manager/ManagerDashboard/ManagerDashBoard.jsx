@@ -290,7 +290,12 @@ const ManagerDashBoard = () => {
     }
   }, [building_id]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
   if (error) return <div>Error: {error.message}</div>;
 
   return (

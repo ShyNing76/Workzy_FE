@@ -124,25 +124,6 @@ const StaffsManagerPage = () => {
     }
   }, [successMessage]);
 
-  //Hiện detail khi click vô 1 hàng
-  
-  const handleRowClick = async (user_id) => {
-    try {
-      const res = await getStaffById(user_id);
-      if (res && res.data) {
-        // Format the date using formatDate before setting it in state
-        const staffDetails = {
-          ...res.data,
-          date_of_birth: formatDate(res.data.date_of_birth),
-        };
-  
-        setSelectedStaffDetails(staffDetails);
-        setShowDetailsModal(true);
-      }
-    } catch (err) {
-      console.error("Error fetching staff type details: ", err);
-    }
-  };
 
   //Khu vực hàm dành cho add
    const handleAddStaff = async (e) => {
@@ -391,77 +372,7 @@ const StaffsManagerPage = () => {
 
 
 
-  // const handleInputChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setCurrentStaff((prev) => ({ ...prev, [name]: value }));
-  // };
-
-  // const generateStaffId = () => {
-  //   const lastId = staffs.length > 0 ? staffs[staffs.length - 1].id : "ST00";
-  //   const newId = `ST${(parseInt(lastId.substring(2)) + 1)
-  //     .toString()
-  //     .padStart(2, "0")}`;
-  //   return newId;
-  // };
-
-  // const handleAddStaffSubmit = (e) => {
-  //   e.preventDefault();
-  //   const newStaff = {
-  //     ...currentStaff,
-  //     id: generateStaffId(),
-  //     name: `${currentStaff.fname} ${currentStaff.lname}`,
-  //   };
-  //   setStaffs([...staffs, newStaff]);
-  //   setShowAddModal(false);
-  //   setSuccessMessage("Staff Added Successfully!");
-  //   setSuccessModal({ show: true, message: "Staff Added Successfully!" });
-  //   setCurrentStaff({ id: "", fname: "", lname: "", info: "" });
-  // };
-
-  // const handleUpdateStaffSubmit = (e) => {
-  //   e.preventDefault();
-  //   setStaffs((prevStaffs) => {
-  //     const staffIndex = prevStaffs.findIndex(
-  //       (staff) => staff.id === currentStaff.oldId
-  //     );
-  //     if (staffIndex !== -1) {
-  //       const updatedStaffs = [...prevStaffs];
-  //       updatedStaffs[staffIndex] = {
-  //         ...currentStaff,
-  //         name: `${currentStaff.fname} ${currentStaff.lname}`,
-  //       };
-  //       return updatedStaffs;
-  //     }
-  //     return prevStaffs;
-  //   });
-  //   setShowUpdateModal(false);
-  //   setSuccessModal({ show: true, message: "Staff Updated Successfully!" });
-  //   setCurrentStaff({ id: "", fname: "", lname: "", info: "" });
-  // };
-
-  // const handleDeleteStaff = () => {
-  //   setStaffs((prevStaffs) =>
-  //     prevStaffs.filter((staff) => staff.id !== staffToDelete.id)
-  //   );
-  //   setShowDeleteModal(false);
-  //   setSuccessModal({ show: true, message: "Staff Deleted Successfully!" });
-  // };
-
-  // const handleSearchChange = (e) => {
-  //   setSearchTerm(e.target.value);
-  // };
-
-  // const closeSuccessModal = () => {
-  //   setSuccessModal({ show: false, message: "" });
-  // };
-
-  // const filteredStaffs = staffs.filter(
-  //   (staff) =>
-  //     staff.id.includes(searchTerm) ||
-  //     staff.fname.includes(searchTerm) ||
-  //     staff.lname.includes(searchTerm) ||
-  //     staff.info.includes(searchTerm)
-  // );
+  
 
   return (
     <div className="container mx-auto p-4">
@@ -512,7 +423,7 @@ const StaffsManagerPage = () => {
           </thead>
           <tbody>
             {filteredStaff.map((staff) => (
-                <tr key={staff.user_id} className="hover:bg-gray-100 cursor-pointer" onClick={() => handleRowClick(staff.user_id)}>
+                <tr key={staff.user_id} className="hover:bg-gray-100" onClick={() => handleRowClick(staff.user_id)}>
                   <td>{staff.name}</td>
                   <td>{staff.email}</td>
                   <td>{staff.gender}</td>

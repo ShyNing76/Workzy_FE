@@ -34,7 +34,7 @@ const AmenitiesManagerPage = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedAmenityDetails, setSelectedAmenityDetails] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [isChanged, setIsChanged] = useState(false);
+  const [isChanged, setIsChanged] = useState(false); 
   const [newAmenity, setNewAmenity] = useState({
     amenity_name: "",
     image: null,
@@ -43,6 +43,27 @@ const AmenitiesManagerPage = () => {
     rent_price: 0,
     status: "active",
   });
+
+  // Validate error message
+  const [errorMessage, setErrorMessage] = useState({
+    amenity_name: "",
+    original_price: "",
+    rent_price: "",
+  });
+
+
+  const validationSchema = (amenity) => {
+    let error = {};
+    // Kiểm tra xem amenities có phải là đối tượng không
+   
+    if (!Number.isInteger(Number(amenity.original_price)) || Number(amenity.original_price) <= 0) {
+      error.original_price = "Original price must be a positive whole number and greater than 0";
+    }
+    if (!Number.isInteger(Number(amenity.rent_price)) || Number(amenity.rent_price) <= 0) {
+      error.rent_price = "Rent price must be a positive whole number and greater than 0";
+    }
+    return error;
+  }
 
   // pagination
   const PAGE_SIZE = 8;
@@ -96,39 +117,12 @@ const AmenitiesManagerPage = () => {
   //Khu vực hàm dành cho add
   const handleAddAmenity = async (e) => {
     e.preventDefault();
-
-    if (!newAmenity.amenity_name) {
-      Swal.fire({
-        icon: "error",
-        title: "Validation Error",
-        text: "Amenity name is required.",
-        position: "top-end",
-        toast: true,
-        timer: 3000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-      return;
+    const errorInput = validationSchema(newAmenity);
+    if (Object.keys(errorInput).length > 0) {
+      setErrorMessage(errorInput);
+      console.log("errors", errorInput);
+      return; // Dừng lại nếu có lỗi
     }
-
-    // check price is number and greater than 0
-    if (
-      (newAmenity && isNaN(newAmenity.original_price)) ||
-      newAmenity.original_price <= 0
-    ) {
-      Swal.fire({
-        icon: "error",
-        title: "Validation Error",
-        text: "Original price must be a number.",
-        position: "top-end",
-        toast: true,
-        timer: 3000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-      return;
-    }
-
     try {
       const response = await postAmenity(newAmenity);
       if (response && response.err === 0) {
@@ -136,18 +130,15 @@ const AmenitiesManagerPage = () => {
         setShowAddModal(false);
         setAmenity([...amenity, newAmenity]);
         setIsChanged(!isChanged);
-        setSuccessMessage("Amenity added successfully!"); // Set success message
+        //setSuccessMessage("Amenity added successfully!"); // Set success message
         Swal.fire({
           icon: "success",
           title: "Add Amenity!",
           text: "Do you want to add this amenity?",
         });
       } else {
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: response.message,
-        });
+       const error = response.message;
+       setErrorMessage({...errorMessage, amenity_name: error});
       }
     } catch (err) {
       console.error("Error adding amenity", err);
@@ -165,18 +156,24 @@ const AmenitiesManagerPage = () => {
       label: "Amenity Name",
       type: "text",
       value: `${newAmenity.amenity_name}`,
+      required: true,
+      showError: true,
     },
     {
       name: "original_price",
       label: "Original Price",
       type: "text",
       value: `${newAmenity.original_price}`,
+      required: true,
+      showError: true,
     },
     {
       name: "rent_price",
       label: "Rent Price",
       type: "text",
       value: `${newAmenity.rent_price}`,
+      required: true,
+      showError: true,
     },
     {
       name: "image",
@@ -184,6 +181,8 @@ const AmenitiesManagerPage = () => {
       type: "file",
       multiple: false,
       value: `${newAmenity.image}`,
+      required: true,
+      showError: false,
     },
   ];
 
@@ -199,56 +198,13 @@ const AmenitiesManagerPage = () => {
   const handleUpdateAmenity = async (e) => {
     e.preventDefault();
 
-    // Check for duplicate amenity name
-    const isDuplicateName = amenity.some(
-      (a) =>
-        a.amenity_name.toLowerCase() ===
-          newAmenity.amenity_name.toLowerCase() &&
-        a.amenity_id !== newAmenity.amenity_id
-    );
-
-    // Validation logic
-    if (isDuplicateName) {
-      Swal.fire({
-        icon: "error",
-        title: "Validation Error",
-        text: "Amenity name already exists. Please enter a unique name.",
-        position: "top-end",
-        toast: true,
-        timer: 3000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-      return;
+    const errorInput = validationSchema(newAmenity);
+    if (Object.keys(errorInput).length > 0) {
+      setErrorMessage(errorInput);
+      console.log("errors", errorInput);
+      return; // Dừng lại nếu có lỗi
     }
 
-    if (!newAmenity.amenity_name) {
-      Swal.fire({
-        icon: "error",
-        title: "Validation Error",
-        text: "Amenity name is required.",
-        position: "top-end",
-        toast: true,
-        timer: 3000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-      return;
-    }
-
-    if (newAmenity.original_price <= 0) {
-      Swal.fire({
-        icon: "error",
-        title: "Validation Error",
-        text: "Original price must be greater than 0.",
-        position: "top-end",
-        toast: true,
-        timer: 3000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-      return;
-    }
 
     try {
       const response = await putAmenity(newAmenity.amenity_id, newAmenity);
@@ -257,7 +213,7 @@ const AmenitiesManagerPage = () => {
         // set to the updated amenity in the local state
         setAmenity(
           amenity.map((a) =>
-            a.amenity_id === newAmenity.amenity_id ? newAmenity : a
+            a.amenity_id === newAmenity.amenity_id ? newAmenity : a 
           )
         );
 
@@ -270,15 +226,19 @@ const AmenitiesManagerPage = () => {
           text: response.message,
         });
       } else {
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: response.message,
-        });
+        const error = response.message;
+        setErrorMessage({...errorMessage, amenity_name: error});
       }
+
     } catch (err) {
       console.error("Error updating amenity", err);
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Something went wrong!",
+      });
     }
+
   };
 
   const handleUpdateChange = (event) => {
@@ -300,18 +260,24 @@ const AmenitiesManagerPage = () => {
       label: "Amenity Name",
       type: "text",
       value: `${newAmenity.amenity_name}`,
+      required: true,
+      showError: true,
     },
     {
       name: "original_price",
       label: "Original Price",
-      type: "number",
+      type: "text",
       value: `${newAmenity.original_price}`,
+      required: true,
+      showError: true,
     },
     {
       name: "rent_price",
       label: "Rent Price",
-      type: "number",
+      type: "text",
       value: `${newAmenity.rent_price}`,
+      required: true,
+      showError: true,
     },
     {
       name: "image",
@@ -319,6 +285,8 @@ const AmenitiesManagerPage = () => {
       type: "file",
       multiple: false,
       value: `${newAmenity.image}`,
+      required: true,
+      showError: false,
     },
   ];
 
@@ -375,6 +343,7 @@ const AmenitiesManagerPage = () => {
     setShowUpdateModal(false);
     setShowDeleteModal(false);
     setShowDetailsModal(false);
+    setErrorMessage({});
   };
 
   const handleSearchChange = (e) => {
@@ -513,6 +482,7 @@ const AmenitiesManagerPage = () => {
         currentItem={newAmenity}
         onInputChange={handleInputChange}
         fields={addAmenityFields}
+        errorMessage={errorMessage}
       />
 
       <UpdateModal
@@ -522,6 +492,7 @@ const AmenitiesManagerPage = () => {
         currentItem={newAmenity}
         onInputChange={handleUpdateChange}
         fields={updateAmenityFields}
+        errorMessage={errorMessage}
       />
 
       <DetailsModal
