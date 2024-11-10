@@ -87,7 +87,59 @@ const WorkspacesManagerPage = () => {
     setViewWorkspace(null);
   };
   //-------------------------------------------------------------//
+  // Validate to show error message
+  const [errorMessage, setErrorMessage] = useState({
+    price_per_hour: "",
+    price_per_day: "",
+    price_per_month: "",
+    capacity: "",
+    area: "",        
+  });
 
+  const validationSchema  = (workspace) => {
+    let error = {};
+
+    // Kiểm tra giá trị giá theo giờ
+    if (!Number.isInteger(Number(workspace.price_per_hour)) || Number(workspace.price_per_hour) <= 0) {
+      error.price_per_hour = "Price per Hour must be a positive whole number";
+    }
+
+    // Kiểm tra giá trị giá theo ngày
+    if (!Number.isInteger(Number(workspace.price_per_day)) || Number(workspace.price_per_day) <= 0) {
+      error.price_per_day = "Price per Day must be a positive whole number";
+    }
+
+    // Kiểm tra giá trị giá theo tháng
+    if (!Number.isInteger(Number(workspace.price_per_month)) || Number(workspace.price_per_month) <= 0) {
+      error.price_per_month = "Price per Month must be a positive whole number";
+    }
+
+    // Kiểm tra giá trị tối thiểu
+    if (workspace.price_per_hour < 35000) {
+      error.price_per_hour = "Hourly price must be greater than 35000";
+    }
+    
+  // Kiểm tra mối quan hệ giữa các giá
+    if (Number(workspace.price_per_hour) >= Number(workspace.price_per_day)) {
+      error.price_per_hour = "Hourly price must be less than daily price.";
+    }
+    if (Number(workspace.price_per_day) >= Number(workspace.price_per_month)) {
+      error.price_per_day = "Daily price must be less than monthly price.";
+    }
+    if (Number(workspace.price_per_hour) >= Number(workspace.price_per_month)) {
+      error.price_per_hour = "Hourly price must be less than monthly price.";
+    }
+    if (Number(workspace.capacity) <= 0) {
+      error.capacity = "Capacity must be greater than 0";
+    }
+    if (Number(workspace.area) <= 0) {
+      error.area = "Area must be greater than 0";
+    }
+
+    return error;
+  };
+
+  //-----------------------------------------------------------------//
   const fetchWorkspaces = async () => {
     setIsLoading(true);
     try {
@@ -239,6 +291,7 @@ const WorkspacesManagerPage = () => {
       description: "",
       status: "active",
     });
+    setErrorMessage({});
   };
 
   const handleFileChange = (e) => {
@@ -247,11 +300,21 @@ const WorkspacesManagerPage = () => {
   };
 
   const handleAddChange = (e) => {
-    setNewWorkspace({ ...newWorkspace, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setNewWorkspace({ ...newWorkspace, [name]: value });
   };
-
+ 
   const handleAddWorkspace = async (e) => {
     e.preventDefault();
+    
+    const errorInput = validationSchema(newWorkspace); // Gọi hàm validatePrices
+
+    if (Object.keys(errorInput).length > 0) {
+      setErrorMessage(errorInput);
+      console.log("errors", errorInput);
+      return; // Dừng lại nếu có lỗi
+    }
+
     try {
       const formData = new FormData();
       formData.append("workspace_name", newWorkspace.workspace_name);
@@ -314,10 +377,15 @@ const WorkspacesManagerPage = () => {
 
   const handleCloseModalUpdate = () => {
     setOpenModalUpdate(false);
+    setErrorMessage({});
   };
 
   const handleUpdateChange = (e) => {
+    
+    
     const { name, type, files, value } = e.target;
+
+    
 
     setUpdateWorkspace((prev) => {
       if (type === "file") {
@@ -344,6 +412,7 @@ const WorkspacesManagerPage = () => {
         [name]: value,
       };
     });
+    
   };
 
   const handleUpdateFileChange = (e) => {
@@ -353,6 +422,14 @@ const WorkspacesManagerPage = () => {
 
   const handleUpdateWorkspace = async (e) => {
     e.preventDefault();
+    
+    const errorInput = validationSchema(updateWorkspace); // Gọi hàm validate
+
+    if (Object.keys(errorInput).length > 0) {
+      setErrorMessage(errorInput);
+      console.log("errors", errorInput);
+      return; // Dừng lại nếu có lỗi
+    }
     try {
       const formData = new FormData();
 
@@ -475,12 +552,14 @@ const WorkspacesManagerPage = () => {
         onInputChange={(e) =>
           setNewWorkspace({ ...newWorkspace, [e.target.name]: e.target.value })
         }
+        errorMessage={errorMessage}
         fields={[
           {
             name: "workspace_name",
             label: "Workspace Name",
             type: "text",
             required: true,
+            
           },
           {
             name: "building_id",
@@ -507,21 +586,24 @@ const WorkspacesManagerPage = () => {
             label: "Price per Hour",
             type: "text",
             required: true,
+            showError: true,
           },
           {
             name: "price_per_day",
             label: "Price per Day",
             type: "text",
             required: true,
+            showError: true,
           },
           {
             name: "price_per_month",
             label: "Price per Month",
             type: "text",
             required: true,
+            showError: true,
           },
-          { name: "capacity", label: "Capacity", type: "text", required: true },
-          { name: "area", label: "Area (sq ft)", type: "text", required: true },
+          { name: "capacity", label: "Capacity", type: "text", required: true, showError: true },
+          { name: "area", label: "Area (sq ft)", type: "text", required: true, showError: true },
           {
             name: "description",
             label: "Description",
@@ -536,6 +618,7 @@ const WorkspacesManagerPage = () => {
             required: false,
           },
         ]}
+        
       />
 
       {openModalUpdate && (
@@ -545,6 +628,7 @@ const WorkspacesManagerPage = () => {
           onSubmit={handleUpdateWorkspace}
           currentItem={updateWorkspace}
           onInputChange={handleUpdateChange}
+          errorMessage={errorMessage}
           fields={[
             {
               name: "workspace_name",
@@ -577,30 +661,35 @@ const WorkspacesManagerPage = () => {
               label: "Price per Hour",
               type: "text",
               required: true,
+              showError: true,
             },
             {
               name: "price_per_day",
               label: "Price per Day",
               type: "text",
               required: true,
+              showError: true,
             },
             {
               name: "price_per_month",
               label: "Price per Month",
               type: "text",
               required: true,
+              showError: true,
             },
             {
               name: "capacity",
               label: "Capacity",
               type: "text",
               required: true,
+              showError: true,
             },
             {
               name: "area",
               label: "Area (sq ft)",
               type: "text",
               required: true,
+              showError: true,
             },
             {
               name: "description",
@@ -712,6 +801,8 @@ const WorkspacesManagerPage = () => {
         </table>
       </div>
       <Pagination page={page} setPage={setPage} totalPages={totalPages} />
+
+      
     </div>
   );
 };

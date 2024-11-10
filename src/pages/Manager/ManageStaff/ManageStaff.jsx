@@ -9,6 +9,7 @@ const ManageStaff = () => {
   const [staffs, setStaffs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [openModalDetail, setOpenModalDetail] = useState(false);  
   useEffect(() => {
     const fetchStaffs = async () => {
       setIsLoading(true);

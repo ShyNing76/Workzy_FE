@@ -13,9 +13,11 @@ const AddModal = ({
   currentItem,
   onInputChange,
   fields,
+  errorMessage = {} // Default của errorMessage là một object rỗng để khi mở modal không có lỗi
 }) => {
   const [errorMissing, setErrorMissing] = useState([]);
   const [previewImages, setPreviewImages] = useState([]);
+  const [error, setError] = useState({});
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (e.target === document.querySelector(".modal")) {
@@ -48,7 +50,6 @@ const AddModal = ({
     } else {
       setPreviewImages(previews);
     }
-
     onInputChange({
       target: {
         name: e.target.name,
@@ -71,7 +72,7 @@ const AddModal = ({
       },
     });
   };
-
+  
   const handleOnClick = (e) => {
     e.preventDefault();
     let missing = [];
@@ -117,11 +118,13 @@ const AddModal = ({
             {fields.map((field) => (
               <div key={field.name} className="form-control">
                 <label className="label">{field.label}</label>
+                
                 {isFieldMissing(field.label) && (
                   <span className="text-red-500 text-sm">
                     This field is required
                   </span>
                 )}
+                
 
                 {/* Render inputs based on field type */}
                 {field.type === "text" && (
@@ -130,7 +133,7 @@ const AddModal = ({
                     name={field.name}
                     value={currentItem[field.name] || ""}
                     onChange={onInputChange}
-                    className="input input-bordered"
+                    className={`input input-bordered ${error[field.name] ? "border-error-500" : ""}`}
                     required
                   />
                 )}
@@ -140,7 +143,7 @@ const AddModal = ({
                     name={field.name}
                     value={currentItem[field.name] || 0}
                     onChange={onInputChange}
-                    className="input input-bordered"
+                    className={`input input-bordered ${error[field.name] ? "border-error-500" : ""}`}
                     required
                   />
                 )}
@@ -181,6 +184,17 @@ const AddModal = ({
                     ))}
                   </select>
                 )}
+                {field.type === "password" && (
+                  <input
+                    type="password"
+                    name={field.name}
+                    value={currentItem[field.name] || ""}
+                    onChange={onInputChange}
+                    className={`input input-bordered ${error[field.name] ? "border-error-500" : ""}`}
+                    required
+                  />
+                )}
+                
                 {field.type === "checkbox" && (
                   <label className="cursor-pointer">
                     <input
@@ -248,7 +262,13 @@ const AddModal = ({
                         ))}
                       </div>
                     )}
+                   
                   </div>
+                )}
+                {errorMessage[field.name] && field.showError && (
+                  <span className="text-red-500 text-sm">
+                    {errorMessage[field.name]}
+                  </span>
                 )}
               </div>
             ))}
@@ -294,6 +314,7 @@ AddModal.propTypes = {
           value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
             .isRequired,
         })
+
       ),
       checkboxLabels: PropTypes.shape({
         checked: PropTypes.string,
@@ -302,8 +323,10 @@ AddModal.propTypes = {
       className: PropTypes.string,
       multiple: PropTypes.bool,
       required: PropTypes.bool,
+      showError: PropTypes.bool,
     })
   ).isRequired,
+
 };
 
 export default AddModal;

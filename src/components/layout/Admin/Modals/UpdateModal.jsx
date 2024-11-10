@@ -11,10 +11,12 @@ const UpdateModal = ({
   currentItem,
   onInputChange,
   fields,
+  errorMessage = {} // Default của errorMessage là một object rỗng để khi mở modal không có lỗi
 }) => {
   const [previewImages, setPreviewImages] = useState([]);
   const [imageFiles, setImageFiles] = useState([]);
   const [removedImages, setRemovedImages] = useState([]);
+  const [error, setError] = useState({});
 
   useEffect(() => {
     if (currentItem?.images) {
@@ -177,6 +179,7 @@ const UpdateModal = ({
                 <label className="label">
                   <span className="label-text font-medium">{field.label}</span>
                 </label>
+                
 
                 {field.type === "text" && (
                   <input
@@ -184,7 +187,7 @@ const UpdateModal = ({
                     name={field.name}
                     value={currentItem[field.name] || ""}
                     onChange={onInputChange}
-                    className="input input-bordered w-full"
+                    className={`input input-bordered w-full ${error[field.name] ? "border-error-500" : ""}`}
                     required
                   />
                 )}
@@ -195,7 +198,7 @@ const UpdateModal = ({
                     name={field.name}
                     value={currentItem[field.name] || 0}
                     onChange={onInputChange}
-                    className="input input-bordered w-full"
+                    className={`input input-bordered w-full ${error[field.name] ? "border-error-500" : ""}`}
                     step="0.01"
                     required
                   />
@@ -238,6 +241,16 @@ const UpdateModal = ({
                     value={currentItem[field.name] || ""}
                     onChange={onInputChange}
                     className="input input-bordered w-full"
+                    required
+                  />
+                )}
+                {field.type === "password" && (
+                  <input
+                    type="password"
+                    name={field.name}
+                    value={currentItem[field.name] || ""}
+                    onChange={onInputChange}
+                    className={`input input-bordered w-full ${error[field.name] ? "border-error-500" : ""}`}
                     required
                   />
                 )}
@@ -334,6 +347,11 @@ const UpdateModal = ({
                         : field.checkboxLabels?.unchecked}
                     </span>
                   </label>
+                )}
+                {errorMessage[field.name] && field.showError && (
+                  <span className="text-red-500 text-sm">
+                    {errorMessage[field.name]}
+                  </span>
                 )}
               </div>
             ))}

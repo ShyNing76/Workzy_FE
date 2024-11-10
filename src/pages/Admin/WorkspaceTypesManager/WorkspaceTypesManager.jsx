@@ -32,8 +32,10 @@ const WorkspacesTypesManagerPage = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [workspaceTypeToDelete, setWorkspaceTypeToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
-  const [selectedWorkspaceTypeDetails, setSelectedWorkspaceTypeDetails] =
-    useState(null);
+  const [selectedWorkspaceTypeDetails, setSelectedWorkspaceTypeDetails] = useState(null);
+  const [validationErrors, setValidationErrors] = useState({
+    workspace_type_name: "",
+  });
   const [isChanged, setIsChanged] = useState(false);
 
   const [newWorkspaceType, setNewWorkspaceType] = useState({
@@ -42,6 +44,12 @@ const WorkspacesTypesManagerPage = () => {
     description: "",
     status: "active",
   });
+//-------------------------------------------------------------
+
+ 
+
+
+  //---------------------------------------------------------
 
   // pagination
   const PAGE_SIZE = 10;
@@ -129,14 +137,18 @@ const WorkspacesTypesManagerPage = () => {
         setShowAddModal(false);
         setNewWorkspaceType({ name: "", image: null, description: "" });
       } else {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: response.message,
+        setValidationErrors({
+          workspace_type_name: response.message || "Lỗi khi cập nhật loại workspace",
         });
+        console.log(validationErrors)
       }
     } catch (err) {
       console.error("Failed to add workspace type:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to add workspace type",
+      });
     }
   };
 
@@ -146,6 +158,7 @@ const WorkspacesTypesManagerPage = () => {
       type: "text",
       name: "workspace_type_name",
       value: `${newWorkspaceType.workspace_type_name}`,
+      showError: true,
     },
     {
       label: "Description",
@@ -164,11 +177,7 @@ const WorkspacesTypesManagerPage = () => {
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
-    console.log("🚀 ~ handleInputChange ~  { name, value, files }:", {
-      name,
-      value,
-      files,
-    });
+  
     setNewWorkspaceType({
       ...newWorkspaceType,
       [name]: files ? files[0] : value,
@@ -219,11 +228,7 @@ const WorkspacesTypesManagerPage = () => {
       }
     } catch (err) {
       console.error("Failed to update workspace type:", err);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Failed to update workspace type",
-      });
+      
     }
   };
 

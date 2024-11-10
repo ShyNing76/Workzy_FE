@@ -63,7 +63,6 @@ const BookingsManagerPage = () => {
   const handleOpenModal = (selectedBooking, bookingId) => {
     // param: selectedBooking là booking được chọn để hiển thị chi tiết
     setSelectedBooking(selectedBooking); // set selectedBooking là booking được chọn
-    setBookingId(bookingId);
     setOpenModal(true); // set openModal là true để hiển thị modal
   };
 
@@ -72,7 +71,6 @@ const BookingsManagerPage = () => {
     // đóng modal
     setSelectedBooking(null); // set selectedBooking là null
     setOpenModal(false); // set openModal là false để đóng modal
-    setBookingId(null);
   };
 
   // Tính thời gian thuê
@@ -91,43 +89,12 @@ const BookingsManagerPage = () => {
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2">
             <h1 className="text-3xl font-bold">View Bookings</h1>
-            <div className="badge badge-neutral">
-              {filteredBookings.length} bookings
-            </div>
-          </div>
-
-          {/* Stats Cards */}
-          <div className="stats shadow">
-            <div className="stat place-items-center">
-              <div className="stat-title">Total Bookings</div>
-              <div className="stat-value text-primary">{bookings.length}</div>
-            </div>
-            <div className="stat place-items-center">
-              <div className="stat-title">In using</div>
-              <div className="stat-value text-success">
-                {
-                  bookings.filter(
-                    (booking) => booking.BookingStatuses[0]?.status === "usage"
-                  ).length
-                }
-              </div>
-            </div>
           </div>
         </div>
 
         {/* Filters Card */}
-        <div className="card bg-base-100 shadow-lg mb-6">
+        <div className="card bg-base-100  mb-6">
           <div className="card-body">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-2 bg-primary/10 rounded-full">
-                <FiFilter className="w-5 h-5 text-primary" />
-              </div>
-              <h2 className="card-title text-xl font-bold">Advanced Filters</h2>
-              <div className="badge badge-primary badge-outline">
-                {filteredBookings.length} results
-              </div>
-            </div>
-
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
               {/* Search Box - spans 6 columns */}
               <div className="form-control md:col-span-6">
