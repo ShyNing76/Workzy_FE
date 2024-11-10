@@ -26,6 +26,7 @@ const BookingManagement = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [allBookings, setAllBookings] = useState([]); 
   const [searchedBookings, setSearchedBookings] = useState([]);
+  const [totalFilteredItems, setTotalFilteredItems] = useState(0);
 
   const [selectedDate, setSelectedDate] = useState(() => {
     const today = new Date();
@@ -320,25 +321,25 @@ const BookingManagement = () => {
     }
   }, [buildingId, itemsPerPage]);
 
-  const handleSearch = useCallback(async () => {
-    if (searchQuery.trim() !== "") {
-      const result = await searchBooking(searchQuery);
-      setSearchedBookings(result);
-    } else {
-      setSearchedBookings(filteredBookings);
-    }
-  }, [searchQuery, filteredBookings, searchBooking]);
-
   useEffect(() => {
-    handleSearch();
-  }, [handleSearch]);
+    const doSearch = async () => {
+      if (searchQuery.trim() !== "") {
+        const result = await searchBooking(searchQuery);
+        setSearchedBookings(result);
+        setTotalFilteredItems(result.length);
+      } else {
+        setSearchedBookings(filteredBookings);
+        setTotalFilteredItems(filteredBookings.length);
+      }
+    };
+    doSearch();
+  }, [searchQuery, filteredBookings, searchBooking]);
 
   const totalFilteredPages = Math.ceil(searchedBookings.length / itemsPerPage);
 
-  const currentFilteredBookings = searchedBookings.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentFilteredBookings = searchedBookings.slice(startIndex, endIndex);
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -359,6 +360,7 @@ const BookingManagement = () => {
           <BookingTable
             bookings={currentFilteredBookings}
             currentPage={currentPage}
+            itemsPerPage={itemsPerPage}
             handleChangeStatus={handleChangeStatus}
             setSelectedBooking={setSelectedBooking}
             setShowDetailModal={setShowDetailModal}
@@ -372,6 +374,7 @@ const BookingManagement = () => {
         totalFilteredPages={totalFilteredPages}
         setCurrentPage={setCurrentPage}
         isLoading={isLoading}
+        totalItems={totalFilteredItems}
       />
 
       {/* Detail Modal */}
