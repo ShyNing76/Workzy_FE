@@ -9,6 +9,7 @@ import {
   FiClock,
   FiCalendar,
 } from "react-icons/fi";
+import Pagination from "../../../components/layout/Shared/Pagination/Pagination";
 const BookingsManagerPage = () => {
   const [bookings, setBookings] = useState([]);
   const [filterLocation, setFilterLocation] = useState("");
@@ -16,25 +17,39 @@ const BookingsManagerPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [page, setPage] = useState(1); // Trang hiện tại
+  const [limit, setLimit] = useState(8); // Số lượng bookings trên 1 trang
+  const [totalBookings, setTotalBookings] = useState(0); // Tổng số bookings
+  const [totalPages, setTotalPages] = useState(0); // Tổng số trang
 
   // Fetch bookings data
-  useEffect(() => {
-    const fetchDataBookings = async () => {
-      setIsLoading(true);
+  const fetchDataBookings = async () => {
+    setIsLoading(true);
       try {
-        const response = await getAllBooking();
+        const response = await getAllBooking(page, limit); // Lấy bookings theo trang và số lượng bookings trên 1 trang
         if (response) {
           setBookings(response.data.rows);
+          setTotalBookings(response.data.count);
           console.log("bookings", bookings);
         }
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchDataBookings();
-  }, []);
+  }, [page, setPage]); // Lấy bookings theo trang
+
+  useEffect(() => {
+    if (totalBookings > 0) { // Nếu tổng số bookings > 0
+      setTotalPages(Math.ceil(totalBookings / limit)); // Calculate total pages
+    } else {
+      setTotalPages(1); // Nếu tổng số bookings = 0 thì set tổng số trang = 1
+    }
+  }, [totalBookings, limit]); // Tính tổng số trang
 
   // Hold the location value
   const handleFilterLocation = (event) => {
@@ -56,7 +71,7 @@ const BookingsManagerPage = () => {
       (filterBookingType
         ? booking.BookingType.type === filterBookingType
         : true)
-  );
+  ).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   // Open modal truyền vào 1 booking để hiển thị chi tiết booking đó
   const handleOpenModal = (selectedBooking, bookingId) => {
     // param: selectedBooking là booking được chọn để hiển thị chi tiết
@@ -71,14 +86,6 @@ const BookingsManagerPage = () => {
     setOpenModal(false); // set openModal là false để đóng modal
   };
 
-  // Tính thời gian thuê
-  const CalculateTime = (startTime, endTime) => {
-    const start = new Date(startTime);
-    const end = new Date(endTime);
-    const diff = end - start;
-    const hoursRent = Math.floor(diff / (1000 * 60 * 60)); // chia thời gian cho 1000 * 60 * 60 để đổi ra giờ
-    return hoursRent;
-  };
 
   return (
     <div>
@@ -239,6 +246,7 @@ const BookingsManagerPage = () => {
                 ))}
               </tbody>
             </table>
+            
           </div>
         ) : (
           <table>
@@ -262,6 +270,12 @@ const BookingsManagerPage = () => {
           />
         )}
       </div>
+      {/* Pagination */}
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        setPage={setPage}
+      />
     </div>
   );
 };

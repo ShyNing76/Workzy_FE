@@ -181,20 +181,6 @@ const WorkspacesManagerPage = () => {
     }
   };
 
-  // const fetchTotalWorkspaces = async () => {
-  //   try {
-  //     setIsLoading(true);
-
-  //     const res = await getTotalWorkspace();
-  //     if (res && res.data) {
-  //       setTotalWorkSpace(res.data);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   useEffect(() => {
     fetchWorkspaces();

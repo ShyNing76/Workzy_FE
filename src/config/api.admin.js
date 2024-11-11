@@ -276,8 +276,8 @@ const getCustomer = (status = 'all', gender = 'all', name = '') => {
   return axios.get(URL_API);
 };
 
-const getAllBooking = () => {
-  const URL_API = `/api/v1/booking/get`;
+const getAllBooking = (page, limit) => {
+  const URL_API = `/api/v1/booking/get?page=${page}&limit=${limit}`;
   return axios.get(URL_API);
 };
 
