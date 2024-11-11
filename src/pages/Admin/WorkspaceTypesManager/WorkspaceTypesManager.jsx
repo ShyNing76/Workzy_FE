@@ -78,7 +78,7 @@ const WorkspacesTypesManagerPage = () => {
       }
     };
     fetchWorkspaceType();
-  }, [isChanged, currentPage, statusFilter]);
+  }, [isChanged, currentPage]);
 
   //Hàm click lên hàng để hiện more details
   const handleRowClick = async (workspace_type_id) => {
