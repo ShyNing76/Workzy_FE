@@ -35,6 +35,7 @@ const AmenitiesManagerPage = () => {
   const [selectedAmenityDetails, setSelectedAmenityDetails] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isChanged, setIsChanged] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("all");
   const [newAmenity, setNewAmenity] = useState({
     amenity_name: "",
     image: null,
@@ -56,7 +57,7 @@ const AmenitiesManagerPage = () => {
     //Hiện data lên table
     const fetchAmenity = async () => {
       try {
-        const res = await getAmenity(searchTerm, currentPage, PAGE_SIZE);
+        const res = await getAmenity(searchTerm, currentPage, PAGE_SIZE, statusFilter);
         if (res && res.data && Array.isArray(res.data.rows)) {
           const sortAmenity = res.data.rows.sort((a, b) => {
             if (a.status === "active" && b.status !== "active") return -1;
@@ -67,17 +68,21 @@ const AmenitiesManagerPage = () => {
           setTotalPages(Math.ceil(res.data.count / PAGE_SIZE));
           setAmenity(res.data.rows);
         } else {
-          setAmenity([]);
+          setAmenity(null);
         }
       } catch (err) {
-        setError(err);
+        if (err.message === "No Amenity Exist") {
+          setAmenity(null);
+        } else {
+          setError(err);
+        }
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchAmenity();
-  }, [isChanged, currentPage]);
+  }, [isChanged, currentPage, statusFilter]);
 
   //Hàm click lên hàng để hiện more details
   const handleRowClick = async (amenity_id) => {
@@ -386,42 +391,65 @@ const AmenitiesManagerPage = () => {
     setLoading(true);
     try {
       setCurrentPage(1);
-      const res = await getAmenity(searchTerm, currentPage, PAGE_SIZE);
+      const res = await getAmenity(searchTerm, currentPage, PAGE_SIZE, statusFilter);
       if (res && res.data && Array.isArray(res.data.rows)) {
         setAmenity(res.data.rows);
         setAmenitiesCount(res.data.count);
       } else {
-        setAmenity([]);
+        setAmenity(null);
       }
     } catch (err) {
-      setError(err);
+      if (err.message === "No Amenity Exist") {
+        setAmenity(null);
+      } else {
+        setError(err);
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleStatusChange = (e) => {
+    setStatusFilter(e.target.value);
   };
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-4xl font-black mb-4">Manage Amenities</h1>
 
-      <div className="grid grid-cols-3">
-        <SearchBar
-          searchTerm={searchTerm}
-          handleSearchChange={handleSearchChange}
-          placeholder="Search by ID, name, or status"
-        />
-        <div className="">
+      <div className="grid grid-cols-3 items-center">
+        <div className="mt-4">
+          <SearchBar
+            searchTerm={searchTerm}
+            handleSearchChange={handleSearchChange}
+            placeholder="Search by Amenity name"
+          />
+        </div>
+        <div>
           <SearchButton onClick={handleSearchAmenies} label="Search" />
         </div>
 
         {/* Add Button */}
-        <div className="ml-2">
+        <div className="ml-auto">
           <AddButton
             onClick={() => setShowAddModal(true)}
             label="Add Amenity"
           />
         </div>
       </div>
+
+      <div>
+        <select
+            className="select select-bordered select-sm max-w-xs"
+            value={statusFilter}
+            onChange={handleStatusChange}
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+        </select>
+      </div>
+
 
       {/* Table */}
       <div className="overflow-x-auto">
@@ -439,8 +467,14 @@ const AmenitiesManagerPage = () => {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="4" className="text-center">
+                <td colSpan="6" className="text-center">
                   <span className="loading loading-spinner loading-xs"></span>
+                </td>
+              </tr>
+            ) : amenity === null ? (
+              <tr>
+                <td colSpan="6" className="text-center">
+                  No Amenity Found
                 </td>
               </tr>
             ) : (
@@ -478,7 +512,7 @@ const AmenitiesManagerPage = () => {
                         handleUpdateClick(amenity);
                       }}
                     />
-
+      
                     {/* Block button or un block button */}
                     <DeleteButton
                       onClick={() =>
@@ -495,7 +529,7 @@ const AmenitiesManagerPage = () => {
             )}
           </tbody>
         </table>
-
+          
         {/* Pagination */}
         {amenitiesCount >= PAGE_SIZE && (
           <Pagination

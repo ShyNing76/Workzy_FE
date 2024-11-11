@@ -36,6 +36,7 @@ const StaffsManagerPage = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState('all');
+  const [genderFilter, setGenderFilter] = useState('all');
   const [newStaff, setNewStaff] = useState({
     email: '',
     password: '',
@@ -45,8 +46,8 @@ const StaffsManagerPage = () => {
   });
   const [response, setResponseData] = useState(null);
   const [selectedStaffDetails, setSelectedStaffDetails] = useState(null);
+  const [noStaffFound, setNoStaffFound] = useState(false); // State để kiểm tra xem có staff nào được tìm thấy không
 
-  //hàm chuyển đổi định dạng ngày
   const formatDateToISO = (dateString) => {
     if (!dateString || !dateString.includes('/')) {
       return ''; // Default or handle missing date
@@ -71,17 +72,19 @@ const StaffsManagerPage = () => {
     return `${day}/${month}/${year}`;
   };
 
-  //Hiện data lên table
   const fetchStaff = async () => {
     try {
-      const res = await getStaff();
+      const res = await getStaff(statusFilter, genderFilter, searchTerm);
       if(res && res.data && Array.isArray(res.data.rows)){
         setStaff(res.data.rows);
+        setNoStaffFound(res.data.rows.length === 0); // Cập nhật state noStaffFound
       } else {
         setStaff([]);
+        setNoStaffFound(true); // Cập nhật state noStaffFound
       }
     } catch (err){
       setError(err);
+      setNoStaffFound(true); // Cập nhật state noStaffFound
     } finally{
       setLoading(false);
     }
@@ -89,7 +92,7 @@ const StaffsManagerPage = () => {
 
   useEffect(() => {
     fetchStaff();
-  }, []);
+  }, [statusFilter, genderFilter, searchTerm]);
 
   const fetchData = async () => {
     try {
@@ -124,13 +127,10 @@ const StaffsManagerPage = () => {
     }
   }, [successMessage]);
 
-  //Hiện detail khi click vô 1 hàng
-  
   const handleRowClick = async (user_id) => {
     try {
       const res = await getStaffById(user_id);
       if (res && res.data) {
-        // Format the date using formatDate before setting it in state
         const staffDetails = {
           ...res.data,
           date_of_birth: formatDate(res.data.date_of_birth),
@@ -144,8 +144,7 @@ const StaffsManagerPage = () => {
     }
   };
 
-  //Khu vực hàm dành cho add
-   const handleAddStaff = async (e) => {
+  const handleAddStaff = async (e) => {
     e.preventDefault();
 
     if (!newStaff.name || !newStaff.email || !newStaff.password || !newStaff.phone) {
@@ -162,7 +161,6 @@ const StaffsManagerPage = () => {
       return;
     }
   
-    // Check for email and phone number duplicates
     const isEmailDuplicate = [...staff, ...manager, ...customer].some(
       (person) => person.email === newStaff.email
     );
@@ -197,116 +195,113 @@ const StaffsManagerPage = () => {
       return;
     }
 
-        // Validation logic with SweetAlert
-        if (!newStaff.name) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Validation Error',
-            text: 'Staff name is required.',
-            position: 'top-end',
-            toast: true,
-            timer: 3000,
-            timerProgressBar: true,
-            showConfirmButton: false,
-          });
-          return;
-        }
-    
-        if (!newStaff.email) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Validation Error',
-            text: 'Staff email is required.',
-            position: 'top-end',
-            toast: true,
-            timer: 3000,
-            timerProgressBar: true,
-            showConfirmButton: false,
-          });
-          return;
-        }
-    
-        if (!newStaff.password) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Validation Error',
-            text: 'Staff password is required.',
-            position: 'top-end',
-            toast: true,
-            timer: 3000,
-            timerProgressBar: true,
-            showConfirmButton: false,
-          });
-          return;
-        }
-    
-        if (!newStaff.phone) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Validation Error',
-            text: 'Staff phone is required.',
-            position: 'top-end',
-            toast: true,
-            timer: 3000,
-            timerProgressBar: true,
-            showConfirmButton: false,
-          });
-          return;
-        }
+    if (!newStaff.name) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Staff name is required.',
+        position: 'top-end',
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+      return;
+    }
 
-        const emailDuplicate = staff && staff.some((item) => item.email === newStaff.email);
-        if (emailDuplicate) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Validation Error',
-            text: 'A staff member with this email already exists.',
-            position: 'top-end',
-            toast: true,
-            timer: 3000,
-            timerProgressBar: true,
-            showConfirmButton: false,
-          });
-          return;
-        }
-      
-        const phoneDuplicate = staff && staff.some((item) => item.phone === newStaff.phone);
-        if (phoneDuplicate) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Validation Error',
-            text: 'A staff member with this phone number already exists.',
-            position: 'top-end',
-            toast: true,
-            timer: 3000,
-            timerProgressBar: true,
-            showConfirmButton: false,
-          });
-          return;
-        }
+    if (!newStaff.email) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Staff email is required.',
+        position: 'top-end',
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+      return;
+    }
 
-          // Check if passwords match
-  if (newStaff.password !== newStaff.confirmPassword) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Password Error',
-      text: 'Passwords do not match.',
-      position: 'top-end',
-      toast: true,
-      timer: 3000,
-      timerProgressBar: true,
-      showConfirmButton: false,
-    });
-    return;
-  }
+    if (!newStaff.password) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Staff password is required.',
+        position: 'top-end',
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    if (!newStaff.phone) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Staff phone is required.',
+        position: 'top-end',
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    const emailDuplicate = staff && staff.some((item) => item.email === newStaff.email);
+    if (emailDuplicate) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'A staff member with this email already exists.',
+        position: 'top-end',
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+      return;
+    }
+  
+    const phoneDuplicate = staff && staff.some((item) => item.phone === newStaff.phone);
+    if (phoneDuplicate) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'A staff member with this phone number already exists.',
+        position: 'top-end',
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    if (newStaff.password !== newStaff.confirmPassword) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Password Error',
+        text: 'Passwords do not match.',
+        position: 'top-end',
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+      return;
+    }
 
     try {
-      // Ensure we send only the necessary fields
       const { email, password, phone, name } = newStaff;
       const staffResponse = await postStaff({ email, password, phone, name });
       setSuccessMessage(`Staff member ${staffResponse.data.name} added successfully!`);
       setShowAddModal(false);
-      setNewStaff({ email: '', password: '', phone: '', name: '' }); // Reset form
-      fetchStaff();  // Refresh the staff list
+      setNewStaff({ email: '', password: '', phone: '', name: '' });
+      fetchStaff();
     } catch (err) {
       console.error('Failed to add new staff member:', err);
       setError(err.response?.data?.message || 'Failed to add new staff');
@@ -339,7 +334,6 @@ const StaffsManagerPage = () => {
     });
   };
 
-  //Khu vực hàm dành cho block/unblock
   const handleStatusToggle = async (staff) => {
     const newStatus = staff.status === "active" ? "inactive" : "active";
     const action = newStatus === "active" ? "unblock" : "block";
@@ -381,160 +375,110 @@ const StaffsManagerPage = () => {
     }
   };
 
-  const filteredStaff = Array.isArray(staff)
-  ? staff.filter((item) => {
-      const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
-      const matchesSearchTerm = item.name.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchesStatus && matchesSearchTerm;
-    })
-  : [];
+  const handleStatusFilterChange = (e) => {
+    setStatusFilter(e.target.value);
+  };
 
-
-
-  // const handleInputChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setCurrentStaff((prev) => ({ ...prev, [name]: value }));
-  // };
-
-  // const generateStaffId = () => {
-  //   const lastId = staffs.length > 0 ? staffs[staffs.length - 1].id : "ST00";
-  //   const newId = `ST${(parseInt(lastId.substring(2)) + 1)
-  //     .toString()
-  //     .padStart(2, "0")}`;
-  //   return newId;
-  // };
-
-  // const handleAddStaffSubmit = (e) => {
-  //   e.preventDefault();
-  //   const newStaff = {
-  //     ...currentStaff,
-  //     id: generateStaffId(),
-  //     name: `${currentStaff.fname} ${currentStaff.lname}`,
-  //   };
-  //   setStaffs([...staffs, newStaff]);
-  //   setShowAddModal(false);
-  //   setSuccessMessage("Staff Added Successfully!");
-  //   setSuccessModal({ show: true, message: "Staff Added Successfully!" });
-  //   setCurrentStaff({ id: "", fname: "", lname: "", info: "" });
-  // };
-
-  // const handleUpdateStaffSubmit = (e) => {
-  //   e.preventDefault();
-  //   setStaffs((prevStaffs) => {
-  //     const staffIndex = prevStaffs.findIndex(
-  //       (staff) => staff.id === currentStaff.oldId
-  //     );
-  //     if (staffIndex !== -1) {
-  //       const updatedStaffs = [...prevStaffs];
-  //       updatedStaffs[staffIndex] = {
-  //         ...currentStaff,
-  //         name: `${currentStaff.fname} ${currentStaff.lname}`,
-  //       };
-  //       return updatedStaffs;
-  //     }
-  //     return prevStaffs;
-  //   });
-  //   setShowUpdateModal(false);
-  //   setSuccessModal({ show: true, message: "Staff Updated Successfully!" });
-  //   setCurrentStaff({ id: "", fname: "", lname: "", info: "" });
-  // };
-
-  // const handleDeleteStaff = () => {
-  //   setStaffs((prevStaffs) =>
-  //     prevStaffs.filter((staff) => staff.id !== staffToDelete.id)
-  //   );
-  //   setShowDeleteModal(false);
-  //   setSuccessModal({ show: true, message: "Staff Deleted Successfully!" });
-  // };
-
-  // const handleSearchChange = (e) => {
-  //   setSearchTerm(e.target.value);
-  // };
-
-  // const closeSuccessModal = () => {
-  //   setSuccessModal({ show: false, message: "" });
-  // };
-
-  // const filteredStaffs = staffs.filter(
-  //   (staff) =>
-  //     staff.id.includes(searchTerm) ||
-  //     staff.fname.includes(searchTerm) ||
-  //     staff.lname.includes(searchTerm) ||
-  //     staff.info.includes(searchTerm)
-  // );
+  const handleGenderFilterChange = (e) => {
+    setGenderFilter(e.target.value);
+  };
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-4xl font-black mb-4">Manage Staffs</h1>
 
-      <div className="grid grid-cols-2">
-      <SearchBar
+      <div className="grid grid-cols-2 items-center">
+        <SearchBar
           searchTerm={searchTerm}
           handleSearchChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search by Staff Name"
         />
-
-        {/* Add Button */}
-        <div className="ml-2">
+      
+        <div className="ml-2 flex justify-end">
           <AddButton onClick={() => {
             resetNewStaff();
             setShowAddModal(true)
-          } } label="Add Staff" />
+          }} label="Add Staff" />
         </div>
       </div>
 
-      <div className="mb-4">
-        <select
+      <div className="mb-4 flex gap-4">
+      <select
           id="statusFilter"
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
+          onChange={handleStatusFilterChange}
           className="select select-bordered select-sm max-w-xs"
         >
-          <option value="all">All</option>
+          <option value="all">All Status</option>
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
         </select>
+
+        <select
+          id="genderFilter"
+          value={genderFilter}
+          onChange={handleGenderFilterChange}
+          className="select select-bordered select-sm max-w-xs"
+        >
+          <option value="all">All Genders</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Others">Others</option>
+        </select>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto">
-        <table className="table w-full">
-          <thead>
-            <tr>
-              <th>Staff Name</th>
-              <th>Email</th>
-              <th>Gender</th>
-              <th>Date of birth</th>
-              <th>Phone</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredStaff.map((staff) => (
-                <tr key={staff.user_id} className="hover:bg-gray-100 cursor-pointer" onClick={() => handleRowClick(staff.user_id)}>
-                  <td>{staff.name}</td>
-                  <td>{staff.email}</td>
-                  <td>{staff.gender}</td>
-                  <td>{formatDate(staff.date_of_birth)}</td>
-                  <td>{staff.phone}</td>
-                  <td>{staff.status}</td>
-                  <td>
-                    <BlockButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleStatusToggle(staff);
-                      }}
-                      status={staff.status}
-                    />
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
+        {noStaffFound ? (
+          <div className="text-center text-gray-500">No staff found</div>
+        ) : (
+          <table className="table w-full">
+            <thead>
+              <tr>
+                <th>Staff Name</th>
+                <th>Email</th>
+                <th>Gender</th>
+                <th>Date of birth</th>
+                <th>Phone</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.isArray(staff) && staff.map((staff) => (
+                  <tr key={staff.user_id} className="hover:bg-gray-100 cursor-pointer" onClick={() => handleRowClick(staff.user_id)}>
+                    <td>{staff.name}</td>
+                    <td>{staff.email}</td>
+                    <td>{staff.gender}</td>
+                    <td>{formatDate(staff.date_of_birth)}</td>
+                    <td>{staff.phone}</td>
+                    <td>
+                      <div
+                        className={`badge uppercase w-20 font-bold text-gray-100 ${
+                          staff.status === "active"
+                            ? "badge-success"
+                            : "badge-error"
+                        }`}
+                      >
+                        {" "}
+                        {staff.status}
+                      </div>
+                    </td>
+                    <td>
+                      <BlockButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStatusToggle(staff);
+                        }}
+                        status={staff.status}
+                      />
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
-      {/* Add, Update, Delete, Success Modals */}
       <AddModal
         show={showAddModal}
         onClose={() => setShowAddModal(false)}
@@ -543,12 +487,6 @@ const StaffsManagerPage = () => {
         onInputChange={handleInputChange}
         fields={addStaffFields}
       />
-
-      {/* <SuccessModal
-        show={successModal.show}
-        message={successModal.message}
-        onClose={closeSuccessModal}
-      /> */}
 
       <DetailsModal
       show={showDetailsModal}

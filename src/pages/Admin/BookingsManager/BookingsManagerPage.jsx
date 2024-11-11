@@ -5,7 +5,6 @@ import { formatCurrency } from "../../../components/context/priceFormat";
 import BookingDetailsModal from "../../../components/layout/Admin/Modals/BookingDetailModal";
 import {
   FiFilter,
-  FiSearch,
   FiMapPin,
   FiClock,
   FiCalendar,
@@ -17,7 +16,6 @@ const BookingsManagerPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
 
   // Fetch bookings data
   useEffect(() => {
@@ -129,24 +127,8 @@ const BookingsManagerPage = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-              {/* Search Box - spans 6 columns */}
+              {/* Location Filter - spans 6 columns */}
               <div className="form-control md:col-span-6">
-                <div className="join w-full">
-                  <div className="join-item bg-base-200 px-3 flex items-center">
-                    <FiSearch className="w-5 h-5 text-base-content/70" />
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Search by ID, workspace, or building..."
-                    className="input input-bordered join-item w-full"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              {/* Location Filter - spans 3 columns */}
-              <div className="form-control md:col-span-3">
                 <div className="join w-full">
                   <div className="join-item bg-base-200 px-3 flex items-center">
                     <FiMapPin className="w-5 h-5 text-base-content/70" />
@@ -163,8 +145,8 @@ const BookingsManagerPage = () => {
                 </div>
               </div>
 
-              {/* Booking Type Filter - spans 3 columns */}
-              <div className="form-control md:col-span-3">
+              {/* Booking Type Filter - spans 6 columns */}
+              <div className="form-control md:col-span-6">
                 <div className="join w-full">
                   <div className="join-item bg-base-200 px-3 flex items-center">
                     <FiClock className="w-5 h-5 text-base-content/70" />
@@ -203,18 +185,6 @@ const BookingsManagerPage = () => {
                     <button
                       className="btn btn-xs btn-ghost btn-circle"
                       onClick={() => setFilterBookingType("")}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                )}
-                {searchQuery && (
-                  <div className="badge badge-primary gap-2">
-                    <FiSearch className="w-4 h-4" />
-                    Search: {searchQuery}
-                    <button
-                      className="btn btn-xs btn-ghost btn-circle"
-                      onClick={() => setSearchQuery("")}
                     >
                       ✕
                     </button>

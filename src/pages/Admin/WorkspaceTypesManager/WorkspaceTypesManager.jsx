@@ -35,7 +35,7 @@ const WorkspacesTypesManagerPage = () => {
   const [selectedWorkspaceTypeDetails, setSelectedWorkspaceTypeDetails] =
     useState(null);
   const [isChanged, setIsChanged] = useState(false);
-
+  const [statusFilter, setStatusFilter] = useState("all");
   const [newWorkspaceType, setNewWorkspaceType] = useState({
     workspace_type_name: "",
     image: null,
@@ -54,16 +54,18 @@ const WorkspacesTypesManagerPage = () => {
   useEffect(() => {
     //Hiện data lên table
     setLoading(true);
+
     const fetchWorkspaceType = async () => {
+      setLoading(true);
       try {
-        const res = await getWorkspaceType("", currentPage, PAGE_SIZE);
-        console.log("API response:", res); // Inspect API response
+        const res = await getWorkspaceType(searchTerm, currentPage, PAGE_SIZE, statusFilter);
+        console.log("API response:", res);
         if (res && res.data && Array.isArray(res.data.rows)) {
           setWorkspaceType(res.data.rows);
           setWorkspaceTypeCount(res.data.count);
           setTotalPages(Math.ceil(res.data.count / PAGE_SIZE));
         } else {
-          setWorkspaceType([]); // Initialize as an empty array if data is not as expected
+          setWorkspaceType([]);
         }
       } catch (err) {
         setError(err);
@@ -72,7 +74,7 @@ const WorkspacesTypesManagerPage = () => {
       }
     };
     fetchWorkspaceType();
-  }, [isChanged, currentPage]);
+  }, [isChanged, currentPage, statusFilter]);
 
   //Hàm click lên hàng để hiện more details
   const handleRowClick = async (workspace_type_id) => {
@@ -345,27 +347,49 @@ const WorkspacesTypesManagerPage = () => {
     }
   };
 
+  const handleStatusFilterChange = (e) => {
+    setStatusFilter(e.target.value);
+    setCurrentPage(1); // Reset to first page when changing filter
+  };
+
   return (
     <div className="container mx-auto p-4 sm:px-8 ">
       <h1 className="text-4xl font-black mb-4">Manage Workspace Types</h1>
 
-      <div className="grid grid-cols-3">
-        <SearchBar
-          searchTerm={searchTerm}
-          handleSearchChange={handleSearchChange}
-          placeholder="Search by ID, name, or status"
-        />
-        <div className="">
+      <div className="grid grid-cols-3 items-center">
+
+        <div className="mt-4">
+          <SearchBar
+            searchTerm={searchTerm}
+            handleSearchChange={handleSearchChange}
+            placeholder="Search by Workspace type name"
+          />
+        </div>
+
+        <div>
           <SearchButton onClick={handleSearchWorkspaceType} label="Search" />
         </div>
 
         {/* Add Button */}
-        <div className="ml-2">
+        <div className="ml-auto">
           <AddButton
             onClick={() => setShowAddModal(true)}
             label="Add Workspace Type"
           />
         </div>
+      </div>
+
+      <div>
+        <select
+          className="select select-bordered select-sm max-w-xs"
+          value={statusFilter}
+          onChange={handleStatusFilterChange}
+          
+        >
+          <option value="all">All Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
       </div>
 
       {/* Table */}
