@@ -68,9 +68,10 @@ const getTop5Customers = (name, point) => {
 };
 
 //Amenities Manager APIs_________________________________________________________
-const getAmenity = (search, page, limit) => {
+const getAmenity = (search, page, limit, status) => {
   let URL_API = `/api/v1/amenity?page=${page}&limit=${limit}`;
   if (search) URL_API += `&amenity_name=${search}`;
+  if (status && status !== 'all') URL_API += `&status=${status}`;
   return axios.get(URL_API);
 };
 
@@ -123,10 +124,11 @@ const blockAmenity = (amenity_id) => {
 
 //Workspace Types Manager APIs____________________________________________________
 
-const getWorkspaceType = (search, page, limit) => {
+const getWorkspaceType = (search, page, limit, status) => {
   let URL_API = `/api/v1/workspace-type?`;
-  if (search) URL_API += `workspace_type_name=${search}`;
-  URL_API += `&page=${page}&limit=${limit}`;
+  if (search) URL_API += `workspace_type_name=${search}&`;
+  if (status && status !== 'all') URL_API += `status=${status}&`;
+  URL_API += `page=${page}&limit=${limit}`;
   return axios.get(URL_API);
 };
 
@@ -191,8 +193,13 @@ const deleteWorkspaceType = (workspace_type_id) => {
   return axios.put(URL_API);
 };
 
-const getManager = () => {
-  const URL_API = "/api/v1/manager/";
+const getManager = (status, gender, name) => {
+  let URL_API = "/api/v1/manager/";
+  const params = new URLSearchParams();
+  if (status && status !== 'all') params.append('status', status);
+  if (gender && gender !== 'all') params.append('gender', gender);
+  if (name) params.append('name', name);
+  if (params.toString()) URL_API += `?${params.toString()}`;
   return axios.get(URL_API);
 };
 
@@ -218,8 +225,13 @@ const deleteManager = (user_id) => {
 
 //Staffs Manager APIs__________________________________________________________
 
-const getStaff = () => {
-  const URL_API = "/api/v1/staff/";
+const getStaff = (status = 'all', gender = 'all', name = '') => {
+  let URL_API = "/api/v1/staff/";
+  const params = new URLSearchParams();
+  if (status !== 'all') params.append('status', status);
+  if (gender !== 'all') params.append('gender', gender);
+  if (name) params.append('name', name);
+  if (params.toString()) URL_API += `?${params.toString()}`;
   return axios.get(URL_API);
 };
 
@@ -254,26 +266,14 @@ const deleteStaff = (user_id) => {
 };
 
 //Customers Manager APIs___________________________________________________________
-const getCustomer = (
-  user_id,
-  name,
-  email,
-  phone,
-  gender,
-  date_of_birth,
-  status
-) => {
-  const URL_API = "/api/v1/customer";
-  const data = {
-    user_id,
-    name,
-    email,
-    phone,
-    gender,
-    date_of_birth,
-    status,
-  };
-  return axios.get(URL_API, data);
+const getCustomer = (status = 'all', gender = 'all', name = '') => {
+  let URL_API = "/api/v1/customer";
+  const params = new URLSearchParams();
+  if (status !== 'all') params.append('status', status);
+  if (gender !== 'all') params.append('gender', gender);
+  if (name) params.append('name', name);
+  if (params.toString()) URL_API += `?${params.toString()}`;
+  return axios.get(URL_API);
 };
 
 const getAllBooking = () => {
@@ -282,8 +282,20 @@ const getAllBooking = () => {
 };
 
 //Buildings Manager APIs_________________________________________________________
-const getBuilding = () => {
-  const URL_API = "/api/v1/building/";
+const getBuilding = (searchTerm, statusFilter, locationFilter) => {
+  const params = new URLSearchParams();
+
+  if (searchTerm) {
+    params.append("building_name", searchTerm);
+  }
+  if (statusFilter && statusFilter !== "all") {
+    params.append("status", statusFilter);
+  }
+  if (locationFilter && locationFilter !== "all") {
+    params.append("location", locationFilter);
+  }
+
+  const URL_API = `/api/v1/building?${params.toString()}`;
   return axios.get(URL_API);
 };
 
@@ -379,8 +391,11 @@ const deleteBuilding = (building_id) => {
 };
 
 //Workspace Manager APIs_________________________________________________________
-const getWorkspace = (page, limit) => {
-  const URL_API = `api/v1/workspace/?page=${page}&limit=${limit}`;
+const getWorkspace = (page, limit, workspace_name = '', status = '', building_id = '') => {
+  let URL_API = `/api/v1/workspace/?page=${page}&limit=${limit}`;
+  if (workspace_name) URL_API += `&workspace_name=${workspace_name}`;
+  if (status && status !== 'all') URL_API += `&status=${status}`;
+  if (building_id) URL_API += `&building_id=${building_id}`;
   return axios.get(URL_API);
 };
 
@@ -429,27 +444,18 @@ const unassignWorkspaceFromBuilding = (building_id, workspace_ids) => {
 };
 
 //Voucher Manager APIs___________________________________________________________
-const getVoucher = (
-  voucher_id,
-  voucher_name,
-  voucher_code,
-  description,
-  discount,
-  quantity,
-  expired_date,
-  status
-) => {
-  const URL_API = "/api/v1/voucher";
-  const data = {
-    voucher_id,
-    voucher_name,
-    voucher_code,
-    description,
-    discount,
-    quantity,
-    expired_date,
-    status,
-  };
+const getVoucher = (status = 'all', voucher_name = '') => {
+  let URL_API = "/api/v1/voucher";
+  const params = [];
+  if (status !== 'all') {
+    params.push(`status=${status}`);
+  }
+  if (voucher_name) {
+    params.push(`voucher_name=${voucher_name}`);
+  }
+  if (params.length > 0) {
+    URL_API += `?${params.join('&')}`;
+  }
   return axios.get(URL_API);
 };
 

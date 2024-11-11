@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 import { getVoucher } from "../../../config/api.admin.js";
 import { getVoucherById } from "../../../config/api.admin.js";
@@ -18,10 +19,9 @@ import BlockButton from "../../../components/layout/Admin/Buttons/BlockButton.js
 const VouchersManagerPage = () => {
   const location = useLocation();
 
-  const [voucher, setVoucher] = useState(null);
+  const [voucher, setVoucher] = useState([]);
   const [loading, setLoading] = useState(true); // State loading
   const [error, setError] = useState(null); // State lỗi
-  //const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -30,6 +30,9 @@ const VouchersManagerPage = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [expirationDate, setExpirationDate] = useState(
+    new Date().toISOString().split("T")[0]
+  ); // Set default to today's date // New state for expiration date filter
   const [newVoucher, setNewVoucher] = useState({
     voucher_name: "",
     voucher_code: "",
@@ -38,6 +41,7 @@ const VouchersManagerPage = () => {
     quantity: 0,
     expired_date: "",
   });
+  const [noVoucherFound, setNoVoucherFound] = useState(false); // State để kiểm tra xem có voucher nào được tìm thấy không
 
   const [responseData, setResponseData] = useState(null);
 
@@ -88,23 +92,34 @@ const VouchersManagerPage = () => {
   //Hiện data lên table
   const fetchVoucher = async () => {
     try {
-      const res = await getVoucher();
-      console.log("API response:", res); // Inspect API response
+      const res = await getVoucher(statusFilter, searchTerm);
+      console.log("API response:", res);
       if (res && res.data && Array.isArray(res.data.rows)) {
-        setVoucher(res.data.rows);
+        let filteredVouchers = res.data.rows;
+        if (expirationDate) {
+          filteredVouchers = filteredVouchers.filter(
+            (voucher) =>
+              new Date(voucher.expired_date) >= new Date(expirationDate)
+          );
+        }
+        setVoucher(filteredVouchers);
+        setNoVoucherFound(filteredVouchers.length === 0); // Cập nhật state noVoucherFound
       } else {
-        setVoucher([]); // Initialize as an empty array if data is not as expected
+        setVoucher([]);
+        setNoVoucherFound(true); // Cập nhật state noVoucherFound
       }
     } catch (err) {
       setError(err);
+      setNoVoucherFound(true); // Cập nhật state noVoucherFound
     } finally {
       setLoading(false);
     }
   };
 
+  // Add a useEffect to refetch vouchers when statusFilter or expirationDate changes
   useEffect(() => {
     fetchVoucher();
-  }, []);
+  }, [statusFilter, searchTerm, expirationDate]);
 
   useEffect(() => {
     if (successMessage) {
@@ -122,7 +137,6 @@ const VouchersManagerPage = () => {
   }, [successMessage]);
 
   //Hàm click lên hàng để hiện more details
- 
 
   //Khu vực hàm dành cho add
   const handleAddVoucher = async (e) => {
@@ -401,17 +415,6 @@ const VouchersManagerPage = () => {
     }
   };
 
-  const filteredVoucher = Array.isArray(voucher)
-    ? voucher.filter((item) => {
-        const matchesStatus =
-          statusFilter === "all" || item.status === statusFilter;
-        const matchesSearchTerm = item.voucher_name
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
-        return matchesStatus && matchesSearchTerm;
-      })
-    : [];
-
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-4xl font-black mb-4">Manage Vouchers</h1>
@@ -424,7 +427,7 @@ const VouchersManagerPage = () => {
         />
 
         {/* Add Button */}
-        <div className="ml-2">
+        <div className="ml-auto">
           <AddButton
             onClick={() => {
               resetNewVoucher();
@@ -435,51 +438,59 @@ const VouchersManagerPage = () => {
         </div>
       </div>
 
-      <div className="mb-4">
+      <div className="mb-4 flex gap-4">
         <select
           id="statusFilter"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="select select-bordered select-sm max-w-xs"
+          className="select select-bordered select-sm max-w-xs mr-4"
         >
-          <option value="all">All</option>
+          <option value="all">All Status</option>
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
         </select>
-      </div>
 
-      <div>
-        {/* <SuccessAlert message={successMessage} onClose={closeSuccessMessage} /> */}
+        <p className="flex gap-4">
+          <p className="mt-1">Sort by Expiration Date:</p>
+          <input
+            type="date"
+            value={expirationDate}
+            onChange={(e) => setExpirationDate(e.target.value)}
+            className="input input-bordered input-sm max-w-xs"
+          />
+        </p>
       </div>
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="table w-full">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Code</th>
-              <th>Discount</th>
-              <th>Quantity</th>
-              <th>Expired Date</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredVoucher.map((voucher) => (
-              <tr
-                key={voucher.voucher_id}
-                className="hover:bg-gray-100"
-                onClick={() => handleRowClick(voucher.voucher_id)}
-              >
-                <td>{voucher.voucher_name}</td>
-                <td>{voucher.voucher_code}</td>
-                <td>{voucher.discount * 100}%</td>
-                <td>{voucher.quantity}</td>
-                <td>{convertDateToMMDDYYYY(voucher.expired_date)}</td>
-                <td>
-                  {
+        {noVoucherFound ? (
+          <div className="text-center text-gray-500">No Voucher Found</div>
+        ) : (
+          <table className="table w-full">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Code</th>
+                <th>Discount</th>
+                <th>Quantity</th>
+                <th>Expired Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {voucher.map((voucher) => (
+                <tr
+                  key={voucher.voucher_id}
+                  className="hover:bg-gray-100 cursor-pointer"
+                  onClick={() => handleRowClick(voucher.voucher_id)}
+                >
+                  <td>{voucher.voucher_name}</td>
+                  <td>{voucher.voucher_code}</td>
+                  <td>{voucher.discount * 100}%</td>
+                  <td>{voucher.quantity}</td>
+                  <td>{convertDateToMMDDYYYY(voucher.expired_date)}</td>
+                  <td>
                     <div
                       className={`badge uppercase w-20 font-bold text-gray-100 ${
                         voucher.status === "active"
@@ -487,32 +498,24 @@ const VouchersManagerPage = () => {
                           : "badge-error"
                       }`}
                     >
-                      {" "}
                       {voucher.status}
                     </div>
-                  }
-                </td>
-                <td className="flex space-x-2">
-                  <BlockButton
-                    status={voucher.status}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleToggleStatus(voucher);
-                    }}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  </td>
+                  <td className="flex space-x-2">
+                    <BlockButton
+                      status={voucher.status}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleStatus(voucher);
+                      }}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
-
-      {/* Detail Modal */}
-      {/* <DetailsModal
-        show={showDetailsModal}
-        onClose={() => setShowDetailsModal(false)}
-        details={currentAmenityDetails}
-      />
 
       {/* Add, Update, Delete Modals */}
       <AddModal
