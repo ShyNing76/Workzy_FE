@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { getWishlist, getWorkspaceById } from "../../../config/api.staff";
 
 const Wishlist = () => {
+  const { buildingId } = useOutletContext();
   const [wishlists, setWishlists] = useState([]);
   const [workspaces, setWorkspaces] = useState({});
   const [loading, setLoading] = useState(false);
@@ -12,7 +13,7 @@ const Wishlist = () => {
     const fetchWishlistData = async () => {
       try {
         setLoading(true);
-        const response = await getWishlist();
+        const response = await getWishlist(buildingId);
         setWishlists(response.data);
       } catch (error) {
         console.error("Error fetching wishlist data:", error);
@@ -21,13 +22,15 @@ const Wishlist = () => {
       }
     };
 
-    fetchWishlistData();
-  }, []);
-
-  const uniqueWorkspaces = {};
+    if (buildingId) {
+      fetchWishlistData();
+    }
+  }, [buildingId]);
 
   useEffect(() => {
     const fetchWorkspaces = async () => {
+      if (!Array.isArray(wishlists) || wishlists.length === 0) return;
+
       setLoading(true);
       const newWorkspaces = {};
       await Promise.all(
@@ -47,15 +50,15 @@ const Wishlist = () => {
       setWorkspaces(newWorkspaces);
     };
 
-    if (wishlists.length) fetchWorkspaces();
+    fetchWorkspaces();
   }, [wishlists]);
 
   const handleViewClick = (workspaceId) => {
     const customers = wishlists
-      .filter((item) => item.Workspaces.workspace_id === workspaceId)
+      .filter((item) => item.Workspace.workspace_id === workspaceId)
       .map((item) => ({
-        name: item.Customers.User.name,
-        id: item.Customers.customer_id,
+        name: item.Customer.User.name,
+        id: item.Customer.customer_id,
         wishlist_id: item.wishlist_id,
       }));
 
@@ -76,12 +79,14 @@ const Wishlist = () => {
     );
   }
 
+  const uniqueWorkspaces = {};
+
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-4xl font-black mt-5 ml-2">Wishlist</h2>
       <div className="grid grid-cols-3 gap-4 mt-6">
-        {wishlists.map((wishlist) => {
-          const workspaceId = wishlist.Workspaces.workspace_id;
+        {Array.isArray(wishlists) && wishlists.map((wishlist) => {
+          const workspaceId = wishlist.Workspace.workspace_id;
 
           if (uniqueWorkspaces[workspaceId]) {
             return null;
@@ -101,13 +106,13 @@ const Wishlist = () => {
                     workspaces[wishlist.workspace_id]?.WorkspaceImages &&
                     workspaces[wishlist.workspace_id]?.WorkspaceImages[0]?.image
                   }
-                  alt={wishlist.Workspaces.workspace_name}
+                  alt={wishlist.Workspace.workspace_name}
                   className="w-full h-72 object-cover"
                 />
               </figure>
               <div className="card-body">
                 <h2 className="card-title text-center">
-                  {wishlist.Workspaces.workspace_name}
+                  {wishlist.Workspace.workspace_name}
                 </h2>
               </div>
             </div>
