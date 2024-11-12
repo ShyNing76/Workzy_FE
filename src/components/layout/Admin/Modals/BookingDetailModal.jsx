@@ -43,7 +43,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
   const InfoSection = ({ icon: Icon, title, children }) => (
     <div className="card bg-base-100 shadow-sm">
       <div className="card-body p-4 gap-4">
-        <div className="flex items-center gap-2 text-primary">
+        <div className="flex items-center gap-2 text-amber-500">
           <Icon className="w-5 h-5" />
           <h3 className="card-title text-lg">{title}</h3>
         </div>
@@ -67,7 +67,9 @@ const BookingDetailsModal = ({ booking, onClose }) => {
         {/* Header */}
         <div className="sticky top-0 bg-base-100 px-6 py-4 border-b border-base-200 flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold text-primary">Booking Details</h2>
+            <h2 className="text-2xl font-bold text-amber-500">
+              Booking Details
+            </h2>
             <p className="text-base-content/60">ID: {booking.booking_id}</p>
           </div>
           <div className="flex items-center gap-4">
@@ -100,7 +102,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
             <InfoRow
               label="Price per hour"
               value={formatCurrency(booking.workspace_price)}
-              className="text-primary font-medium"
+              className="text-amber-500 font-medium"
             />
           </InfoSection>
 
@@ -131,7 +133,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
             <InfoRow
               label="Workspace Total"
               value={formatCurrency(booking.total_workspace_price)}
-              className="text-primary font-medium"
+              className="text-amber-500  font-medium"
             />
           </InfoSection>
 
@@ -153,7 +155,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                           <InfoRow
                             label="Price"
                             value={formatCurrency(amenity.rent_price)}
-                            className="text-primary"
+                            className="text-amber-500 "
                           />
                           <InfoRow label="Status" value={amenity.status} />
                         </div>
@@ -164,7 +166,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                 <InfoRow
                   label="Amenities Total"
                   value={formatCurrency(booking.total_amenities_price)}
-                  className="text-primary font-medium"
+                  className="text-amber-500  font-medium"
                 />
               </div>
             ) : (
@@ -173,11 +175,11 @@ const BookingDetailsModal = ({ booking, onClose }) => {
           </InfoSection>
 
           {/* Total Section */}
-          <div className="card bg-primary text-primary-content">
+          <div className="card bg-amber-500 text-white ">
             <div className="card-body p-4">
               <div className="flex justify-between items-center">
                 <span className="text-lg font-medium">Total Amount</span>
-                <span className="text-2xl font-bold">
+                <span className="text-2xl font-extrabold">
                   {formatCurrency(booking.total_price)}
                 </span>
               </div>
