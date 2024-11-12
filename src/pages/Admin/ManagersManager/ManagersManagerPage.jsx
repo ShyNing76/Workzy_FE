@@ -44,7 +44,6 @@ const ManagersManagerPage = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    date_of_birth: "",
     phone: "",
     status: "",
   });
@@ -122,22 +121,6 @@ const ManagersManagerPage = () => {
       }).then(() => setSuccessMessage("")); // clear the message after showing
     }
   }, [successMessage]);
-
-  const handleRowClick = async (user_id) => {
-    try {
-      const res = await getManagerById(user_id);
-      if (res && res.data) {
-        const details = {
-          ...res.data,
-          date_of_birth: formatDate(res.data.date_of_birth), // Format date
-        };
-        setSelectedManagerDetails(details);
-        setShowDetailsModal(true);
-      }
-    } catch (err) {
-      console.error("Error fetching manager details: ", err);
-    }
-  };
 
   const handleAddManger = async (e) => {
     e.preventDefault();
@@ -312,7 +295,6 @@ const ManagersManagerPage = () => {
       email: "",
       password: "",
       confirmPassword: "",
-      date_of_birth: "",
       phone: "",
       status: "",
     });
