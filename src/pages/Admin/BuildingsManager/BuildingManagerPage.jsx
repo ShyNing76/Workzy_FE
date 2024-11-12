@@ -4,21 +4,16 @@ import Swal from "sweetalert2";
 
 import {
   getBuilding,
-  getBuildingById,
   postNewBuilding,
-  getManager,
   changeBuildingStatus,
   putBuilding,
-  getManagerById,
 } from "../../../config/api.admin";
 import AddModal from "../../../components/layout/Admin/Modals/AddModal";
-import DeleteModal from "../../../components/layout/Admin/Modals/DeleteModal.jsx";
 import UpdateModal from "../../../components/layout/Admin/Modals/UpdateModal";
 import AddButton from "../../../components/layout/Admin/Buttons/AddButton";
 import UpdateButton from "../../../components/layout/Admin/Buttons/UpdateButton.jsx";
-import DeleteButton from "../../../components/layout/Admin/Buttons/DeleteButton.jsx";
-import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
 import BlockButton from "../../../components/layout/Admin/Buttons/BlockButton.jsx";
+import SearchBar from "../../../components/layout/Admin/SearchBar/SearchBar.jsx";
 import DetailsModal from "../../../components/layout/Admin/Modals/DetailsModal.jsx";
 
 const BuildingManagerPage = () => {
@@ -34,6 +29,7 @@ const BuildingManagerPage = () => {
   const [locationFilter, setLocationFilter] = useState("all");
   const [selectedBuildingDetails, setSelectedBuildingDetails] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [allLocations, setAllLocations] = useState(["all", "HCM", "Hanoi"]);
   const [newBuilding, setNewBuilding] = useState({
     building_name: "",
     location: "",
@@ -67,12 +63,12 @@ const BuildingManagerPage = () => {
       error.google_address = "Google address is invalid";
     }
     return error;
-  }
+  };
 
   // Fetch building và managers
   const fetchBuilding = async () => {
     try {
-      const res = await getBuilding();
+      const res = await getBuilding(searchTerm, statusFilter, locationFilter);
       setBuilding(res.data || []);
     } catch (err) {
       setError(err);
@@ -83,7 +79,7 @@ const BuildingManagerPage = () => {
 
   useEffect(() => {
     fetchBuilding();
-  }, []);
+  }, [statusFilter, locationFilter, searchTerm]);
 
   const handleRowClick = async (building) => {
     const buildingDetails = {
@@ -103,20 +99,12 @@ const BuildingManagerPage = () => {
     setShowDetailsModal(false);
   };
 
-  
-
   const getDisplayLocation = (location) => {
     const locationMappings = {
       HCM: "Hồ Chí Minh",
       Hanoi: "Hà Nội",
     };
     return locationMappings[location] || location;
-  };
-
-  // Extract unique locations from the buildings
-  const getUniqueLocations = () => {
-    if (!building) return [];
-    return ["all", ...new Set(building.map((b) => b.location))];
   };
 
   // Xử lý thêm building
@@ -444,7 +432,7 @@ const BuildingManagerPage = () => {
     <div className="container mx-auto p-4">
       <h1 className="text-4xl font-black mb-4">Building Management</h1>
 
-      <div className="flex justify-between items-center my-4">
+      <div className="flex justify-between items-center">
         <div className="flex-grow mr-4">
           <SearchBar
             searchTerm={searchTerm}
@@ -452,26 +440,34 @@ const BuildingManagerPage = () => {
             placeholder="Search by Building Name"
           />
         </div>
-        <AddButton
-          onClick={handleAddBuildingModalOpen}
-          label="Add Building"
-        />
+        <AddButton onClick={handleAddBuildingModalOpen} label="Add Building" />
       </div>
 
       <div className="flex mr-2">
-        <div className="form-control w-full max-w-xs">
+        <div className="form-control max-w-xs mr-2">
           <select
             className="select select-bordered select-sm w-full max-w-xs"
             value={locationFilter}
             onChange={(e) => setLocationFilter(e.target.value)}
           >
-            {getUniqueLocations().map((location, index) => (
+            {allLocations.map((location, index) => (
               <option key={index} value={location}>
                 {location === "all"
                   ? "All Locations"
                   : getDisplayLocation(location)}
               </option>
             ))}
+          </select>
+        </div>
+        <div className="form-control max-w-xs">
+          <select
+            className="select select-bordered select-sm w-full max-w-xs"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="all">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
           </select>
         </div>
       </div>
@@ -489,48 +485,62 @@ const BuildingManagerPage = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredBuilding.map((building) => (
-              <tr key={building.building_id} className="hover:bg-gray-100 ">
-                <td>{building.building_name}</td>
-                <td>{building?.Manager?.User?.name || "None"}</td>
-                <td>{getDisplayLocation(building.location)}</td>
-                <td>{building.address}</td>
-                <td>
-                  <div
-                    className={`badge uppercase w-20 font-bold text-gray-100 ${
-                      building.status === "active"
-                        ? "badge-success"
-                        : "badge-error"
-                    }`}
-                  >
-                    {" "}
-                    {building.status}
-                  </div>
-                </td>
-
-                <td className="flex space-x-2">
-                  <button
-                    className="btn btn-info btn-sm w-20"
-                    onClick={() => handleRowClick(building)}
-                  >
-                    Details
-                  </button>
-                  <UpdateButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleUpdateBuildingModalOpen(building);
-                    }}
-                  />
-                  <BlockButton
-                    status={building.status}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleChangeStatus(building);
-                    }}
-                  />
+            {building && building.length > 0 ? (
+              building.map((building) => (
+                <tr key={building.building_id} className="hover:bg-gray-100 ">
+                  <td>{building.building_name}</td>
+                  <td>{building?.Manager?.User?.name || "None"}</td>
+                  <td>{getDisplayLocation(building.location)}</td>
+                  <td>{building.address}</td>
+                  <td>
+                    <div
+                      className={`badge uppercase w-20 font-bold text-gray-100 ${
+                        building.status === "active"
+                          ? "badge-success"
+                          : "badge-error"
+                      }`}
+                    >
+                      {building.status}
+                    </div>
+                  </td>
+                  <td className="flex space-x-2">
+                    <button
+                      className="btn btn-info btn-sm w-20"
+                      onClick={() => handleRowClick(building)}
+                    >
+                      Details
+                    </button>
+                    <UpdateButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Restructure the building object
+                        const restructuredBuilding = {
+                          ...building,
+                          images: building.BuildingImages.map(
+                            (img) => img.image
+                          ),
+                        };
+                        setUpdateBuilding(restructuredBuilding);
+                        setShowUpdateModal(true);
+                      }}
+                    />
+                    <BlockButton
+                      status={building.status}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleChangeStatus(building);
+                      }}
+                    />
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" className="text-center">
+                  No buildings found.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

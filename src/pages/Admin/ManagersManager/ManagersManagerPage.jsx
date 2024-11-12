@@ -38,6 +38,7 @@ const ManagersManagerPage = () => {
   const [selectedManagerDetails, setSelectedManagerDetails] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [genderFilter, setGenderFilter] = useState("all");
   const [newManager, setNewManager] = useState({
     name: "",
     email: "",
@@ -48,6 +49,7 @@ const ManagersManagerPage = () => {
     status: "",
   });
   const [responseData, setResponseData] = useState(null);
+  const [noManagerFound, setNoManagerFound] = useState(false); // State để kiểm tra xem có manager nào được tìm thấy không
 
   const formatDate = (dateString) => {
     if (!dateString) return "None";
@@ -65,18 +67,20 @@ const ManagersManagerPage = () => {
     return `${day}/${month}/${year}`;
   };
 
-  //Hiện data lên table
   const fetchManager = async () => {
     try {
-      const res = await getManager();
+      const res = await getManager(statusFilter, genderFilter, searchTerm);
       console.log("API response: ", res);
       if (res && res.data) {
         setManager(res.data);
+        setNoManagerFound(res.data.length === 0); // Cập nhật state noManagerFound
       } else {
         setManager([]);
+        setNoManagerFound(true); // Cập nhật state noManagerFound
       }
     } catch (err) {
       setError(err);
+      setNoManagerFound(true); // Cập nhật state noManagerFound
     } finally {
       setLoading(false);
     }
@@ -84,7 +88,7 @@ const ManagersManagerPage = () => {
 
   useEffect(() => {
     fetchManager();
-  }, []);
+  }, [statusFilter, genderFilter, searchTerm]);
 
   const fetchData = async () => {
     try {
@@ -119,9 +123,21 @@ const ManagersManagerPage = () => {
     }
   }, [successMessage]);
 
-  //Hiện detail khi click vô 1 hàng
-
-  //Khu vực hàm dành cho add
+  const handleRowClick = async (user_id) => {
+    try {
+      const res = await getManagerById(user_id);
+      if (res && res.data) {
+        const details = {
+          ...res.data,
+          date_of_birth: formatDate(res.data.date_of_birth), // Format date
+        };
+        setSelectedManagerDetails(details);
+        setShowDetailsModal(true);
+      }
+    } catch (err) {
+      console.error("Error fetching manager details: ", err);
+    }
+  };
 
   const handleAddManger = async (e) => {
     e.preventDefault();
@@ -302,8 +318,6 @@ const ManagersManagerPage = () => {
     });
   };
 
-  //Khu vực hàm dành cho delete
-
   const handleDeleteManager = async () => {
     if (!managerToDelete) return;
 
@@ -326,7 +340,6 @@ const ManagersManagerPage = () => {
     }
   };
 
-  //Khu vực dành cho hàm blovk/unblock
   const handleToggleStatus = async (manager) => {
     const newStatus = manager.status === "active" ? "inactive" : "active"; // Toggle status
     const action = newStatus === "active" ? "unblock" : "block";
@@ -370,46 +383,26 @@ const ManagersManagerPage = () => {
     }
   };
 
-  const filteredManager = Array.isArray(manager)
-    ? manager.filter((item) => {
-        const matchesStatus =
-          statusFilter === "all" || item.status === statusFilter;
-        const matchesSearchTerm = item.name
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
-        return matchesStatus && matchesSearchTerm;
-      })
-    : [];
+  const handleStatusFilterChange = (e) => {
+    setStatusFilter(e.target.value);
+  };
 
-  // const handleSearchChange = (e) => {
-  //   setSearchTerm(e.target.value);
-  // };
-
-  // const closeSuccessMessage = () => {
-  //   setSuccessMessage("");
-  // };
-
-  // const filteredManagers = managers.filter(
-  //   (manager) =>
-  //     manager.id.includes(searchTerm) ||
-  //     manager.fname.includes(searchTerm) ||
-  //     manager.lname.includes(searchTerm) ||
-  //     manager.info.includes(searchTerm)
-  // );
+  const handleGenderFilterChange = (e) => {
+    setGenderFilter(e.target.value);
+  };
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-4xl font-black mb-4">Manage Managers</h1>
 
-      <div className="grid grid-cols-2">
+      <div className="grid grid-cols-2 items-center">
         <SearchBar
           searchTerm={searchTerm}
           handleSearchChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search by Manager Name"
         />
 
-        {/* Add Button */}
-        <div className="ml-2">
+        <div className="ml-2 flex justify-end">
           <AddButton
             onClick={() => {
               resetNewManager();
@@ -420,62 +413,85 @@ const ManagersManagerPage = () => {
         </div>
       </div>
 
-      <div className="mb-4">
+      <div className="mb-4 flex space-x-4">
         <select
           id="statusFilter"
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
+          onChange={handleStatusFilterChange}
           className="select select-bordered select-sm max-w-xs"
         >
-          <option value="all">All</option>
+          <option value="all">All Status</option>
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
         </select>
-      </div>
 
-      {/* <div>
-        <SuccessAlert message={successMessage} onClose={closeSuccessMessage} />
-      </div> */}
+        <select
+          id="genderFilter"
+          value={genderFilter}
+          onChange={handleGenderFilterChange}
+          className="select select-bordered select-sm max-w-xs"
+        >
+          <option value="all">All Genders</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Others">Others</option>
+        </select>
+      </div>
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="table w-full">
-          <thead>
-            <tr>
-              <th>Manager Name</th>
-              <th>Email</th>
-              <th>Gender</th>
-              <th>Date of birth</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredManager.map((manager) => (
-              // <tr key={manager.user_id} className="cursor-pointer">
-              <tr
-                key={manager.Manager.user_id}
-                className="hover:bg-gray-100"
-                onClick={() => handleRowClick(manager.Manager.user_id)}
-              >
-                <td>{manager.name}</td>
-                <td>{manager.email}</td>
-                <td>{manager.gender}</td>
-                <td>{formatDate(manager.date_of_birth)}</td>
-                <td>{manager.status}</td>
-                <td>
-                  <BlockButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleToggleStatus(manager);
-                    }}
-                    status={manager.status}
-                  />
-                </td>
+        {noManagerFound ? (
+          <div className="text-center text-gray-500">No manager found</div>
+        ) : (
+          <table className="table w-full">
+            <thead>
+              <tr>
+                <th>Manager Name</th>
+                <th>Email</th>
+                <th>Gender</th>
+                <th>Date of birth</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {manager &&
+                manager.map((manager) => (
+                  <tr
+                    key={manager.Manager.user_id}
+                    className="hover:bg-gray-100 cursor-pointer"
+                    onClick={() => handleRowClick(manager.Manager.user_id)}
+                  >
+                    <td>{manager.name}</td>
+                    <td>{manager.email}</td>
+                    <td>{manager.gender}</td>
+                    <td>{formatDate(manager.date_of_birth)}</td>
+                    <td>
+                      <div
+                        className={`badge uppercase w-20 font-bold text-gray-100 ${
+                          manager.status === "active"
+                            ? "badge-success"
+                            : "badge-error"
+                        }`}
+                      >
+                        {" "}
+                        {manager.status}
+                      </div>
+                    </td>
+                    <td>
+                      <BlockButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleStatus(manager);
+                        }}
+                        status={manager.status}
+                      />
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/* Add, Update, Delete, Success Modals */}

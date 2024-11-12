@@ -1,12 +1,5 @@
-import React, { useContext } from "react";
-import {
-  Link,
-  Outlet,
-  useNavigate,
-  useLocation,
-  useOutletContext,
-} from "react-router-dom";
-import { useState, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
+import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../../components/context/auth.context";
 import { getUserAuthen } from "../../../config/api";
 import { getStaffBuildingId } from "../../../config/api.staff";
@@ -24,10 +17,8 @@ const Staff = () => {
   const [buildingName, setBuildingName] = useState("");
   const [buildingId, setBuildingId] = useState("");
   const [staff, setStaff] = useState(null);
-
   const [refresh, setRefresh] = useState(false);
 
-  // function render both sideBar and outlet
   const handleUpdate = () => {
     setRefresh((prev) => !prev);
   };

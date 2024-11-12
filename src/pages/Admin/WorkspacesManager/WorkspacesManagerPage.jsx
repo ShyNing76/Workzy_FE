@@ -35,7 +35,6 @@ const WorkspacesManagerPage = () => {
   const [workspacesTypes, setWorkspacesType] = useState([]);
   const [buildings, setBuildings] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(8);
@@ -44,6 +43,9 @@ const WorkspacesManagerPage = () => {
   const [allAmenities, setAllAmenities] = useState([]);
   const [selectedAmenitiesWithQuantity, setSelectedAmenitiesWithQuantity] =
     useState([]);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [buildingFilter, setBuildingFilter] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   //-----------------------------------------------------------------//
   // ADD
@@ -158,36 +160,31 @@ const WorkspacesManagerPage = () => {
   const fetchWorkspaces = async () => {
     setIsLoading(true);
     try {
-      const res = await getWorkspace(page, limit);
+      const res = await getWorkspace(
+        page,
+        limit,
+        searchTerm,
+        statusFilter,
+        buildingFilter
+      );
       if (res && res.data) {
         setWorkspaces(res.data);
+        setTotalWorkSpace(res.total); // Cập nhật totalWorkSpace từ response
+      } else if (res && res.err === 1 && res.message === "No Workspace Exist") {
+        setWorkspaces([]);
+        setTotalWorkSpace(0); // Đặt totalWorkSpace về 0 nếu không có workspace
       }
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const fetchTotalWorkspaces = async () => {
-    try {
-      setIsLoading(true);
-
-      const res = await getTotalWorkspace();
-      if (res && res.data) {
-        setTotalWorkSpace(res.data);
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   useEffect(() => {
     fetchWorkspaces();
-    fetchTotalWorkspaces();
-  }, [page, setPage]);
+  }, [page, limit, searchTerm, statusFilter, buildingFilter]);
 
   useEffect(() => {
     if (totalWorkSpace > 0) {
@@ -235,14 +232,6 @@ const WorkspacesManagerPage = () => {
     fetchBuildings();
     fetchAllAmenities();
   }, []);
-
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const searchedWorkspaces = workspaces.filter((ws) =>
-    ws.workspace_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const handleDeleteWorkspace = async (workspaceId, currentStatus) => {
     try {
@@ -617,8 +606,45 @@ const WorkspacesManagerPage = () => {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-4xl font-black mb-4">Workspace Management</h1>
-        <AddButton onClick={handleOpenModalAdd} label="Add Workspace" />
+        <h1 className="text-4xl font-black">Workspace Management</h1>
+      </div>
+
+      <div className="flex gap-2">
+        <input
+          type="text"
+          placeholder="Search by Workspace Name"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="input input-bordered input-sm w-96"
+        />
+        <div className="ml-auto">
+          <AddButton onClick={handleOpenModalAdd} label="Add Workspace" />
+        </div>
+      </div>
+
+      <div className="flex gap-2 mb-4">
+        <select
+          className="select select-bordered select-sm"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
+          <option value="all">All Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+
+        <select
+          className="select select-bordered select-sm"
+          value={buildingFilter}
+          onChange={(e) => setBuildingFilter(e.target.value)}
+        >
+          <option value="">All Buildings</option>
+          {buildings.map((building) => (
+            <option key={building.building_id} value={building.building_id}>
+              {building.building_name}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Modal sử dụng AddModal */}
@@ -810,25 +836,9 @@ const WorkspacesManagerPage = () => {
         />
       )}
 
-      {/* Search Bar */}
-      <div className="form-control mb-6">
-        <div className="input-group">
-          <input
-            type="text"
-            placeholder="Search workspaces..."
-            className="input input-bordered w-full max-w-xs"
-            value={searchTerm}
-            onChange={handleSearch}
-          />
-          <button className="btn btn-square">
-            <FiSearch className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="table w-full ">
+        <table className="table w-full">
           <thead>
             <tr>
               <th>Workspace ID</th>
@@ -842,12 +852,18 @@ const WorkspacesManagerPage = () => {
           <tbody>
             {isLoading ? (
               <tr>
-                <td colSpan="4" className="text-center">
+                <td colSpan="6" className="text-center">
                   <span className="loading loading-spinner loading-md"></span>
                 </td>
               </tr>
+            ) : workspaces.length === 0 ? (
+              <tr>
+                <td colSpan="6" className="text-center">
+                  No workspaces found.
+                </td>
+              </tr>
             ) : (
-              searchedWorkspaces.map((ws) => (
+              workspaces.map((ws) => (
                 <tr className="hover" key={ws.workspace_id}>
                   <td>{ws.workspace_id}</td>
                   <td>{ws.workspace_name}</td>
@@ -859,7 +875,6 @@ const WorkspacesManagerPage = () => {
                         ws.status === "active" ? "badge-success" : "badge-error"
                       }`}
                     >
-                      {" "}
                       {ws.status}
                     </div>
                   </td>
@@ -880,7 +895,7 @@ const WorkspacesManagerPage = () => {
                     <button
                       className={`btn btn-sm w-20 ${
                         ws.status === "inactive" ? "btn-success" : "btn-error"
-                      } `}
+                      }`}
                       onClick={() =>
                         handleDeleteWorkspace(ws.workspace_id, ws.status)
                       }

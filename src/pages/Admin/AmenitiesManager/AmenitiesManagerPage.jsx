@@ -34,7 +34,8 @@ const AmenitiesManagerPage = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedAmenityDetails, setSelectedAmenityDetails] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [isChanged, setIsChanged] = useState(false); 
+  const [isChanged, setIsChanged] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("all");
   const [newAmenity, setNewAmenity] = useState({
     amenity_name: "",
     image: null,
@@ -51,19 +52,26 @@ const AmenitiesManagerPage = () => {
     rent_price: "",
   });
 
-
   const validationSchema = (amenity) => {
     let error = {};
     // Kiểm tra xem amenities có phải là đối tượng không
-   
-    if (!Number.isInteger(Number(amenity.original_price)) || Number(amenity.original_price) <= 0) {
-      error.original_price = "Original price must be a positive whole number and greater than 0";
+
+    if (
+      !Number.isInteger(Number(amenity.original_price)) ||
+      Number(amenity.original_price) <= 0
+    ) {
+      error.original_price =
+        "Original price must be a positive whole number and greater than 0";
     }
-    if (!Number.isInteger(Number(amenity.rent_price)) || Number(amenity.rent_price) <= 0) {
-      error.rent_price = "Rent price must be a positive whole number and greater than 0";
+    if (
+      !Number.isInteger(Number(amenity.rent_price)) ||
+      Number(amenity.rent_price) <= 0
+    ) {
+      error.rent_price =
+        "Rent price must be a positive whole number and greater than 0";
     }
     return error;
-  }
+  };
 
   // pagination
   const PAGE_SIZE = 8;
@@ -77,7 +85,12 @@ const AmenitiesManagerPage = () => {
     //Hiện data lên table
     const fetchAmenity = async () => {
       try {
-        const res = await getAmenity(searchTerm, currentPage, PAGE_SIZE);
+        const res = await getAmenity(
+          searchTerm,
+          currentPage,
+          PAGE_SIZE,
+          statusFilter
+        );
         if (res && res.data && Array.isArray(res.data.rows)) {
           const sortAmenity = res.data.rows.sort((a, b) => {
             if (a.status === "active" && b.status !== "active") return -1;
@@ -88,17 +101,21 @@ const AmenitiesManagerPage = () => {
           setTotalPages(Math.ceil(res.data.count / PAGE_SIZE));
           setAmenity(res.data.rows);
         } else {
-          setAmenity([]);
+          setAmenity(null);
         }
       } catch (err) {
-        setError(err);
+        if (err.message === "No Amenity Exist") {
+          setAmenity(null);
+        } else {
+          setError(err);
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchAmenity();
-  }, [isChanged, currentPage]);
+  }, [isChanged, currentPage, statusFilter]);
 
   //Hàm click lên hàng để hiện more details
   const handleRowClick = async (amenity_id) => {
@@ -137,8 +154,8 @@ const AmenitiesManagerPage = () => {
           text: "Do you want to add this amenity?",
         });
       } else {
-       const error = response.message;
-       setErrorMessage({...errorMessage, amenity_name: error});
+        const error = response.message;
+        setErrorMessage({ ...errorMessage, amenity_name: error });
       }
     } catch (err) {
       console.error("Error adding amenity", err);
@@ -205,7 +222,6 @@ const AmenitiesManagerPage = () => {
       return; // Dừng lại nếu có lỗi
     }
 
-
     try {
       const response = await putAmenity(newAmenity.amenity_id, newAmenity);
 
@@ -213,7 +229,7 @@ const AmenitiesManagerPage = () => {
         // set to the updated amenity in the local state
         setAmenity(
           amenity.map((a) =>
-            a.amenity_id === newAmenity.amenity_id ? newAmenity : a 
+            a.amenity_id === newAmenity.amenity_id ? newAmenity : a
           )
         );
 
@@ -227,9 +243,8 @@ const AmenitiesManagerPage = () => {
         });
       } else {
         const error = response.message;
-        setErrorMessage({...errorMessage, amenity_name: error});
+        setErrorMessage({ ...errorMessage, amenity_name: error });
       }
-
     } catch (err) {
       console.error("Error updating amenity", err);
       Swal.fire({
@@ -238,14 +253,13 @@ const AmenitiesManagerPage = () => {
         text: "Something went wrong!",
       });
     }
-
   };
 
   const handleUpdateChange = (event) => {
     const { name, value } = event.target;
     setNewAmenity((prev) => ({
-        ...prev,
-        [name]: value,
+      ...prev,
+      [name]: value,
     }));
   };
 
@@ -355,41 +369,68 @@ const AmenitiesManagerPage = () => {
     setLoading(true);
     try {
       setCurrentPage(1);
-      const res = await getAmenity(searchTerm, currentPage, PAGE_SIZE);
+      const res = await getAmenity(
+        searchTerm,
+        currentPage,
+        PAGE_SIZE,
+        statusFilter
+      );
       if (res && res.data && Array.isArray(res.data.rows)) {
         setAmenity(res.data.rows);
         setAmenitiesCount(res.data.count);
       } else {
-        setAmenity([]);
+        setAmenity(null);
       }
     } catch (err) {
-      setError(err);
+      if (err.message === "No Amenity Exist") {
+        setAmenity(null);
+      } else {
+        setError(err);
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleStatusChange = (e) => {
+    setStatusFilter(e.target.value);
   };
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-4xl font-black mb-4">Manage Amenities</h1>
 
-      <div className="grid grid-cols-3">
-        <SearchBar
-          searchTerm={searchTerm}
-          handleSearchChange={handleSearchChange}
-          placeholder="Search by ID, name, or status"
-        />
-        <div className="">
+      <div className="grid grid-cols-3 items-center">
+        <div className="mt-4">
+          <SearchBar
+            searchTerm={searchTerm}
+            handleSearchChange={handleSearchChange}
+            placeholder="Search by Amenity name"
+          />
+        </div>
+        <div>
           <SearchButton onClick={handleSearchAmenies} label="Search" />
         </div>
 
         {/* Add Button */}
-        <div className="ml-2">
+        <div className="ml-auto">
           <AddButton
             onClick={() => setShowAddModal(true)}
             label="Add Amenity"
           />
         </div>
+      </div>
+
+      <div>
+        <select
+          className="select select-bordered select-sm max-w-xs"
+          value={statusFilter}
+          onChange={handleStatusChange}
+        >
+          <option value="all">All Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
       </div>
 
       {/* Table */}
@@ -408,8 +449,14 @@ const AmenitiesManagerPage = () => {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="4" className="text-center">
+                <td colSpan="6" className="text-center">
                   <span className="loading loading-spinner loading-xs"></span>
+                </td>
+              </tr>
+            ) : amenity === null ? (
+              <tr>
+                <td colSpan="6" className="text-center">
+                  No Amenity Found
                 </td>
               </tr>
             ) : (
