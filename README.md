@@ -1,8 +1,6 @@
 <div align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="/assets/logo/workzy-white.png">
-    <source media="(prefers-color-scheme: light)" srcset="/assets/logo/workzy-dark.png">
-    <img alt="Workzy Logo" src="/assets/logo/workzy-dark.png" width="200">
+    <img alt="Workzy Logo" src="/public/WORKZY_LOGO_BGR.png" width="200">
   </picture>
 
   <h1>Workzy - Pod Workspace Booking Platform 🏢</h1>
@@ -37,19 +35,19 @@ Workzy is a modern workspace booking platform that simplifies the process of res
 
 <div align="center">
   <h3>Home Page</h3>
-  <img src="docs/images/home.png" alt="Home Page" width="600"/>
+  <img src="/src/assets/Screenshots/Homepage.jpg" alt="Home Page" width="600"/>
   <p><em>Modern and intuitive landing page showcasing available workspaces</em></p>
 
   <h3>Booking Interface</h3>
-  <img src="docs/images/booking.png" alt="Booking System" width="600"/>
+  <img src="/src/assets/Screenshots/Booking.jpg" alt="Booking System" width="600"/>
   <p><em>Easy-to-use booking system with real-time availability</em></p>
 
   <h3>Dashboard</h3>
-  <img src="docs/images/dashboard.png" alt="Dashboard" width="600"/>
+  <img src="/src/assets/Screenshots/Dashboard.jpg" alt="Dashboard" width="600"/>
   <p><em>Comprehensive dashboard for managing bookings and preferences</em></p>
 
   <h3>Admin Panel</h3>
-  <img src="docs/images/admin.png" alt="Admin Panel" width="600"/>
+  <img src="/src/assets/Screenshots/Admin.jpg" alt="Admin Panel" width="600"/>
   <p><em>Powerful admin interface for workspace management</em></p>
 </div>
 
@@ -63,22 +61,27 @@ Workzy is a modern workspace booking platform that simplifies the process of res
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/ShyNing76/Workzy_FE.git
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Set up environment variables:
+
 ```bash
 cp .env.example .env
 ```
+
 Edit `.env` with your configuration settings.
 
 4. Start the development server:
+
 ```bash
 npm run dev
 ```
@@ -121,6 +124,7 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ## 🆘 Support
 
 For support:
+
 - Email: workzy.contact@gmail.com
 - Live chat: Available on our website
 
@@ -131,6 +135,7 @@ For support:
 - Our heartfelt thanks to lecturer [Nguyen The Hoang](https://github.com/doit-now) for helping our project.
 
 ---
+
 <div align="center">
   Made with ❤️ by the Workzy Team
 </div>
