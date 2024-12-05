@@ -35,19 +35,19 @@ Workzy is a modern workspace booking platform that simplifies the process of res
 
 <div align="center">
   <h3>Home Page</h3>
-  <img src="/src/assets/Screenshots/Homepage.jpg" alt="Home Page" width="600"/>
+  <img src="/src/assets/Screenshots/Homepage.jpg" alt="Home Page" />
   <p><em>Modern and intuitive landing page showcasing available workspaces</em></p>
 
   <h3>Booking Interface</h3>
-  <img src="/src/assets/Screenshots/Booking.jpg" alt="Booking System" width="600"/>
+  <img src="/src/assets/Screenshots/Booking.jpg" alt="Booking System"/>
   <p><em>Easy-to-use booking system with real-time availability</em></p>
 
   <h3>Dashboard</h3>
-  <img src="/src/assets/Screenshots/Dashboard.jpg" alt="Dashboard" width="600"/>
+  <img src="/src/assets/Screenshots/Dashboard.jpg" alt="Dashboard" />
   <p><em>Comprehensive dashboard for managing bookings and preferences</em></p>
 
   <h3>Admin Panel</h3>
-  <img src="/src/assets/Screenshots/Admin.jpg" alt="Admin Panel" width="600"/>
+  <img src="/src/assets/Screenshots/Admin.jpg" alt="Admin Panel" />
   <p><em>Powerful admin interface for workspace management</em></p>
 </div>
 
@@ -131,7 +131,7 @@ npm run test:coverage
 
 <div align="center">
   <h4>Unit Test Code Screenshot</h4>
-  <img src="/src/assets/Screenshots/unit-testing.png" alt="Unit Testing Code Example" width="600"/>
+  <img src="/src/assets/Screenshots/unit-testing.png" alt="Unit Testing Code Example"/>
   <p><em>Sample unit test using Mocha, Chai, and Sinon</em></p>
 </div>
 
@@ -242,7 +242,6 @@ For support:
 ## 🌍 Scalability
 
 - Horizontal scaling support
-- Microservices architecture
 - Cloud-native deployment ready
 
 ## 🙏 Acknowledgments
