@@ -112,6 +112,7 @@ VITE_SECRET_ROLE_KEY= Your Secret Role Key
 ### Unit Testing Framework
 
 Workzy uses a robust unit testing approach with:
+
 - **Test Runner**: Mocha
 - **Assertion Library**: Chai
 - **Mocking Library**: Sinon
@@ -130,37 +131,39 @@ npm run test:coverage
 
 <div align="center">
   <h4>Unit Test Code Screenshot</h4>
-  <img src="/src/assets/Screenshots/UnitTestingScreenshot.png" alt="Unit Testing Code Example" width="600"/>
+  <img src="/src/assets/Screenshots/unit-testing.png" alt="Unit Testing Code Example" width="600"/>
   <p><em>Sample unit test using Mocha, Chai, and Sinon</em></p>
 </div>
 
 ### Key Testing Scenarios
 
 #### 1. Workspace Booking Service
+
 ```javascript
-describe('Booking Service', () => {
+describe("Booking Service", () => {
   // Test booking creation
-  it('should create a valid booking', () => {
+  it("should create a valid booking", () => {
     // Test logic using Chai assertions
   });
 
   // Test booking validation
-  it('should reject invalid booking times', () => {
+  it("should reject invalid booking times", () => {
     // Validate booking constraints
   });
 });
 ```
 
 #### 2. Authentication Module
+
 ```javascript
-describe('Authentication', () => {
+describe("Authentication", () => {
   // Test user login
-  it('should authenticate valid user credentials', () => {
+  it("should authenticate valid user credentials", () => {
     // Sinon for mocking authentication service
   });
 
   // Test authorization
-  it('should prevent unauthorized access', () => {
+  it("should prevent unauthorized access", () => {
     // Role-based access control tests
   });
 });
@@ -177,18 +180,18 @@ describe('Authentication', () => {
 ### Mocking with Sinon
 
 ```javascript
-describe('Payment Service', () => {
+describe("Payment Service", () => {
   // Create a stub for payment gateway
-  const paymentStub = sinon.stub(PaymentGateway, 'processPayment');
-  
-  it('should handle successful payment', () => {
+  const paymentStub = sinon.stub(PaymentGateway, "processPayment");
+
+  it("should handle successful payment", () => {
     // Stub successful payment scenario
     paymentStub.returns({ success: true });
   });
 
-  it('should handle payment failures', () => {
+  it("should handle payment failures", () => {
     // Stub payment failure scenario
-    paymentStub.throws(new Error('Payment failed'));
+    paymentStub.throws(new Error("Payment failed"));
   });
 });
 ```
